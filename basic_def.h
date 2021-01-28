@@ -43,6 +43,7 @@ extern "C" {
 #define LEN_OF_VAL48 48
 #define LEN_OF_VAL64 64
 #define LEN_OF_VAL80 80
+#define LEN_OF_VAL128 128
 
 #define LEN_OF_BUF128 128
 #define LEN_OF_BUF256 256

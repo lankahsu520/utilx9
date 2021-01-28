@@ -127,7 +127,6 @@ clean:
 	done
 	rm -f $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	rm -f util_expiration.h
-	rm -rf conf
 	rm -f .configured
 
 distclean: clean

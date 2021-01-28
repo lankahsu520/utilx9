@@ -10,10 +10,11 @@ define generate_expiration
 	@echo "#endif" >> util_expiration.h
 
 	mkdir -p conf
-	cp -avf $(CONFIG_AUTOCONF_H) conf/
-	cp -avf $(CONFIG_CONFIG) conf/
-	cp -avf $(CONFIG_CUSTOMER_H) conf/
-	cp -avf $(CONFIG_CUSTOMER) conf/
+	[ -f $(CONFIG_AUTOCONF_H) ] && cp -avf $(CONFIG_AUTOCONF_H) conf/autoconf_def.h
+	#[ -f $(CONFIG_CONFIG) ] && cp -avf $(CONFIG_CONFIG) conf/
+	[ -f $(CONFIG_CUSTOMER_H) ] && cp -avf $(CONFIG_CUSTOMER_H) conf/
+	[ -f $(CONFIG_CUSTOMER) ] && cp -avf $(CONFIG_CUSTOMER) conf/
+	cp -avf $(PJ_ROOT)/include/* conf/
 endef
 
 .configured:

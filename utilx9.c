@@ -806,7 +806,7 @@ static void time_sec2day(int duration, int *day, int *hrs, int *min, int *sec)
 
 char *time_now_full(time_t now_t) // output: 2020-03-06 15:01:47
 {
-	static char buff[LEN_OF_VAL32] = "";
+	static char buff[LEN_OF_VAL128] = "";
 	//time_t now_t = time(NULL);
 	struct tm *timeinfo  = localtime (&now_t);
 	SAFE_SPRINTF(buff, "%04d-%02d-%02d %02d:%02d:%02d",
@@ -818,7 +818,7 @@ char *time_now_full(time_t now_t) // output: 2020-03-06 15:01:47
 
 char *time_now_short(time_t now_t) // output: 20200306 150147
 {
-	static char buff[LEN_OF_VAL32] = "";
+	static char buff[LEN_OF_VAL128] = "";
 	//time_t now_t = time(NULL);
 	struct tm *timeinfo  = localtime (&now_t);
 	SAFE_SPRINTF(buff, "%04d%02d%02d %02d%02d%02d",

@@ -57,7 +57,7 @@ led_123 - led controller example.
 lws_123 - a websocket example.
 mqtt_123 - a mqtt example.
 multicast_cli & multicast_srv - multicast example.
-nlink_123 & nlink_456 - netlink example. got from internet.
+~~nlink_123 & nlink_456 - netlink example. got from internet.~~
 onvif_client_123 - onvif client example.
 ping_123 - ping example.
 proc_list_123 & proc_watch - a system and proc information example.

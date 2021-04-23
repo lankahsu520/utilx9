@@ -53,8 +53,6 @@ CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 
 #** Target (CLEAN_BINS) **
 CLEAN_BINS += \
-						nlink_123 \
-						nlink_456 \
 						proc_list_123 \
 						proc_watch \
 						spawn_test \

@@ -10,11 +10,11 @@ define generate_expiration
 	@echo "#endif" >> util_expiration.h
 
 	mkdir -p conf
-	[ -f $(CONFIG_AUTOCONF_H) ] && cp -avf $(CONFIG_AUTOCONF_H) conf/autoconf_def.h
-	#[ -f $(CONFIG_CONFIG) ] && cp -avf $(CONFIG_CONFIG) conf/
-	[ -f $(CONFIG_CUSTOMER_H) ] && cp -avf $(CONFIG_CUSTOMER_H) conf/
-	[ -f $(CONFIG_CUSTOMER) ] && cp -avf $(CONFIG_CUSTOMER) conf/
-	cp -avf $(PJ_ROOT)/include/* conf/
+	[ -f $(SDK_CONFIG_AUTOCONF_H) ] && (cp -avf $(SDK_CONFIG_AUTOCONF_H) conf/autoconf_def.h;) || echo "skip !!!"
+	#[ -f $(SDK_CONFIG_CONFIG) ] && (cp -avf $(SDK_CONFIG_CONFIG) conf/;) || echo "skip !!!"
+	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] && (cp -avf $(SDK_CONFIG_CUSTOMER_DEF_H) conf/;) || echo "skip !!!"
+	[ -f $(SDK_CONFIG_CUSTOMER) ] && (cp -avf $(SDK_CONFIG_CUSTOMER) conf/;) || echo "skip !!!"
+	[ -d $(PJ_ROOT)/include ] && (cp -avf $(PJ_ROOT)/include/* conf/;) || echo "skip !!!"
 endef
 
 .configured:

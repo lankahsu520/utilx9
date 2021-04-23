@@ -11,6 +11,7 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 
 
 # Depend on
+- ubuntu_ - https://github.com/lankahsu520/ubuntu_
 - curl (PJ_HAS_CURL) - https://curl.haxx.se
 - dbus (PJ_HAS_DBUS) - https://www.freedesktop.org/wiki/Software/dbus/
 - fcgi2 (PJ_HAS_FASTCGI) - http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm
@@ -39,7 +40,7 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 # Build
    ```
 $ . conf/config_customer
-	My prefix is /work/codebase/xbox/xbox_123/install/ubuntu_/.
+	My prefix is /work/codebase/xbox/xbox_ubuntu/install/ubuntu_/.
 	Please replace the string.
 $ make
    ```

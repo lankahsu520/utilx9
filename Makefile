@@ -1,4 +1,6 @@
-include $(CONFIG_CONFIG)
+include $(SDK_CONFIG_CONFIG)
+
+STRIP ?= $(PJ_STRIP)
 
 #** CFLAGS & LDFLAGS **
 CFLAGS += $(CFLAGS_CUSTOMER)

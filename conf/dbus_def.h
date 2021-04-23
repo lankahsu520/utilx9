@@ -23,22 +23,32 @@
 #define PHILIO_GPIO_DBUS_DEST                     "com.philio-tech.www.gpio"
 #define DB_DBUS_DEST                              "com.philio-tech.www.database"
 #define STORAGE_DBUS_DEST                         "com.philio-tech.www.storage"
-#define DBUS_DEMO_DEST                            "com.philio-tech.www.demo"
-
-#define MASTER_DBUS_DEST                          "com.luffanet.www.master"
-#define YK_P2P_DAEMON_DBUS_DEST                   "com.luffanet.www.yk_p2p_daemon"
-
-//path
-#define ZWAVE_DBUS_DEV_PATH                       "/com/PhilioTech/zwave/device"
-#define ZIGBEE_DBUS_DEV_PATH                      "/com/PhilioTech/zigbee/device"
-#define PAN27_DBUS_DEV_PATH                       "/com/PhilioTech/pan27/device"
-#define WATCHDOG_DBUS_PROCESS_PATH                "/com/PhilioTech/watchdog/process"
 
 //#define PLATFORM_SIG_IFAC                         "com.PhilioTech.signal.platform"
 #define PHILIO_SDK_DBUS_CTRL_LED_IFAC             "com.PhilioTech.control.LED"
 //#define APACHE_DBUS_IFAC                          "com.PhilioTech.message.Apache"
 //#define UPDATE_DBUS_STATUS_IFAC                   "com.PhilioTech.update.status"
 //#define ZWAVE_RECENT_EVENT_IFAC                   "com.PhilioTech.zwave.recentEvent"
+
+#define DBUS_DEMO_DEST                            "com.luffanet.www.demo"
+#define MASTER_DBUS_DEST                          "com.luffanet.www.master"
+#define YK_P2P_DAEMON_DBUS_DEST                   "com.luffanet.www.yk_p2p_daemon"
+
+//path - PhilioTech
+#define ZWAVE_DBUS_DEV_PATH                       "/com/PhilioTech/zwave/device"
+#define ZIGBEE_DBUS_DEV_PATH                      "/com/PhilioTech/zigbee/device"
+#define PAN27_DBUS_DEV_PATH                       "/com/PhilioTech/pan27/device"
+#define WATCHDOG_DBUS_PROCESS_PATH                "/com/PhilioTech/watchdog/process"
+
+//path - Luffanet
+#define DBUS_PATH_YK_P2P_DAEMON                   "/com/Luffanet/yk_p2p_daemon"
+#define DBUS_PATH_YK_P2P_ECHO                     "/com/Luffanet/yk_p2p_echo"
+#define DBUS_PATH_YK_P2P_CALL                     "/com/Luffanet/yk_p2p_call"
+#define DBUS_PATH_YK_WS_DAEMON                    "/com/Luffanet/yk_ws_daemon"
+
+//path - xbox
+#define DBUS_PATH_DBUS_123                        "/com/xbox/dbus_123"
+
 
 //******************************************************************************
 // libsdk
@@ -399,6 +409,18 @@
 //#define DBUS_METHOD_SWITCH_SIGNAL                 "switch_signal"
 
 //******************************************************************************
+// dbus_demo
+//******************************************************************************
+// -> dbus_demo
+#define DBUS_M_IFAC_DEMO_CMD                      "com.luffanet.demo.command" // sync
+
+// dbus_demo => all
+#define DBUS_S_IFAC_DEMO                          "com.luffanet.signal.demo"
+#define DBUS_S_MATCH_DEMO                         "type='signal',interface='com.luffanet.signal.demo'"
+
+#define DBUS_METHOD_ECHO                          "echo"
+
+//******************************************************************************
 // yk_p2p_daemon
 //******************************************************************************
 // -> yk_p2p_daemon
@@ -720,13 +742,6 @@
 #define DBUS_S_MATCH_JSON                         "type='signal',interface='com.PhilioTech.signal.json'"
 
 //#define DBUS_METHOD_COMMAND                       "command"
-
-// 1.0  => dbus_demo
-#define DBUS_S_IFAC_DEMO                          "com.PhilioTech.signal.demo"
-#define DBUS_S_MATCH_DEMO                         "type='signal',interface='com.PhilioTech.signal.demo'"
-
-// 1.0, 2.0 -> dbus_demo
-#define DBUS_M_IFAC_DEMO_CMD                      "com.PhilioTech.demo.cmd"
 
 //******************************************************************************
 // value

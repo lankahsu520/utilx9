@@ -224,7 +224,7 @@ void fs_open_cb(uv_fs_t *req)
 UvEventCtx_t fs_event_req = {
 	.name = TAG,
 	.filename = TEST_TXT_FILENAME,
-	.quit = 0,
+	.isquit = 0,
 	.flags = UV_FS_EVENT_RECURSIVE,
 };
 

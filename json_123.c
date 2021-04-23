@@ -75,7 +75,11 @@ int main(int argc, char* argv[])
 	json_t *jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "logo", JSON_OBJ_FIND_ID_INFINITE);
 	if (jfound)
 	{
-		DBG_LN_Y("(%s: %s)", "logo", JSON_STR(jfound) );
+		const char *found = JSON_STR(jfound);
+		if (found)
+		{
+			DBG_LN_Y("(logo: %s)", (char*)found);
+		}
 	}
 	JSON_FREE(jroot);
 #endif

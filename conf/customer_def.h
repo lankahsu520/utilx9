@@ -9,11 +9,12 @@
 #define PJ_AR "ar"
 #define PJ_ARCH "x86"
 #define PJ_AUTHOR "lanka"
+#define PJ_BRANCH "v3"
 #define PJ_BR "br9"
-#define PJ_BUILDDATE "20210128100538"
+#define PJ_BUILDDATE "20210423094854"
 #define PJ_BUILDER "lanka"
 #define PJ_BUILD_LUA "BUILD_LUA=off"
-#define PJ_BUILDNO "1611799538"
+#define PJ_BUILDNO "1619142534"
 #define PJ_BUILD "x86_64-ubuntu-linux"
 #define PJ_BUSYBOX_VERSION "busybox-1.23.2"
 #define PJ_CC "gcc"
@@ -23,12 +24,13 @@
 #define PJ_EXPIRATION_DATE "1704067200"
 #define PJ_FASTCGI_PORT "9188"
 #undef PJ_HAS_APP
-#define PJ_HAS_APR_UTIL
-#define PJ_HAS_APR
+#undef PJ_HAS_APR
+#undef PJ_HAS_APR_UTIL
 #undef PJ_HAS_AVRO
 #undef PJ_HAS_AWS
 #undef PJ_HAS_AXIS2
 #undef PJ_HAS_BACKTRACE
+#define PJ_HAS_BEEX
 #undef PJ_HAS_BOOST_CMAKE
 #undef PJ_HAS_BOOST
 #undef PJ_HAS_BUSYBOX
@@ -39,13 +41,14 @@
 #undef PJ_HAS_CURVE25519
 #define PJ_HAS_CUSTOMER_NAME "LANKA"
 #undef PJ_HAS_DAQ
+#undef PJ_HAS_DBUS123
 #define PJ_HAS_DBUS_CONF
 #undef PJ_HAS_DBUS_DEMO
 #define PJ_HAS_DBUS
 #undef PJ_HAS_DROPBEAR
 #undef PJ_HAS_EUDEV
 #undef PJ_HAS_EXPAT050
-#define PJ_HAS_EXPAT
+#undef PJ_HAS_EXPAT
 #undef PJ_HAS_FASTCGI
 #undef PJ_HAS_FASTCGI_USER
 #undef PJ_HAS_GDBM
@@ -53,7 +56,7 @@
 #undef PJ_HAS_GLIB
 #undef PJ_HAS_GSOAP
 #undef PJ_HAS_HIDAPI
-#define PJ_HAS_HTTPD
+#undef PJ_HAS_HTTPD
 #define PJ_HAS_ICLOUD
 #undef PJ_HAS_ICU
 #define PJ_HAS_JANSSON
@@ -62,16 +65,16 @@
 #undef PJ_HAS_LIBESMTP
 #undef PJ_HAS_LIBFFI
 #undef PJ_HAS_LIBICONV
-#undef PJ_HAS_LIBNL_TINY
+#define PJ_HAS_LIBNL_TINY
 #undef PJ_HAS_LIBNVRAM
 #undef PJ_HAS_LIBROXML
 #undef PJ_HAS_LIBSOAP
-#undef PJ_HAS_LIBSSH
+#define PJ_HAS_LIBSSH
 #define PJ_HAS_LIBUBOX
 #define PJ_HAS_LIBUSB
 #undef PJ_HAS_LIBUUID
 #define PJ_HAS_LIBUV
-#undef PJ_HAS_LIBWEBSOCKETS
+#define PJ_HAS_LIBWEBSOCKETS
 #undef PJ_HAS_LIBXML2
 #define PJ_HAS_LIBYUAREL
 #undef PJ_HAS_LINUX_KERNEL
@@ -80,18 +83,18 @@
 #undef PJ_HAS_LOGCAT
 #define PJ_HAS_LOGD_CONF
 #undef PJ_HAS_LUA
-#define PJ_HAS_MASTER
+#undef PJ_HAS_MASTER
 #undef PJ_HAS_MDNSRESPONDER
-#define PJ_HAS_MININI
+#undef PJ_HAS_MININI
 #undef PJ_HAS_MOD_IOT
 #undef PJ_HAS_MOD_LUFFA
 #undef PJ_HAS_MOD_YOKIS
-#undef PJ_HAS_MOSQUITTO
+#define PJ_HAS_MOSQUITTO
 #define PJ_HAS_MXML
 #undef PJ_HAS_NCURSES
 #define PJ_HAS_OPENSSL
-#define PJ_HAS_P7ZIP
-#define PJ_HAS_PCRE
+#undef PJ_HAS_P7ZIP
+#undef PJ_HAS_PCRE
 #undef PJ_HAS_PHILIO_ENHANCE
 #undef PJ_HAS_PHILIO_SDK_S2
 #undef PJ_HAS_PHILIO_SDK_V1
@@ -101,6 +104,7 @@
 #undef PJ_HAS_PROTOBUF
 #define PJ_HAS_PYTHON_EX
 #undef PJ_HAS_PYTHON
+#define PJ_HAS_QUEEN_BEE
 #undef PJ_HAS_READLINE
 #define PJ_HAS_SHARE_LIB
 #undef PJ_HAS_SIMCLIST
@@ -108,15 +112,15 @@
 #undef PJ_HAS_STATIC_LIB
 #undef PJ_HAS_SWCONFIG
 #undef PJ_HAS_TIMEZONE
-#undef PJ_HAS_UBOX
+#define PJ_HAS_UBOX
 #define PJ_HAS_UBUS
-#undef PJ_HAS_UCI
+#define PJ_HAS_UCI
 #undef PJ_HAS_UDUNITS
 #define PJ_HAS_UHTTPD_CONF
 #undef PJ_HAS_UHTTPD
 #undef PJ_HAS_ULIBC
-#undef PJ_HAS_URIPARSER
-#define PJ_HAS_USTREAM
+#define PJ_HAS_URIPARSER
+#undef PJ_HAS_USTREAM
 #define PJ_HAS_UTILX9
 #undef PJ_HAS_VALGRIND
 #undef PJ_HAS_WWW_YOKIS
@@ -124,19 +128,22 @@
 #undef PJ_HAS_YK_DATAB
 #undef PJ_HAS_YK_INFO
 #undef PJ_HAS_YK_KMS
-#define PJ_HAS_YK_P2P_DAEMON
+#undef PJ_HAS_YK_P2P_LED
+#undef PJ_HAS_YK_P2P
 #undef PJ_HAS_YK_REQUEST
 #undef PJ_HAS_YK_SERVER
 #undef PJ_HAS_YK_STANDALONE
 #undef PJ_HAS_YK_SUBNET
+#undef PJ_HAS_YK_THERMO
 #undef PJ_HAS_YK_UPDATE
+#undef PJ_HAS_YK_WS
 #undef PJ_HAS_ZBDAEMON
 #undef PJ_HAS_ZIGBEE_HOST
-#define PJ_HAS_ZIPGATEWAY
+#undef PJ_HAS_ZIPGATEWAY
 #define PJ_HAS_ZLIB
-#define PJ_HAS_ZWARE
-#define PJ_HAS_ZWDAEMON
-#define PJ_HAS_ZWECHO
+#undef PJ_HAS_ZWARE
+#undef PJ_HAS_ZWDAEMON
+#undef PJ_HAS_ZWECHO
 #define PJ_HOST ""
 #define PJ_ICLOUD_BACKUP
 #define PJ_ICLOUD_CERT_LUFFANET
@@ -188,13 +195,15 @@
 #define PJ_MCTT_IP "229.255.255.250"
 #define PJ_MCTT_PORT "6288"
 #define PJ_MODE "RELEASE"
+#define PJ_MQTT_IP "192.168.50.9"
+#define PJ_MQTT_PORT "1883"
 #define PJ_NAME "ubuntu"
 #define PJ_NM "nm"
 #undef PJ_PHILIO_SDK_ONVIF
 #define PJ_PKG_CONFIG "/work/codebase/xbox/xbox_123/install/ubuntu_/lib/pkgconfig"
 #define PJ_PLATFORM "linux"
 #define PJ_RANLIB "ranlib"
-#define PJ_REVISION "3760"
+#define PJ_REVISION "3935"
 #define PJ_ROOT "/work/codebase/xbox/xbox_123"
 #define PJ_RPATH "/work/codebase/xbox/xbox_123/install/ubuntu_/lib"
 #define PJ_SAVE_PATH "/work/IoT"
@@ -214,7 +223,7 @@
 #undef PJ_ZWARE_SHARED
 #define PJ_ZWAVE_FOLDER "ZWave_v2"
 #define PJ_ZWAVE_OPT "opt"
-#define PJ_NAME_UBUNTU
+#define PJ_NAME_ubuntu
 #define PJ_MODE_RELEASE
 #define CONFIG_AUTOCONF_H "/work/codebase/xbox/xbox_123/confs/config/autoconf_common.h"
 #define CONFIG_CONFIG "/work/codebase/xbox/xbox_123/confs/config/config_common"

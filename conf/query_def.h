@@ -2,22 +2,25 @@
 #define __QUERY_DEF_H__
 
 //******************************************************************************
-//** FILE? **
+//** FILENAME? **
 //******************************************************************************
-#define QUERY_FILE_COMMAND_XML "command.xml"
-#define QUERY_FILE_DATAB_XML "datab.xml"
-#define QUERY_FILE_INFO_XML "info.xml"
-#define QUERY_FILE_SCENAR_XML "scenar.xml"
-#define QUERY_FILE_SERVER_XML "server.xml"
-#define QUERY_FILE_SYSTEM "system"
-#define QUERY_FILE_VERSION "version"
-#define QUERY_FILE_ZIP "zip"
+#define QUERY_FILENAME_COMMAND_XML "command.xml"
+#define QUERY_FILENAME_DATAB_XML "datab.xml"
+#define QUERY_FILENAME_FLASH "flash"
+#define QUERY_FILENAME_INFO_XML "info.xml"
+#define QUERY_FILENAME_SCENAR_XML "scenar.xml"
+#define QUERY_FILENAME_SERVER_XML "server.xml"
+#define QUERY_FILENAME_SYSTEM "system"
+#define QUERY_FILENAME_VERSION "version"
+#define QUERY_FILENAME_ZIP "zip"
+#define QUERY_FILENAME_UNKNOW "unknow"
 
 
 //******************************************************************************
 //** KEY **
 //******************************************************************************
 #define QUERY_KEY_ACTION "action"
+#define QUERY_KEY_ALIVE "alive"
 #define QUERY_KEY_EXT1 "ext1"
 #define QUERY_KEY_EXT2 "ext2"
 #define QUERY_KEY_FAKE "fake"
@@ -25,17 +28,22 @@
 #define QUERY_KEY_GROUP "group"
 #define QUERY_KEY_ID "id"
 #define QUERY_KEY_LEVEL "level"
+#define QUERY_KEY_LOCALTIME "localtime"
 #define QUERY_KEY_ORDER "order"
 #define QUERY_KEY_ROOM "room"
 #define QUERY_KEY_SCOPE "scope"
 #define QUERY_KEY_SETFORSCAN "setforscan" // server.xml?setforscan
 #define QUERY_KEY_STATEBOX "statebox" // server.xml?statebox
+#define QUERY_KEY_STATUS "status"
 #define QUERY_KEY_UID_AP "uid_ap"
+#define QUERY_KEY_UNLOCKCODE "unlockcode"
 #define QUERY_KEY_USE "use"
+#define QUERY_KEY_UID "uid"
 #define QUERY_KEY_UUID "uuid"
 // for Luffanet only
 #define QUERY_KEY_MODULE "module"
 #define QUERY_KEY_STATE "state"
+#define QUERY_KEY_UNKNOW "unknow"
 
 
 //******************************************************************************
@@ -50,6 +58,9 @@
 //******************************************************************************
 #define QUERY_ACTION_VAL_GETP "getp"
 #define QUERY_ACTION_VAL_GETSTATUS "getstatus"
+#define QUERY_ACTION_VAL_GETVEMERVERSION "getvemerversion"
+#define QUERY_ACTION_VAL_IMPORT "import"
+#define QUERY_ACTION_VAL_NETWORKTEST "networktest"
 #define QUERY_ACTION_VAL_OPENCOM "opencom"
 #define QUERY_ACTION_VAL_ORDER "order"
 #define QUERY_ACTION_VAL_RAZCPT "razcpt"
@@ -58,6 +69,7 @@
 #define QUERY_ACTION_VAL_SETP "setp"
 #define QUERY_ACTION_VAL_TESTLK "testlk"
 #define QUERY_ACTION_VAL_TIMERPARA "timerpara"
+#define QUERY_ACTION_VAL_UPDATETHERMOSTAT "updatethermostat"
 #define QUERY_ACTION_VAL_VARX "varX"
 #define QUERY_ACTION_VAL_ZONEPARA "zonepara"
 // for Luffanet only

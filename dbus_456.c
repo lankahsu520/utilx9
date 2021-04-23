@@ -75,9 +75,22 @@ static int app_quit(void)
 	return is_quit;
 }
 
+static void app_set_quit(int mode)
+{
+	is_quit = mode;
+}
+
+static void app_stop(void)
+{
+	if (app_quit()==0)
+	{
+		app_set_quit(1);
+	}
+}
+
 static void app_loop(void)
 {
-	dbus_path_set("/com/xbox/dbus_123");
+	dbus_path_set(DBUS_PATH_DBUS_123);
 	if (is_service)
 	{
 		dbus_thread_init(dbus_match_cb, dbus_filter_cb);
@@ -108,18 +121,6 @@ static int app_init(void)
 	return ret;
 }
 
-static void app_set_quit(int mode)
-{
-	is_quit = mode;
-}
-
-static void app_stop(void)
-{
-	if (app_quit()==0)
-	{
-		app_set_quit(1);
-	}
-}
 static void app_exit(void)
 {
 	app_stop();
@@ -187,7 +188,7 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)  
+	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
 	{
 		switch (opt)
 		{
@@ -207,7 +208,8 @@ static void app_ParseArguments(int argc, char **argv)
 				is_service = 1;
 				break;
 			default:
-				app_showusage(-1); break;
+				app_showusage(-1);
+				break;
 		}
 	}
 }
@@ -225,5 +227,6 @@ int main(int argc, char *argv[])
 
 	app_loop();
 
+	DBG_WN_LN(DBG_TXT_BYE_BYE);
 	return 0;
 }

@@ -58,6 +58,14 @@ void queue_wait(QueueInfo_t *queue)
 	}
 }
 
+void queue_debug(QueueInfo_t *queue, int dbg_more)
+{
+	if (queue)
+	{
+		queue->dbg_more = dbg_more;
+	}
+}
+
 static void queue_create(QueueInfo_t *queue)
 {
 #ifdef UTIL_EX_CLIST
@@ -68,7 +76,7 @@ static void queue_create(QueueInfo_t *queue)
 	queue->data_pop = SAFE_CALLOC(1, queue->data_size);
 }
 
-static void queue_free(QueueInfo_t *queue)
+void queue_free(QueueInfo_t *queue)
 {
 	if (queue)
 	{
@@ -108,6 +116,18 @@ static void queue_free(QueueInfo_t *queue)
 
 		queue_unlock(queue);
 	}
+}
+
+int queue_length(QueueInfo_t *queue)
+{
+	int ret = 0;
+	if (queue)
+	{
+		queue_lock(queue);
+		ret = clist_length(queue->qlist);
+		queue_unlock(queue);
+	}
+	return ret;
 }
 
 // 1: full, 0: not full
@@ -193,6 +213,11 @@ void queue_add(QueueInfo_t *queue, void *data_new)
 	if (queue->tid==0) return;
 
 	queue_lock(queue);
+	if ( queue->dbg_more < DBG_LVL_MAX )
+	{
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isready: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue->isready);
+	}
+
 	if ( (queue->isquit== 0) && ( !queue_isfull(queue) ) )
 	{
 #ifdef UTIL_EX_CLIST
@@ -219,6 +244,11 @@ void queue_push(QueueInfo_t *queue, void *data_new)
 	if (queue->tid==0) return;
 
 	queue_lock(queue);
+	if ( queue->dbg_more < DBG_LVL_MAX )
+	{
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isready: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue->isready);
+	}
+
 	if ( (queue->isquit== 0) && ( !queue_isfull(queue) ) )
 	{
 #ifdef UTIL_EX_CLIST
@@ -245,11 +275,17 @@ void queue_push(QueueInfo_t *queue, void *data_new)
 
 static void queue_pop(QueueInfo_t *queue)
 {
+	int exec = 0;
 	if (queue==NULL) return;
 	void *data_pop = (void *)queue->data_pop;
 
 	//int old = clist_length(queue->qlist);
 	queue_lock(queue);
+	if ( queue->dbg_more < DBG_LVL_MAX )
+	{
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isready: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue->isready);
+	}
+
 	if ( ( queue->isquit == 0 ) && ( queue->ishold == 0 ) && (queue_isempty(queue) != 1) )
 	{
 		SAFE_MEMSET(data_pop, 0, queue->data_size);
@@ -268,6 +304,17 @@ static void queue_pop(QueueInfo_t *queue)
 		SAFE_MEMCPY(data_pop, datas + (queue->head_pos*queue->data_size), queue->data_size, queue->data_size);
 		SAFE_MEMSET(datas + (queue->head_pos*queue->data_size), 0, queue->data_size);
 #endif
+
+		exec = 1;
+	}
+	else if ( queue->isquit == 0 )
+	{
+		queue_wait(queue);
+	}
+	queue_unlock(queue);
+
+	if (exec)
+	{
 		if (queue->exec_cb)
 		{
 			queue->exec_cb(data_pop);
@@ -277,11 +324,6 @@ static void queue_pop(QueueInfo_t *queue)
 			queue->free_cb(data_pop);
 		}
 	}
-	else if ( queue->isquit == 0 )
-	{
-		queue_wait(queue);
-	}
-	queue_unlock(queue);
 	//int new = clist_length(queue->qlist);
 }
 
@@ -364,6 +406,7 @@ QueueInfo_t *queue_thread_init(char *name, int queue_size, int data_size, queue_
 		queue->max_data = queue_size;
 		queue->exec_cb = exec_cb;
 		queue->free_cb = free_cb;
+		queue->dbg_more = DBG_LVL_MAX;
 
 		{
 			queue_thread_mutex_init(queue);

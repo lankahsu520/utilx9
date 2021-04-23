@@ -8,12 +8,12 @@
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
 
-#define container_of(ptr, type, member) ({ \
+#define container_of_ex(ptr, type, member) ({ \
      const typeof( ((type *)0)->member ) *__mptr = (ptr); \
      (type *)( (char *)__mptr - offsetof(type,member) );})
 
 #define list_entry(ptr, type, member) \
-	container_of(ptr, type, member)
+	container_of_ex(ptr, type, member)
 	
 #define list_for_each(pos, head) \
 	for (pos = (head)->next; pos != (head); pos = pos->next)

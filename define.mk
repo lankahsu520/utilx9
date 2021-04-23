@@ -110,4 +110,10 @@ else
 	sed -i "s|#define UTIL_EX_WEBSOCKETS.*|#undef UTIL_EX_WEBSOCKETS|g" utilx9.h
 endif
 
+ifeq ("$(PJ_HAS_MOSQUITTO)", "yes")
+	sed -i "s|#undef UTIL_EX_MQTT.*|#define UTIL_EX_MQTT|g" utilx9.h
+else
+	sed -i "s|#define UTIL_EX_MQTT.*|#undef UTIL_EX_MQTT|g" utilx9.h
+endif
+
 	touch $@

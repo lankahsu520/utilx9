@@ -41,7 +41,7 @@ uv_pipe_t pipe_in;
 uv_pipe_t pipe_out;
 
 void on_child_exit(uv_process_t *req, int64_t exit_status, int term_signal) {
-    fprintf(stderr, "Process exited with status %d, signal %d\n", exit_status, term_signal);
+    fprintf(stderr, "Process exited with status %ld, signal %d\n", exit_status, term_signal);
     uv_close((uv_handle_t*) req, NULL);
     uv_close((uv_handle_t*) &pipe_out, NULL);
     uv_close((uv_handle_t*) &pipe_in, NULL);
@@ -57,7 +57,7 @@ void pipe_out_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
 	if (nread > 0)
 	{
-		printf("(nread: %d, len: %d, %s)", nread, buf->len, buf->base);
+		printf("(nread: %ld, len: %ld, %s)", nread, buf->len, buf->base);
 	}
 
 	if (buf->base)

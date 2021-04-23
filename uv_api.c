@@ -193,9 +193,9 @@ static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events,
 
 void uv_event_close_ex(UvEventCtx_t *event_req)
 {
-	if ( (event_req) && (event_req->quit==0) )
+	if ( (event_req) && (event_req->isquit==0) )
 	{
-		event_req->quit = 1;
+		event_req->isquit = 1;
 		uv_fs_event_stop(&event_req->req);
 		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, event_req->name);
 	}

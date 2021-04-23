@@ -14,48 +14,52 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-static pthread_t tid = 0;
+ThreadX_t tidx_data;
 
-int thread_exit = 0;
-
-static void *thread_handler(void *arg)
+static void *thread_handler(void *user)
 {
-	int i = 10;
-	while (i>0)
+	ThreadX_t *tidx_req = (ThreadX_t*)user;
+
+	int count = 0;
+	DBG_IF_LN("(count: %d)", count++);
+
+	while ( (threadx_isstop(tidx_req)==0) && (threadx_isquit(tidx_req)==0) )
 	{
-		i--;
-		DBG_DB_LN("thread_handler - %d", i);
-		sleep(1);
+		if (threadx_ispause(tidx_req)==0)
+		{
+			DBG_IF_LN("(count: %d)", count++);
+			if ( count > 10)
+			{
+				break;
+			}
+		}
+		else
+		{
+			threadx_wait_simple(tidx_req);
+		}
 	}
 
-	thread_exit = 1;
-	DBG_DB_LN("thread_handler exit - %d", i);
+	threadx_set_quit(tidx_req, 1);
+	DBG_IF_LN(DBG_TXT_BYE_BYE);
+
 	return NULL;
-}
-
-int thread_init(void)
-{
-	int ret = 0;
-	if (pthread_create(&tid, NULL, thread_handler, NULL) != 0)
-	{
-		DBG_ER_LN("pthread_create error !!!");
-		return -1;
-	}
-	return ret;
 }
 
 int main(int argc, char* argv[])
 {
 	DBG_TR_LN("enter");
 
-	thread_init();
+	tidx_data.thread_cb = thread_handler;
+	tidx_data.data = (void *)&tidx_data;
 
-	while (thread_exit==0)
+	threadx_init(&tidx_data);
+
+	while ( (threadx_isquit(&tidx_data)==0) )
 	{
 		// busy loop
 		sleep(1);
 	}
 
-	DBG_TR_LN(DBG_TXT_BYE_BYE);
+	DBG_IF_LN(DBG_TXT_BYE_BYE);
 	exit(0);
 }

@@ -74,13 +74,18 @@ void proc_info_show(void)
 void proc_table_add_yokis(clist_t head)
 {
 	proc_entry_push(head, "yk_p2p_daemon");
+	proc_entry_push(head, "yk_ws_daemon");
 
 	proc_entry_push(head, "yk_command_daemon");
 	proc_entry_push(head, "yk_datab_daemon");
-	proc_entry_push(head, "yk_info_daemon");
-	proc_entry_push(head, "yk_request_daemon");
-	proc_entry_push(head, "yk_server_daemon");
 	proc_entry_push(head, "yk_update_daemon");
+	proc_entry_push(head, "yk_info_daemon");
+	proc_entry_push(head, "yk_server_daemon");
+	proc_entry_push(head, "yk_request_daemon");
+	proc_entry_push(head, "yk_subnet_daemon");
+	proc_entry_push(head, "yk_kms_daemon");
+	proc_entry_push(head, "yk_standalone_daemon");
+	proc_entry_push(head, "yk_thermo_daemon");
 
 	proc_entry_push(head, "proc_watch");
 }
@@ -148,6 +153,8 @@ static int app_init(void)
 	clist_init( OrgListHead);
 #if defined(PJ_NAME_LSC002)
 	proc_table_add_yokis(OrgListHead);
+#elif defined(PJ_NAME_LSC012)
+	proc_table_add_yokis(OrgListHead);
 #elif defined(PJ_NAME_LSC003)
 	proc_table_add_yokis(OrgListHead);
 #else
@@ -161,6 +168,8 @@ static int app_init(void)
 
 	clist_init( CurrListHead);
 #if defined(PJ_NAME_LSC002)
+	proc_table_add_yokis(CurrListHead);
+#elif defined(PJ_NAME_LSC012)
 	proc_table_add_yokis(CurrListHead);
 #elif defined(PJ_NAME_LSC003)
 	proc_table_add_yokis(CurrListHead);

@@ -72,16 +72,17 @@ extern "C" {
 #endif
 #endif
 
-#undef UTIL_EX_SSH
+#define UTIL_EX_SSH
 #undef UTIL_EX_SWCONFIG
 #define UTIL_EX_UV
 #define UTIL_EX_DBUS
 #define UTIL_EX_USB
-#undef UTIL_EX_UCI
+#define UTIL_EX_UCI
 #define UTIL_EX_UBOX
 #undef UTIL_EX_FASTCGI
 #define UTIL_EX_YUAREL
-#undef UTIL_EX_WEBSOCKETS
+#define UTIL_EX_WEBSOCKETS
+#define UTIL_EX_MQTT
 
 //******************************************************************************
 //** UTIL_EX_DBG **
@@ -236,6 +237,9 @@ void* pcheck( void* a );
 
 #define SAFE_STRCAT(str1, str2) \
 	({ char *__ret = NULL; do { if ( (pcheck(str1)) && (pcheck(str2)) ) { __ret = strcat(str1, str2); } } while(0); __ret; })
+#define SAFE_STRCAT_EX(str, args...) \
+	({ char *__ret = NULL; do { if (pcheck(str)) { __ret = str_cat_ex(str, ## args, NULL); } } while(0); __ret; })
+
 
 // #define SAFE_STRTOK(str, delim) strtok(str, delim) // please don't use this, not thread safe
 #define SAFE_STRTOK_R(str, delim, saveptr) strtok_r(str, delim, saveptr)
@@ -363,17 +367,57 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 	({ double  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2) && (strncasecmp(str, "0x", 2)==0)) { __ret = strtod(str, &endptr, 16); } else { __ret=strtod(str, &endptr, 10); } } while(0); __ret; })
 
 #define SAFE_ATOI(str) \
-	({ int  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2)) { __ret = atoi(str); } } while(0); __ret; })
+	({ int  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>0)) { __ret = atoi(str); } } while(0); __ret; })
 #define SAFE_ATOL(str) \
-	({ long  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2)) { __ret = atol(str); } } while(0); __ret; })
+	({ long  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>0)) { __ret = atol(str); } } while(0); __ret; })
 #define SAFE_ATOF(str) \
-	({ double  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2)) { __ret = atof(str); } } while(0); __ret; })
+	({ double  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>0)) { __ret = atof(str); } } while(0); __ret; })
 
 //** thread & lock **
 #include <pthread.h>
 
-#define SAFE_THREAD_LOCK(in_mtx_p) pthread_mutex_trylock(in_mtx_p)
-#define SAFE_THREAD_UNLOCK(in_mtx_p) pthread_mutex_unlock(in_mtx_p)
+#define SAFE_THREAD_LOCK(in_mtx_p) \
+	({ int __ret = EINVAL; \
+		do { \
+			if (pcheck(in_mtx_p)) \
+			{ \
+				__ret = pthread_mutex_lock(in_mtx_p); \
+				if ( __ret != 0 ) \
+				{ \
+					DBG_ER_LN("pthread_mutex_lock error !!! (__ret: %d, EINVAL: %d, EBUSY: %d, EAGAIN: %d, EDEADLK: %d, EPERM: %d)", __ret, EINVAL, EBUSY, EAGAIN, EDEADLK, EPERM); \
+				} \
+			} \
+		} while(0); \
+		__ret; \
+	})
+#define SAFE_THREAD_TRYLOCK(in_mtx_p) \
+	({ int __ret = EINVAL; \
+		do { \
+			if (pcheck(in_mtx_p)) \
+			{ \
+				__ret = pthread_mutex_trylock(in_mtx_p); \
+				if ( __ret != 0 ) \
+				{ \
+					DBG_ER_LN("pthread_mutex_trylock error !!! (__ret: %d, EINVAL: %d, EBUSY: %d, EAGAIN: %d, EDEADLK: %d, EPERM: %d)", __ret, EINVAL, EBUSY, EAGAIN, EDEADLK, EPERM); \
+				} \
+			} \
+		} while(0); \
+		__ret; \
+	})
+#define SAFE_THREAD_UNLOCK(in_mtx_p) \
+	({ int __ret = EINVAL; \
+		do { \
+			if (pcheck(in_mtx_p)) \
+			{ \
+				__ret = pthread_mutex_unlock(in_mtx_p); \
+				if ( __ret != 0 ) \
+				{ \
+					DBG_ER_LN("pthread_mutex_unlock error !!! (__ret: %d, EINVAL: %d, EBUSY: %d, EAGAIN: %d, EDEADLK: %d, EPERM: %d)", __ret, EINVAL, EBUSY, EAGAIN, EDEADLK, EPERM); \
+				} \
+			} \
+		} while(0); \
+		__ret; \
+	})
 #define SAFE_THREAD_SIGNAL(in_cond_p) pthread_cond_signal(in_cond_p)
 #define SAFE_THREAD_BROADCAST(in_cond_p) pthread_cond_broadcast(in_cond_p)
 #define SAFE_THREAD_DETACH(tid) pthread_detach(tid)
@@ -491,13 +535,23 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		__ret; \
 	})
 
-//#define SAFE_THREAD_LOCK_EX(ptr) SAFE_THREAD_LOCK(&ptr->in_mtx)
 #define SAFE_THREAD_LOCK_EX(ptr) \
 	({ int __ret = EINVAL; \
 		do { \
 			if (pcheck(ptr)) \
 			{ \
 				__ret = SAFE_THREAD_LOCK(&ptr->in_mtx); \
+			} \
+		} while(0); \
+		__ret; \
+	})
+	
+#define SAFE_THREAD_TRYLOCK_EX(ptr) \
+	({ int __ret = EINVAL; \
+		do { \
+			if (pcheck(ptr)) \
+			{ \
+				__ret = SAFE_THREAD_TRYLOCK(&ptr->in_mtx); \
 			} \
 		} while(0); \
 		__ret; \
@@ -628,6 +682,7 @@ char *version_show(void);
 
 int system_ex(char *fmt, ...);
 
+char *str_cat_ex(char *str, ...);
 int str_isnum(const char *str);
 char *str_rtrim(char *str);
 char *str_ltrim(char *str);
@@ -2091,6 +2146,7 @@ typedef struct QueueInfo_Struct
 	int isquit;
 	int ishold;
 	int isready;
+	int dbg_more;
 
 #ifdef UTIL_EX_CLIST
 	CLIST_STRUCT(qlist);
@@ -2116,6 +2172,9 @@ void queue_unlock(QueueInfo_t *queue);
 void queue_signal(QueueInfo_t *queue);
 void queue_wait(QueueInfo_t *queue);
 
+void queue_debug(QueueInfo_t *queue, int dbg_more);
+void queue_free(QueueInfo_t *queue);
+int queue_length(QueueInfo_t *queue);
 int queue_isfull(QueueInfo_t *queue);
 int queue_isempty(QueueInfo_t *queue);
 int queue_isready(QueueInfo_t *queue, int retry);
@@ -2209,12 +2268,14 @@ typedef struct StateXCtx_STRUCT
 	StateXFnCtx_t *fn_last;
 	StateXFnCtx_t *fn_links;
 
-	int debug;
+	int dbg_more;
 	void *data;
 } StateXCtx_t;
 
 StateXFnCtx_t *statex_fn_last(StateXCtx_t *statex_req);
 
+void statex_debug_q(StateXCtx_t *statex_req, int dbg_more);
+void statex_debug(StateXCtx_t *statex_req, int dbg_more);
 void statex_add(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run);
 void statex_push(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run);
 int statex_open(StateXCtx_t *statex_req, char *name);
@@ -2406,6 +2467,14 @@ typedef enum
 
 #define JSON_FLAGS_WITHOUT_SORT_KEY JSON_COMPACT|JSON_ENSURE_ASCII|JSON_PRESERVE_ORDER
 #define JSON_FLAGS_EASY JSON_COMPACT|JSON_ENSURE_ASCII|JSON_SORT_KEYS|JSON_PRESERVE_ORDER
+
+#define JSON_DUMP_FILE_FLAGS(x, filename, y) \
+		({ int __ret = 0; \
+			do { \
+				if ( (x) && (pcheck(filename)) && (strlen(filename)>0) ) __ret = json_dump_file(x, filename, y); \
+			} while(0); \
+			__ret; \
+		})
 
 #define JSON_DUMP_FILE_EASY(x, filename) \
 	({ int __ret = 0; \
@@ -3005,7 +3074,7 @@ typedef struct
 {
 	char name[LEN_OF_NAME32];
 	char filename[LEN_OF_FILENAME256];
-	int quit;
+	int isquit;
 
 	uv_loop_t *loop;
 	uv_fs_event_t req;
@@ -3388,13 +3457,226 @@ yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_ctx);
 
 #endif
 
+
 //******************************************************************************
 //** UTIL_EX_WEBSOCKETS **
 //******************************************************************************
 #ifdef UTIL_EX_WEBSOCKETS
-#define WEBSOCKETS_PORT 7681
+#include <libwebsockets.h>
+
+#define WEBSOCKETS_PORT_7681 7681
+#define LEN_OF_WEBSOCKET LEN_OF_BUF1024
+#define LEN_OF_LWS (LWS_SEND_BUFFER_PRE_PADDING + LEN_OF_WEBSOCKET + LWS_SEND_BUFFER_POST_PADDING)
+#define MAX_OF_RING 8
+#define MAX_OF_SESSION 8
+
+#define LWS_SUB_PROTOCOL_HTTP "http"
+//#define LWS_SUB_PROTOCOL_EXAMPLE "lws_example"
+
+typedef enum
+{
+	LWS_PROTO_ID_HTTP,
+	//LWS_PROTO_ID_EXAMPLE,
+	LWS_PROTO_ID_MAX,
+} LWS_PROTO_ID;
+
+typedef enum
+{
+	LWS_WSI_ID_CLIENT,
+	LWS_WSI_ID_SERVER,
+	LWS_WSI_ID_MAX,
+} LWS_WSI_ID;
+
+typedef struct LWSMsg_Struct
+{
+	void* next;
+
+	char payload[LEN_OF_LWS];
+	int payload_len;
+} LWSMsg_t;
+
+typedef struct LWSSession_Struct
+{
+	void* next;
+
+	struct lws *wsi;
+	pthread_mutex_t in_mtx;
+	CLIST_STRUCT(msg_list);
+} LWSSession_t;
+
+typedef struct LWSCtx_Struct
+{
+	char name[LEN_OF_NAME32];
+	int isquit;
+	int isecho;
+	int dbg_more;
+
+	LWS_WSI_ID wsi_id;
+
+	struct lws_context_creation_info cinfo;
+	struct lws_context *context;
+
+	struct lws_client_connect_info ccinfo;
+	char hostname[LEN_OF_HOSTNAME];
+
+	lws_callback_function *callback;
+
+	CLIST_STRUCT(session_list);
+
+	pthread_mutex_t in_mtx;
+	pthread_cond_t in_cond;
+
+	char tx[LEN_OF_LWS];
+	int tx_size;
+	char rx[LEN_OF_LWS];
+	int rx_size;
+} LWSCtx_t;
+
+#define SAFE_LWS_MEMCPY(dst, src, count, maxcount) \
+	SAFE_MEMCPY(dst+LWS_SEND_BUFFER_PRE_PADDING, src, count, maxcount)
+
+#define SAFE_LWS_WRITE(wsi, buf, len, wp) \
+	lws_write(wsi, (unsigned char *)buf+LWS_SEND_BUFFER_PRE_PADDING, len, wp)
+
+#if (0)
+#define LWS_TX_PRINT(x) \
+	if (pcheck(x)) \
+	{ \
+		LWSCtx_t *ctx = x; \
+		char *body = ctx->tx + LWS_SEND_BUFFER_PRE_PADDING; \
+		if (ctx->dbg_more<DBG_LVL_MAX) DBG_IF_LN("(tx_size: %d, body: %s)", ctx->tx_size, body); \
+	}
+
+#define LWS_RX_PRINT(x) \
+	if (pcheck(x)) \
+	{ \
+		LWSCtx_t *ctx = x; \
+		char *body = ctx->rx + LWS_SEND_BUFFER_PRE_PADDING; \
+		if (ctx->dbg_more<DBG_LVL_MAX) DBG_IF_LN("(rx_size: %d, body: %s)", ctx->rx_size, body); \
+	}
+#endif
+
+char* translate_lws_cb(enum lws_callback_reasons reason);
+
+LWSCtx_t *lws2_protocol_user(struct lws *wsi);
+
+int lws2_session_lock(LWSSession_t *session);
+int lws2_session_unlock(LWSSession_t *session);
+void lws2_session_write(LWSSession_t *session);
+void lws2_session_write_q_push(LWSSession_t *session, char *payload, int payload_len);
+void lws2_session_write_q_broadcast(LWSCtx_t *lws_ctx, char *payload, int payload_len);
+int lws2_session_count(LWSCtx_t *lws_ctx);
+
+int lws2_lock(LWSCtx_t *lws_ctx);
+int lws2_unlock(LWSCtx_t *lws_ctx);
+
+void lws2_cli_init(LWSCtx_t *lws_ctx, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
+void lws2_cli_open(LWSCtx_t *lws_ctx, char *address, int port, char *filename);
+void lws2_cli_close(LWSCtx_t *lws_ctx);
+
+void lws2_srv_init(LWSCtx_t *lws_ctx, int port, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
+void lws2_srv_open(LWSCtx_t *lws_ctx, int timeout_ms);
+void lws2_srv_close(LWSCtx_t *lws_ctx);
 
 #endif
+
+
+//******************************************************************************
+//** UTIL_EX_MQTT **
+//******************************************************************************
+#ifdef UTIL_EX_MQTT
+#include <mosquitto.h>
+
+#define LEN_OF_TOPIC LEN_OF_BUF1024
+#define LEN_OF_CLIENT_ID LEN_OF_VAL32
+#define MAX_OF_QPUB     30
+#define MAX_OF_QSUB     30
+
+#define MQTT_TOPIC_SUB_ROOT_MASK "+/+/%s/#"
+#define MQTT_TOPIC_SUB_ROOT_MASK_METHODID "%d/+/%s/#"
+#define MQTT_TOPIC_PUB_ROOT_MASK "%d/%d/%s/%s/%d/%d/%08X"
+
+typedef void mqtt_log_fn(struct mosquitto *mosq, void *userdata, int level, const char *str);
+typedef void mqtt_connect_fn(struct mosquitto *mosq, void *userdata, int result);
+typedef void mqtt_disconnect_fn(struct mosquitto *mosq, void *userdata, int result);
+typedef void mqtt_message_fn(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message);
+
+typedef struct MQTTSub_Struct
+{
+	void* next;
+
+	char topic[LEN_OF_TOPIC];
+	mqtt_message_fn *message_cb;
+} MQTTSub_t;
+
+typedef struct MQTTSession_Struct
+{
+	void *mqtt_ctx;
+	struct mosquitto *mosq;
+
+	char hostname[LEN_OF_HOSTNAME];
+	int port;
+	int keepalive;
+	char topic[LEN_OF_TOPIC];
+
+	bool clean_session;
+	char clientid[LEN_OF_CLIENT_ID];
+
+	int isconnect;
+
+	QueueInfo_t *qpub;
+	QueueInfo_t *qsub;
+
+	CLIST_STRUCT(sub_list);
+
+	mqtt_log_fn *log_cb;
+	mqtt_connect_fn *connect_cb;
+	mqtt_disconnect_fn *disconnect_cb;
+	mqtt_message_fn *message_cb;
+} MQTTSession;
+
+typedef struct MQTTTopic_Struct
+{
+	MQTTSession *session;
+	char *topic;
+	char *msg;
+} MQTTTopic_t;
+
+typedef struct MQTTCtx_Struct
+{
+	char name[LEN_OF_NAME32];
+	pthread_mutex_t in_mtx;
+	pthread_cond_t in_cond;
+	pthread_t tid;
+	int in_detach;
+
+	int isinit;
+	int isfree;
+	int isquit;
+	//int ishold;
+	//int isready;
+	int dbg_more;
+
+	MQTTSession *session;
+} MQTTCtx_t;
+
+int mqtt_publish(MQTTSession *session, char *topic, char *msg);
+
+void mqtt_subscribe_add(MQTTSession *session, char *topic, mqtt_message_fn *message_cb);
+
+void mqtt_qsub_add(MQTTSession *session, char *topic, char *msg);
+void mqtt_qpub_add(MQTTSession *session, char *topic, char *msg);
+
+void mqtt_lock(MQTTCtx_t *mqtt_ctx);
+void mqtt_unlock(MQTTCtx_t *mqtt_ctx);
+void mqtt_signal(MQTTCtx_t *mqtt_ctx);
+void mqtt_wait(MQTTCtx_t *mqtt_ctx);
+void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx);
+void mqtt_thread_close(MQTTCtx_t *mqtt_ctx);
+void mqtt_thread_init(MQTTCtx_t *mqtt_ctx);
+
+#endif
+
 
 //******************************************************************************
 //** END **

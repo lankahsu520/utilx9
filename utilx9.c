@@ -139,7 +139,7 @@ int system_ex(char *fmt, ...)
 {
 	va_list vargs;
 	char *cmd = NULL;
-	int	rc = 0;
+	int rc = 0;
 
 	va_start(vargs, fmt);
 	vasprintf(&cmd, fmt, vargs);
@@ -152,6 +152,24 @@ int system_ex(char *fmt, ...)
 		SAFE_FREE(cmd);
 	}
 	return rc;
+}
+
+char *str_cat_ex(char *str, ...)
+{
+	if (str)
+	{
+		va_list vargs;
+		va_start(vargs, str);
+		char *s = va_arg(vargs, char*);
+		while (s)
+		{
+			strcat(str, s);
+			s = va_arg(vargs, char*);
+		}
+		va_end(vargs);
+	}
+
+	return str;
 }
 
 // 0: is number. -1: fail

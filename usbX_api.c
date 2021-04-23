@@ -501,7 +501,7 @@ void usbX_wakeup_transfer(UsbXCtx_t *usbX_req)
 {
 	if (usbX_req)
 	{
-		if ( ( 0 == SAFE_THREAD_LOCK_EX(usbX_req) ) &&  (usbX_req->in_wait) )
+		if ( 0 == SAFE_THREAD_LOCK_EX(usbX_req) )
 		{
 			usbX_req->in_wait = 0;
 			SAFE_THREAD_SIGNAL_EX(usbX_req);

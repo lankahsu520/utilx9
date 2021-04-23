@@ -33,6 +33,22 @@ static void statex_free(StateXCtx_t *statex_req, StateXFnCtx_t *fn_curr)
 	}
 }
 
+void statex_debug_q(StateXCtx_t *statex_req, int dbg_more)
+{
+	if (statex_req)
+	{
+		queue_debug(statex_req->statex_q, dbg_more);
+	}
+}
+
+void statex_debug(StateXCtx_t *statex_req, int dbg_more)
+{
+	if (statex_req)
+	{
+		statex_req->dbg_more = dbg_more;
+	}
+}
+
 // curr-init -> last-leave -> curr-enter
 static int statex_rotate(StateXCtx_t *statex_req, int run)
 {
@@ -184,7 +200,7 @@ static int statex_q_exec_cb(void *arg)
 		ACTION_ID action = data_pop->action;
 		int run = data_pop->run;
 
-		if (statex_req->debug)
+		if (statex_req->dbg_more < DBG_LVL_MAX)
 		{
 			DBG_IF_LN("(name: %s, idx: %d, subitem: %d, action: %d, run : %d)", name, idx, subitem, action, run);
 		}

@@ -41,6 +41,8 @@ StateXFnCtx_t sys_fn_links[] =
 StateXCtx_t statex_sys = {
 	.fn_last = NULL,
 	.fn_links = sys_fn_links,
+
+	.dbg_more = DBG_LVL_MAX,
 };
 
 int main(int argc, char* argv[])

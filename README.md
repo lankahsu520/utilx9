@@ -59,6 +59,7 @@ $ make
 - mqtt_123 - a mqtt example.
 - multicast_cli & multicast_srv - multicast example.
 - ~~nlink_123 & nlink_456 - netlink example. got from internet.~~
+- queue_123 - a queue example.
 - onvif_client_123 - onvif client example.
 - ping_123 - ping example.
 - proc_list_123 & proc_watch - a system and proc information example.

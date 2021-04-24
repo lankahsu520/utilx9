@@ -129,7 +129,7 @@ static void mqtt_queue_new(MQTTTopic_t *new, MQTTSession *session, char *topic, 
 
 void mqtt_qsub_add(MQTTSession *session, char *topic, char *msg)
 {
-	if ( (session) && (topic) && (msg) )
+	if ( (session->qsub) && (session) && (topic) && (msg) )
 	{
 		MQTTTopic_t topic_new;
 		mqtt_queue_new(&topic_new, session, topic, msg);
@@ -154,7 +154,7 @@ static int mqtt_qsub_exec_cb(void *arg)
 
 void mqtt_qpub_add(MQTTSession *session, char *topic, char *msg)
 {
-	if ( (session) && (topic) && (msg) )
+	if ( (session->qpub) && (session) && (topic) && (msg) )
 	{
 		MQTTTopic_t topic_new;
 		mqtt_queue_new(&topic_new, session, topic, msg);
@@ -191,23 +191,15 @@ static int mqtt_queue_free_cb(void *arg)
 	return 0;
 }
 
-static void mqtt_queue_stop(MQTTSession *session)
-{
-	if (session)
-	{
-		queue_thread_stop(session->qpub);
-		queue_thread_stop(session->qsub);
-	}
-}
-
 static void mqtt_queue_close(MQTTSession *session)
 {
 	if (session)
 	{
+		queue_thread_stop(session->qpub);
 		queue_thread_close(session->qpub);
-		session->qpub = NULL;
+		
+		queue_thread_stop(session->qsub);
 		queue_thread_close(session->qsub);
-		session->qsub = NULL;
 	}
 }
 
@@ -239,12 +231,12 @@ static void mqtt_srv_subscribe(MQTTSession *session)
 			DBG_IF_LN("(topic: %s)", session->topic);
 		}
 
-		CLIST_STRUCT_INIT(session, sub_list);
 	}
 }
 
 static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 {
+	int result = 0;
 	struct mosquitto *mosq = NULL;
 
 	if (mqtt_ctx->isinit == 0)
@@ -277,7 +269,25 @@ static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 			session->mosq = mosq;
 			//mqtt_ctx->isready = 1;
 
-			//mosquitto_username_pw_set(mosq, userName, password);
+			// username / password
+			if ( (SAFE_STRLEN(session->user) > 0) && (SAFE_STRLEN(session->pass) > 0) )
+			{
+				result = mosquitto_username_pw_set(mosq, session->user, session->pass);
+				DBG_DB_LN("mosquitto_username_pw_set (result: %d, user: %s)", result, session->user);
+			}
+
+			//
+			if ( (session->ca_file) ||
+				(session->certificate_file) ||
+				(session->privatekey_file) )
+			{
+				//--tls-version : TLS protocol version, can be one of tlsv1.3 tlsv1.2 or tlsv1.1.
+				//								Defaults to tlsv1.2 if available.
+				mosquitto_tls_opts_set(mosq, 1, NULL, NULL);
+				mosquitto_tls_insecure_set(mosq, 1);
+				mosquitto_tls_set(mosq, session->ca_file, NULL, session->certificate_file, session->privatekey_file, NULL);
+			}
+
 			if ( mqtt_ctx->dbg_more < DBG_LVL_MAX )
 			{
 				mosquitto_log_callback_set(mosq, mqtt_log_cb);
@@ -300,8 +310,11 @@ static void mqtt_srv_close(MQTTCtx_t *mqtt_ctx)
 		if (mqtt_ctx->session)
 		{
 			MQTTSession *session = mqtt_ctx->session;
-			mosquitto_destroy(session->mosq);
-			session->mosq = NULL;
+			if (session->mosq)
+			{
+				mosquitto_destroy(session->mosq);
+				session->mosq = NULL;
+			}
 		}
 
 		if (mqtt_ctx->isinit==1)
@@ -318,15 +331,16 @@ static void *mqtt_thread_handler( void *user )
 
 	if (mqtt_ctx)
 	{
-		struct mosquitto *mosq = mqtt_srv_open(mqtt_ctx);
+		MQTTSession *session = mqtt_ctx->session;
+		CLIST_STRUCT_INIT(session, sub_list);
+		mqtt_queue_init(session);
 
+		//struct mosquitto *mosq = NULL;
+		struct mosquitto *mosq = mqtt_srv_open(mqtt_ctx);
 		if (mosq)
 		{
-			MQTTSession *session = mqtt_ctx->session;
 			DBG_IF_LN("call mosquitto_connect ... (%s:%d, keepalive: %d, topic: %s)", session->hostname,  session->port, session->keepalive, session->topic);
 			int rc = mosquitto_connect(mosq, session->hostname, session->port, session->keepalive);
-
-			mqtt_queue_init(session);
 
 			mqtt_srv_subscribe(session);
 
@@ -339,7 +353,6 @@ static void *mqtt_thread_handler( void *user )
 					sleep(10);
 					mosquitto_reconnect(mosq);
 				}
-
 			}
 		}
 
@@ -386,11 +399,17 @@ static void mqtt_thread_free(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx==NULL) return;
 
+	if (mqtt_ctx->isfree == 0)
 	{
+		mqtt_ctx->isfree ++;
+
+		//sk_free(SSL_COMP_get_compression_methods());
+		//SSL_COMP_free_compression_methods();
+
 		SAFE_MUTEX_DESTROY(&mqtt_ctx->in_mtx);
 		SAFE_COND_DESTROY(&mqtt_ctx->in_cond);
+		SAFE_FREE(mqtt_ctx);
 	}
-	SAFE_FREE(mqtt_ctx);
 }
 
 void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx)
@@ -399,10 +418,16 @@ void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx)
 	{
 		mqtt_lock(mqtt_ctx);
 		mqtt_ctx->isquit = 1;
+
+		mqtt_queue_close(mqtt_ctx->session);
+		MQTTSession *session = mqtt_ctx->session;
+		if (session)
+		{
+			clist_free(session->sub_list);
+		}
+
 		mqtt_signal(mqtt_ctx);
 		mqtt_unlock(mqtt_ctx);
-
-		mqtt_queue_stop(mqtt_ctx->session);
 	}
 }
 
@@ -413,13 +438,6 @@ void mqtt_thread_close(MQTTCtx_t *mqtt_ctx)
 		mqtt_ctx->isfree ++;
 
 		SAFE_THREAD_JOIN_EX(mqtt_ctx);
-
-		MQTTSession *session = mqtt_ctx->session;
-		if (session)
-		{
-			mqtt_queue_close(session);
-			clist_free(session->sub_list);
-		}
 
 		DBG_TR_LN("call mqtt_thread_free ... (name: %s)", mqtt_ctx->name);
 		mqtt_thread_free(mqtt_ctx);

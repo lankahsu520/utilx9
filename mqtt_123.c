@@ -86,6 +86,11 @@ static MQTTSession hornet_session = {
 	.topic = "",
 
 	.clean_session = true,
+	.user="lanka",
+	.pass="123456",
+	.certificate_file = NULL,
+	.privatekey_file = NULL,
+	.ca_file = NULL,
 	.isconnect = 0,
 
 	.log_cb = NULL,
@@ -106,7 +111,7 @@ MQTTCtx_t hornet_data = {
 
 static void hornet_init(void)
 {
-	SAFE_SPRINTF(hornet_session.topic, "%s/#", iface_mac);
+	SAFE_SPRINTF(hornet_session.topic, MQTT_TOPIC_SUB_ROOT_MASK, iface_mac);
 	//DBG_ER_LN(">>>>>>>>>>>>>> %s", hornet_session.topic);
 	mqtt_thread_init( &hornet_data );
 }
@@ -218,6 +223,11 @@ static void app_loop(void)
 #ifdef USE_UV
 	SAFE_UV_LOOP_RUN(uv_loop);
 	SAFE_UV_LOOP_CLOSE(uv_loop);
+#else
+	while ( is_quit == 0)
+	{
+		sleep(1);
+	}
 #endif
 
 	goto exit_loop;

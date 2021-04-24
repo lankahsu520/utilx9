@@ -3622,6 +3622,13 @@ typedef struct MQTTSession_Struct
 	bool clean_session;
 	char clientid[LEN_OF_CLIENT_ID];
 
+	char user[LEN_OF_USER];
+	char pass[LEN_OF_PASS];
+
+	char *certificate_file;
+	char *privatekey_file;
+	char *ca_file;
+
 	int isconnect;
 
 	QueueInfo_t *qpub;

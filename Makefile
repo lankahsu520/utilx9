@@ -58,6 +58,7 @@ CLEAN_BINS += \
 						proc_list_123 \
 						proc_watch \
 						spawn_test \
+						queue_123 \
 						demo_123 \
 						demo_000
 

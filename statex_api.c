@@ -143,10 +143,9 @@ static void statex_new(StateXPuck_t *puck_new, StateXCtx_t *statex_req, int idx,
 	puck_new->statex_req = statex_req;
 }
 
-
 void statex_add(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
 {
-	if  ( ( statex_req ) && (statex_req->statex_q) )
+	if ( ( statex_req ) && (statex_req->statex_q) )
 	{
 		StateXPuck_t puck_new;
 
@@ -161,7 +160,7 @@ void statex_add(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action,
 
 void statex_push(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
 {
-	if  ( ( statex_req ) && (statex_req->statex_q) )
+	if ( ( statex_req ) && (statex_req->statex_q) )
 	{
 		StateXPuck_t puck_new;
 

@@ -40,8 +40,7 @@ char hostname[LEN_OF_HOSTNAME] = "";
 #define OPEN_START_PORT 19999
 
 Tunnel_t tunnel_req = {
-	.ssh_ctx.server_ip = "60.250.242.233",
-//	.ssh_ctx.server_ip = "192.168.50.100",
+	.ssh_ctx.server_ip = "192.168.50.100",
 	.ssh_ctx.server_port = 2222,
 //	.ssh_ctx.server_port = 22,
 	.ssh_ctx.server_user = "pikachu",
@@ -342,8 +341,8 @@ static void tunnel_create(Tunnel_t *tunnel_ctx)
 }
 #else
 //#define FILE_AUTH_KEY "~/.ssh/authorized_keys"
-#define SSH_PUB_KEY "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDYPPTXuwvp8PSdA5HiUtiCpfw3/5I1H32c9mVfVgjlzX6GiN4jLX+dMVo+9wOlvpt1YExhWzlxH+RtFIsfaglZB934XXRFbAP+Q/vLQT9/pbEvmmyM3QoNCI/Cg4PRAfoMALYIdJcFYTrtMo7oRgzfb2jF9gU0PL01CS/1wP9JJqMtHps2g4ZT36kwMPvnJtfWN9LL+QeyeDnH50IEYTM7AXGcNAiAJx3YL3ziPmjNSSTivNVFY2PiRm0e+t/TlSBJ+NNJRggCbzgcA2q0LZn4ZuoPIp1U59NWgEIZvDsgkv8mvwbEy77tmo9iAfK+QpOpWRswBQrD0schQSLNeSd/ pikachu@60.250.242.233\n"
-#define SSH_TUNNEL_ENC "c3NocGFzcyAtcCA2OTY0MTI3NiBzc2ggLU5SICo6OTk5OTpsb2NhbGhvc3Q6MjIgcGlrYWNodUA2MC4yNTAuMjQyLjIzMyAtbyAnU3RyaWN0SG9zdEtleUNoZWNraW5nIG5vJyAtcCAyMjIy"
+#define SSH_PUB_KEY "ssh-rsa XXX"
+#define SSH_TUNNEL_ENC "XXX"
 
 static int ssh_auth_key = 0; // 1: found
 

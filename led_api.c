@@ -36,6 +36,8 @@ static void *led_thread_handler(void *user)
 	LedRequest_t *ledreq = (LedRequest_t*)user;
 	ThreadX_t *tidx_req = &ledreq->tidx;
 
+	threadx_detach(tidx_req);
+
 	if ( ledreq == NULL )
 		goto led_exit;
 	if ( ledreq->led_on_cb == NULL )
@@ -58,7 +60,7 @@ static void *led_thread_handler(void *user)
 	}
 
 	idx = 0;
-	while ( (threadx_isstop(tidx_req)==0) && (threadx_isquit(tidx_req)==0) )
+	while (threadx_isquit(tidx_req)==0)
 	{
 		if (threadx_ispause(tidx_req)==0)
 		{
@@ -69,7 +71,7 @@ static void *led_thread_handler(void *user)
 
 			threadx_timewait_simple(tidx_req, hold_next*TICK_OF_LEDON_10);
 
-			if ( (threadx_isquit(tidx_req)==0) && (threadx_isstop(tidx_req)==0) && (threadx_ispause(tidx_req)==0) )
+			if ( (threadx_isquit(tidx_req)==0)  && (threadx_ispause(tidx_req)==0) )
 			{
 				idx ++;
 				idx %= ledreq->max_led;
@@ -99,7 +101,7 @@ static void *led_thread_handler(void *user)
 	}
 
 led_exit:
-	threadx_set_quit(tidx_req, 1);
+	threadx_leave(tidx_req);
 
 	return NULL;
 }

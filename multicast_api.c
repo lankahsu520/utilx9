@@ -51,9 +51,12 @@ static void mctt_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
 
 void mctt_thread_close(ChainXCtx_t *chainX_req)
 {
-	chainX_thread_stop(chainX_req);
-	chainX_thread_close(chainX_req);
-	SAFE_FREE(chainX_req);
+	if ( (chainX_req) && ( chainX_req->isfree == 0 ) )
+	{
+		chainX_thread_stop(chainX_req);
+		chainX_thread_close(chainX_req);
+		SAFE_FREE(chainX_req);
+	}
 }
 
 ChainXCtx_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb)
@@ -68,7 +71,7 @@ ChainXCtx_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn c
 		chainX_req->select_wait = TIMEOUT_OF_SELECT_1;
 		chainX_req->retry_hold = TIMEOUT_OF_RETRY_HOLD,
 		chainX_req->noblock =  1;
-		chainX_req->in_detach = 1;
+		chainX_req->isfree = 0;
 
 		chainX_ip_set(chainX_req, ip);
 		chainX_port_set(chainX_req, port);

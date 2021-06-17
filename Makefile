@@ -1,4 +1,4 @@
-include $(SDK_CONFIG_CONFIG)
+-include $(SDK_CONFIG_CONFIG)
 
 STRIP ?= $(PJ_STRIP)
 
@@ -46,10 +46,10 @@ LIBS_yes = $(LIBXXXS_yes)
 
 #** librarys **
 LIBS += -lz
-#-ldl -lpthread -lm 
+#-ldl -lpthread -lm
 
 #** Clean **
-#CLEAN_BINS = 
+#CLEAN_BINS =
 CLEAN_OBJS = $(LIBXXX_OBJS)
 CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 
@@ -57,20 +57,21 @@ CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 CLEAN_BINS += \
 						proc_list_123 \
 						proc_watch \
-						spawn_test \
 						queue_123 \
 						demo_123 \
 						demo_000
 
 #** Target (DUMMY_BINS) **
 DUMMY_BINS = \
+						jqx \
 						util_123
 
 CLEAN_BINS += $(DUMMY_BINS)
 CLEAN_OBJS += $(addsuffix .o, $(CLEAN_BINS))
 
 #** Target (SHELL_BINS) **
-SHELL_BINS =
+SHELL_BINS = \
+						proc_watch.sh
 
 include define.mk
 

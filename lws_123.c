@@ -73,6 +73,11 @@ LWSCtx_t lws_req = {
 	.callback = lws2_client_cb,
 };
 
+static int app_quit(void)
+{
+	return is_quit;
+}
+
 #ifdef USE_TIMER_CREATE
 uv_timer_t uv_timer_1sec_fd;
 void timer_1sec_loop(uv_timer_t *handle)
@@ -80,36 +85,40 @@ void timer_1sec_loop(uv_timer_t *handle)
 	//DBG_TR_LN(DBG_TXT_ENTER);
 	//SAFE_UV_ASYNC(&uv_async_fd);
 
-	if (is_service)
-	{ // server mode, send to myself
+	if (app_quit()==1)
+	{
+		//SAFE_UV_TIMER_STOP(handle);
+		SAFE_UV_TIMER_CLOSE(handle, NULL);
+		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
 	}
 	else
-	{ // client mode
-		static int cli_count = 0;
-
-		if (lws2_session_count(&lws_req) > 0)
-		{
-			char tmpbuf[LEN_OF_WEBSOCKET] = "";
-
-			//DBG_IF_LN(">>>>>>>>>> (&lws_req: %p)", &lws_req);
-			SAFE_SPRINTF(tmpbuf, "(cli_count: %d)", cli_count);
-
-			lws2_session_write_q_broadcast(&lws_req, tmpbuf, SAFE_STRLEN(tmpbuf));
+	{
+		if (is_service)
+		{ // server mode, send to myself
 		}
-		else if (cli_count%10==0)
-		{
-			const struct lws_protocols *protocols = lws_req.cinfo.protocols;
-			lws2_cli_open(&lws_req, "localhost", WEBSOCKETS_PORT_7681, (char*)protocols[0].name);
+		else
+		{ // client mode
+			static int cli_count = 0;
+
+			if (lws2_session_count(&lws_req) > 0)
+			{
+				char tmpbuf[LEN_OF_WEBSOCKET] = "";
+
+				//DBG_IF_LN(">>>>>>>>>> (&lws_req: %p)", &lws_req);
+				SAFE_SPRINTF(tmpbuf, "(cli_count: %d)", cli_count);
+
+				lws2_session_write_q_broadcast(&lws_req, tmpbuf, SAFE_STRLEN(tmpbuf));
+			}
+			else if (cli_count%10==0)
+			{
+				const struct lws_protocols *protocols = lws_req.cinfo.protocols;
+				lws2_cli_open(&lws_req, "localhost", WEBSOCKETS_PORT_7681, (char*)protocols[0].name);
+			}
+			cli_count++;
 		}
-		cli_count++;
 	}
 }
 #endif
-
-static int app_quit(void)
-{
-	return is_quit;
-}
 
 void app_stop_uv(uv_async_t *handle, int force)
 {
@@ -164,6 +173,7 @@ static void app_stop(void)
 #ifdef USE_ASYNC_CREATE
 		SAFE_UV_ASYNC(&uv_async_fd);
 #else
+#error "Please use USE_ASYNC_CREATE !!!"
 		app_stop_uv(NULL, 1);
 #endif
 

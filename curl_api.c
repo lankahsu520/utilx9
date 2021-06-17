@@ -148,6 +148,7 @@ static int http_request_simple(HttpCtx_t *http_req)
 		{
 			curl_global_init(CURL_GLOBAL_DEFAULT);
 			CURL *curl = curl_easy_init();
+			http_req->curl = curl;
 			CURLcode curl_res;
 			{
 				curl_easy_setopt(curl, CURLOPT_URL, http_req->url);
@@ -163,6 +164,7 @@ static int http_request_simple(HttpCtx_t *http_req)
 					curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 					curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
 					//curl_easy_setopt(curl, CURLOPT_SSLVERSION, 3);
+					curl_easy_setopt(curl, CURLOPT_CAINFO, "/cert/curl/cacert.pem");
 				}
 				if ((http_req->user) && (http_req->password))
 				{
@@ -196,6 +198,7 @@ static int http_request_simple(HttpCtx_t *http_req)
 				switch (simple_req->method)
 				{
 					case HTTP_METHOD_ID_POST:
+						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); 
 						break;
 					case HTTP_METHOD_ID_GET:
 						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); 
@@ -222,6 +225,7 @@ static int http_request_simple(HttpCtx_t *http_req)
 				ret = 0;
 			}
 			/* always cleanup */ 
+			http_req->curl = NULL;
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 		}
@@ -246,6 +250,7 @@ static int http_request_soap(HttpCtx_t *http_req)
 		{
 			curl_global_init(CURL_GLOBAL_DEFAULT);
 			CURL *curl = curl_easy_init();
+			http_req->curl = curl;
 			CURLcode curl_res;
 			{
 				curl_easy_setopt(curl, CURLOPT_URL, http_req->url);
@@ -303,10 +308,10 @@ static int http_request_soap(HttpCtx_t *http_req)
 			}
 			else
 			{
-
 				ret = 0;
 			}
 			/* always cleanup */ 
+			http_req->curl = NULL;
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 		}
@@ -338,6 +343,7 @@ static int http_request_uploadfile(HttpCtx_t *http_req)
 		{
 			curl_global_init(CURL_GLOBAL_DEFAULT);
 			CURL *curl = curl_easy_init();
+			http_req->curl = curl;
 			CURLcode curl_res;
 			curl_easy_setopt(curl, CURLOPT_URL, http_req->url);
 
@@ -412,6 +418,7 @@ static int http_request_uploadfile(HttpCtx_t *http_req)
 				ret = 0;
 			}
 			/* always cleanup */ 
+			http_req->curl = NULL;
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 		}
@@ -434,10 +441,10 @@ static int http_request_uploadfile(HttpCtx_t *http_req)
 static size_t rtsp_options_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req  = (HttpCtx_t *)context;
+	HttpCtx_t *http_req = (HttpCtx_t *)context;
 	if (http_req)
 	{
-		if (  SAFE_STRSTR(ptr, "Public:") )
+		if ( SAFE_STRSTR(ptr, "Public:") )
 		{
 			RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
 			QBUF_t *qoption = &rtsp_req->qoption;
@@ -451,7 +458,7 @@ static size_t rtsp_options_header_cb(char *ptr, size_t size, size_t nmemb, void 
 // send RTSP OPTIONS request
 static CURLcode rtsp_options(HttpCtx_t *http_req, CURL *curl)
 {
-  CURLcode curl_res = CURLE_OK;
+	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
 
 	rtsp_req->CSeq ++;
@@ -516,7 +523,7 @@ static void rtsp_describe_parse(HttpCtx_t *http_req)
 				else if ( (strlen(track)>0) && (rtsp_req->no_of_track<=MAX_OF_RTSP_TRACK) )
 				{
 					//DBG_DB_LN(">>>>>>>> (mtype: %d, rtsp_req->no_of_track: %d)", mtype, rtsp_req->no_of_track);
-					if  (mtype == 0) // video
+					if (mtype == 0) // video
 					{
 						SAFE_SNPRINTF(rtsp_req->track[rtsp_req->no_of_track], sizeof(rtsp_req->track[rtsp_req->no_of_track]), "%s", track);
 						DBG_DB_LN("(rtsp_req->control: %s)", rtsp_req->track[rtsp_req->no_of_track]);
@@ -634,7 +641,7 @@ static CURLcode rtsp_describe(HttpCtx_t *http_req, CURL *curl)
 static size_t rtsp_setup_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
 	HttpCtx_t *http_req = (HttpCtx_t *)context;
-  size_t bytec = size * nmemb;
+	size_t bytec = size * nmemb;
 	DBG_TMP_Y("(bytec: %zd, ptr: %s)", bytec, str_trim(ptr));
 
 	char *session = NULL;
@@ -651,7 +658,7 @@ static size_t rtsp_setup_header_cb(char *ptr, size_t size, size_t nmemb, void *c
 		//DBG_DB_LN(">>>>>>> (session: %s)", http_req->rtsp_req.session);
 	}
 	
-  return bytec;
+	return bytec;
 }
 
 static CURLcode rtsp_setup(HttpCtx_t *http_req, CURL *curl, int track_id)
@@ -699,7 +706,7 @@ static CURLcode rtsp_setup(HttpCtx_t *http_req, CURL *curl, int track_id)
 	{
 		// ** Body **
 		//curl_easy_setopt(curl, CURLOPT_WRITEDATA, stdout);
-	  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, dummy_body_cb);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, dummy_body_cb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)http_req);
 	}
 
@@ -716,7 +723,7 @@ static size_t rtsp_play_body_cb(char *ptr, size_t size, size_t nmemb, void *cont
 	size_t bytec = size * nmemb;
 	//DBG_TMP_DUMP(ptr, bytec, " ", "(bytec: %ld)", bytec);
 
-	HttpCtx_t *http_req  = (HttpCtx_t *)context;
+	HttpCtx_t *http_req = (HttpCtx_t *)context;
 	if (http_req)
 	{
 		//unsigned char magic = ptr[0];
@@ -736,7 +743,7 @@ static size_t rtsp_play_body_cb(char *ptr, size_t size, size_t nmemb, void *cont
 
 static CURLcode rtsp_play(HttpCtx_t *http_req, CURL *curl)
 {
-  CURLcode curl_res = CURLE_OK;
+	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
 
 	rtsp_req->CSeq ++;
@@ -761,9 +768,9 @@ static CURLcode rtsp_play(HttpCtx_t *http_req, CURL *curl)
 
 	{
 		// ** Body **
-	  //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, dummy_body_cb);
+		//curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, dummy_body_cb);
 		//curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)http_req);
-	  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)NULL);
 
 		if (rtsp_req->interleaved != 0)
@@ -825,15 +832,15 @@ static CURLcode rtsp_teardown(HttpCtx_t *http_req, CURL *curl)
 
 static int _getch(void)
 {
-  struct termios oldt, newt;
-  int ch;
-  tcgetattr(STDIN_FILENO, &oldt);
-  newt = oldt;
-  newt.c_lflag &= ~( ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  ch = getchar();
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  return ch;
+	struct termios oldt, newt;
+	int ch;
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~( ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	ch = getchar();
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	return ch;
 }
 
 static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
@@ -855,6 +862,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 		{
 			curl_global_init(CURL_GLOBAL_ALL);
 			CURL *curl = curl_easy_init();
+			http_req->curl = curl;
 			CURLcode curl_res;
 			curl_easy_setopt(curl, CURLOPT_URL, http_req->url);
 			//curl_easy_setopt(curl, CURLOPT_PROTOCOLS, (long)CURLPROTO_RTSP);
@@ -933,7 +941,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 					{
 						rtsp_receive(http_req, curl);
 						duration = (int)difftime(time(NULL), start_t );
-						if ( (rtsp_req->progress) &&  ( (duration%5)==0) )
+						if ( (rtsp_req->progress) && ( (duration%5)==0) )
 						{
 							DBG_DB_LN("(duration: %d/%d)", duration,rtsp_req->duration );
 							//rtp_context_print( &rtp_req->sess_data);
@@ -961,6 +969,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 			}
 
 			/* always cleanup */ 
+			http_req->curl = NULL;
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 
@@ -997,6 +1006,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 		{
 			curl_global_init(CURL_GLOBAL_DEFAULT);
 			CURL *curl = curl_easy_init();
+			http_req->curl = curl;
 			CURLcode curl_res;
 			curl_easy_setopt(curl, CURLOPT_URL, http_req->url);
 
@@ -1017,6 +1027,11 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 			}
 
 			{
+				if (file_req->progress==1)
+				{
+					curl_easy_setopt(curl, CURLOPT_NOPROGRESS, FALSE);
+				}
+
 				// ** Debug & Timeout **
 				curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, MAX_OF_CURL_CONNECTTIMEOUT);
 				curl_easy_setopt(curl, CURLOPT_TIMEOUT, MAX_OF_CURL_TIMEOUT);
@@ -1031,12 +1046,12 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 
 			{
 				// ** Body **
-			  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-			  curl_easy_setopt(curl, CURLOPT_WRITEDATA, file_req->fp);
+				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+				curl_easy_setopt(curl, CURLOPT_WRITEDATA, file_req->fp);
 
 				if (http_req->file_req.max_filesize > 0)
 				{
-				  curl_easy_setopt(curl, CURLOPT_MAXFILESIZE, http_req->file_req.max_filesize);
+					curl_easy_setopt(curl, CURLOPT_MAXFILESIZE, http_req->file_req.max_filesize);
 				}
 			}
 
@@ -1058,6 +1073,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 				ret = 0;
 			}
 			/* always cleanup */ 
+			http_req->curl = NULL;
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 		}
@@ -1073,8 +1089,8 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 
 static size_t mjpeg_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
-  size_t bytec = size * nmemb;
-	HttpCtx_t *http_req  = (HttpCtx_t *)context;
+	size_t bytec = size * nmemb;
+	HttpCtx_t *http_req = (HttpCtx_t *)context;
 	char *multi_ptr = NULL;
 	char *ctype = NULL;
 	char *clength = NULL;
@@ -1105,12 +1121,12 @@ static size_t mjpeg_header_cb(char *ptr, size_t size, size_t nmemb, void *contex
 			mjpeg_req->clength = atoi(clength);
 		}
 	}
-  return bytec;
+	return bytec;
 }
 
 static size_t mjpeg_body_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
-  size_t bytec = size * nmemb;
+	size_t bytec = size * nmemb;
 	HttpCtx_t *http_req = (HttpCtx_t *)context;
 
 	//DBG_DB_LN("(ptr: %s)", ptr);
@@ -1320,6 +1336,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 		{
 			curl_global_init(CURL_GLOBAL_DEFAULT);
 			CURL *curl = curl_easy_init();
+			http_req->curl = curl;
 			CURLcode curl_res;
 			curl_easy_setopt(curl, CURLOPT_URL, http_req->url);
 
@@ -1350,18 +1367,18 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 
 			{
 				// ** Header **
-			  curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, mjpeg_header_cb);
-			  curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void *)http_req);
+				curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, mjpeg_header_cb);
+				curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void *)http_req);
 			}
 
 			{
 				// ** Body **
-			  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mjpeg_body_cb);
+				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mjpeg_body_cb);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)http_req);
 
 				if (http_req->mjpeg_req.max_size> 0)
 				{
-				  curl_easy_setopt(curl, CURLOPT_MAXFILESIZE, http_req->mjpeg_req.max_size);
+					curl_easy_setopt(curl, CURLOPT_MAXFILESIZE, http_req->mjpeg_req.max_size);
 				}
 			}
 
@@ -1383,6 +1400,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 				ret = 0;
 			}
 			/* always cleanup */ 
+			http_req->curl = NULL;
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 		}
@@ -1424,6 +1442,31 @@ void http_request_free(HttpCtx_t *http_req)
 	}
 }
 
+void http_connect_timeout_set(HttpCtx_t *http_req, int timeout)
+{
+	if ( (http_req) && (http_req->curl) )
+	{
+		curl_easy_setopt(http_req->curl, CURLOPT_CONNECTTIMEOUT, timeout);
+	}
+}
+
+void http_timeout_set(HttpCtx_t *http_req, int timeout)
+{
+	if ( (http_req) && (http_req->curl) )
+	{
+		curl_easy_setopt(http_req->curl, CURLOPT_TIMEOUT, timeout);
+	}
+}
+
+void http_request_stop(HttpCtx_t *http_req)
+{
+	if (http_req)
+	{
+		http_connect_timeout_set(http_req, 1);
+		http_timeout_set(http_req, 1);
+	}
+}
+
 int http_request(HttpCtx_t *http_req)
 {
 	int ret = -1;
@@ -1443,15 +1486,15 @@ int http_request(HttpCtx_t *http_req)
 				break;
 			case HTTP_MODE_ID_DOWNLOAFILE_MJPEG:
 				ret = http_request_downloadfile_mjpeg(http_req);
-				break;				
+				break;
 			case HTTP_MODE_ID_DOWNLOAFILE_RTSP:
-#ifdef UTIL_EX_CURL_RTSP				
+#ifdef UTIL_EX_CURL_RTSP
 				ret = http_request_downloadfile_rtsp(http_req);
 #else
 				DBG_ER_LN("%s (HTTP_MODE_ID_DOWNLOAFILE_RTSP)", DBG_TXT_NO_SUPPORT);
 				ret = -1;
 #endif
-				break;				
+				break;
 			case HTTP_MODE_ID_SOAP:
 				ret = http_request_soap(http_req);
 				break;

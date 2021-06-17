@@ -179,7 +179,7 @@ int str_isnum(const char *str)
 
 	while (*str != '\0')
 	{
-		if (*str < '0' || *str > '9')
+		if ( (*str < '0') || (*str > '9') )
 		{
 			return ret;
 		}
@@ -191,14 +191,14 @@ int str_isnum(const char *str)
 
 char *str_rtrim(char *str)
 {
-	if (str == NULL || *str == '\0')
+	if ( (str == NULL) || (*str == '\0') )
 	{
 		return str;
 	}
 
 	int len = strlen(str);
 	char *p = str + len - 1;
-	while (p >= str  && isspace(*p))
+	while ( (p >= str) && (isspace(*p)) )
 	{
 		*p = '\0';
 		--p;
@@ -209,14 +209,14 @@ char *str_rtrim(char *str)
 
 char *str_ltrim(char *str)
 {
-	if (str == NULL || *str == '\0')
+	if ( (str == NULL) || (*str == '\0') )
 	{
 		return str;
 	}
 
 	int len = 0;
 	char *p = str;
-	while (*p != '\0' && isspace(*p))
+	while ( (*p != '\0') && (isspace(*p)) )
 	{
 		++p;
 		++len;
@@ -233,6 +233,33 @@ char *str_trim(char *str)
 {
 	str = str_rtrim(str);
 	str = str_ltrim(str);
+
+	return str;
+}
+
+char *str_trim_char(char *str, const char *delim, int delim_len)
+{
+	if ( (str == NULL) || (*str == '\0') )
+	{
+		return str;
+	}
+
+	char *p = str;
+	while (*p != '\0')
+	{
+		//if (*p == trim)
+		if ( SAFE_MEMCHR((char*)delim, *p, delim_len) )
+		{
+			char *endp = NULL;
+			endp = p+strlen(p+1);
+			SAFE_MEMMOVE(p, p+1, strlen(p+1));
+			*endp = '\0';
+		}
+		else
+		{
+			p++;
+		}
+	}
 
 	return str;
 }
@@ -890,6 +917,35 @@ int file_exe_chk(char *filename)
 	{
 		ret = 0;
 	}
+	return ret;
+}
+
+// 1: soft link
+int file_slink(char *filename)
+{
+	struct stat file_stat= {0};
+
+	if (lstat(filename, &file_stat) == -1)
+	{
+		return 0;
+	}
+
+	return S_ISLNK(file_stat.st_mode) ? 1 : 0;
+}
+
+int file_spath(char *filename, char *spath, int length)
+{
+	int ret = -1;
+	if ( file_slink(filename) )
+	{
+		DBG_DB_LN("S_ISLNK !!!(filename: %s)", filename);
+		ret = readlink(filename, spath, length);
+	}
+	else
+	{
+		DBG_DB_LN("S_ISLNK not !!! (filename: %s)", filename);
+	}
+
 	return ret;
 }
 
@@ -2054,6 +2110,55 @@ void proc_info(ProcInfo_t *procinfo_ctx)
 	proc_info_static(procinfo_ctx);
 	proc_cpu_usage(procinfo_ctx);
 }
+
+unsigned long pidof(char *name)
+{
+	unsigned long ret = 0;
+	DIR* dir;
+	struct dirent* ent;
+	char* endptr;
+
+	if (!(dir = opendir("/proc")))
+	{
+		DBG_ER_LN("opendir error !!! (/proc)");
+		return ret;
+	}
+
+	while ( (ret == 0) && ((ent = readdir(dir)) != NULL) )
+	{
+		// if endptr is not a null character, the directory is not entirely numeric, so ignore it
+		char cmdline[LEN_OF_CMDLINE] = "";
+		unsigned long pid = strtol(ent->d_name, &endptr, 10);
+		if (*endptr != '\0')
+		{
+			continue;
+		}
+
+		/* try to open the cmdline file */
+		SAFE_SNPRINTF(cmdline, (int)sizeof(cmdline), "/proc/%ld/cmdline", pid);
+		//DBG_ER_LN(">>>>>>>>> (cmdline: %s)", cmdline);
+		FILE* fp = SAFE_FOPEN(cmdline, "r");
+		if (fp) 
+		{
+			if (SAFE_FGETS(cmdline, sizeof(cmdline), fp) != NULL)
+			{
+				//DBG_ER_LN(">>>>>>>>> (cmdline: %s)", cmdline);
+				// check the first token in the file, the program name
+				char *saveptr = NULL;
+				char *first = SAFE_STRTOK_R(cmdline, " ", &saveptr);
+
+				if ( SAFE_STRRCMP(first, name) == 0 )
+				{
+					ret = pid;
+				}
+			}
+			SAFE_FCLOSE(fp);
+		}
+	}
+
+	return ret;
+}
+
 #endif
 
 #ifdef UTIL_EX_FASTCGI

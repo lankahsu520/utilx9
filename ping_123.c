@@ -26,7 +26,6 @@ ChainXCtx_t chainX_i = {
 	//.netinfo.addr.ipv4="8.8.8.8",
 	//.netinfo.addr.ipv4="192.168.50.1",
 	.netinfo.port = 0,
-	.isquit = 0,
 	.isfree = 0,
 
 	.recycle = 1,

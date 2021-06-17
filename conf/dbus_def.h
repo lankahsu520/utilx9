@@ -30,9 +30,10 @@
 //#define UPDATE_DBUS_STATUS_IFAC                   "com.PhilioTech.update.status"
 //#define ZWAVE_RECENT_EVENT_IFAC                   "com.PhilioTech.zwave.recentEvent"
 
-#define DBUS_DEMO_DEST                            "com.luffanet.www.demo"
-#define MASTER_DBUS_DEST                          "com.luffanet.www.master"
-#define YK_P2P_DAEMON_DBUS_DEST                   "com.luffanet.www.yk_p2p_daemon"
+#define DBUS_DEST_DEMO                            "com.luffanet.www.demo"
+#define DBUS_DEST_MASTER                          "com.luffanet.www.master"
+#define DBUS_DEST_YK_P2P_DAEMON                   "com.luffanet.www.yk_p2p_daemon"
+#define DBUS_DEST_OTA_DAEMON                      "com.luffanet.www.ota_daemon"
 
 //path - PhilioTech
 #define ZWAVE_DBUS_DEV_PATH                       "/com/PhilioTech/zwave/device"
@@ -45,9 +46,13 @@
 #define DBUS_PATH_YK_P2P_ECHO                     "/com/Luffanet/yk_p2p_echo"
 #define DBUS_PATH_YK_P2P_CALL                     "/com/Luffanet/yk_p2p_call"
 #define DBUS_PATH_YK_WS_DAEMON                    "/com/Luffanet/yk_ws_daemon"
+#define DBUS_PATH_YK_MQTT_DAEMON                  "/com/Luffanet/yk_mqtt_daemon"
+
+#define DBUS_PATH_OTA_DAEMON                      "/com/Luffanet/ota_daemon"
 
 //path - xbox
 #define DBUS_PATH_DBUS_123                        "/com/xbox/dbus_123"
+#define DBUS_PATH_DBUS_456                        "/com/xbox/dbus_456"
 
 
 //******************************************************************************
@@ -419,6 +424,18 @@
 #define DBUS_S_MATCH_DEMO                         "type='signal',interface='com.luffanet.signal.demo'"
 
 #define DBUS_METHOD_ECHO                          "echo"
+
+//******************************************************************************
+// ota_daemon
+//******************************************************************************
+// -> ota_daemon
+#define DBUS_M_IFAC_OTA_COMMAND                   "com.luffanet.ota.command" // sync
+
+// ota_daemon => all
+#define DBUS_S_IFAC_OTA                           "com.luffanet.signal.ota"
+#define DBUS_S_MATCH_OTA                          "type='signal',interface='com.luffanet.signal.ota'"
+
+#define DBUS_METHOD_GETFW                         "getfw"
 
 //******************************************************************************
 // yk_p2p_daemon

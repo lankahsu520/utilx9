@@ -18,122 +18,95 @@
 #include "utilx9.h"
 
 #define USE_UV
-#ifdef USE_UV
-#define USE_ASYNC_CREATE
-#define USE_TIMER_CREATE
-#endif
+#define USE_MQTT_DEMO
 
 #define TAG "mqtt_123"
 
 // ** app **
 static int is_quit = 0;
 
+#ifdef USE_UV
+#define USE_ASYNC_CREATE
+#define USE_TIMER_CREATE
 static uv_loop_t *uv_loop = NULL;
-
-char iface_mac[LEN_OF_MAC]= "9C65F9361C00";
-
-#ifdef USE_ASYNC_CREATE
 uv_async_t uv_async_fd;
+
+uv_timer_t uv_timer_1sec_fd;
 #endif
 
-static void hornet_message_put_cb(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
+char iface_dev[LEN_OF_NAME_DEV] = "eth0";
+char iface_mac[LEN_OF_MAC]= "9C65F9361C00";
+
+#ifdef USE_MQTT_DEMO
+static void mqtt123_connect_cb(struct mosquitto *mosq, void *userdata, int result)
 {
-	MQTTSession *session = (MQTTSession *)userdata;
-
-	DBG_IF_LN("(%s:%d, topic: %s, [%d]%s)", session->hostname, session->port, message->topic, message->payloadlen, (char*) message->payload);
-}
-
-static void hornet_message_event_cb(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
-{
-	MQTTSession *session = (MQTTSession *)userdata;
-
-	DBG_IF_LN("(%s:%d, topic: %s, [%d]%s)", session->hostname, session->port, message->topic, message->payloadlen, (char*) message->payload);
-}
-
-static void hornet_connect_cb(struct mosquitto *mosq, void *userdata, int result)
-{
-	MQTTSession *session = (MQTTSession *)userdata;
-
-	DBG_IF_LN("(%s:%d, result: %d)", session->hostname, session->port, result);
-
-	char topic[LEN_OF_TOPIC] = "";
-	SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID, JVAL_METHODID_EVENT, iface_mac);
-	mqtt_subscribe_add(session, topic, hornet_message_event_cb);
-
-	SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID, JVAL_METHODID_PUT, iface_mac);
-	mqtt_subscribe_add(session, topic, hornet_message_put_cb);
-
-	SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID, JVAL_METHODID_GET, iface_mac);
-	mqtt_subscribe_add(session, topic, hornet_message_put_cb);
-}
-
-static void hornet_disconnect_cb(struct mosquitto *mosq, void *userdata, int result)
-{
-	MQTTSession *session = (MQTTSession *)userdata;
+	MQTTSession_t *session = (MQTTSession_t *)userdata;
 
 	DBG_IF_LN("(%s:%d, result: %d)", session->hostname, session->port, result);
 }
 
-static void hornet_message_cb(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
+static void mqtt123_disconnect_cb(struct mosquitto *mosq, void *userdata, int result)
 {
+	MQTTSession_t *session = (MQTTSession_t *)userdata;
+
+	DBG_IF_LN("(%s:%d, result: %d)", session->hostname, session->port, result);
 }
 
-static MQTTSession hornet_session = {
+static void mqtt123_root_subscribe_cb(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
+{
+	MQTTSession_t *session = (MQTTSession_t *)userdata;
+
+	DBG_IF_LN("(%s:%d, topic: %s, [%d]%s)", session->hostname, session->port, message->topic, message->payloadlen, (char*) message->payload);
+}
+
+static MQTTSession_t mqtt123_session = {
 	.hostname = "192.168.50.9",
 	.port = 1883,
 	.keepalive = 60,
 	//.topic = "9C65F9361C00/#",
-	.topic = "",
+	.topic_root = MQTT_TOPIC_SUB_ROOT_MASK,
+	.topic_id = MQTT_TOPIC_ID_USER,
 
 	.clean_session = true,
-	.user="lanka",
-	.pass="123456",
+	.user=JVAL_C_USERNAME_BROADCAST,
+	.pass="guest",
 	.certificate_file = NULL,
 	.privatekey_file = NULL,
 	.ca_file = NULL,
 	.isconnect = 0,
 
 	.log_cb = NULL,
-	.connect_cb = hornet_connect_cb,
-	.disconnect_cb = hornet_disconnect_cb,
-	.message_cb = hornet_message_cb,
+	.connect_cb = mqtt123_connect_cb,
+	.disconnect_cb = mqtt123_disconnect_cb,
+
+	.root_subscribe_cb = mqtt123_root_subscribe_cb,
 };
 
-MQTTCtx_t hornet_data = {
-	.name = "hornet_data",
+MQTTCtx_t mqtt123_data = {
+	.name = "mqtt123_data",
+
+	.isfree = 0,
 	.isinit = 0,
-	.isquit = 0,
-
 	.dbg_more = DBG_LVL_MAX,
-	.session = &hornet_session,
 
+	.session = &mqtt123_session,
 };
 
-static void hornet_init(void)
+static void mqtt123_init(MQTTCtx_t *mqtt_ctx)
 {
-	SAFE_SPRINTF(hornet_session.topic, MQTT_TOPIC_SUB_ROOT_MASK, iface_mac);
-	//DBG_ER_LN(">>>>>>>>>>>>>> %s", hornet_session.topic);
-	mqtt_thread_init( &hornet_data );
+	MQTTSession_t *session = mqtt_session_get(mqtt_ctx);
+
+	if (session->topic_id == MQTT_TOPIC_ID_USER)
+	{
+		SAFE_SPRINTF(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, session->user, "/");
+	}
+	else
+	{
+		SAFE_SPRINTF(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, "", "");
+	}
+	mqtt_thread_init( mqtt_ctx );
 }
 
-#ifdef USE_TIMER_CREATE
-uv_timer_t uv_timer_1sec_fd;
-void timer_1sec_loop(uv_timer_t *handle)
-{
-	//DBG_TR_LN(DBG_TXT_ENTER);
-	//SAFE_UV_ASYNC(&uv_async_fd);
-
-	char topic[LEN_OF_TOPIC] = "";
-
-	char c_uuid[LEN_OF_UUID]="CCC3F3BB";
-	int nodeid = 2;
-	int epid = 0;
-	int issueid = JKEY_ISSUEID_MOTION;
-	SAFE_SPRINTF(topic, MQTT_TOPIC_PUB_ROOT_MASK, JVAL_METHODID_EVENT, JVAL_PROTOCOLID_ZWAVES2, iface_mac, c_uuid, nodeid, epid, issueid);
-	//mqtt_publish(hornet_data.session, "0/0/9C65F9361C00/CCC3F3BB/2/0/0001000C", "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}");
-	//mqtt_qpub_add(hornet_data.session, "0/0/9C65F9361C00/CCC3F3BB/2/0/0001000C", "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}");
-	mqtt_qpub_add(hornet_data.session, topic, "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}");
-}
 #endif
 
 static int app_quit(void)
@@ -141,13 +114,52 @@ static int app_quit(void)
 	return is_quit;
 }
 
+#ifdef USE_UV
+#ifdef USE_TIMER_CREATE
+void timer_1sec_loop(uv_timer_t *handle)
+{
+	int count = 0;
+	count ++;
+
+	//DBG_TR_LN(DBG_TXT_ENTER);
+	//SAFE_UV_ASYNC(&uv_async_fd);
+
+	if (app_quit()==1)
+	{
+		//SAFE_UV_TIMER_STOP(handle);
+		SAFE_UV_TIMER_CLOSE(handle, NULL);
+		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
+	}
+	else
+	{
+		char topic[LEN_OF_TOPIC] = "";
+
+		char c_uuid[LEN_OF_UUID]="CCC3F3BB";
+		int nodeid = 2;
+		int epid = 0;
+		int issueid = JKEY_ISSUEID_MOTION;
+
+		if (mqtt123_session.topic_id == MQTT_TOPIC_ID_USER)
+		{
+			SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, mqtt123_session.user, "/", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
+		}
+		else
+		{
+			SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, "", "", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
+		}
+		//mqtt_publish(mqtt123_data.session, "0/0/9C65F9361C00/CCC3F3BB/2/0/0001000C", "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}");
+		//mqtt_qpub_add(mqtt123_data.session, "0/0/9C65F9361C00/CCC3F3BB/2/0/0001000C", "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}", NULL);
+		mqtt_qpub_add(mqtt123_data.session, topic, "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}", NULL);
+	}
+}
+#endif
+
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
 	if ( (is_free==0) && (app_quit()==1) )
 	{
 		is_free = 1;
-#ifdef USE_UV
 		if (uv_loop)
 		{
 #ifdef USE_TIMER_CREATE
@@ -164,20 +176,18 @@ void app_stop_uv(uv_async_t *handle, int force)
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
 		}
-#endif
 	}
 }
 
 #ifdef USE_ASYNC_CREATE
-//uv_async_t uv_async_fd;
-int async_count = 0;
-
 void async_loop(uv_async_t *handle)
 {
 	DBG_IF_LN(DBG_TXT_ENTER);
 
 	app_stop_uv(handle, 0);
 }
+#endif
+
 #endif
 
 static void app_set_quit(int mode)
@@ -191,40 +201,51 @@ static void app_stop(void)
 	{
 		app_set_quit(1);
 
-		mqtt_thread_stop(&hornet_data);
-		mqtt_thread_close(&hornet_data);
+#ifdef USE_MQTT_DEMO
+		{
+			mqtt_thread_stop(&mqtt123_data);
+			mqtt_thread_close(&mqtt123_data);
+		}
+#endif
 
+#ifdef USE_UV
 #ifdef USE_ASYNC_CREATE
 		SAFE_UV_ASYNC(&uv_async_fd);
 #else
+#error "Please use USE_ASYNC_CREATE !!!"
 		app_stop_uv(NULL, 1);
 #endif
+#endif
+		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
 	}
 }
 
 static void app_loop(void)
 {
+#ifdef USE_MQTT_DEMO
+	{
+		mqtt123_init(&mqtt123_data);
+	}
+#endif
+
 #ifdef USE_UV
-	SAFE_UV_LOOP_INIT(uv_loop);
+	{
+		SAFE_UV_LOOP_INIT(uv_loop);
 
 #ifdef USE_ASYNC_CREATE
-	uv_async_fd.data = (void *) &async_count;
-	SAFE_UV_ASYNC_INIT(uv_loop, &uv_async_fd, async_loop);
+		SAFE_UV_ASYNC_INIT(uv_loop, &uv_async_fd, async_loop);
 #endif
 
 #ifdef USE_TIMER_CREATE
-	SAFE_UV_TIMER_INIT(uv_loop, &uv_timer_1sec_fd);
-	SAFE_UV_TIMER_START(&uv_timer_1sec_fd, timer_1sec_loop, 1000, 1000); // 1st: 1, 2nd: 1+1, 3rd: 1+1+1, 4th: 1+1+1+1 .....
-#endif
+		SAFE_UV_TIMER_INIT(uv_loop, &uv_timer_1sec_fd);
+		SAFE_UV_TIMER_START(&uv_timer_1sec_fd, timer_1sec_loop, 1000, 1000); // 1st: 1, 2nd: 1+1, 3rd: 1+1+1, 4th: 1+1+1+1 .....
 #endif
 
-	hornet_init();
-
-#ifdef USE_UV
-	SAFE_UV_LOOP_RUN(uv_loop);
-	SAFE_UV_LOOP_CLOSE(uv_loop);
+		SAFE_UV_LOOP_RUN(uv_loop);
+		SAFE_UV_LOOP_CLOSE(uv_loop);
+	}
 #else
-	while ( is_quit == 0)
+	while ( app_quit()==0 )
 	{
 		sleep(1);
 	}
@@ -284,10 +305,21 @@ static void app_signal_register(void)
 }
 
 int option_index = 0;
-const char* short_options = "d:h";
+const char* short_options = "d:f:p:i:u:w:c:r:k:h";
 static struct option long_options[] =
 {
 	{ "debug",       required_argument,   NULL,    'd'  },
+	{ "host",        required_argument,   NULL,    'f'  },
+	{ "port",        required_argument,   NULL,    'p'  },
+	{ "iface",       required_argument,   NULL,    'i'  },
+
+	{ "user",        required_argument,   NULL,    'u'  },
+	{ "pass",        required_argument,   NULL,    'w'  },
+
+	{ "cafile",      required_argument,   NULL,    'c'  },
+	{ "cert",        required_argument,   NULL,    'r'  },
+	{ "key",         required_argument,   NULL,    'k'  },
+
 	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
 };
@@ -296,10 +328,18 @@ static void app_showusage(int exit_code)
 {
 	printf( "Usage: %s\n"
 					"  -d, --debug       debug level\n"
+					"  -f, --host        hostname\n"
+					"  -p, --port        port\n"
+					"  -i, --iface       iface\n"
+					"  -u, --user        user\n"
+					"  -w, --pass        pass\n"
+					"  -c, --cafile      cafile\n"
+					"  -r, --cert        cert\n"
+					"  -k, --key         key\n"
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
-					"  %s -d 4\n", TAG);
+					"  %s -d 2 -f 192.168.50.9 -p 1883\n", TAG);
 	exit(exit_code);
 }
 
@@ -307,15 +347,79 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
+	MQTTSession_t *session = mqtt_session_get(&mqtt123_data);
+
 	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
 	{
 		switch (opt)
 		{
+			case 'f':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					SAFE_SPRINTF(session->hostname, "%s", optarg);
+				}
+#endif
+				break;
+			case 'p':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					session->port = atoi(optarg);
+				}
+#endif
+				break;
+			case 'i':
+				if (optarg)
+				{
+					SAFE_SPRINTF(iface_dev, "%s", optarg);
+				}
+				break;
 			case 'd':
 				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
+				break;
+			case 'u':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					SAFE_SPRINTF(session->user, "%s", optarg);
+				}
+#endif
+				break;
+			case 'w':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					SAFE_SPRINTF(session->pass, "%s", optarg);
+				}
+#endif
+				break;
+			case 'c':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					session->ca_file = optarg;
+				}
+#endif
+				break;
+			case 'r':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					session->certificate_file = optarg;
+				}
+#endif
+				break;
+			case 'k':
+#ifdef USE_MQTT_DEMO
+				if (optarg)
+				{
+					session->privatekey_file = optarg;
+				}
+#endif
 				break;
 			default:
 				app_showusage(-1);
@@ -331,6 +435,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
+	SAFE_STDOUT_NONE();
 	if ( app_init() == -1 )
 	{
 		return -1;

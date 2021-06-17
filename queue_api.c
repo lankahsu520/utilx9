@@ -30,7 +30,8 @@ void queue_lock(QueueInfo_t *queue)
 {
 	if (queue)
 	{
-		SAFE_THREAD_LOCK_EX(queue);
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_lock(tidx_req);
 	}
 }
 
@@ -38,7 +39,8 @@ void queue_unlock(QueueInfo_t *queue)
 {
 	if (queue)
 	{
-		SAFE_THREAD_UNLOCK_EX(queue);
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_unlock(tidx_req);
 	}
 }
 
@@ -46,15 +48,30 @@ void queue_signal(QueueInfo_t *queue)
 {
 	if (queue)
 	{
-		SAFE_THREAD_SIGNAL_EX(queue);
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_wakeup(tidx_req);
 	}
+}
+
+int queue_timewait(QueueInfo_t *queue, int ms)
+{
+	int ret = EINVAL;
+
+	if (queue)
+	{
+		ThreadX_t *tidx_req = &queue->tidx;
+		ret = threadx_timewait(tidx_req, ms);
+	}
+
+	return ret;
 }
 
 void queue_wait(QueueInfo_t *queue)
 {
 	if (queue)
 	{
-		SAFE_THREAD_WAIT_EX(queue);
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_wait(tidx_req);
 	}
 }
 
@@ -172,24 +189,45 @@ int queue_isempty(QueueInfo_t *queue)
 	return ret;
 }
 
+int queue_isloop(QueueInfo_t *queue)
+{
+	int isloop = 0;
+	if (queue)
+	{
+		ThreadX_t *tidx_req = &queue->tidx;
+		isloop = threadx_isloop(tidx_req);
+	}
+	return isloop;
+}
+
+int queue_isquit(QueueInfo_t *queue)
+{
+	int isquit = 0;
+	if (queue)
+	{
+		ThreadX_t *tidx_req = &queue->tidx;
+		isquit = threadx_isquit(tidx_req);
+	}
+	return isquit;
+}
+
 // 20 = 2 secs
 int queue_isready(QueueInfo_t *queue, int retry)
 {
-	if (retry<0) retry = 10;
-
-	while ((queue->isquit==0) && (retry>0) && (queue->isready==0) )
+	int isready = 0;
+	if (queue)
 	{
-		retry--;
-		usleep(100*1000);
+		ThreadX_t *tidx_req = &queue->tidx;
+		isready = threadx_isready(tidx_req, retry);
 	}
 
-	return queue->isready;
+	return isready;
 }
 
 void queue_gosleep(QueueInfo_t *queue)
 {
 	if (queue==NULL) return;
-	if (queue->tid==0) return;
+	if (queue_isloop(queue)==0) return;
 
 	queue_lock(queue);
 	queue->ishold = 1;
@@ -199,7 +237,7 @@ void queue_gosleep(QueueInfo_t *queue)
 void queue_wakeup(QueueInfo_t *queue)
 {
 	if (queue==NULL) return;
-	if (queue->tid==0) return;
+	if (queue_isloop(queue)==0) return;
 
 	queue_lock(queue);
 	queue->ishold = 0;
@@ -210,15 +248,15 @@ void queue_wakeup(QueueInfo_t *queue)
 void queue_add(QueueInfo_t *queue, void *data_new)
 {
 	if (queue==NULL) return;
-	if (queue->tid==0) return;
+	if (queue_isloop(queue)==0) return;
 
 	queue_lock(queue);
 	if ( queue->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isready: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue->isready);
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue_isloop(queue));
 	}
 
-	if ( (queue->isquit== 0) && ( !queue_isfull(queue) ) )
+	if ( (queue_isquit(queue)== 0) && ( !queue_isfull(queue) ) )
 	{
 #ifdef UTIL_EX_CLIST
 		QItem_t *qitem = (QItem_t*)SAFE_CALLOC(1, sizeof(QItem_t));
@@ -241,15 +279,15 @@ void queue_add(QueueInfo_t *queue, void *data_new)
 void queue_push(QueueInfo_t *queue, void *data_new)
 {
 	if (queue==NULL) return;
-	if (queue->tid==0) return;
+	if (queue_isloop(queue)==0) return;
 
 	queue_lock(queue);
 	if ( queue->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isready: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue->isready);
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue_isloop(queue));
 	}
 
-	if ( (queue->isquit== 0) && ( !queue_isfull(queue) ) )
+	if ( (queue_isquit(queue)== 0) && ( !queue_isfull(queue) ) )
 	{
 #ifdef UTIL_EX_CLIST
 		QItem_t *qitem = (QItem_t*)SAFE_CALLOC(1, sizeof(QItem_t));
@@ -277,16 +315,17 @@ static void queue_pop(QueueInfo_t *queue)
 {
 	int exec = 0;
 	if (queue==NULL) return;
+
 	void *data_pop = (void *)queue->data_pop;
 
 	//int old = clist_length(queue->qlist);
 	queue_lock(queue);
 	if ( queue->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isready: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue->isready);
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queue->name, clist_length(queue->qlist), queue->max_data, queue->ishold, queue_isloop(queue));
 	}
 
-	if ( ( queue->isquit == 0 ) && ( queue->ishold == 0 ) && (queue_isempty(queue) != 1) )
+	if ( ( queue_isquit(queue) == 0 ) && ( queue->ishold == 0 ) && (queue_isempty(queue) != 1) )
 	{
 		SAFE_MEMSET(data_pop, 0, queue->data_size);
 
@@ -307,7 +346,7 @@ static void queue_pop(QueueInfo_t *queue)
 
 		exec = 1;
 	}
-	else if ( queue->isquit == 0 )
+	else if ( queue_isquit(queue) == 0 )
 	{
 		queue_wait(queue);
 	}
@@ -333,38 +372,30 @@ static void *queue_thread_handler( void *user )
 
 	if (queue)
 	{
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_detach(tidx_req);
+
 		queue_create(queue);
 
-		queue->isready = 1;
-		while (queue->isquit == 0)
+		while (threadx_isquit(tidx_req) == 0)
 		{
 			queue_pop(queue);
 		}
 
 		queue_free(queue);
+
+		threadx_leave(tidx_req);
 	}
+
 	return NULL;
-}
-
-static void queue_thread_free(QueueInfo_t *queue)
-{
-	if (queue==NULL) return;
-
-	{
-		SAFE_MUTEX_DESTROY(&queue->in_mtx);
-		SAFE_COND_DESTROY(&queue->in_cond);
-	}
-	SAFE_FREE(queue);
 }
 
 void queue_thread_stop(QueueInfo_t *queue)
 {
 	if (queue)
 	{
-		queue_lock(queue);
-		queue->isquit = 1;
-		queue_signal(queue);
-		queue_unlock(queue);
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_stop(tidx_req);
 	}
 }
 
@@ -374,21 +405,10 @@ void queue_thread_close(QueueInfo_t *queue)
 	{
 		queue->isfree ++;
 
-		SAFE_THREAD_JOIN_EX(queue);
+		ThreadX_t *tidx_req = &queue->tidx;
+		threadx_close(tidx_req);
 
-		DBG_TR_LN("call queue_thread_free ... (name: %s)", queue->name);
-		queue_thread_free(queue);
-	}
-}
-
-static void queue_thread_mutex_init(QueueInfo_t *queue)
-{
-	if (queue==NULL) return;
-
-	int rc = SAFE_MUTEX_ATTR_RECURSIVE(queue->in_mtx);
-	if (rc == 0)
-	{
-		SAFE_COND_ATTR_NORMAL(queue->in_cond);
+		SAFE_FREE(queue);
 	}
 }
 
@@ -409,8 +429,10 @@ QueueInfo_t *queue_thread_init(char *name, int queue_size, int data_size, queue_
 		queue->dbg_more = DBG_LVL_MAX;
 
 		{
-			queue_thread_mutex_init(queue);
-			SAFE_THREAD_CREATE(queue->tid, NULL, queue_thread_handler, queue);
+			ThreadX_t *tidx_req = &queue->tidx;
+			tidx_req->thread_cb = queue_thread_handler;
+			tidx_req->data = queue;
+			threadx_init(tidx_req);
 		}
 	}
 	return queue;

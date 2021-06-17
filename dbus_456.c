@@ -25,6 +25,17 @@ static int is_quit = 0;
 static int is_service = 0;
 char msg[LEN_OF_BUF256]="";
 
+static DbusX dbusx_456 = {
+	.name = "dbusx_456",
+
+	.isfree = 0,
+	.isinit = 0,
+
+	.path = DBUS_PATH_DBUS_456,
+	.dbus_conn = NULL,
+	.dbus_conn_listen = NULL,
+};
+
 static DBusHandlerResult dbus_filter_cb(DBusConnection *connection, DBusMessage *message, void *usr_data)
 {
 	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -44,7 +55,7 @@ static DBusHandlerResult dbus_filter_cb(DBusConnection *connection, DBusMessage 
 	return handled;
 }
 
-static int dbus_match_cb(DBusConnection *dbus_listen, DBusError *err)
+static int dbus_match_cb(DBusConnection *dbus_listen, DBusError *err, void *usr_data)
 {
 	int ret = -1;
 
@@ -56,10 +67,10 @@ static int dbus_match_cb(DBusConnection *dbus_listen, DBusError *err)
 		goto exit_match;
 	}
 
-	dbus_bus_request_name(dbus_listen, DBUS_DEMO_DEST, DBUS_NAME_FLAG_REPLACE_EXISTING, err);
+	dbus_bus_request_name(dbus_listen, DBUS_DEST_DEMO, DBUS_NAME_FLAG_REPLACE_EXISTING, err);
 	if (dbus_error_is_set(err))
 	{
-		DBG_ER_LN("dbus_bus_request_name error !!! (%s, %s)", DBUS_DEMO_DEST, err->message );
+		DBG_ER_LN("dbus_bus_request_name error !!! (%s, %s)", DBUS_DEST_DEMO, err->message );
 		goto exit_match;
 	}
 
@@ -90,10 +101,9 @@ static void app_stop(void)
 
 static void app_loop(void)
 {
-	dbus_path_set(DBUS_PATH_DBUS_123);
 	if (is_service)
 	{
-		dbus_thread_init(dbus_match_cb, dbus_filter_cb);
+		dbusx_thread_init(dbus_match_cb, dbus_filter_cb, &dbusx_456);
 
 		while (app_quit()==0)
 		{
@@ -102,15 +112,15 @@ static void app_loop(void)
 	}
 	else
 	{
-		dbus_client_init();
+		dbusx_client_init(&dbusx_456);
 
-		dbus_signal_str(DBUS_S_IFAC_DEMO, DBUS_METHOD_COMMAND, msg);
+		dbusx_signal_str(&dbusx_456, DBUS_S_IFAC_DEMO, DBUS_METHOD_COMMAND, msg);
 
-		char *retStr = dbus_method_str2str(DBUS_DEMO_DEST, DBUS_M_IFAC_DEMO_CMD, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
+		char *retStr = dbusx_method_str2str(&dbusx_456, DBUS_DEST_DEMO, DBUS_M_IFAC_DEMO_CMD, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
 		DBG_IF_LN("(retStr: %s)", retStr);
 		SAFE_FREE(retStr);
-		
-		dbus_conn_free();
+
+		dbusx_conn_free(&dbusx_456);
 	}
 }
 

@@ -40,7 +40,7 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 # Build
    ```
 $ . conf/config_customer
-	My prefix is /work/codebase/xbox/xbox_ubuntu/install/ubuntu_/.
+	My prefix is /work/codebase/lankahsu520/xbox_github/install/ubuntu_/.
 	Please replace the string.
 $ make
    ```
@@ -53,16 +53,17 @@ $ make
 - demo_000 - c template.
 - demo_123 - a example.
 - http_client_123 - http client example. use curl.
+- jqx - it is similar to jq. jqx only support reads from pipe. 
 - json_123 - json example.
 - led_123 - led controller example.
 - lws_123 - a websocket example.
 - mqtt_123 - a mqtt example.
 - multicast_cli & multicast_srv - multicast example.
 - ~~nlink_123 & nlink_456 - netlink example. got from internet.~~
-- queue_123 - a queue example.
 - onvif_client_123 - onvif client example.
 - ping_123 - ping example.
 - proc_list_123 & proc_watch - a system and proc information example.
+- queue_123 - a queue example.
 - sshX_123 - ssh example.
 - statex_123 - state machine example. use statex_api.c.
 - ~~swlink_123 - swconfig example. (depend on linux kernel)~~

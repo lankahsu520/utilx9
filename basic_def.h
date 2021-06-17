@@ -27,7 +27,7 @@ extern "C" {
 //******************************************************************************
 //** define **
 //******************************************************************************
-#define LEN_OF_USER 16
+#define LEN_OF_USER 64// must be > LEN_OF_UUID
 #define LEN_OF_PASS 16
 
 #define LEN_OF_NAME32 32
@@ -44,18 +44,30 @@ extern "C" {
 #define LEN_OF_VAL64 64
 #define LEN_OF_VAL80 80
 #define LEN_OF_VAL128 128
+#define LEN_OF_VAL512 512
+#define LEN_OF_VAL1024 1024
+#define LEN_OF_VAL2048 2048
+#define LEN_OF_VAL3072 3072
+#define LEN_OF_VAL4096 4096
 
 #define LEN_OF_BUF128 128
 #define LEN_OF_BUF256 256
 #define LEN_OF_BUF512 512
 #define LEN_OF_BUF1024 1024
+#define LEN_OF_BUF2048 2048
+#define LEN_OF_BUF3072 3072
+#define LEN_OF_BUF4096 4096
 
 #define LEN_OF_CMDLINE LEN_OF_BUF1024
 #define LEN_OF_NEWLINE LEN_OF_BUF1024
-#define LEN_OF_RESPONSE LEN_OF_BUF1024
+#define LEN_OF_RESPONSE LEN_OF_BUF3072
 
 #define LEN_OF_FILENAME256 256
 #define LEN_OF_FILENAME512 512
+#define LEN_OF_FILENAME1024 1024
+#define LEN_OF_FILENAME2048 2048
+#define LEN_OF_FILENAME3072 3072
+#define LEN_OF_FILENAME4096 4096
 
 #define MAX_OF_OVERLOAD 3 // Uptime_t
 #define MAX_OF_FDSIZE 40 // ProcInfo_t

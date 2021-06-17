@@ -20,17 +20,20 @@ static void *thread_handler(void *user)
 {
 	ThreadX_t *tidx_req = (ThreadX_t*)user;
 
+	threadx_detach(tidx_req);
+
 	int count = 0;
 	DBG_IF_LN("(count: %d)", count++);
 
-	while ( (threadx_isstop(tidx_req)==0) && (threadx_isquit(tidx_req)==0) )
+	while (threadx_isquit(tidx_req)==0)
 	{
 		if (threadx_ispause(tidx_req)==0)
 		{
 			DBG_IF_LN("(count: %d)", count++);
-			if ( count > 10)
+			if (( count % 10) == 0)
 			{
-				break;
+				threadx_timewait_simple(tidx_req, 3*1000);
+				//break;
 			}
 		}
 		else
@@ -39,7 +42,7 @@ static void *thread_handler(void *user)
 		}
 	}
 
-	threadx_set_quit(tidx_req, 1);
+	threadx_leave(tidx_req);
 	DBG_IF_LN(DBG_TXT_BYE_BYE);
 
 	return NULL;

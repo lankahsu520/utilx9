@@ -19,12 +19,14 @@
 
 #define TAG "tty_123"
 
+// ** app **
+static int is_quit = 0;
+
 ChainXCtx_t chainX_T = {
 	.mode = CHAINX_MODE_ID_TTY,
 	.ttyfd = -1,
 
 	.status = 0,
-	.isquit = 0,
 	.isfree = 0,
 
 	.security = 0,
@@ -40,13 +42,18 @@ ChainXCtx_t chainX_T = {
 	.ttyinfo.stopbits = 1,	
 };
 
+static int app_quit(void)
+{
+	return is_quit;
+}
+
 #ifdef UTIL_EX_TTY
 static void tty_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
 {
 	if (( chainX_req ) && (buff))
 	{
 #if (1)
-		DBG_IF_LN(">>>>>>>>>>>> (buff: %s, buff_len: %d)", buff, buff_len);
+		DBG_IF_LN("(buff: %s, buff_len: %d)", buff, buff_len);
 #else
 		QBUF_t *qbuf = (QBUF_t *)chainX_req->c_data;
 
@@ -98,22 +105,109 @@ static void tty_linked(ChainXCtx_t *chainX_req)
 
 static int tty_init(void)
 {
+	int ret = -1;
 	chainX_serial_register(&chainX_T, tty_response);
 	chainX_linked_register(&chainX_T, tty_linked);
 
-	if ( chainX_thread_init(&chainX_T)==-1 ) return -1;
+	if ( chainX_thread_init(&chainX_T)==-1 ) return ret;
 
-	int i =0;
-	while (1)
+	while ( app_quit() == 0 )
 	{
 		char buff[LEN_OF_VAL32]="";
-		SAFE_SPRINTF(buff, "%03d\r\n", i++);
-		DBG_IF_LN("(buff: %s)", buff );
+		//SAFE_SPRINTF(buff, "%03d\r\n", i++);
+		SAFE_SPRINTF(buff, "AT\r\n");
+		DBG_IF_LN("(buff: %s, %d)", buff, strlen(buff));
 		SOCKETX_WRITE(&chainX_T, buff, strlen(buff));
-		sleep(1);
+		sleep(5);
 	}
+	ret =0;
+
+	return ret;
 }
 #endif
+
+static void app_set_quit(int mode)
+{
+	is_quit = mode;
+}
+
+static void app_stop(void)
+{
+	if (app_quit()==0)
+	{
+		app_set_quit(1);
+
+
+#ifdef UTIL_EX_TTY
+		chainX_thread_stop(&chainX_T);
+		chainX_thread_close(&chainX_T);
+#endif
+	}
+}
+static void app_showusage(int exit_code);
+
+static void app_loop(void)
+{
+#ifdef UTIL_EX_TTY
+	if (tty_init() == -1)
+	{
+		app_showusage(-1);
+		goto exit_loop;
+	}
+#endif
+
+	goto exit_loop;
+
+exit_loop:
+	app_stop();
+}
+
+static int app_init(void)
+{
+	int ret = 0;
+
+	return ret;
+}
+
+static void app_exit(void)
+{
+	app_stop();
+}
+
+static void app_signal_handler(int signum)
+{
+	DBG_ER_LN("(signum: %d)", signum);
+	switch (signum)
+	{
+		case SIGINT:
+		case SIGTERM:
+		case SIGHUP:
+			app_stop();
+			break;
+		case SIGPIPE:
+			break;
+
+		case SIGUSR1:
+			break;
+
+		case SIGUSR2:
+			dbg_lvl_round();
+			DBG_ER_LN("dbg_lvl_get(): %d", dbg_lvl_get());
+			DBG_ER_LN("(Version: %s)", version_show());
+			break;
+	}
+}
+
+static void app_signal_register(void)
+{
+	signal(SIGINT, app_signal_handler );
+	signal(SIGTERM, app_signal_handler );
+	signal(SIGHUP, app_signal_handler );
+	signal(SIGUSR1, app_signal_handler );
+	signal(SIGUSR2, app_signal_handler );
+
+	signal(SIGPIPE, SIG_IGN );
+}
 
 int option_index = 0;
 const char* short_options = "d:t:b:h"; 
@@ -124,7 +218,7 @@ static struct option long_options[] =
 	{ "baudrate",    required_argument,   NULL,    'b'  },  
 	{ "help",        no_argument,         NULL,    'h'  },  
 	{ 0,             0,                      0,    0    }
-};  
+};
 
 static void app_showusage(int exit_code)
 {
@@ -143,7 +237,7 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)  
+	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
 	{
 		switch (opt)
 		{
@@ -182,18 +276,19 @@ static void app_ParseArguments(int argc, char **argv)
 	}
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	app_ParseArguments(argc, argv);
-
-	DBG_TR_LN("enter");
-
+	app_signal_register();
+	atexit(app_exit);
 	//dbg_lvl_set(DBG_LVL_DEBUG);
 
-#ifdef UTIL_EX_TTY
-	if (tty_init() == -1)
-		app_showusage(-1);
-#endif
+	if ( app_init() == -1 )
+	{
+		return -1;
+	}
 
-	exit(0);
+	app_loop();
+
+	return 0;
 }

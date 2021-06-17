@@ -14,67 +14,95 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+MQTTSession_t *mqtt_session_get(MQTTCtx_t *mqtt_ctx)
+{
+	if (mqtt_ctx)
+	{
+		return mqtt_ctx->session;
+	}
+	return NULL;
+}
+
 void mqtt_log_cb(struct mosquitto *mosq, void *userdata, int level, const char *str)
 {
-	MQTTSession *session = (MQTTSession *)userdata;
-	DBG_TR_LN("(%s)", str);
-	if (session->log_cb)
+	if ((mosq) && (userdata))
 	{
-		session->log_cb(mosq, userdata, level, str);
+		MQTTSession_t *session = (MQTTSession_t *)userdata;
+		DBG_TR_LN("(%s)", str);
+		if (session->log_cb)
+		{
+			session->log_cb(mosq, userdata, level, str);
+		}
 	}
 }
 
 static void mqtt_connect_cb(struct mosquitto *mosq, void *userdata, int result)
 {
-	MQTTSession *session = (MQTTSession *)userdata;
-
-	session->isconnect = 1;
-	DBG_TR_LN("(%s:%d, result: %d)", session->hostname, session->port, result);
-	if (session->connect_cb)
+	if ((mosq) && (userdata))
 	{
-		session->connect_cb(mosq, userdata, result);
+		MQTTSession_t *session = (MQTTSession_t *)userdata;
+
+		mqtt_srv_subscribe(session);
+		session->count ++;
+
+		session->isconnect = 1;
+		DBG_IF_LN("(%s:%d, result: %d, count: %d)", session->hostname, session->port, result, session->count);
+		if (session->connect_cb)
+		{
+			session->connect_cb(mosq, userdata, result);
+		}
+
+		mqtt_queue_wakeup(session);
 	}
 }
 
 static void mqtt_disconnect_cb(struct mosquitto *mosq, void *userdata, int result)
 {
-	MQTTSession *session = (MQTTSession *)userdata;
-
-	session->isconnect = 0;
-	DBG_TR_LN("(%s:%d, result: %d)", session->hostname, session->port, result);
-	if (session->disconnect_cb)
+	if ((mosq) && (userdata))
 	{
-		session->disconnect_cb(mosq, userdata, result);
+		MQTTSession_t *session = (MQTTSession_t *)userdata;
+
+		session->isconnect = 0;
+		DBG_WN_LN("(%s:%d, result: %d, count: %d)", session->hostname, session->port, result, session->count);
+		if (session->disconnect_cb)
+		{
+			session->disconnect_cb(mosq, userdata, result);
+		}
+
+		mqtt_queue_gosleep(session);
 	}
 }
 
 static void mqtt_message_cb(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
-	MQTTSession *session = (MQTTSession *)userdata;
-
-	DBG_TR_LN("(%s:%d, topic: %s, [%d]%s)", session->hostname, session->port, message->topic, message->payloadlen, (char*) message->payload);
-	if (session->message_cb)
+	if ((mosq) && (userdata))
 	{
-		session->message_cb(mosq, userdata, message);
-	}
+		MQTTSession_t *session = (MQTTSession_t *)userdata;
 
-	MQTTSub_t *cur = NULL;
-	for (cur = clist_head(session->sub_list); cur != NULL; cur = clist_item_next(cur))
-	{
-		bool match = 0;
-		mosquitto_topic_matches_sub(cur->topic, message->topic, &match);
-		if (match)
+		DBG_TR_LN("(%s:%d, topic: %s, [%d]%s)", session->hostname, session->port, message->topic, message->payloadlen, (char*) message->payload);
+		if (session->root_subscribe_cb)
 		{
-			DBG_DB_LN("(match: %d, cur->topic: %s ?= %s)", match, cur->topic, message->topic);
-			if (cur->message_cb) cur->message_cb(mosq, userdata, message);
+			session->root_subscribe_cb(mosq, userdata, message);
+		}
+
+		MQTTSub_t *cur = NULL;
+		for (cur = clist_head(session->sub_list); cur != NULL; cur = clist_item_next(cur))
+		{
+			bool match = 0;
+			mosquitto_topic_matches_sub(cur->topic, message->topic, &match);
+			if (match)
+			{
+				DBG_DB_LN("(match: %d, cur->topic: %s ?= %s)", match, cur->topic, message->topic);
+				if (cur->message_cb) cur->message_cb(mosq, userdata, message);
+			}
 		}
 	}
 }
 
-int mqtt_publish(MQTTSession *session, char *topic, char *msg)
+int mqtt_publish(MQTTSession_t *session, char *topic, char *msg)
 {
 	int ret = 0;
-	if (session)
+	if ( (session) && (msg) )
 	{
 		return mosquitto_publish(session->mosq, NULL, topic, SAFE_STRLEN(msg), msg, 0, 0);
 	}
@@ -82,22 +110,27 @@ int mqtt_publish(MQTTSession *session, char *topic, char *msg)
 }
 
 // 1: found
-static int mqtt_subscribe_duplicate(MQTTSession *session, char *topic, mqtt_message_fn *message_cb)
+static int mqtt_subscribe_duplicate(MQTTSession_t *session, char *topic, mqtt_message_fn *message_cb)
 {
 	int ret = 0;
-	MQTTSub_t *cur = NULL;
 
-	for (cur = clist_head(session->sub_list); cur != NULL; cur = clist_item_next(cur))
+	if (session)
 	{
-		if ( (SAFE_STRCMP(topic, cur->topic)==0) && (message_cb == cur->message_cb) )
+		MQTTSub_t *cur = NULL;
+
+		for (cur = clist_head(session->sub_list); cur != NULL; cur = clist_item_next(cur))
 		{
-			ret = 1;
+			if ( (SAFE_STRCMP(topic, cur->topic)==0) && (message_cb == cur->message_cb) )
+			{
+				ret = 1;
+			}
 		}
 	}
+
 	return ret;
 }
 
-void mqtt_subscribe_add(MQTTSession *session, char *topic, mqtt_message_fn *message_cb)
+void mqtt_subscribe_add(MQTTSession_t *session, char *topic, mqtt_message_fn *message_cb)
 {
 	if ( (session) && (topic) && (message_cb) )
 	{
@@ -117,22 +150,23 @@ void mqtt_subscribe_add(MQTTSession *session, char *topic, mqtt_message_fn *mess
 	}
 }
 
-static void mqtt_queue_new(MQTTTopic_t *new, MQTTSession *session, char *topic, char *msg)
+static void mqtt_queue_new(MQTTTopic_t *new, MQTTSession_t *session, char *topic, char *msg, mqtt_topic_fn *topic_cb)
 {
 	if ( (new) && (session) && (topic) && (msg) )
 	{
 		new->session = session;
 		SAFE_ASPRINTF(new->topic, "%s", topic);
 		SAFE_ASPRINTF(new->msg, "%s", msg);
+		new->topic_cb = topic_cb;
 	}
 }
 
-void mqtt_qsub_add(MQTTSession *session, char *topic, char *msg)
+void mqtt_qsub_add(MQTTSession_t *session, char *topic, char *msg, mqtt_topic_fn *topic_cb)
 {
-	if ( (session->qsub) && (session) && (topic) && (msg) )
+	if ( (session) && (session->qsub) && (topic) && (msg) )
 	{
 		MQTTTopic_t topic_new;
-		mqtt_queue_new(&topic_new, session, topic, msg);
+		mqtt_queue_new(&topic_new, session, topic, msg, topic_cb);
 
 		queue_add(session->qsub, (void*)&topic_new);
 	}
@@ -144,7 +178,7 @@ static int mqtt_qsub_exec_cb(void *arg)
 
 	if (data_pop)
 	{
-
+		data_pop->topic_cb(data_pop->session, data_pop->topic, data_pop->msg);
 		SAFE_FREE(data_pop->topic);
 		SAFE_FREE(data_pop->msg);
 	}
@@ -152,12 +186,12 @@ static int mqtt_qsub_exec_cb(void *arg)
 	return 0;
 }
 
-void mqtt_qpub_add(MQTTSession *session, char *topic, char *msg)
+void mqtt_qpub_add(MQTTSession_t *session, char *topic, char *msg, mqtt_topic_fn *topic_cb)
 {
-	if ( (session->qpub) && (session) && (topic) && (msg) )
+	if ( (session) && (session->qpub) && (topic) && (msg) )
 	{
 		MQTTTopic_t topic_new;
-		mqtt_queue_new(&topic_new, session, topic, msg);
+		mqtt_queue_new(&topic_new, session, topic, msg, topic_cb);
 
 		queue_add(session->qpub, (void*)&topic_new);
 	}
@@ -191,7 +225,25 @@ static int mqtt_queue_free_cb(void *arg)
 	return 0;
 }
 
-static void mqtt_queue_close(MQTTSession *session)
+void mqtt_queue_wakeup(MQTTSession_t *session)
+{
+	if (session)
+	{
+		queue_wakeup(session->qpub);
+		queue_wakeup(session->qsub);
+	}
+}
+
+void mqtt_queue_gosleep(MQTTSession_t *session)
+{
+	if (session)
+	{
+		queue_gosleep(session->qpub);
+		queue_gosleep(session->qsub);
+	}
+}
+
+static void mqtt_queue_close(MQTTSession_t *session)
 {
 	if (session)
 	{
@@ -203,7 +255,7 @@ static void mqtt_queue_close(MQTTSession *session)
 	}
 }
 
-static void mqtt_queue_init(MQTTSession *session)
+static void mqtt_queue_init(MQTTSession_t *session)
 {
 	if (session)
 	{
@@ -212,23 +264,25 @@ static void mqtt_queue_init(MQTTSession *session)
 		{
 			queue_isready(session->qpub, 20);
 		}
+		queue_gosleep(session->qpub);
+
 		session->qsub = queue_thread_init("qsub", MAX_OF_QSUB, sizeof(MQTTTopic_t), mqtt_qsub_exec_cb, mqtt_queue_free_cb);
 		if (session->qsub)
 		{
 			queue_isready(session->qsub, 20);
 		}
+		queue_gosleep(session->qsub);
 	}
 }
 
-static void mqtt_srv_subscribe(MQTTSession *session)
+void mqtt_srv_subscribe(MQTTSession_t *session)
 {
 	if (session)
 	{
-		if (SAFE_STRLEN(session->topic) > 0)
+		if (SAFE_STRLEN(session->topic_root) > 0)
 		{
-			//mosquitto_subscribe(mqtt_ctx->mosq, NULL, "9C65F9361C00/#", 0);
-			mosquitto_subscribe(session->mosq, NULL, session->topic, 0);
-			DBG_IF_LN("(topic: %s)", session->topic);
+			mosquitto_subscribe(session->mosq, NULL, session->topic_root, 0);
+			DBG_IF_LN("(topic: %s)", session->topic_root);
 		}
 
 	}
@@ -256,10 +310,16 @@ static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 
 	if (mqtt_ctx->session)
 	{
-		MQTTSession *session = mqtt_ctx->session;
+		MQTTSession_t *session = mqtt_ctx->session;
 
-		SAFE_MEMSET(session->clientid, 0, LEN_OF_VAL32);
-		SAFE_SPRINTF(session->clientid, "%d", getpid());
+		if ( SAFE_STRLEN(session->clientid) > 0 )
+		{
+		}
+		else
+		{
+			SAFE_MEMSET(session->clientid, 0, LEN_OF_VAL32);
+			SAFE_SPRINTF(session->clientid, "%s-%d", session->macid, getpid());
+		}
 
 		session->mqtt_ctx = (void*)mqtt_ctx;
 
@@ -273,7 +333,7 @@ static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 			if ( (SAFE_STRLEN(session->user) > 0) && (SAFE_STRLEN(session->pass) > 0) )
 			{
 				result = mosquitto_username_pw_set(mosq, session->user, session->pass);
-				DBG_DB_LN("mosquitto_username_pw_set (result: %d, user: %s)", result, session->user);
+				DBG_IF_LN("mosquitto_username_pw_set (result: %d, user: %s)", result, session->user);
 			}
 
 			//
@@ -309,7 +369,7 @@ static void mqtt_srv_close(MQTTCtx_t *mqtt_ctx)
 		DBG_IF_LN("%s", DBG_TXT_BYE_BYE);
 		if (mqtt_ctx->session)
 		{
-			MQTTSession *session = mqtt_ctx->session;
+			MQTTSession_t *session = mqtt_ctx->session;
 			if (session->mosq)
 			{
 				mosquitto_destroy(session->mosq);
@@ -331,32 +391,75 @@ static void *mqtt_thread_handler( void *user )
 
 	if (mqtt_ctx)
 	{
-		MQTTSession *session = mqtt_ctx->session;
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_detach(tidx_req);
+
+		MQTTSession_t *session = mqtt_ctx->session;
 		CLIST_STRUCT_INIT(session, sub_list);
 		mqtt_queue_init(session);
 
+		session->count = 0;
 		//struct mosquitto *mosq = NULL;
 		struct mosquitto *mosq = mqtt_srv_open(mqtt_ctx);
 		if (mosq)
 		{
+#if (1)
+			int rc = 0;
+			DBG_IF_LN("call mosquitto_connect_async ... (%s:%d, keepalive: %d, topic: %s)", session->hostname,  session->port, session->keepalive, session->topic_root);
+			rc = mosquitto_connect_async(mosq, session->hostname, session->port, session->keepalive);
+			if(rc){
+				DBG_ER_LN("mosquitto_connect_async error !!! (rc: %d, %s)", rc, mosquitto_strerror(rc));
+				goto exit_mqtt;
+			}
+
+			//mqtt_srv_subscribe(session);
+
+			rc = mosquitto_loop_start(mosq);
+			if(rc){
+				DBG_ER_LN("mosquitto_loop_start error !!! (rc: %d, %s)", rc, mosquitto_strerror(rc));
+				goto exit_mqtt;
+			}
+
+			while (threadx_isquit(tidx_req) == 0)
+			{
+				threadx_timewait_simple(tidx_req, 10*1000);
+			}
+			mosquitto_disconnect(mosq);
+			mosquitto_loop_stop(mosq, true);
+#else
 			DBG_IF_LN("call mosquitto_connect ... (%s:%d, keepalive: %d, topic: %s)", session->hostname,  session->port, session->keepalive, session->topic);
 			int rc = mosquitto_connect(mosq, session->hostname, session->port, session->keepalive);
 
 			mqtt_srv_subscribe(session);
 
-			while (mqtt_ctx->isquit == 0)
+			while (threadx_isquit(tidx_req) == 0)
 			{
 				rc = mosquitto_loop(mosq, -1, 1);
-				if ( (mqtt_ctx->isquit==0) && (rc) )
+				if ( (threadx_isquit(tidx_req)==0) && (rc) )
 				{
 					DBG_WN_LN("call mosquitto_reconnect ...");
-					sleep(10);
-					mosquitto_reconnect(mosq);
+					if (MOSQ_ERR_SUCCESS == mosquitto_reconnect(mosq) )
+					{
+					}
+					else
+					{
+						//mqtt_timewait(mqtt_ctx, 10*1000);
+						sleep(10);
+					}
 				}
 			}
+#endif
 		}
 
+exit_mqtt:
 		mqtt_srv_close(mqtt_ctx);
+		//sk_free(SSL_COMP_get_compression_methods());
+		//SSL_COMP_free_compression_methods();
+
+		mqtt_queue_close(mqtt_ctx->session);
+		clist_free(session->sub_list);
+
+		threadx_leave(tidx_req);
 	}
 
 	DBG_IF_LN(DBG_TXT_BYE_BYE);
@@ -367,7 +470,8 @@ void mqtt_lock(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
 	{
-		SAFE_THREAD_LOCK_EX(mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_lock(tidx_req);
 	}
 }
 
@@ -375,7 +479,8 @@ void mqtt_unlock(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
 	{
-		SAFE_THREAD_UNLOCK_EX(mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_unlock(tidx_req);
 	}
 }
 
@@ -383,32 +488,39 @@ void mqtt_signal(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
 	{
-		SAFE_THREAD_SIGNAL_EX(mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_wakeup(tidx_req);
 	}
+}
+
+int mqtt_timewait(MQTTCtx_t *mqtt_ctx, int ms)
+{
+	int ret = EINVAL;
+
+	if (mqtt_ctx)
+	{
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		ret = threadx_timewait(tidx_req, ms);
+	}
+
+	return ret;
 }
 
 void mqtt_wait(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
 	{
-		SAFE_THREAD_WAIT_EX(mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_wait(tidx_req);
 	}
 }
 
-static void mqtt_thread_free(MQTTCtx_t *mqtt_ctx)
+void mqtt_wakeup(MQTTCtx_t *mqtt_ctx)
 {
-	if (mqtt_ctx==NULL) return;
-
-	if (mqtt_ctx->isfree == 0)
+	if (mqtt_ctx)
 	{
-		mqtt_ctx->isfree ++;
-
-		//sk_free(SSL_COMP_get_compression_methods());
-		//SSL_COMP_free_compression_methods();
-
-		SAFE_MUTEX_DESTROY(&mqtt_ctx->in_mtx);
-		SAFE_COND_DESTROY(&mqtt_ctx->in_cond);
-		SAFE_FREE(mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_wakeup(tidx_req);
 	}
 }
 
@@ -416,18 +528,8 @@ void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
 	{
-		mqtt_lock(mqtt_ctx);
-		mqtt_ctx->isquit = 1;
-
-		mqtt_queue_close(mqtt_ctx->session);
-		MQTTSession *session = mqtt_ctx->session;
-		if (session)
-		{
-			clist_free(session->sub_list);
-		}
-
-		mqtt_signal(mqtt_ctx);
-		mqtt_unlock(mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_stop(tidx_req);
 	}
 }
 
@@ -437,21 +539,8 @@ void mqtt_thread_close(MQTTCtx_t *mqtt_ctx)
 	{
 		mqtt_ctx->isfree ++;
 
-		SAFE_THREAD_JOIN_EX(mqtt_ctx);
-
-		DBG_TR_LN("call mqtt_thread_free ... (name: %s)", mqtt_ctx->name);
-		mqtt_thread_free(mqtt_ctx);
-	}
-}
-
-static void mqtt_thread_mutex_init(MQTTCtx_t *mqtt_ctx)
-{
-	if (mqtt_ctx==NULL) return;
-
-	int rc = SAFE_MUTEX_ATTR_RECURSIVE(mqtt_ctx->in_mtx);
-	if (rc == 0)
-	{
-		SAFE_COND_ATTR_NORMAL(mqtt_ctx->in_cond);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		threadx_close(tidx_req);
 	}
 }
 
@@ -459,8 +548,10 @@ void mqtt_thread_init(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
 	{
-		mqtt_thread_mutex_init(mqtt_ctx);
-		SAFE_THREAD_CREATE(mqtt_ctx->tid, NULL, mqtt_thread_handler, mqtt_ctx);
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		tidx_req->thread_cb = mqtt_thread_handler;
+		tidx_req->data = mqtt_ctx;
+		threadx_init(tidx_req);
 	}
 }
 

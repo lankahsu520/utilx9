@@ -19,7 +19,6 @@ ChainXCtx_t chainX_S = {
 	.mode = CHAINX_MODE_ID_TCP_CLIENT,
 	.sockfd = -1,
 	.status = 0,
-	.isquit = 0,
 	.isfree = 0,
 
 	.security = 0,

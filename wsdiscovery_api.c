@@ -329,7 +329,6 @@ void wsdiscovery_probe(chainX_post_fn cb)
 			.sockfd = -1,
 
 			.status = 0,
-			.isquit = 0,
 			.isfree = 0,
 
 			.security = 0,
@@ -413,7 +412,6 @@ static WSDiscoveryCtx_t *wsdiscovery_init(void)
 			chainX_req->select_wait = TIMEOUT_OF_SELECT_1;
 			chainX_req->retry_hold = TIMEOUT_OF_RETRY_HOLD,
 			chainX_req->noblock =  1;
-			chainX_req->in_detach = 0;
 			
 			chainX_ip_set(chainX_req, WS_DISCOVERY_IPV4);
 			chainX_port_set(chainX_req, WS_DISCOVERY_PORT);

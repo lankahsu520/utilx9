@@ -14,8 +14,20 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+#if (1) // ID 0658:0200 Sigma Designs, Inc. Aeotec Z-Stick Gen5 (ZW090) - UZB
+#define VENDOR_ID 0x0658
+#define PRODUCT_ID 0x0200
+#endif
+
+#if (0) //yokis
 #define VENDOR_ID 0x1072
 #define PRODUCT_ID 0x0100
+#endif
+
+#if (0) //any
+#define VENDOR_ID LIBUSB_HOTPLUG_MATCH_ANY
+#define PRODUCT_ID LIBUSB_HOTPLUG_MATCH_ANY
+#endif
 
 int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, libusb_hotplug_event event, void *user_data);
 
@@ -32,9 +44,6 @@ UsbXCtx_t usbx_main =
 
 	.usb_hotplug_handle = -1,
 	.usb_hotplug_fn = usb_hotplug_cb,
-	.tid = 0,
-	.in_detach = 0,
-	.in_wait = 0,
 
 	.usb_iface_idx = 0,
 	.usb_claim = -1,
@@ -52,17 +61,21 @@ UsbXCtx_t usbx_main =
 
 int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, libusb_hotplug_event event, void *user_data)
 {
-	//UsbXCtx_t *usbX_req = (UsbXCtx_t *)user_data;
+	UsbXCtx_t *usbX_req = (UsbXCtx_t *)user_data;
 
 	DBG_WN_LN("(event: %d)", event);
 	switch ( event )
 	{
 		case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
 			DBG_WN_LN("LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED");
+			usbX_dev_open(usbX_req, usb_dev);
+			usbX_dev_print_ex(usbX_req);
 			break;
 		case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
 		default:
 			DBG_WN_LN("LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT");
+			usbX_req->usb_claim = -1;
+			usbX_dev_close(usbX_req);
 			break;
 	}
 
@@ -163,7 +176,7 @@ int main(int argc, char* argv[])
 	dbg_lvl_set(DBG_LVL_DEBUG);
 
 #if (1)
-	if ( usbX_open(&usbx_main, NULL) >= 0 )
+	if ( usbX_listen_open(&usbx_main, NULL) >= 0 )
 	{
 		usbX_dev_print_ex(&usbx_main);
 
@@ -175,7 +188,7 @@ int main(int argc, char* argv[])
 		//usbX_dev_write(&usbx_main, &nwrite, 2000);
 		//usbX_dev_read(&usbx_main, 2000);
 	}
-	usbX_close(&usbx_main);
+	usbX_listen_close(&usbx_main);
 #else
 	usb_hotplug_loop();
 #endif

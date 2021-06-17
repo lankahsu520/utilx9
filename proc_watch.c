@@ -73,20 +73,106 @@ void proc_info_show(void)
 
 void proc_table_add_yokis(clist_t head)
 {
+#ifdef PJ_HAS_YK_P2P
 	proc_entry_push(head, "yk_p2p_daemon");
+#endif
+#ifdef PJ_HAS_YK_WS
 	proc_entry_push(head, "yk_ws_daemon");
-
+#endif
+#ifdef PJ_HAS_YK_COMMAND
 	proc_entry_push(head, "yk_command_daemon");
+#endif
+#ifdef PJ_HAS_YK_DATAB
 	proc_entry_push(head, "yk_datab_daemon");
+#endif
+#ifdef PJ_HAS_YK_UPDATE
 	proc_entry_push(head, "yk_update_daemon");
+#endif
+#ifdef PJ_HAS_YK_INFO
 	proc_entry_push(head, "yk_info_daemon");
+#endif
+#ifdef PJ_HAS_YK_SERVER
 	proc_entry_push(head, "yk_server_daemon");
+#endif
+#ifdef PJ_HAS_YK_REQUEST
 	proc_entry_push(head, "yk_request_daemon");
+#endif
+#ifdef PJ_HAS_YK_SUBNET
 	proc_entry_push(head, "yk_subnet_daemon");
+#endif
+#ifdef PJ_HAS_YK_KMS
 	proc_entry_push(head, "yk_kms_daemon");
+#endif
+#ifdef PJ_HAS_YK_STANDALONE
 	proc_entry_push(head, "yk_standalone_daemon");
+#endif
+#ifdef PJ_HAS_YK_THERMO
 	proc_entry_push(head, "yk_thermo_daemon");
+#endif
+}
 
+void proc_table_add_mqtt(clist_t head)
+{
+#ifdef PJ_HAS_HONEY_MARKET
+	proc_entry_push(head, "honey_market");
+#endif
+#ifdef PJ_HAS_QUEEN_BEE
+	proc_entry_push(head, "queen_bee");
+#endif
+}
+
+void proc_table_add_zwave(clist_t head)
+{
+#ifdef PJ_HAS_ZIPGATEWAY
+	proc_entry_push(head, "zipgateway");
+#endif
+#ifdef PJ_HAS_ZWDAEMON
+	proc_entry_push(head, "zwdaemon");
+#endif
+}
+
+void proc_table_add_philio(clist_t head)
+{
+	proc_entry_push(head, "app");
+	proc_entry_push(head, "debuger");
+	proc_entry_push(head, "platform");
+
+	// network
+	proc_entry_push(head, "orbwebm2m");
+	proc_entry_push(head, "icloud");
+
+	// 1.x
+	proc_entry_push(head, "philio-sdk");
+	
+	// 2.x
+	proc_entry_push(head, "pan27");
+	proc_entry_push(head, "sdk");
+	proc_entry_push(head, "storage");
+	proc_entry_push(head, "zigbee");
+	proc_entry_push(head, "zwave");
+	//proc_entry_push(head, "zwared");
+}
+
+void proc_watch_OrgList(clist_t head)
+{
+	clist_init(head);
+	proc_table_add_zwave(head);
+	proc_table_add_mqtt(head);
+	proc_table_add_yokis(head);
+	proc_entry_push(head, "proc_watch");
+
+	proc_entry_reset(head);
+	proc_entry_scan(head);
+	//proc_entry_cpuusage(head);
+	//proc_entry_print_ex(head, 0);
+}
+
+void proc_watch_CurrList(clist_t head)
+{
+	clist_init(head);
+	proc_table_add_zwave(head);
+	proc_table_add_mqtt(head);
+	proc_table_add_yokis(head);
 	proc_entry_push(head, "proc_watch");
 }
 
@@ -149,33 +235,9 @@ static int app_init(void)
 	int ret = 0;
 
 	//dbg_lvl_set(DBG_LVL_DEBUG);
+	proc_watch_OrgList(OrgListHead);
 
-	clist_init( OrgListHead);
-#if defined(PJ_NAME_LSC002)
-	proc_table_add_yokis(OrgListHead);
-#elif defined(PJ_NAME_LSC012)
-	proc_table_add_yokis(OrgListHead);
-#elif defined(PJ_NAME_LSC003)
-	proc_table_add_yokis(OrgListHead);
-#else
-	proc_table_add_philio(OrgListHead);
-#endif
-
-	proc_entry_reset(OrgListHead);
-	proc_entry_scan(OrgListHead);
-	//proc_entry_cpuusage(OrgListHead);
-	//proc_entry_print_ex( OrgListHead, 0);
-
-	clist_init( CurrListHead);
-#if defined(PJ_NAME_LSC002)
-	proc_table_add_yokis(CurrListHead);
-#elif defined(PJ_NAME_LSC012)
-	proc_table_add_yokis(CurrListHead);
-#elif defined(PJ_NAME_LSC003)
-	proc_table_add_yokis(CurrListHead);
-#else
-	proc_table_add_philio(CurrListHead);
-#endif
+	proc_watch_CurrList(CurrListHead);
 
 	return ret;
 }
@@ -226,6 +288,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
+	SAFE_STDOUT_NONE();
 	if ( app_init() == -1 )
 	{
 		return -1;

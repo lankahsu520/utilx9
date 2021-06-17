@@ -18,26 +18,12 @@
 
 #include "utilx9.h"
 
-static int chainX_mutex_init(ChainXCtx_t *chainX_req)
-{
-	int ret = -1;
-
-	int rc = SAFE_MUTEX_ATTR_RECURSIVE(chainX_req->in_mtx);
-	if (rc == 0)
-	{
-		SAFE_COND_ATTR_NORMAL(chainX_req->in_cond);
-		ret = 0;
-	}
-
-	return ret;
-}
-
 #ifdef UTIL_EX_TTY
 static int chainX_tty_open(ChainXCtx_t *chainX_req)
 {
-//	return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NONBLOCK | O_NOCTTY | O_NDELAY );
-//	return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NONBLOCK | O_NDELAY );
-	return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR );
+	//return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NONBLOCK | O_NOCTTY | O_NDELAY );
+	//return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NONBLOCK | O_NDELAY );
+	return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NOCTTY );
 }
 #endif
 
@@ -1034,37 +1020,36 @@ static int chainX_status_check(ChainXCtx_t *chainX_req)
 	int ret = 0;
 	if ( chainX_req )
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		if ( 0 == threadx_lock(tidx_req) )
 		{
 			ret = chainX_req->status;
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
+			threadx_unlock(tidx_req);
 		}
 	}
 	return ret;
 }
 
-static void chainX_status_set(ChainXCtx_t *chainX_req, int isready)
+static void chainX_status_set(ChainXCtx_t *chainX_req, int status)
 {
 	if (chainX_req)
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		if ( 0 == threadx_lock(tidx_req) )
 		{
-			chainX_req->status= isready;
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
+			chainX_req->status= status;
+			threadx_unlock(tidx_req);
 		}
 	}
 }
 
-static int chainX_quit_check(ChainXCtx_t *chainX_req)
+int chainX_quit_check(ChainXCtx_t *chainX_req)
 {
 	int ret = -1;
 	if ( chainX_req )
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
-		{
-			ret = chainX_req->isquit;
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
-		}
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		ret = threadx_isquit(tidx_req);
 	}
 	return ret;
 }
@@ -1073,11 +1058,8 @@ void chainX_quit_set(ChainXCtx_t *chainX_req, int is_quit)
 {
 	if ( chainX_req )
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
-		{
-			chainX_req->isquit = is_quit;
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
-		}
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		threadx_set_quit(tidx_req, is_quit);
 	}
 }
 
@@ -1086,7 +1068,8 @@ int chainX_linked_check(ChainXCtx_t *chainX_req)
 	int ret = -1;
 	if (chainX_req)
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		if ( 0 == threadx_lock(tidx_req) )
 		{
 			if ( (chainX_status_check(chainX_req)) && (chainX_fd_get(chainX_req)>=0) )
 			{
@@ -1096,7 +1079,7 @@ int chainX_linked_check(ChainXCtx_t *chainX_req)
 			{
 				ret = -1;
 			}
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
+			threadx_unlock(tidx_req);
 		}
 	}
 
@@ -1107,29 +1090,35 @@ void chainX_wakeup(ChainXCtx_t *chainX_req)
 {
 	if (chainX_req)
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
-		{
-			SAFE_THREAD_SIGNAL_EX(chainX_req);
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
-		}
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		threadx_wakeup_simple(tidx_req);
 	}
 }
 
-static void chainX_wait(ChainXCtx_t *chainX_req)
+int chainX_timewait_simple(ChainXCtx_t *chainX_req, int ms)
 {
-	if ( (chainX_req) && ( chainX_quit_check(chainX_req)==0) )
+	int ret = EINVAL;
+
+	if (chainX_req)
 	{
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
+		ThreadX_t *tidx_req = &chainX_req->tidx;
+		ret = threadx_timewait_simple(tidx_req, ms);
+	}
+
+	return ret;
+}
+
+static void chainX_retry_wait(ChainXCtx_t *chainX_req)
+{
+	if (chainX_req)
+	{
+		if (chainX_req->retry_hold>0)
 		{
-			if (chainX_req->retry_hold>0)
-			{
-				SAFE_THREAD_TIMEWAIT_EX(chainX_req, chainX_req->retry_hold*1000 );
-			}
-			else
-			{
-				SAFE_THREAD_TIMEWAIT_EX(chainX_req, MIN_TIMEOUT_OF_RETRY*1000 );
-			}
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
+			chainX_timewait_simple(chainX_req, chainX_req->retry_hold*1000 );
+		}
+		else
+		{
+			chainX_timewait_simple(chainX_req, MIN_TIMEOUT_OF_RETRY*1000 );
 		}
 	}
 }
@@ -1962,7 +1951,7 @@ void chainX_close(ChainXCtx_t *chainX_req)
 	if (chainX_req)
 	{
 		//DBG_TR_LN("enter");
-		if ( 0 == SAFE_THREAD_LOCK_EX(chainX_req) )
+		if ( 0 == threadx_lock(&chainX_req->tidx) )
 		{
 			chainXssl_close(chainX_req);
 
@@ -1981,7 +1970,7 @@ void chainX_close(ChainXCtx_t *chainX_req)
 					SAFE_SCLOSE(chainX_req->sockfd);
 				}
 			}
-			SAFE_THREAD_UNLOCK_EX(chainX_req);
+			threadx_unlock(&chainX_req->tidx);
 		}
 		//DBG_TR_LN("exit");
 	}
@@ -2120,6 +2109,7 @@ static int chainX_tcp_connect(ChainXCtx_t *chainX_req)
 
 #ifdef UTIL_EX_TTY
 int speed_arr[] = {
+	B460800,
 	B230400,
 	B115200,
 	B57600,
@@ -2131,6 +2121,7 @@ int speed_arr[] = {
 	B1200,
 	B300};
 int name_arr[] = {
+	460800,
 	230400,
 	115200,
 	57600,
@@ -2268,15 +2259,6 @@ static int chainX_tty_parity(ChainXCtx_t *chainX_req)
 			return ret;
 	}
 
-	/* Set input parity option */
-	if (chainX_req->ttyinfo.parity != 'n')
-	{
-		chainX_req->ttyinfo.options.c_iflag |= INPCK;
-	}
-
-	chainX_req->ttyinfo.options.c_cc[VTIME] = 150; // 15 seconds
-	chainX_req->ttyinfo.options.c_cc[VMIN] = 0;
-
 	tcflush(chainX_req->ttyfd, TCIFLUSH); /* Update the options and do it NOW */
 
 	if (tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
@@ -2292,14 +2274,14 @@ static int chainX_tty_speed(ChainXCtx_t *chainX_req)
 {
 	int idx = 0;
 
-	for ( idx= 0;	idx < sizeof(speed_arr) / sizeof(int);	idx++)
+	for ( idx= 0; idx < sizeof(speed_arr) / sizeof(int); idx++)
 	{
 		if	(chainX_req->ttyinfo.speed == name_arr[idx])
 		{
 			tcflush(chainX_req->ttyfd, TCIOFLUSH);
 			cfsetispeed(&chainX_req->ttyinfo.options, speed_arr[idx]);
 			cfsetospeed(&chainX_req->ttyinfo.options, speed_arr[idx]);
-			if	( tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
+			if ( tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
 			{
 				DBG_ER_LN("tcsetattr error !!!");
 				return -1;
@@ -2310,19 +2292,42 @@ static int chainX_tty_speed(ChainXCtx_t *chainX_req)
 	return 0;
 }
 
-static int chainX_tty_connect(ChainXCtx_t *chainX_req)
+// http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html
+static int chainX_tty_option(ChainXCtx_t *chainX_req)
 {
-	int ret = -1;
-	
-	if (chainX_fd_get(chainX_req)>=0)
+	int ret = 0;
+	if (chainX_req->ttyinfo.isset)
 	{
-		DBG_IF_LN("connecting ... (%s)", chainX_req->ttyinfo.ttyname);
+	}
+	else
+	{
+		// 輸入模式
+		chainX_req->ttyinfo.options.c_iflag = IGNPAR;
 
-		if ( tcgetattr(chainX_req->ttyfd, &chainX_req->ttyinfo.options) !=	0)
-		{
-			DBG_ER_LN("tcgetattr error !!!");
-			return ret;
-		}
+		// 輸出模式
+		chainX_req->ttyinfo.options.c_oflag = 0;
+
+		// 控制模式
+		chainX_req->ttyinfo.options.c_cflag = B9600|CS8|CLOCAL|CREAD;
+
+#if (0)
+		// 局部模式
+		chainX_req->ttyinfo.options.c_lflag = ICANON;// | ISIG | FLUSHO;
+#else
+		// 特殊控制字元
+		// non-canonical
+		chainX_req->ttyinfo.options.c_cc[VTIME] = 15; // 15 seconds
+		chainX_req->ttyinfo.options.c_cc[VMIN] = 0;
+#endif
+	}
+
+	tcflush(chainX_req->ttyfd, TCIOFLUSH);
+	if ( tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
+	{
+		DBG_ER_LN("tcsetattr error !!!");
+		return -1;
+	}
+	tcflush(chainX_req->ttyfd, TCIOFLUSH);
 #if (0)
 		chainX_req->ttyinfo.options.c_cflag |= (CLOCAL | CREAD | CS8);
 		chainX_req->ttyinfo.options.c_cflag &= ~(CSTOPB | PARENB | CRTSCTS);
@@ -2336,14 +2341,14 @@ static int chainX_tty_connect(ChainXCtx_t *chainX_req)
 		chainX_req->ttyinfo.options.c_cc[VQUIT]  = 0; //Ctrl-
 		chainX_req->ttyinfo.options.c_cc[VERASE] = 0; //del
 		chainX_req->ttyinfo.options.c_cc[VKILL]  = 0;
-		chainX_req->ttyinfo.options.c_cc[VEOF]	 = 0; //Ctrl-d
+		chainX_req->ttyinfo.options.c_cc[VEOF] = 0; //Ctrl-d
 		chainX_req->ttyinfo.options.c_cc[VTIME]  = 1;
-		chainX_req->ttyinfo.options.c_cc[VMIN]	 = 1; // 設定滿足讀取功能的最低字元接收個數
+		chainX_req->ttyinfo.options.c_cc[VMIN] = 1; // 設定滿足讀取功能的最低字元接收個數
 		chainX_req->ttyinfo.options.c_cc[VSWTC]  = 0;
 		chainX_req->ttyinfo.options.c_cc[VSTART] = 0; //Ctrl-q
 		chainX_req->ttyinfo.options.c_cc[VSTOP]  = 0; //Ctrl-s
 		chainX_req->ttyinfo.options.c_cc[VSUSP]  = 0; //Ctrl-z
-		chainX_req->ttyinfo.options.c_cc[VEOL]	 = 0;
+		chainX_req->ttyinfo.options.c_cc[VEOL] = 0;
 		chainX_req->ttyinfo.options.c_cc[VREPRINT]=0; //Ctrl-r
 		chainX_req->ttyinfo.options.c_cc[VDISCARD]=0; //Ctrl-u
 		chainX_req->ttyinfo.options.c_cc[VWERASE]= 0; //Ctrl-w
@@ -2351,15 +2356,40 @@ static int chainX_tty_connect(ChainXCtx_t *chainX_req)
 		chainX_req->ttyinfo.options.c_cc[VEOL2]  = 0;
 		tcsetattr (chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options);
 		ret = 0;
-#else
-		if ( chainX_tty_speed(chainX_req) ==	0)
+#endif
+	return ret;
+}
+
+static int chainX_tty_connect(ChainXCtx_t *chainX_req)
+{
+	int ret = -1;
+	
+	if (chainX_fd_get(chainX_req)>=0)
+	{
+		DBG_IF_LN("connecting ... (%s)", chainX_req->ttyinfo.ttyname);
+
+		tcgetattr(chainX_req->ttyfd, &chainX_req->ttyinfo.options_bak);
+
+		if (chainX_req->ttyinfo.isset)
 		{
-			if ( chainX_tty_parity(chainX_req) == 0)
+			// use the new conf
+		}
+		else if ( tcgetattr(chainX_req->ttyfd, &chainX_req->ttyinfo.options) != 0)
+		{
+			DBG_ER_LN("tcgetattr error !!!");
+			return ret;
+		}
+
+		if ( chainX_tty_option(chainX_req) == 0)
+		{
+			if ( chainX_tty_speed(chainX_req) == 0)
 			{
-				ret = 0;
+				if ( chainX_tty_parity(chainX_req) == 0)
+				{
+					ret = 0;
+				}
 			}
 		}
-#endif
 
 		if (ret == 0)
 		{
@@ -2522,6 +2552,8 @@ static void chainX_loop_serial(ChainXCtx_t *chainX_req)
 			chainX_recycle_dec(chainX_req);
 		}
 
+		//tcflush(chainX_fd_get(chainX_req), TCIOFLUSH);
+
 		result = chainX_RW_select(chainX_req);
 		if(result == -1)
 		{
@@ -2532,11 +2564,16 @@ static void chainX_loop_serial(ChainXCtx_t *chainX_req)
 		else if (result==0)
 		{
 		}
-		else if ( CHAINX_FD_ISSET_R(chainX_req) ) 
+		else if ( CHAINX_FD_ISSET_R(chainX_req) || CHAINX_FD_ISSET_E(chainX_req) ) 
 		{
+			if (1)
 			{
 				//nread = LEN_OF_SSL_BUFFER;
 				SAFE_IOCTL(chainX_fd_get(chainX_req), FIONREAD, &nread);
+			}
+			else
+			{
+				nread = LEN_OF_BUF1024;
 			}
 
 			if (nread>0)
@@ -2811,13 +2848,14 @@ disconnected:
 static void *chainX_thread_handler_tcp(void *arg)
 {
 	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ThreadX_t *tidx_req = &chainX_req->tidx;
+
+	threadx_detach(tidx_req);
 
 	if (chainX_req==NULL)
 	{
-		return NULL;
+		goto tcp_exit;
 	}
-
-	SAFE_THREAD_DETACH_EX(chainX_req);
 
 	while (chainX_quit_check(chainX_req) == 0)
 	{
@@ -2834,9 +2872,12 @@ static void *chainX_thread_handler_tcp(void *arg)
 			DBG_WN_LN("tcp-client broken !!! (%s:%u, dbg: %d, net_last: %d)", chainX_req->netinfo.addr.ipv4 , chainX_req->netinfo.port, dbg_lvl_get(), net_last);
 		}
 
-		if (net_last == 0) chainX_wait(chainX_req);
+		if (net_last == 0) chainX_retry_wait(chainX_req);
 	}
 	DBG_TR_LN("exit (%s:%u)", chainX_req->netinfo.addr.ipv4 , chainX_req->netinfo.port);
+
+tcp_exit:
+	threadx_leave(tidx_req);
 
 	return NULL;
 }
@@ -2880,7 +2921,8 @@ int chainX_multi_sender_and_post(ChainXCtx_t *chainX_req, char *buffer, int nbuf
 		return -1;
 	}
 
-	chainX_mutex_init(chainX_req);
+	ThreadX_t *tidx_req = &chainX_req->tidx;
+	threadx_mutex_init(tidx_req);
 
 	/* set up destination address */
 	chainX_addr_to_set(chainX_req, chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
@@ -2896,24 +2938,27 @@ int chainX_multi_sender_and_post(ChainXCtx_t *chainX_req, char *buffer, int nbuf
 	chainX_loop_post(chainX_req);
 
 	chainX_close(chainX_req);
+
+	threadx_mutex_free(tidx_req);
 	return ret;
 }
 
 static void *chainX_thread_handler_udp(void *arg)
 {
 	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ThreadX_t *tidx_req = &chainX_req->tidx;
+
+	threadx_detach(tidx_req);
 
 	if (chainX_req==NULL)
 	{
-		return NULL;
+		goto udp_exit;
 	}
-
-	SAFE_THREAD_DETACH_EX(chainX_req);
 
 	chainX_status_set(chainX_req, 0);
 	chainX_infinite_set(chainX_req, 1);
 	chainX_recycle_set(chainX_req, 0);
-	
+
 	while (chainX_quit_check(chainX_req) == 0)
 	{
 		int net_last = 0;
@@ -2930,10 +2975,12 @@ static void *chainX_thread_handler_udp(void *arg)
 			chainX_status_set(chainX_req, 0);
 		}
 
-		if (net_last == 0) chainX_wait(chainX_req);
+		if (net_last == 0) chainX_retry_wait(chainX_req);
 	}
-
 	DBG_TR_LN("exit (%s:%u)", chainX_req->netinfo.addr.ipv4 , chainX_req->netinfo.port);
+
+udp_exit:
+	threadx_leave(tidx_req);
 
 	return NULL;
 }
@@ -2942,18 +2989,19 @@ static void *chainX_thread_handler_udp(void *arg)
 static void *chainX_thread_handler_tty(void *arg)
 {
 	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ThreadX_t *tidx_req = &chainX_req->tidx;
+
+	threadx_detach(tidx_req);
 
 	if (chainX_req==NULL)
 	{
-		return NULL;
+		goto tty_exit;
 	}
-
-	SAFE_THREAD_DETACH_EX(chainX_req);
 
 	chainX_status_set(chainX_req, 0);
 	chainX_infinite_set(chainX_req, 1);
 	chainX_recycle_set(chainX_req, 0);
-	
+
 	while (chainX_quit_check(chainX_req) == 0)
 	{
 		int net_last = 0;
@@ -2965,15 +3013,19 @@ static void *chainX_thread_handler_tty(void *arg)
 				net_last = 1;
 				DBG_IF_LN("tty ok !!! (%s, dbg: %d, tty_status: %d, sockfd: %d)", chainX_req->ttyinfo.ttyname, dbg_lvl_get(), chainX_req->status, chainX_fd_get(chainX_req));
 				chainX_loop_serial(chainX_req);
+
+				tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options_bak);
 			}
 			DBG_WN_LN("tty broken !!! (ttyname: %s, dbg: %d)", chainX_req->ttyinfo.ttyname, dbg_lvl_get());
 			chainX_status_set(chainX_req, 0);
 		}
 
-		if (net_last == 0) chainX_wait(chainX_req);
+		if (net_last == 0) chainX_retry_wait(chainX_req);
 	}
-
 	DBG_TR_LN("exit (ttyname: %s)", chainX_req->ttyinfo.ttyname);
+
+tty_exit:
+	threadx_leave(tidx_req);
 
 	return NULL;
 }
@@ -2983,8 +3035,7 @@ void chainX_thread_stop(ChainXCtx_t *chainX_req)
 {
 	if (chainX_req)
 	{
-		chainX_quit_set(chainX_req, 1);
-		chainX_wakeup(chainX_req);
+		threadx_stop(&chainX_req->tidx);
 	}
 }
 
@@ -2993,12 +3044,8 @@ void chainX_thread_close(ChainXCtx_t *chainX_req)
 	if ( (chainX_req) && (chainX_req->isfree==0) )
 	{
 		chainX_req->isfree++;
-		chainX_close(chainX_req);
 
-		if (chainX_req->in_detach == 0)
-		{
-			SAFE_THREAD_JOIN_EX(chainX_req);
-		}
+		threadx_close(&chainX_req->tidx);
 	}
 	DBG_TR_LN("exit (mode: %d)", chainX_req->mode);
 }
@@ -3010,16 +3057,11 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return -1;
 	}
+	ThreadX_t *tidx_req = &chainX_req->tidx;
 
 	if (chainX_security_get(chainX_req) == 1)
 	{
 		chainXssl_init(chainX_req);
-	}
-
-	if ( chainX_mutex_init(chainX_req) == -1 )
-	{
-		DBG_ER_LN("thread_mutex error !!!");
-		return -1;
 	}
 
 	if ( chainX_check(chainX_req) == -1 )
@@ -3031,26 +3073,38 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 	switch (chainX_req->mode)
 	{
 		case CHAINX_MODE_ID_TCP_CLIENT:
-			if (SAFE_THREAD_CREATE(chainX_req->tid, NULL, chainX_thread_handler_tcp, chainX_req) != 0)
 			{
-				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
-				return -1;
+				tidx_req->thread_cb = chainX_thread_handler_tcp;
+				tidx_req->data = chainX_req;
+				if (threadx_init(tidx_req) != 0)
+				{
+					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
+					return -1;
+				}
 			}
 			break;
 		case CHAINX_MODE_ID_UDP_SERVER:
 		case CHAINX_MODE_ID_MULTI_RECEIVER:
-			if (SAFE_THREAD_CREATE(chainX_req->tid, NULL, chainX_thread_handler_udp, chainX_req) != 0)
 			{
-				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
-				return -1;
+				tidx_req->thread_cb = chainX_thread_handler_udp;
+				tidx_req->data = chainX_req;
+				if (threadx_init(tidx_req) != 0)
+				{
+					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
+					return -1;
+				}
 			}
 			break;
 #ifdef UTIL_EX_TTY
 		case CHAINX_MODE_ID_TTY:
-			if (SAFE_THREAD_CREATE(chainX_req->tid, NULL, chainX_thread_handler_tty, chainX_req) != 0)
 			{
-				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
-				return -1;
+				tidx_req->thread_cb = chainX_thread_handler_tty;
+				tidx_req->data = chainX_req;
+				if (threadx_init(tidx_req) != 0)
+				{
+					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
+					return -1;
+				}
 			}
 #endif
 			break;
@@ -3059,6 +3113,8 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 			return -1;
 			break;
 	}
+
+	threadx_isready(&chainX_req->tidx, 20);
 
 	return 0;
 }

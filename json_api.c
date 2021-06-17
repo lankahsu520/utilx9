@@ -14,9 +14,55 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+int json_pass_base64_dec(json_t *jparent, const char *key, char *pass, int len)
+{
+	int ret = -1;
+
+	if ( (jparent) && (key) && (pass) && (len) )
+	{
+		json_t *jobj = NULL;
+		const char *pass_enc = JSON_OBJ_GET_STR(jparent, jobj, key);
+		int pass_enc_len = SAFE_STRLEN((char *)pass_enc);
+
+		if ( (pass_enc) && (pass_enc_len>0) )
+		{
+			int dec_len = 0;
+			char *pass_dec = sec_base64_dec((char *)pass_enc, pass_enc_len, &dec_len);
+			if (pass_dec)
+			{
+				SAFE_SNPRINTF(pass, len, "%s", pass_dec);
+				ret = 0;
+				SAFE_FREE(pass_dec);
+			}
+		}
+	}
+
+	return ret;
+}
+
+int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len)
+{
+	int ret = -1;
+
+	if ( (jparent) && (key) && (pass) && (len) )
+	{
+		int enc_len = 0;
+		char *pass_enc = sec_base64_enc(pass, len, &enc_len);
+
+		if (pass_enc)
+		{
+			JSON_OBJ_SET_STR(jparent, key, pass_enc);
+			ret = 0;
+			SAFE_FREE(pass_enc);
+		}
+	}
+
+	return ret;
+}
+
 json_t *json_ary_create(json_t *jparent, const char *key)
 {
-	if ( jparent == NULL ) return NULL;
+	if ( ( jparent == NULL ) && (JSON_CHECK_OBJ(jparent)) ) return NULL;
 
 	json_t *jary = JSON_OBJ_FIND_REUSE(jparent, key);
 	if ( (jary) || (jary = JSON_ARY_NEW()) )
@@ -29,7 +75,7 @@ json_t *json_ary_create(json_t *jparent, const char *key)
 
 json_t *json_obj_create(json_t *jparent, const char *key)
 {
-	if ( jparent == NULL ) return NULL;
+	if ( ( jparent == NULL ) && (JSON_CHECK_OBJ(jparent)) ) return NULL;
 
 	json_t *jobj = JSON_OBJ_FIND_REUSE(jparent, key);
 	if ( (jobj) || (jobj = JSON_OBJ_NEW()) )

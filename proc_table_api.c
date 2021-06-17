@@ -18,11 +18,18 @@ CLIST(ProcListHead);
 
 ProcList_t *proc_entry_push(clist_t head, const char *name)
 {
-	ProcList_t *proc_entry = (ProcList_t*)SAFE_CALLOC(1, sizeof(ProcList_t));
-	proc_entry->name = name;
+	ProcList_t *proc_entry = NULL;
+	if (pidof((char*)name) > 0)
+	{
+		proc_entry = (ProcList_t*)SAFE_CALLOC(1, sizeof(ProcList_t));
+		proc_entry->name = name;
 
-	clist_push(head, proc_entry);
-	
+		clist_push(head, proc_entry);
+	}
+	else
+	{
+		DBG_DB_LN("pidof error !!! (name: %s)", name);
+	}
 	return proc_entry;
 }
 
@@ -174,28 +181,6 @@ void proc_entry_print(int fdlist)
 	proc_entry_print_ex( proc_table_head(), fdlist);
 }
 
-void proc_table_add_philio(clist_t head)
-{
-	proc_entry_push(head, "app");
-	proc_entry_push(head, "debuger");
-	proc_entry_push(head, "platform");
-
-	// network
-	proc_entry_push(head, "orbwebm2m");
-	proc_entry_push(head, "icloud");
-
-	// 1.x
-	proc_entry_push(head, "philio-sdk");
-	
-	// 2.x
-	proc_entry_push(head, "pan27");
-	proc_entry_push(head, "sdk");
-	proc_entry_push(head, "storage");
-	proc_entry_push(head, "zigbee");
-	proc_entry_push(head, "zwave");
-	//proc_entry_push(head, "zwared");
-}
-
 void proc_table_free(clist_t head)
 {
 	clist_free(head);
@@ -204,7 +189,6 @@ void proc_table_free(clist_t head)
 void proc_table_open(void)
 {
 	clist_init(proc_table_head());
-	proc_table_add_philio(proc_table_head());
 }
 
 void proc_table_refresh(void)

@@ -14,7 +14,7 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-static void threadx_mutex_init(ThreadX_t *tidx_req)
+void threadx_mutex_init(ThreadX_t *tidx_req)
 {
 	if (tidx_req==NULL) return;
 
@@ -29,40 +29,69 @@ static void threadx_mutex_init(ThreadX_t *tidx_req)
 	}
 }
 
-static void threadx_mutex_free(ThreadX_t *tidx_req)
+void threadx_mutex_free(ThreadX_t *tidx_req)
 {
 	SAFE_MUTEX_DESTROY_EX(tidx_req);
 	SAFE_COND_DESTROY_EX(tidx_req);
 }
 
-int threadx_isstop(ThreadX_t *tidx_req)
+int threadx_isloop(ThreadX_t *tidx_req)
 {
-	return tidx_req->isstop;
-}
-
-void threadx_set_stop(ThreadX_t *tidx_req, int flag)
-{
-	tidx_req->isstop = flag;
+	int isloop = 0;
+	threadx_lock(tidx_req);
+	isloop = tidx_req->isloop;
+	threadx_unlock(tidx_req);
+	return isloop;
 }
 
 int threadx_ispause(ThreadX_t *tidx_req)
 {
-	return tidx_req->ispause;
+	int ispause = 0;
+	threadx_lock(tidx_req);
+	ispause = tidx_req->ispause;
+	threadx_unlock(tidx_req);
+	return ispause;
 }
 
 void threadx_set_pause(ThreadX_t *tidx_req, int flag)
 {
+	threadx_lock(tidx_req);
 	tidx_req->ispause = flag;
+	threadx_unlock(tidx_req);
 }
 
 int threadx_isquit(ThreadX_t *tidx_req)
 {
-	return tidx_req->isquit;
+	int isquit = 0;
+	threadx_lock(tidx_req);
+	isquit = tidx_req->isquit;
+	threadx_unlock(tidx_req);
+	return isquit;
 }
 
 void threadx_set_quit(ThreadX_t *tidx_req, int flag)
 {
+	threadx_lock(tidx_req);
 	tidx_req->isquit = flag;
+	threadx_unlock(tidx_req);
+}
+
+// 20 = 2 secs
+int threadx_isready(ThreadX_t *tidx_req, int retry)
+{
+	if (retry<0) retry = 10;
+
+	while (retry>0)
+	{
+		if (tidx_req->isloop==1) break;
+		if (tidx_req->isquit==1) break;
+		if (tidx_req->isexit==1) break;
+
+		retry--;
+		usleep(100*1000);
+	}
+
+	return tidx_req->isloop;
 }
 
 int threadx_lock(ThreadX_t *tidx_req)
@@ -77,6 +106,8 @@ int threadx_unlock(ThreadX_t *tidx_req)
 
 int threadx_timewait(ThreadX_t *tidx_req, int ms)
 {
+	if ( threadx_isquit(tidx_req) ) return EINVAL;
+
 	int ret = EINVAL;
 
 #ifdef USE_THREAD_CLOCK
@@ -90,6 +121,8 @@ int threadx_timewait(ThreadX_t *tidx_req, int ms)
 
 int threadx_timewait_simple(ThreadX_t *tidx_req, int ms)
 {
+	if ( threadx_isquit(tidx_req) ) return EINVAL;
+
 	int ret = EINVAL;
 
 	threadx_lock(tidx_req);
@@ -101,13 +134,16 @@ int threadx_timewait_simple(ThreadX_t *tidx_req, int ms)
 
 int threadx_wait(ThreadX_t *tidx_req)
 {
+	if ( threadx_isquit(tidx_req) ) return EINVAL;
+
 	return SAFE_THREAD_WAIT_EX(tidx_req);
 }
 
 int threadx_wait_simple(ThreadX_t *tidx_req)
 {
-	int __ret = EINVAL;
+	if ( threadx_isquit(tidx_req) ) return EINVAL;
 
+	int __ret = EINVAL;
 	threadx_lock(tidx_req);
 	__ret = SAFE_THREAD_WAIT_EX(tidx_req);
 	threadx_unlock(tidx_req);
@@ -127,22 +163,28 @@ void threadx_wakeup_simple(ThreadX_t *tidx_req)
 	threadx_unlock(tidx_req);
 }
 
+void threadx_leave(ThreadX_t *tidx_req)
+{
+	SAFE_THREAD_LEAVE(tidx_req);
+}
+
 int threadx_detach(ThreadX_t *tidx_req)
 {
-	return SAFE_THREAD_DETACH_EX(tidx_req);
+	//return SAFE_THREAD_DETACH_EX(tidx_req);
+	return SAFE_THREAD_DETACH_CHECK(tidx_req);
 }
 
 int threadx_join(ThreadX_t *tidx_req)
 {
-	return SAFE_THREAD_JOIN_EX(tidx_req);
+	//return SAFE_THREAD_JOIN_EX(tidx_req);
+	return SAFE_THREAD_JOIN_CHECK(tidx_req);
 }
 
 void threadx_stop(ThreadX_t *tidx_req)
 {
 	if (tidx_req)
 	{
-		threadx_set_stop(tidx_req, 1);
-
+		threadx_set_quit(tidx_req, 1);
 		threadx_wakeup_simple(tidx_req);
 	}
 }
@@ -167,10 +209,12 @@ int threadx_init(ThreadX_t *tidx_req)
 
 	if (tidx_req)
 	{
-		tidx_req->isstop = 0;
+	
+		tidx_req->isexit = 0;
+		tidx_req->isfree = 0;
+		tidx_req->isloop = 0;
 		tidx_req->ispause = 0;
 		tidx_req->isquit = 0;
-		tidx_req->isfree = 0;
 
 		threadx_mutex_init(tidx_req);
 

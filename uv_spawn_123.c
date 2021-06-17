@@ -17,7 +17,7 @@
 
 #include "utilx9.h"
 
-//#define USE_ASYNC_CREATE
+#define USE_ASYNC_CREATE
 
 #define TAG "uv_spawn_123"
 
@@ -86,6 +86,7 @@ static void app_stop(void)
 #ifdef USE_ASYNC_CREATE
 		SAFE_UV_ASYNC(&uv_async_fd);
 #else
+#error "Please use USE_ASYNC_CREATE !!!"
 		app_stop_uv(NULL, 1);
 #endif
 	}

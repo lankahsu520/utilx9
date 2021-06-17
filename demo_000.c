@@ -42,7 +42,8 @@ static void app_stop(void)
 
 static void app_loop(void)
 {
-
+	int pid = pidof("demo_000");
+	DBG_ER_LN("(pid: %d)", pid);
 }
 
 static int app_init(void)

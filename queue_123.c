@@ -27,6 +27,8 @@ typedef struct TestX_Struct
 	int idx;
 } TestX_t;
 
+int idx = 0;
+
 static int test_q_exec_cb(void *arg)
 {
 	TestX_t *data_pop = (TestX_t *)arg;
@@ -34,6 +36,7 @@ static int test_q_exec_cb(void *arg)
 	if ( (data_pop) )
 	{
 		DBG_IF_LN("(data_pop->idx: %d)", data_pop->idx);
+		idx--;
 	}
 
 	return 0;
@@ -85,18 +88,23 @@ static void app_loop(void)
 
 	test_q = queue_thread_init("test", MAX_OF_QTEST, sizeof(TestX_t), test_q_exec_cb, test_q_free_cb);
 
+	test_q->dbg_more = DBG_LVL_INFO;
 	queue_isready(test_q, 5);
 
-	int idx = 1;
 	while ( ( idx < 5 ) && (is_quit==0) )
 	{
-#if (1)
+#if (0)
 		idx++;
 		DBG_IF_LN("(idx: %d)", idx);
 		sleep(1);
 #else
 		test_push(idx++);
 #endif
+	}
+
+	while (idx>0)
+	{
+		sleep(1);
 	}
 
 	{

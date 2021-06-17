@@ -37,12 +37,22 @@ int main(int argc, char* argv[])
 	DBG_TR_LN("enter");
 
 	//dbg_lvl_set(DBG_LVL_DEBUG);
+	DBG_IF_LN("(1<<3: 0x%08X, 1<<14: 0x%08X, 1<<15: 0x%08X, 1<<16: 0x%08X, 1<<17: 0x%08X)", 1 << 3, 1 << 14, 1 << 15, 1 << 16, 1 << 17);
 
 	char hello[]="Hello World !!!    ";
 	DBG_IF_LN("(hello_trim: %s)", hello);
 	
 	char *hello_trim = str_trim(hello);
 	DBG_IF_LN("(hello_trim: %s)", hello_trim);
+
+	{
+		char topic_pub[LEN_OF_TOPIC]	= "";
+		char user[LEN_OF_TOPIC]= "luffanet";
+		char macid[LEN_OF_TOPIC] = "1234";
+		SAFE_STRCAT_EX(topic_pub, user, "/", macid);
+
+		DBG_ER_LN("SAFE_STRCAT_EX - %s", topic_pub);
+	}
 
 	DBG_LN_LN();
 

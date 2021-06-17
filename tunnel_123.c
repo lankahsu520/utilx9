@@ -101,7 +101,6 @@ static void tunnel_loop_ssh(Tunnel_t *tunnel_ctx)
 		.sockfd = -1,
 
 		.status = 0,
-		.isquit = 0,
 		.isfree = 0,
 
 		.security = 0,

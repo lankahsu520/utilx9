@@ -118,7 +118,7 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 		while ( (token = SAFE_STRTOK_R(NULL, ".", &saveptr)) )
 		{
 			char name[LEN_OF_BUF1024] = "";
-			SAFE_SPRINTF(name, "%s", token);
+			SAFE_SPRINTF_EX(name, "%s", token);
 
 			int is_array = 0;
 			int idx_full = 1;
@@ -346,7 +346,7 @@ static int app_init(void)
 
 	if (nread)
 	{
-		char tmpbuf[LEN_OF_BUF2048] = "";
+		char tmpbuf[LEN_OF_BUF1024] = "";
 		while( (nread=SAFE_READ(0, tmpbuf, sizeof(tmpbuf) )) > 0 )
 		{
 			qbuf_write(&qbuf_r, tmpbuf, nread);

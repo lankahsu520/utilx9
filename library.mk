@@ -93,6 +93,7 @@ ifeq ("$(PJ_HAS_LIBUV)", "yes")
 CLEAN_BINS += \
 						uv_000 \
 						uv_spawn_123 \
+						cronx_123 \
 						uv_123
 LIBXXX_OBJS += \
 							uv_api.o

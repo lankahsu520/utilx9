@@ -272,7 +272,6 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 			{
 				goto exit_send;
 			}
-			//SAFE_SPRINTF(arg_str, "%s", (char *)arg);
 			break;
 		case DBUS_TYPE_INT32:
 			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_INT32, (int*)arg, DBUS_TYPE_INVALID))
@@ -657,7 +656,7 @@ int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, Dbus
 		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
 		tidx_req->thread_cb = dbusx_thread_handler;
 		tidx_req->data = dbusx_ctx;
-		threadx_init(tidx_req);
+		threadx_init(tidx_req, dbusx_ctx->name);
 	}
 
 	return 0;

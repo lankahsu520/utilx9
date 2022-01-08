@@ -39,7 +39,7 @@ static void led_turn_on_cb(void *usr_data)
 		case LED_ID_1:
 		case LED_ID_2:
 		case LED_ID_3:
-			SAFE_SPRINTF(ledname, "%s%d/brightness", LEDX_GPIOXX, ledon->id);
+			SAFE_SPRINTF_EX(ledname, "%s%d/brightness", LEDX_GPIOXX, ledon->id);
 
 			switch (ledon->action)
 			{

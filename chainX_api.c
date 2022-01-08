@@ -16,6 +16,9 @@
 #include <linux/route.h> // RTF_UP, RTF_GATEWAY
 #include <ifaddrs.h> // struct ifaddrs
 
+#include <netinet/tcp.h> //TCP_NODELAY
+#include <arpa/inet.h> //inet_pton
+
 #include "utilx9.h"
 
 #ifdef UTIL_EX_TTY
@@ -315,7 +318,7 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 			{
 				char netmask[LEN_OF_IP] = "";
 				void *addr = &(((struct sockaddr_in*)(ifa->ifa_netmask))->sin_addr);
-				SAFE_SPRINTF(netmask, "%s", inet_ntop(AF_INET, addr, netmask, sizeof(netmask)) );
+				SAFE_SPRINTF_EX(netmask, "%s", inet_ntop(AF_INET, addr, netmask, sizeof(netmask)) );
 
 				if (list_cb)
 				{
@@ -342,9 +345,9 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 			{
 				//mac[i] = s.ifr_addr.sa_data[i];
 				if (i!=0)
-					SAFE_SPRINTF(ethmac+strlen(ethmac), "%s%02X", split, (unsigned char)ptr[i]);
+					SAFE_SNPRINTF(ethmac+strlen(ethmac), sizeof(ethmac)-strlen(ethmac), "%s%02X", split, (unsigned char)ptr[i]);
 				else
-					SAFE_SPRINTF(ethmac+strlen(ethmac), "%02X", (unsigned char)ptr[i]);
+					SAFE_SNPRINTF(ethmac+strlen(ethmac), sizeof(ethmac)-strlen(ethmac), "%02X", (unsigned char)ptr[i]);
 			}
 		}
 		else
@@ -356,7 +359,7 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 	return ret;
 }
 
-int chainX_if_ipaddr(char *iface, char *ip)
+int chainX_if_ipaddr(char *iface, char *ip, int ip_len)
 {
 	int ret = -1;
 
@@ -380,7 +383,7 @@ int chainX_if_ipaddr(char *iface, char *ip)
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
 		if (0 == SAFE_IOCTL(sockfd, SIOCGIFADDR, &ifreq_info))
 		{
-			SAFE_SPRINTF(ip, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_addr)->sin_addr));
+			SAFE_SNPRINTF(ip, ip_len, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_addr)->sin_addr));
 			ret = 0;
 		}
 
@@ -389,7 +392,7 @@ int chainX_if_ipaddr(char *iface, char *ip)
 	return ret;
 }
 
-int chainX_if_netmask(char *iface, char *netmask)
+int chainX_if_netmask(char *iface, char *netmask, int netmask_len)
 {
 	int ret = -1;
 
@@ -413,7 +416,7 @@ int chainX_if_netmask(char *iface, char *netmask)
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
 		if (0 == SAFE_IOCTL(sockfd, SIOCGIFNETMASK, &ifreq_info))
 		{
-			SAFE_SPRINTF(netmask, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_addr)->sin_addr));
+			SAFE_SNPRINTF(netmask, netmask_len, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_addr)->sin_addr));
 			ret = 0;
 		}
 
@@ -422,7 +425,7 @@ int chainX_if_netmask(char *iface, char *netmask)
 	return ret;
 }
 
-int chainX_if_broadcast(char *iface, char *broadcast)
+int chainX_if_broadcast(char *iface, char *broadcast, int broadcast_len)
 {
 	int ret = -1;
 
@@ -446,7 +449,7 @@ int chainX_if_broadcast(char *iface, char *broadcast)
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
 		if (0 == SAFE_IOCTL(sockfd, SIOCGIFBRDADDR, &ifreq_info))
 		{
-			SAFE_SPRINTF(broadcast, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_broadaddr)->sin_addr));
+			SAFE_SNPRINTF(broadcast, broadcast_len, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_broadaddr)->sin_addr));
 			ret = 0;
 		}
 
@@ -455,7 +458,7 @@ int chainX_if_broadcast(char *iface, char *broadcast)
 	return ret;
 }
 
-int chainX_if_gateway(char *iface, char *gateway)
+int chainX_if_gateway(char *iface, char *gateway, int gateway_len)
 {
 	int ret = -1;
 
@@ -490,7 +493,7 @@ int chainX_if_gateway(char *iface, char *gateway)
 					//DBG_ER_LN("(iface_name: %s, dest_addr: %d, gate_addr: %d, iflags: %d)", iface_name, dest_addr, gate_addr, iflags);
 					struct in_addr addr;
 					memcpy(&addr, &gate_addr, 4);
-					SAFE_SPRINTF(gateway, "%s", inet_ntoa(addr));
+					SAFE_SNPRINTF(gateway, gateway_len, "%s", inet_ntoa(addr));
 					ret = 0;
 					break;
 				}
@@ -502,7 +505,7 @@ int chainX_if_gateway(char *iface, char *gateway)
 	return ret;
 }
 
-int chainX_if_hwaddr(char *iface, char *mac, char *split)
+int chainX_if_hwaddr(char *iface, char *mac, int mac_len, char *split)
 {
 	int ret = -1;
 
@@ -533,9 +536,9 @@ int chainX_if_hwaddr(char *iface, char *mac, char *split)
 			{
 				//mac[i] = s.ifr_addr.sa_data[i];
 				if (i!=0)
-					SAFE_SPRINTF(mac+strlen(mac), "%s%02X", split,(unsigned char) ifreq_info.ifr_addr.sa_data[i]);
+					SAFE_SNPRINTF(mac+strlen(mac), mac_len-strlen(mac), "%s%02X", split,(unsigned char) ifreq_info.ifr_addr.sa_data[i]);
 				else
-					SAFE_SPRINTF(mac+strlen(mac), "%02X",(unsigned char) ifreq_info.ifr_addr.sa_data[i]);
+					SAFE_SNPRINTF(mac+strlen(mac), mac_len-strlen(mac), "%02X",(unsigned char) ifreq_info.ifr_addr.sa_data[i]);
 			}
 			ret = 0;
 		}
@@ -546,7 +549,7 @@ int chainX_if_hwaddr(char *iface, char *mac, char *split)
 
 #include <linux/wireless.h>
 
-int chainX_if_ssid(char *iface, char *ssid)
+int chainX_if_ssid(char *iface, char *ssid, int ssid_len)
 {
 	int ret = -1;
 
@@ -576,7 +579,7 @@ int chainX_if_ssid(char *iface, char *ssid)
 
 		if (0 == SAFE_IOCTL(sockfd, SIOCGIWESSID, &iwreq_info))
 		{
-			SAFE_SPRINTF(ssid, "%s", essid);
+			SAFE_SNPRINTF(ssid, ssid_len, "%s", essid);
 			ret = 0;
 		}
 
@@ -657,6 +660,18 @@ int chainX_port_set(ChainXCtx_t *chainX_req, int port)
 	return ret;
 }
 
+int chainX_ip_len(ChainXCtx_t * chainX_req)
+{
+	if (chainX_req)
+	{
+		return sizeof(chainX_req->netinfo.addr.ipv4);
+	}
+	else 
+	{
+		return 0;
+	}
+}
+
 char * chainX_ip_get(ChainXCtx_t * chainX_req)
 {
 	if (chainX_req)
@@ -673,7 +688,7 @@ void chainX_ip_set(ChainXCtx_t *chainX_req, char *ip)
 {
 	if ( (chainX_req) && (ip) )
 	{
-		SAFE_SPRINTF(chainX_req->netinfo.addr.ipv4, "%s", ip);
+		SAFE_SPRINTF_EX(chainX_req->netinfo.addr.ipv4, "%s", ip);
 	}
 }
 
@@ -775,7 +790,19 @@ void chainX_hostname_set(ChainXCtx_t *chainX_req, char *hostname)
 {
 	if ( (chainX_req) && (hostname) )
 	{
-		SAFE_SPRINTF(chainX_req->netinfo.addr.hostname, "%s", hostname);
+		SAFE_SPRINTF_EX(chainX_req->netinfo.addr.hostname, "%s", hostname);
+	}
+}
+
+int chainX_reversename_len(ChainXCtx_t *chainX_req)
+{
+	if (chainX_req)
+	{
+		return sizeof(chainX_req->netinfo.reversename);
+	}
+	else
+	{
+		return 0;
 	}
 }
 
@@ -787,7 +814,7 @@ char *chainX_reversename_get(ChainXCtx_t *chainX_req)
 	}
 	else
 	{
-		return 0;
+		return NULL;
 	}
 }
 
@@ -795,7 +822,7 @@ void chainX_reversename_set(ChainXCtx_t *chainX_req, char *hostname)
 {
 	if ( (chainX_req) && (hostname) )
 	{
-		SAFE_SPRINTF(chainX_req->netinfo.reversename, "%s", hostname);
+		SAFE_SPRINTF_EX(chainX_req->netinfo.reversename, "%s", hostname);
 	}
 }
 
@@ -897,7 +924,7 @@ int chainX_infinite_set(ChainXCtx_t *chainX_req, int infinite)
 }
 
 #if (1)
-int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, char *ipv6_addr)
+int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_len, char *ipv6_addr, int ipv6_len)
 {
 	int ret = -1;
 	struct addrinfo hints, *res, *p;
@@ -923,7 +950,7 @@ int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, char *ipv
 			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
 			addr = &(ipv4->sin_addr);
 			inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr) );
-			SAFE_SPRINTF(ipv4_addr, "%s", ipstr);
+			SAFE_SNPRINTF(ipv4_addr, ipv4_len, "%s", ipstr);
 
 			if ( (ai_family==AF_UNSPEC) || (ai_family==AF_INET) )
 			{
@@ -936,7 +963,7 @@ int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, char *ipv
 			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
 			addr = &(ipv6->sin6_addr);
 			inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr) );
-			SAFE_SPRINTF(ipv6_addr, "%s", ipstr);
+			SAFE_SNPRINTF(ipv6_addr, ipv6_len, "%s", ipstr);
 
 			if ( (ai_family==AF_UNSPEC) || (ai_family==AF_INET6) )
 			{
@@ -950,18 +977,18 @@ int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, char *ipv
 	return ret;
 }
 
-int chainX_nslookup6(char *hostname , char *ip)
+int chainX_nslookup6(char *hostname, char *ip, int ip_len)
 {
-	return chainX_nslookup_ex(hostname, AF_INET6, NULL, ip);
+	return chainX_nslookup_ex(hostname, AF_INET6, NULL, 0, ip, ip_len);
 }
 
-int chainX_nslookup(char *hostname , char *ip)
+int chainX_nslookup(char *hostname, char *ip, int ip_len)
 {
-	return chainX_nslookup_ex(hostname, AF_INET, ip, NULL);
+	return chainX_nslookup_ex(hostname, AF_INET, ip, ip_len, NULL, 0);
 }
 
 #else
-int chainX_nslookup(char * hostname, char * ip)
+int chainX_nslookup(char *hostname, char *ip, int ip_len)
 {
 	struct hostent * he;
 	struct in_addr * *addr_list;
@@ -989,7 +1016,7 @@ int chainX_nslookup(char * hostname, char * ip)
 #endif
 
 // Resolves the reverse lookup of the hostname 
-int chainX_nslookup_reverse(char *ip_addr, char *hostname) 
+int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len)
 {
 	int ret = -1;
 
@@ -1009,7 +1036,7 @@ int chainX_nslookup_reverse(char *ip_addr, char *hostname)
 
 	if (hostname)
 	{
-		SAFE_SPRINTF(hostname, "%s", buf);
+		SAFE_SNPRINTF(hostname, hostname_len, "%s", buf);
 		ret = 0;
 	}
 	return ret;
@@ -1086,7 +1113,7 @@ int chainX_linked_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-void chainX_wakeup(ChainXCtx_t *chainX_req)
+void chainX_wakeup_simple(ChainXCtx_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -1226,7 +1253,7 @@ void chainXssl_certificate_file(ChainXCtx_t *chainX_req, char *filename)
 {
 	if (chainX_req)
 	{
-		SAFE_SPRINTF(chainX_req->certificate_file, "%s", filename);
+		SAFE_SPRINTF_EX(chainX_req->certificate_file, "%s", filename);
 	}
 }
 
@@ -1234,7 +1261,7 @@ void chainXssl_privatekey_file(ChainXCtx_t *chainX_req, char *filename)
 {
 	if (chainX_req)
 	{
-		SAFE_SPRINTF(chainX_req->privatekey_file, "%s", filename);
+		SAFE_SPRINTF_EX(chainX_req->privatekey_file, "%s", filename);
 	}
 }
 
@@ -1242,12 +1269,10 @@ void chainXssl_ca_file(ChainXCtx_t *chainX_req, char *filename)
 {
 	if (chainX_req)
 	{
-		SAFE_SPRINTF(chainX_req->ca_file, "%s", filename);
+		SAFE_SPRINTF_EX(chainX_req->ca_file, "%s", filename);
 	}
 }
 #endif
-
-static int chainXssl_check(ChainXCtx_t *chainX_req);
 
 #ifdef UTIL_EX_SOCKET_OPENSSL
 #define SOCKET_SSL_DEBUG(x) ERR_print_errors_fp( stderr );
@@ -1518,6 +1543,16 @@ static int chainXssl_certs_check(ChainXCtx_t *chainX_req)
 		ret = -1;
 	}
 
+	return ret;
+}
+
+static int chainXssl_check(ChainXCtx_t *chainX_req)
+{
+	int ret = -1;
+	if (chainX_req)
+	{
+		ret = chainXssl_certs_check(chainX_req);
+	}
 	return ret;
 }
 
@@ -1811,6 +1846,16 @@ static int chainXssl_certs_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
+static int chainXssl_check(ChainXCtx_t *chainX_req)
+{
+	int ret = -1;
+	if (chainX_req)
+	{
+		ret = chainXssl_certs_check(chainX_req);
+	}
+	return ret;
+}
+
 int chainXssl_link(ChainXCtx_t *chainX_req)
 {
 	int ret = -1;
@@ -1890,24 +1935,21 @@ static void chainXssl_init(ChainXCtx_t *chainX_req)
 {
 }
 
-int chainXssl_link(ChainXCtx_t *chainX_req)
-{
-	int ret = 0;
-	return ret;
-}
-#endif
-
 static int chainXssl_check(ChainXCtx_t *chainX_req)
 {
 	int ret = -1;
-#ifdef UTIL_EX_SSL
-	if (chainX_req)
-	{
-		ret = chainXssl_certs_check(chainX_req);
-	}
-#endif
 	return ret;
 }
+
+int chainXssl_link(ChainXCtx_t *chainX_req)
+{
+	int ret = 0;
+
+	chainXssl_check(chainX_req);
+
+	return ret;
+}
+#endif
 
 static void chainXssl_close(ChainXCtx_t *chainX_req)
 {
@@ -2142,7 +2184,7 @@ void chainX_tty_setname(ChainXCtx_t *chainX_req, char *ttyname)
 {
 	if ( (chainX_req) && (ttyname) )
 	{
-		SAFE_SPRINTF(chainX_req->ttyinfo.ttyname, "%s", ttyname);
+		SAFE_SPRINTF_EX(chainX_req->ttyinfo.ttyname, "%s", ttyname);
 	}
 }
 
@@ -2412,7 +2454,7 @@ static int chainX_netinfo_scan(ChainXCtx_t *chainX_req)
 	else if ( ( chainX_req->netinfo.addr.hostname ) && (strlen(chainX_req->netinfo.addr.hostname) > 0 ) )
 	{
 		// Got hostname -> IPv4 !!!
-		if ( chainX_nslookup(chainX_req->netinfo.addr.hostname , chainX_req->netinfo.addr.ipv4) != 0 )
+		if ( chainX_nslookup(chainX_req->netinfo.addr.hostname, chainX_req->netinfo.addr.ipv4, sizeof(chainX_req->netinfo.addr.ipv4)) != 0 )
 		{
 			DBG_ER_LN("chainX_nslookup error !!! (hostname: %s)", chainX_req->netinfo.addr.hostname);
 			return -1;
@@ -3076,7 +3118,7 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 			{
 				tidx_req->thread_cb = chainX_thread_handler_tcp;
 				tidx_req->data = chainX_req;
-				if (threadx_init(tidx_req) != 0)
+				if (threadx_init(tidx_req, "chainX_api - TCP") != 0)
 				{
 					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 					return -1;
@@ -3088,7 +3130,7 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 			{
 				tidx_req->thread_cb = chainX_thread_handler_udp;
 				tidx_req->data = chainX_req;
-				if (threadx_init(tidx_req) != 0)
+				if (threadx_init(tidx_req, "chainX_api - UDP") != 0)
 				{
 					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 					return -1;
@@ -3100,7 +3142,7 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 			{
 				tidx_req->thread_cb = chainX_thread_handler_tty;
 				tidx_req->data = chainX_req;
-				if (threadx_init(tidx_req) != 0)
+				if (threadx_init(tidx_req, "chainX_api - TTY") != 0)
 				{
 					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 					return -1;
@@ -3352,7 +3394,7 @@ int chainX_ping(ChainXCtx_t *chainX_req)
 		{
 			// Hostname -> addr
 			ip_addr = chainX_ip_get(chainX_req);
-			if ( ( chainX_nslookup( chainX_hostname_get(chainX_req), chainX_ip_get(chainX_req) ) == 0 ) &&	( chainX_nslookup_reverse(chainX_ip_get(chainX_req), chainX_reversename_get(chainX_req)) == 0 ) )
+			if ( ( chainX_nslookup( chainX_hostname_get(chainX_req), chainX_ip_get(chainX_req), chainX_ip_len(chainX_req) ) == 0 ) &&	( chainX_nslookup_reverse(chainX_ip_get(chainX_req), chainX_reversename_get(chainX_req), chainX_reversename_len(chainX_req)) == 0 ) )
 			{
 				addr_set = chainX_addr_to_set(chainX_req, ip_addr , chainX_port_get(chainX_req) );
 			}

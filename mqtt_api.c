@@ -141,7 +141,7 @@ void mqtt_subscribe_add(MQTTSession_t *session, char *topic, mqtt_message_fn *me
 		else
 		{
 			MQTTSub_t *sub_new = (MQTTSub_t*)SAFE_CALLOC(1, sizeof(MQTTSub_t));
-			SAFE_SPRINTF(sub_new->topic, "%s", topic);
+			SAFE_SPRINTF_EX(sub_new->topic, "%s", topic);
 			sub_new->message_cb = message_cb;
 
 			DBG_IF_LN("(topic: %s)", sub_new->topic);
@@ -296,6 +296,7 @@ static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 	if (mqtt_ctx->isinit == 0)
 	{
 		mqtt_ctx->isinit = 1;
+		DBG_DB_LN("call mosquitto_lib_init ...");
 		mosquitto_lib_init();
 	}
 
@@ -318,7 +319,7 @@ static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 		else
 		{
 			SAFE_MEMSET(session->clientid, 0, LEN_OF_VAL32);
-			SAFE_SPRINTF(session->clientid, "%s-%d", session->macid, getpid());
+			SAFE_SPRINTF_EX(session->clientid, "%s-%d", session->macid, getpid());
 		}
 
 		session->mqtt_ctx = (void*)mqtt_ctx;
@@ -343,7 +344,11 @@ static struct mosquitto *mqtt_srv_open(MQTTCtx_t *mqtt_ctx)
 			{
 				//--tls-version : TLS protocol version, can be one of tlsv1.3 tlsv1.2 or tlsv1.1.
 				//								Defaults to tlsv1.2 if available.
-				mosquitto_tls_opts_set(mosq, 1, NULL, NULL);
+				if (SAFE_STRLEN(session->tls_version) == 0)
+				{
+					SAFE_SPRINTF_EX(session->tls_version, "all");
+				}
+				mosquitto_tls_opts_set(mosq, 1, session->tls_version, NULL);
 				mosquitto_tls_insecure_set(mosq, 1);
 				mosquitto_tls_set(mosq, session->ca_file, NULL, session->certificate_file, session->privatekey_file, NULL);
 			}
@@ -407,6 +412,7 @@ static void *mqtt_thread_handler( void *user )
 			int rc = 0;
 			DBG_IF_LN("call mosquitto_connect_async ... (%s:%d, keepalive: %d, topic: %s)", session->hostname,  session->port, session->keepalive, session->topic_root);
 			rc = mosquitto_connect_async(mosq, session->hostname, session->port, session->keepalive);
+			//rc = mosquitto_connect(mosq, session->hostname, session->port, session->keepalive);
 			if(rc){
 				DBG_ER_LN("mosquitto_connect_async error !!! (rc: %d, %s)", rc, mosquitto_strerror(rc));
 				goto exit_mqtt;
@@ -524,6 +530,17 @@ void mqtt_wakeup(MQTTCtx_t *mqtt_ctx)
 	}
 }
 
+int mqtt_isquit(MQTTCtx_t *mqtt_ctx)
+{
+	int isquit = 0;
+	if (mqtt_ctx)
+	{
+		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
+		isquit = threadx_isquit(tidx_req);
+	}
+	return isquit;
+}
+
 void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx)
 {
 	if (mqtt_ctx)
@@ -551,7 +568,7 @@ void mqtt_thread_init(MQTTCtx_t *mqtt_ctx)
 		ThreadX_t *tidx_req = &mqtt_ctx->tidx;
 		tidx_req->thread_cb = mqtt_thread_handler;
 		tidx_req->data = mqtt_ctx;
-		threadx_init(tidx_req);
+		threadx_init(tidx_req, mqtt_ctx->name);
 	}
 }
 

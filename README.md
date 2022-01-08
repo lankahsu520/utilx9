@@ -5,7 +5,7 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
   應用簡單化！
   強化常用、有用的功能！
 
-大家都知道 Open-source 功能強大，貢獻非凡.提供前所未有的視野，讓開發者們省去大半的研究時間，開發更有效率？
+大家都知道 Open-source 功能強大，貢獻非凡！提供前所未有的視野，讓開發者們省去大半的研究時間，開發更有效率嗎？也因此我們不是要深究 Open-source 是如此高深，而是要知悉如何應用。
 
 經過多年的工作經驗，心想只是為了糊口飯吃，為什麼還要浪費在這些 Open-source 的文件裏打轉，於是一點一滴才整理出這些.
 
@@ -40,7 +40,7 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 # Build
    ```
 $ . conf/config_customer
-	My prefix is /work/codebase/lankahsu520/xbox_github/install/ubuntu_/.
+	My prefix is /work/codebase/lankahsu520/xbox_github/install/github_/.
 	Please replace the string.
 $ make
    ```
@@ -49,6 +49,7 @@ $ make
 - chainX_123 - socket example. use chainX_api.c.
 - client_123 - socket client. use chainX_api.c.
 - clist_123 - link list example. use clist_api.c , use contiki\core\lib\list.*.
+- cronx_123 - parse crontab string ("minute" "hour" "day of month" "month" "day of week" "year, 2020+"), similar to crontab, to use cronx_api.c
 - dbus_456 - dbus example.
 - demo_000 - c template.
 - demo_123 - a example.

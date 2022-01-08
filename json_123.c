@@ -17,7 +17,7 @@
 static void uuid_test(void)
 {
 	char guid[LEN_OF_UUID]="";
-	os_random_uuid(guid);
+	os_random_uuid(guid, sizeof(guid));
 	DBG_LN_Y("(guid: %s)", guid);
 }
 
@@ -61,18 +61,16 @@ int main(int argc, char* argv[])
 	DBG_LN_Y("(jdemo2: %p, refcount: %zd)", jdemo2, jdemo2->refcount);
 	DBG_LN_Y("(jdemo1: %p, refcount: %zd)", jdemo1, jdemo1->refcount);
 
-	{
-		char *dump = JSON_DUMPS_EASY(jroot);
-		DBG_LN_Y("(dump: %s)", dump);
-		SAFE_FREE(dump);
-	}
+	json_dump_simple(jroot, "jroot");
+
 	{
 		int idx = -1;
 		json_ary_find_key_val(jA, "val", JSON_JINT(3), &idx);
 		DBG_LN_Y("(idx: %d)", idx);
 	}
 
-	json_t *jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "logo", JSON_OBJ_FIND_ID_INFINITE);
+	json_t *jfound = NULL;
+	jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "logo", NULL, JSON_OBJ_FIND_ID_INFINITE, "", NULL);
 	if (jfound)
 	{
 		const char *found = JSON_STR(jfound);
@@ -81,7 +79,53 @@ int main(int argc, char* argv[])
 			DBG_LN_Y("(logo: %s)", (char*)found);
 		}
 	}
+
+	JSON_TopicX_t jtopicx ={
+		.jroot = jroot,
+	};
+
+	SAFE_SPRINTF_EX(jtopicx.topic, "j1/j2/j4");
+	jfound = json2topicx(&jtopicx, -1, JSON_ACTID_READ);
+	json_dump_simple(jfound, "Not Found - j1/j2/j4");
+
+	jfound = json2topicx(&jtopicx, -1, JSON_ACTID_APPEND);
+	json_dump_simple(jfound, "APPEND - j1/j2/j4");
+
+	SAFE_SPRINTF_EX(jtopicx.topic, "j1/j2/j3");
+	jfound = json2topicx(&jtopicx, -1, JSON_ACTID_DEL);
+	json_dump_simple(jfound, "DEL - j1/j2/j3");
+
+	SAFE_SPRINTF_EX(jtopicx.topic, "j1/j2");
+	jfound = json2topicx(&jtopicx, -1, JSON_ACTID_READ);
+	json_dump_simple(jfound, jtopicx.topic);
+
 	JSON_FREE(jroot);
+
+	{
+		jroot = JSON_LOADFILE_EASY("./json/urmet.json");
+		if (jroot)
+		{
+			json_t *jfound_ary = JSON_ARY_NEW();
+			if (jfound_ary)
+			{
+				json_t *jval = JSON_JSTR("Battery");
+				char topic[LEN_OF_TOPIC] = "";
+				//json_t *jfound_val = JSON_OBJ_FIND_RECURSIVE(jroot, "class", jval, -1, topic, NULL);
+				//json_dump_simple(jfound_val, "hello");
+
+				jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "class", jval, JSON_OBJ_FIND_ID_INFINITE, topic, jfound_ary);
+				json_dump_simple(jfound_ary, "hello");
+
+				JSON_ARY_CLEAR(jfound_ary);
+				jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "000980001", NULL, JSON_OBJ_FIND_ID_INFINITE, topic, jfound_ary);
+				json_dump_simple(jfound_ary, "hello");
+
+				JSON_FREE(jval);
+				JSON_FREE(jfound_ary);
+			}
+			JSON_FREE(jroot);
+		}
+	}
 #endif
 
 	exit(0);

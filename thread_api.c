@@ -203,13 +203,13 @@ void threadx_close(ThreadX_t *tidx_req)
 	}
 }
 
-int threadx_init(ThreadX_t *tidx_req)
+int threadx_init(ThreadX_t *tidx_req, char *name)
 {
 	int ret = 0;
 
 	if (tidx_req)
 	{
-	
+		SAFE_SPRINTF_EX(tidx_req->name, "%s", name);
 		tidx_req->isexit = 0;
 		tidx_req->isfree = 0;
 		tidx_req->isloop = 0;

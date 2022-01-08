@@ -285,7 +285,7 @@ static void wsdiscovery_uuid_gen(ChainXCtx_t *chainX_req, soap_node_t *request_n
 		soap_node_t *MessageID_node = soap_element_fetch(request_node, NULL, "MessageID", NULL, NULL);
 		if (MessageID_node)
 		{
-			os_random_uuid(chainX_req->session);
+			os_random_uuid(chainX_req->session, sizeof(chainX_req->session));
 			char *messageid = NULL;
 			SAFE_ASPRINTF(messageid, "uuid:%s", chainX_req->session);
 			if (messageid)

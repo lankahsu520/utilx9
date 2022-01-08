@@ -23,19 +23,25 @@
 #define USE_TIMER_CREATE
 #endif
 
+#define USE_WS
+
 #define TAG "lws_123"
 
 // ** app **
 static int is_quit = 0;
 static int is_service = 0;
-static int is_echo = 0;
+static int is_echo = 1;
 
+#ifdef USE_UV
 static uv_loop_t *uv_loop = NULL;
+#endif
 
 #ifdef USE_ASYNC_CREATE
 uv_async_t uv_async_fd;
 #endif
 
+#ifdef USE_WS
+#define LWS_PORT WEBSOCKETS_URMET_PORT_7682//WEBSOCKETS_PORT_7681
 static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len )
 {
 	int ret = -1;
@@ -54,6 +60,13 @@ static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 				ret  = 0;
 			}
 			break;
+		case LWS_CALLBACK_RECEIVE: // 6
+			{
+				//LWSSession_t *session = (LWSSession_t*)user;//SAFE_CALLOC(1, sizeof(LWSSession_t));
+				DBG_IF_LN("(wsi: %p, user: %p, lws_ctx: %p, reason: %d - %s)", wsi, user, lws_ctx, reason, translate_lws_cb(reason));
+				//ret = lws_http_cb_receive(lws_ctx, session, in, len);
+			}
+			break;
 
 		default:
 			break;
@@ -64,14 +77,20 @@ static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 
 LWSCtx_t lws_req = {
 	.name = TAG,
-	.isquit = 0,
 	.isecho = 0,
+
+	.security = 1,
+	.certificate_file ="/work/rootfs_intercom/IoT/https/common/https_srv.crt",
+	.privatekey_file ="/work/rootfs_intercom/IoT/https/common/https_srv.key",
 
 	.cinfo = {0},
 	.context = NULL,
+	.timeout_ms = 1000000,
+
 	.ccinfo = {0},
 	.callback = lws2_client_cb,
 };
+#endif
 
 static int app_quit(void)
 {
@@ -82,8 +101,15 @@ static int app_quit(void)
 uv_timer_t uv_timer_1sec_fd;
 void timer_1sec_loop(uv_timer_t *handle)
 {
-	//DBG_TR_LN(DBG_TXT_ENTER);
+	static int count = 0;
+	count ++;
+
+	//DBG_TR_LN("(count: %d)", count);
 	//SAFE_UV_ASYNC(&uv_async_fd);
+
+	time_t now_t = time((time_t *)NULL);
+	struct tm *now_tm = localtime(&now_t);
+	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
 	if (app_quit()==1)
 	{
@@ -96,26 +122,19 @@ void timer_1sec_loop(uv_timer_t *handle)
 		if (is_service)
 		{ // server mode, send to myself
 		}
+#ifdef USE_WS
+		//else if ( (count%10) == 0 )
 		else
 		{ // client mode
-			static int cli_count = 0;
-
 			if (lws2_session_count(&lws_req) > 0)
 			{
 				char tmpbuf[LEN_OF_WEBSOCKET] = "";
-
-				//DBG_IF_LN(">>>>>>>>>> (&lws_req: %p)", &lws_req);
-				SAFE_SPRINTF(tmpbuf, "(cli_count: %d)", cli_count);
-
+				SAFE_SPRINTF_EX(tmpbuf, "(count: %d)", count);
+				DBG_IF_LN("call lws2_session_write_q_broadcast ... (tmpbuf: %s)", tmpbuf);
 				lws2_session_write_q_broadcast(&lws_req, tmpbuf, SAFE_STRLEN(tmpbuf));
 			}
-			else if (cli_count%10==0)
-			{
-				const struct lws_protocols *protocols = lws_req.cinfo.protocols;
-				lws2_cli_open(&lws_req, "localhost", WEBSOCKETS_PORT_7681, (char*)protocols[0].name);
-			}
-			cli_count++;
 		}
+#endif
 	}
 }
 #endif
@@ -173,18 +192,16 @@ static void app_stop(void)
 #ifdef USE_ASYNC_CREATE
 		SAFE_UV_ASYNC(&uv_async_fd);
 #else
-#error "Please use USE_ASYNC_CREATE !!!"
+//#error "Please use USE_ASYNC_CREATE !!!"
 		app_stop_uv(NULL, 1);
 #endif
 
-		if (is_service)
+#ifdef USE_WS
 		{
-			lws2_srv_close( &lws_req );
+			lws2_thread_stop( &lws_req );
+			lws2_thread_close( &lws_req );
 		}
-		else
-		{
-			lws2_cli_close( &lws_req );
-		}
+#endif
 	}
 }
 
@@ -204,24 +221,57 @@ static void app_loop(void)
 #endif
 #endif
 
+#ifdef USE_WS
 	if (is_service)
 	{
-		lws2_srv_init(&lws_req, WEBSOCKETS_PORT_7681, NULL, LWS_SERVER_OPTION_LIBUV, uv_loop);
+#ifdef USE_UV
+		lws2_srv_init(&lws_req, LWS_PORT, NULL, LWS_SERVER_OPTION_LIBUV, uv_loop);
+#else
+		lws2_srv_init(&lws_req, LWS_PORT, NULL, 0, NULL);
+#endif
 
 		lws_req.isecho = is_echo;
-		lws2_srv_open(&lws_req, 1000000);
+		lws2_thread_init(&lws_req);
 	}
 	else
 	{
+#ifdef USE_UV
 		lws2_cli_init(&lws_req, NULL, LWS_SERVER_OPTION_LIBUV, uv_loop);
+#else
+		lws2_cli_init(&lws_req, NULL, 0, NULL);
+#endif
 
 		const struct lws_protocols *protocols = lws_req.cinfo.protocols;
-		lws2_cli_open(&lws_req, "localhost", WEBSOCKETS_PORT_7681, (char*)protocols[0].name);
+		lws2_cli_open(&lws_req, "localhost", LWS_PORT, (char*)protocols[0].name);
+
+		lws2_thread_init(&lws_req);
 	}
+#endif
 
 #ifdef USE_UV
 	SAFE_UV_LOOP_RUN(uv_loop);
 	SAFE_UV_LOOP_CLOSE(uv_loop);
+#else
+	while ( app_quit()==0 )
+	{
+		static int count = 0;
+		count ++;
+		sleep(1);
+
+		if (is_service==0)
+		{
+			//if ( (count%10) == 0 )
+			{ // client mode
+				if (lws2_session_count(&lws_req) > 0)
+				{
+					char tmpbuf[LEN_OF_WEBSOCKET] = "";
+					SAFE_SPRINTF_EX(tmpbuf, "[%d]", count);
+					DBG_IF_LN("call lws2_session_write_q_broadcast ... (tmpbuf: %s)", tmpbuf);
+					lws2_session_write_q_broadcast(&lws_req, tmpbuf, SAFE_STRLEN(tmpbuf));
+				}
+			}
+		}
+	}
 #endif
 
 	goto exit_loop;

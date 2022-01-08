@@ -14,6 +14,8 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+#include <stdlib.h>
+
 #define USE_NSLOOKUP
 #define USE_DNS_IP
 #define USE_NETLIST
@@ -113,11 +115,11 @@ int main(int argc, char* argv[])
 		char ipv4[LEN_OF_IP] = "";
 		char ipv6[LEN_OF_IP] = "";
 
-		SAFE_SPRINTF(hostname, "%s", argv[1]);
+		SAFE_SPRINTF_EX(hostname, "%s", argv[1]);
 
-		chainX_nslookup(hostname, ipv4);
+		chainX_nslookup(hostname, ipv4, sizeof(ipv4));
 		DBG_IF_LN("(%s -> ipv4: %s)", hostname, ipv4);
-		chainX_nslookup6(hostname, ipv6);
+		chainX_nslookup6(hostname, ipv6, sizeof(ipv6));
 		DBG_IF_LN("(%s -> ipv6: %s)", hostname, ipv6);
 	}
 #endif
@@ -144,26 +146,26 @@ int main(int argc, char* argv[])
 		DBG_LN_Y("** %s **", iface);
 
 		char ip[LEN_OF_IP] = "";
-		chainX_if_ipaddr(iface, ip);
+		chainX_if_ipaddr(iface, ip, sizeof(ip));
 		DBG_LN_Y("ip: %s", ip);
 
 		char netmask[LEN_OF_IP] = "";
-		chainX_if_netmask(iface, netmask);
+		chainX_if_netmask(iface, netmask, sizeof(netmask));
 		DBG_LN_Y("netmask: %s", netmask);
 
 		char broadcast[LEN_OF_IP] = "";
-		chainX_if_broadcast(iface, broadcast);
+		chainX_if_broadcast(iface, broadcast, sizeof(broadcast));
 		DBG_LN_Y("broadcast: %s", broadcast);
 
 		char gateway[LEN_OF_IP] = "";
-		chainX_if_gateway(iface, gateway);
+		chainX_if_gateway(iface, gateway, sizeof(gateway));
 		DBG_LN_Y("gateway: %s", gateway);
 
 		char ethmac[LEN_OF_MAC]= "";
-		chainX_if_hwaddr(iface, ethmac, ":");
+		chainX_if_hwaddr(iface, ethmac, sizeof(ethmac), ":");
 		DBG_LN_Y("ethmac: %s", ethmac);
 
-		chainX_if_hwaddr(iface, ethmac, "");
+		chainX_if_hwaddr(iface, ethmac, sizeof(ethmac), "");
 		DBG_LN_Y("ethmac: %s", ethmac);
 	}
 
@@ -173,30 +175,30 @@ int main(int argc, char* argv[])
 		DBG_LN_Y("** %s **", iface);
 
 		char ip[LEN_OF_IP] = "";
-		chainX_if_ipaddr(iface, ip);
+		chainX_if_ipaddr(iface, ip, sizeof(ip));
 		DBG_LN_Y("ip: %s", ip);
 
 		char netmask[LEN_OF_IP] = "";
-		chainX_if_netmask(iface, netmask);
+		chainX_if_netmask(iface, netmask, sizeof(netmask));
 		DBG_LN_Y("netmask: %s", netmask);
 
 		char broadcast[LEN_OF_IP] = "";
-		chainX_if_broadcast(iface, broadcast);
+		chainX_if_broadcast(iface, broadcast, sizeof(broadcast));
 		DBG_LN_Y("broadcast: %s", broadcast);
 
 		char gateway[LEN_OF_IP] = "";
-		chainX_if_gateway(iface, gateway);
+		chainX_if_gateway(iface, gateway, sizeof(gateway));
 		DBG_LN_Y("gateway: %s", gateway);
 
 		char ethmac[LEN_OF_MAC]= "";
-		chainX_if_hwaddr(iface, ethmac, ":");
+		chainX_if_hwaddr(iface, ethmac, sizeof(ethmac), ":");
 		DBG_LN_Y("ethmac: %s", ethmac);
 
-		chainX_if_hwaddr(iface, ethmac, "");
+		chainX_if_hwaddr(iface, ethmac, sizeof(ethmac), "");
 		DBG_LN_Y("ethmac: %s", ethmac);
 
 		char ssid[LEN_OF_SSID]= "";
-		chainX_if_ssid("ra0", ssid);
+		chainX_if_ssid("ra0", ssid, sizeof(ssid));
 		DBG_LN_Y("ssid: %s", ssid);
 	}
 #endif

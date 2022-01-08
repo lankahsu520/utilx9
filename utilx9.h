@@ -33,7 +33,9 @@ extern "C" {
 #include <string.h>
 #include <unistd.h>
 #include "basic_def.h"
-
+#include <dirent.h> // DIR
+#include <errno.h> // EINVAL
+#include <sys/time.h>
 
 //******************************************************************************
 //** UTIL_EX_XXX **
@@ -83,6 +85,8 @@ extern "C" {
 #define UTIL_EX_YUAREL
 #define UTIL_EX_WEBSOCKETS
 #define UTIL_EX_MQTT
+
+#define UTIL_EX_CRON
 
 //******************************************************************************
 //** UTIL_EX_DBG **
@@ -178,6 +182,8 @@ void* pcheck( void* a );
 #define SAFE_MIN(x,y) ({ typeof(x) _x = (x); typeof(y) _y = (y); (void) (&_x == &_y); _x < _y ? _x : _y; })
 #define SAFE_MAX(x,y) ({ typeof(x) _x = (x); typeof(y) _y = (y); (void) (&_x == &_y); _x > _y ? _x : _y; })
 
+#define SAFE_ARRAY_SIZE(array) (sizeof(array) / sizeof *(array))
+
 #define SAFE_FREE(X) \
 	do { if ( (X) != NULL ) {free(X); X=NULL;} } while(0)
 
@@ -224,8 +230,10 @@ void* pcheck( void* a );
 		({ int __ret =0; do { if (pcheck(X)) __ret = strlen(X); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SPRINTF(X, FMT, args...) \
 	({ int __ret =0; do { if (pcheck(X)) __ret = sprintf(X, FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
+#define SAFE_SPRINTF_EX(X, FMT, args...) \
+		({ int __ret =0; do { if (pcheck(X)) __ret = snprintf(X, sizeof(X), FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SNPRINTF(X, Y, FMT, args...) \
-	({ int __ret =0; do { if ((pcheck(X)) && (Y>0)) __ret = snprintf(X, Y, FMT, ## args); else DBG_ER_LN("%s is NULL or Y (%d <= 0) !!!", #X, (int)Y); } while(0); __ret; })
+	({ int __ret =0; do { if ((pcheck(X)) && (Y>0)) __ret = snprintf(X, Y, FMT, ## args); else DBG_ER_LN("%s is NULL or Y (%zd <= 0) !!!", #X, (size_t)Y); } while(0); __ret; })
 
 #define SAFE_ASPRINTF(X, FMT, args...) \
 	({ int __ret =0; \
@@ -552,6 +560,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 			if (pcheck(ptr)) \
 			{ \
 				__ret = SAFE_THREAD_LOCK(&ptr->in_mtx); \
+				if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
 			} \
 		} while(0); \
 		__ret; \
@@ -563,6 +572,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 			if (pcheck(ptr)) \
 			{ \
 				__ret = SAFE_THREAD_TRYLOCK(&ptr->in_mtx); \
+				if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
 			} \
 		} while(0); \
 		__ret; \
@@ -574,6 +584,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 			if (pcheck(ptr)) \
 			{ \
 				__ret = SAFE_THREAD_UNLOCK(&ptr->in_mtx); \
+				if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
 			} \
 		} while(0); \
 		__ret; \
@@ -697,6 +708,8 @@ typedef void *(*thread_fn) (void *);
 
 typedef struct ThreadX_Struct
 {
+	char name[LEN_OF_NAME32];
+
 	pthread_t tid;
 	pthread_mutex_t in_mtx;
 	pthread_cond_t in_cond;
@@ -739,7 +752,7 @@ int threadx_detach(ThreadX_t *tidx_req);
 int threadx_join(ThreadX_t *tidx_req);
 void threadx_stop(ThreadX_t *tid_req);
 void threadx_close(ThreadX_t *tid_req);
-int threadx_init(ThreadX_t *tid_req);
+int threadx_init(ThreadX_t *tid_req, char *name);
 
 #endif
 
@@ -808,8 +821,9 @@ typedef int (*newline_lookup_fn)(char *newline, void *arg);
 void file_lookup(char *filename, newline_lookup_fn lookup_cb, void *arg);
 void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg);
 
-char *os_random_uuid(char *buf);
+char *os_random_uuid(char *buf, int buf_len);
 char *os_urandom(int byte_count);
+#ifdef UTIL_EX_SSL
 char *sec_base64_enc(char *input, int length, int *enc_len);
 char *sec_base64_dec(char *input, int length, int *dec_len);
 
@@ -818,6 +832,7 @@ char *sec_aes_cbc_enc_ascii(char *in, int in_len, char *aes_key);
 char *sec_aes_cbc_enc_base(char *in, int in_len, char *aes_key);
 int sec_aes_cbc_dec(char *in, char *out, int out_len, char *aes_key);
 int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key);
+#endif
 
 #define UTIL_EX_BASIC_QBUF
 
@@ -958,6 +973,7 @@ int clist_contains(clist_t list, void *item);
 
 typedef void (*clist_item_free_fn)(void *item);
 
+void clist_pop_ex(clist_t list, clist_item_free_fn free_cb);
 void clist_free_ex(clist_t list, clist_item_free_fn free_cb);
 void clist_free(clist_t list);
 #endif
@@ -1185,7 +1201,7 @@ typedef struct LedRequest_Struct
 } LedRequest_t;
 
 void led_gosleep(LedRequest_t *ledreq);
-void led_wakeup(LedRequest_t *ledreq);
+void led_wakeup_simple(LedRequest_t *ledreq);
 
 void led_thread_stop(LedRequest_t *ledreq);
 void led_thread_close(LedRequest_t *ledreq);
@@ -1270,7 +1286,7 @@ typedef struct FileRequest_STRUCT
 	struct curl_slist *headers;
 
 	size_t max_filesize;
-	char filename[LEN_OF_FILENAME256];
+	char filename[LEN_OF_FULLNAME];
 	FILE *fp;
 
 	int progress;
@@ -1291,10 +1307,10 @@ typedef enum
 typedef struct MJPEGRequest_STRUCT
 {
 	size_t max_size;
-	char filename[LEN_OF_FILENAME512];
+	char filename[LEN_OF_FULLNAME];
 	FILE *fp;
 
-	char prefixname[LEN_OF_FILENAME256];
+	char prefixname[LEN_OF_DIRNAME];
 	int maxfiles;
 
 	int num;
@@ -1313,7 +1329,7 @@ typedef struct MJPEGRequest_STRUCT
 typedef struct RTSPRequest_STRUCT
 {
 	size_t max_size;
-	char filename[LEN_OF_FILENAME256];
+	char filename[LEN_OF_FULLNAME];
 	FILE *fp;
 	int duration; // seconds
 
@@ -1657,9 +1673,9 @@ typedef struct ChainXCtx_STRUCT
 	const unsigned char *ca_txt;
 	size_t ca_txt_size;
 #elif defined (UTIL_EX_SOCKET_CERT_FILE)
-	char certificate_file[LEN_OF_FILENAME256];
-	char privatekey_file[LEN_OF_FILENAME256];
-	char ca_file[LEN_OF_FILENAME256];
+	char certificate_file[LEN_OF_FULLNAME];
+	char privatekey_file[LEN_OF_FULLNAME];
+	char ca_file[LEN_OF_FULLNAME];
 #endif
 
 	int infinite; // for post, ping
@@ -1686,17 +1702,18 @@ typedef void (*chainX_if_list_fn)(char *ifa_name, int ifa_flags, int family, cha
 
 int chainX_if_list(chainX_if_list_fn list_cb);
 
-int chainX_if_ipaddr(char *iface, char *ip);
-int chainX_if_netmask(char *iface, char *netmask);
-int chainX_if_broadcast(char *iface, char *broadcast);
-int chainX_if_gateway(char *iface, char *gateway);
-int chainX_if_hwaddr(char *iface, char *mac, char *split);
-int chainX_if_ssid(char *iface, char *ssid);
+int chainX_if_ipaddr(char *iface, char *ip, int ip_len);
+int chainX_if_netmask(char *iface, char *netmask, int netmask_len);
+int chainX_if_broadcast(char *iface, char *broadcast, int broadcast_len);
+int chainX_if_gateway(char *iface, char *gateway, int gateway_len);
+int chainX_if_hwaddr(char *iface, char *mac, int mac_len, char *split);
+int chainX_if_ssid(char *iface, char *ssid, int ssid_len);
 
 int chainX_fd_get(ChainXCtx_t *chainX_req);
 
 int chainX_port_get(ChainXCtx_t *chainX_req);
 int chainX_port_set(ChainXCtx_t *chainX_req, int port);
+int chainX_ip_len(ChainXCtx_t * chainX_req);
 char *chainX_ip_get(ChainXCtx_t *chainX_req);
 void chainX_ip_set(ChainXCtx_t *chainX_req, char *ip);
 struct sockaddr_in *chainX_addr_to_get(ChainXCtx_t *chainX_req);
@@ -1706,6 +1723,7 @@ struct sockaddr_in *chainX_addr_from_get(ChainXCtx_t *chainX_req);
 char *chainX_hostname_get(ChainXCtx_t *chainX_req);
 void chainX_hostname_set(ChainXCtx_t *chainX_req, char *hostname);
 
+int chainX_reversename_len(ChainXCtx_t *chainX_req);
 char *chainX_reversename_get(ChainXCtx_t *chainX_req);
 void chainX_reversename_set(ChainXCtx_t *chainX_req, char *hostname);
 
@@ -1719,17 +1737,17 @@ int chainX_recycle_set(ChainXCtx_t *chainX_req, int recycle);
 int chainX_infinite_get(ChainXCtx_t *chainX_req);
 int chainX_infinite_set(ChainXCtx_t *chainX_req, int infinite);
 
-int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, char *ipv6_addr);
-int chainX_nslookup6(char *hostname , char *ip);
-int chainX_nslookup(char *hostname , char *ip);
-int chainX_nslookup_reverse(char *ip_addr, char *hostname);
+int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_len, char *ipv6_addr, int ipv6_len);
+int chainX_nslookup6(char *hostname , char *ip, int ip_len);
+int chainX_nslookup(char *hostname , char *ip, int ip_len);
+int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len);
 
 int chainX_quit_check(ChainXCtx_t *chainX_req);
 void chainX_quit_set(ChainXCtx_t *chainX_req, int is_quit);
 
 int chainX_linked_check(ChainXCtx_t *chainX_req);
 
-void chainX_wakeup(ChainXCtx_t *chainX_req);
+void chainX_wakeup_simple(ChainXCtx_t *chainX_req);
 int chainX_timewait_simple(ChainXCtx_t *chainX_req, int ms);
 
 void chainXssl_certificate_file(ChainXCtx_t *chainX_req, char *filename);
@@ -1872,13 +1890,14 @@ int chainX_ping(ChainXCtx_t *chainX_req);
 
 typedef void (*mctt_recv_fn)(void *userdata, unsigned char *payload, int payload_len);
 
+#define MAX_OF_MCTT LEN_OF_BUF2048
 typedef struct MCTT_Struct
 {
 	unsigned short bom;
 	unsigned short checksum;
 
 	int payload_len;
-	unsigned char payload[1024];
+	unsigned char payload[MAX_OF_MCTT];
 } MCTT_t;
 
 void mctt_publish(ChainXCtx_t *chainX_req, char *payload, int payload_len);
@@ -2377,6 +2396,24 @@ typedef enum
 	JSON_ACTID_DEL,
 } JSON_ACTID;
 
+typedef struct JSON_TokenX_STRUCT
+{
+	char token[LEN_OF_TOPIC_TOKEN];
+	char topic[LEN_OF_TOPIC];
+	json_t *jdata;
+} JSON_TokenX_t;
+
+#define MAX_OF_TOKENX_ARY 0xFF
+typedef struct JSON_TopicX_STRUCT
+{
+	char topic[LEN_OF_TOPIC];
+	json_t *jroot;
+
+	int deepth_topic;
+	int deepth_json;
+	JSON_TokenX_t tokenx_ary[MAX_OF_TOKENX_ARY];
+} JSON_TopicX_t;
+
 #define JSON_UTF8(X) \
 	({ json_t *__jobj = NULL; \
 		if (X) __jobj = json_stringn(X, strlen(X)); \
@@ -2429,6 +2466,22 @@ typedef enum
 		__ret; \
 	})
 
+#define JSON_OBJ_SET_OBJ_LINK(jroot, key, jval) \
+		({ int __ret = -1; \
+			do { \
+				if (jroot) \
+				{ \
+					__ret = json_object_set(jroot, key, jval ); \
+				} \
+				else \
+				{ \
+					JSON_FREE(jval); \
+					DBG_ER_LN("%s is NULL !!!", #jroot);\
+				} \
+			} while(0); \
+			__ret; \
+		})
+
 #define JSON_OBJ_GET_OBJ(jroot, key) \
 	({ json_t *__jobj = NULL; \
 		if ( (jroot) && (JSON_CHECK_OBJ(jroot)) ) __jobj = json_object_get(jroot, key); \
@@ -2448,7 +2501,7 @@ typedef enum
 	})
 
 #define JSON_OBJ_FIND_ID_INFINITE -1
-#define JSON_OBJ_FIND_RECURSIVE(jroot, key, deepth) json_object_lookup(jroot, key, deepth)
+#define JSON_OBJ_FIND_RECURSIVE(jroot, key, jval, deepth, topic_parent, jfound_ary) json_object_lookup(jroot, key, jval, deepth, topic_parent, jfound_ary)
 #define JSON_OBJ_FIND_REUSE(jroot, key) \
 	({ json_t *__ret = NULL; \
 		do { if ( (JSON_CHECK_OBJ(jroot)) && ((__ret=JSON_OBJ_GET_OBJ(jroot, key))) ) json_incref(__ret);} while(0); \
@@ -2457,7 +2510,12 @@ typedef enum
 
 #define JSON_OBJ_FIND_KEYS(jroot, keys) json_object_find_with_keys(jroot, keys);
 
-#define JSON_OBJ_DEL(jroot, key) json_object_del(jroot, key)
+#define JSON_OBJ_DEL(jroot, key) \
+	({ int __ret = 0; \
+		if ( (jroot) && (JSON_CHECK_OBJ(jroot)) ) \
+			__ret = json_object_del(jroot, key); \
+		__ret; \
+	})
 
 #define JSON_JSTR(val) json_string(val)
 #define JSON_JINT(val) json_integer(val)
@@ -2469,6 +2527,13 @@ typedef enum
 #define JSON_OBJ_SET_STR(jroot, key, val) ({json_t *__jval = JSON_JSTR(val); JSON_OBJ_SET_OBJ(jroot, key, __jval); __jval;})
 #define JSON_OBJ_SET_INT(jroot, key, val) ({json_t *__jval = JSON_JINT(val); JSON_OBJ_SET_OBJ(jroot, key, __jval); __jval;})
 #define JSON_OBJ_SET_REAL(jroot, key, val) ({json_t *__jval = JSON_JREAL(val); JSON_OBJ_SET_OBJ(jroot, key, __jval); __jval;})
+
+#define JSON_OBJ_FILL_STR(jroot, key, val) \
+	({json_t *__jval = JSON_OBJ_GET_OBJ(jroot, key); \
+		if ( (__jval==NULL) && (__jval=JSON_JSTR(val)) ) \
+			JSON_OBJ_SET_OBJ(jroot, key, __jval); \
+		__jval; \
+	})
 
 #define JSON_STR(jobj) \
 	({ const char *__ret = NULL; \
@@ -2590,7 +2655,7 @@ typedef enum
 	({ json_t *__ret = NULL; \
 		do { \
 			json_error_t jerror = {0}; \
-			if ( (filename) && (strlen(filename)>0) ) __ret = json_load_file(filename, 0, &jerror); \
+			if ( (pcheck(filename)) && (strlen(filename)>0) ) __ret = json_load_file(filename, 0, &jerror); \
 			else DBG_ER_LN("json_load_file error !!! (error: %d %s)", jerror.line, jerror.text); \
 		} while(0); \
 		__ret; \
@@ -2600,7 +2665,7 @@ typedef enum
 	({ json_t *__ret = NULL; \
 		do { \
 			json_error_t jerror = {0}; \
-			if ( ( (filename) && (strlen(filename)>0) && (__ret = json_load_file(filename, 0, &jerror))) || (__ret = JSON_OBJ_NEW()) ) {} \
+			if ( ( (pcheck(filename)) && (strlen(filename)>0) && (__ret = json_load_file(filename, 0, &jerror))) || (__ret = JSON_OBJ_NEW()) ) {} \
 			else DBG_ER_LN("json_load_file error !!! (error: %d %s)", jerror.line, jerror.text); \
 		} while(0); \
 		__ret; \
@@ -2626,17 +2691,22 @@ typedef enum
 		__ret; \
 	})
 
+void json_dump_simple(json_t *jparent, char *name);
+
 int json_pass_base64_dec(json_t *jparent, const char *key, char *pass, int len);
 int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len);
 
 json_t *json_ary_create(json_t *jparent, const char *key);
 json_t *json_obj_create(json_t *jparent, const char *key);
 
+json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act);
+
 json_t *json_ary_find_val(json_t *jparent, json_t *jval, int *idx);
 json_t *json_ary_find_key_val(json_t *jparent, const char *key, json_t *jval, int *idx);
+
 // key like dongle/1/device/0/uid
 json_t *json_object_find_with_keys(json_t *jparent, const char *keys);
-json_t *json_object_lookup(json_t *jparent, const char *key, int deepth);
+json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int deepth, char *topic_parent, json_t *jfound_ary);
 
 #endif
 
@@ -3176,7 +3246,7 @@ typedef struct
 typedef struct
 {
 	char name[LEN_OF_NAME32];
-	char filename[LEN_OF_FILENAME256];
+	char filename[LEN_OF_FULLNAME];
 	int isquit;
 
 	uv_loop_t *loop;
@@ -3287,6 +3357,7 @@ void dbusx_thread_close(DbusX *dbusx_ctx);
 #define DELAY_OF_WAIT_USBX (200) // ms
 #define RETRY_OF_WAIT_USBX (10) // 0.2 * 10 s
 #define USE_USBX_THREAD_CLOCK
+#define LEN_OF_USB_BUFFER LEN_OF_BUF512
 
 typedef struct UsbXCtx_STRUCT
 {
@@ -3307,6 +3378,8 @@ typedef struct UsbXCtx_STRUCT
 	libusb_hotplug_callback_handle usb_hotplug_handle;
 	libusb_hotplug_callback_fn usb_hotplug_fn;
 
+	uint8_t usb_reset;
+
 	uint8_t usb_iface_idx;
 	int usb_claim;
 	char usb_path[LEN_OF_VAL32];
@@ -3316,9 +3389,9 @@ typedef struct UsbXCtx_STRUCT
 	uint8_t wMaxPacketSize;
 
 	size_t res_size;
-	unsigned char response[LEN_OF_BUF512];
+	unsigned char response[LEN_OF_USB_BUFFER];
 	size_t req_size;
-	unsigned char request[LEN_OF_BUF512];
+	unsigned char request[LEN_OF_USB_BUFFER];
 
 	unsigned int usb_timeout;
 
@@ -3347,6 +3420,14 @@ int usbX_dev_open(UsbXCtx_t *usbX_req, struct libusb_device *usb_dev);
 void usbX_dev_close(UsbXCtx_t *usbX_req);
 
 int usbX_hotplug_register(UsbXCtx_t *usbX_req);
+
+void usbX_lock(UsbXCtx_t *usbX_req);
+void usbX_unlock(UsbXCtx_t *usbX_req);
+void usbX_signal(UsbXCtx_t *usbX_req);
+int usbX_timewait(UsbXCtx_t *usbX_req, int ms);
+void usbX_wait(UsbXCtx_t *usbX_req);
+int usbX_timewait_simple(UsbXCtx_t *usbX_req, int ms);
+void usbX_wakeup_simple(UsbXCtx_t *usbX_req);
 
 int usbX_thread_isloop(UsbXCtx_t *usbX_req);
 
@@ -3592,7 +3673,10 @@ yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_ctx);
 #ifdef UTIL_EX_WEBSOCKETS
 #include <libwebsockets.h>
 
+#define WEBSOCKETS_OVER_MQTT_PORT_7680 7680
 #define WEBSOCKETS_PORT_7681 7681
+#define WEBSOCKETS_URMET_PORT_7682 7682
+
 #define LEN_OF_WEBSOCKET LEN_OF_BUF1024
 #define LEN_OF_LWS (LWS_SEND_BUFFER_PRE_PADDING + LEN_OF_WEBSOCKET + LWS_SEND_BUFFER_POST_PADDING)
 #define MAX_OF_RING 8
@@ -3619,7 +3703,7 @@ typedef struct LWSMsg_Struct
 {
 	void* next;
 
-	char payload[LEN_OF_LWS];
+	char *payload;
 	int payload_len;
 } LWSMsg_t;
 
@@ -3627,22 +3711,31 @@ typedef struct LWSSession_Struct
 {
 	void* next;
 
+	int use_foreign_loops;
 	struct lws *wsi;
-	pthread_mutex_t in_mtx;
+	//pthread_mutex_t in_mtx;
 	CLIST_STRUCT(msg_list);
 } LWSSession_t;
 
 typedef struct LWSCtx_Struct
 {
 	char name[LEN_OF_NAME32];
-	int isquit;
-	int isecho;
+
+	ThreadX_t tidx;
+
+	int isfree;
 	int dbg_more;
 
+	int isecho;
 	LWS_WSI_ID wsi_id;
+
+	int security;
+	char certificate_file[LEN_OF_FULLNAME];
+	char privatekey_file[LEN_OF_FULLNAME];
 
 	struct lws_context_creation_info cinfo;
 	struct lws_context *context;
+	int timeout_ms;
 
 	struct lws_client_connect_info ccinfo;
 	char hostname[LEN_OF_HOSTNAME];
@@ -3650,9 +3743,6 @@ typedef struct LWSCtx_Struct
 	lws_callback_function *callback;
 
 	CLIST_STRUCT(session_list);
-
-	pthread_mutex_t in_mtx;
-	pthread_cond_t in_cond;
 
 	char tx[LEN_OF_LWS];
 	int tx_size;
@@ -3688,23 +3778,27 @@ char* translate_lws_cb(enum lws_callback_reasons reason);
 
 LWSCtx_t *lws2_protocol_user(struct lws *wsi);
 
-int lws2_session_lock(LWSSession_t *session);
-int lws2_session_unlock(LWSSession_t *session);
+void lws2_session_lock(LWSSession_t *session);
+void lws2_session_unlock(LWSSession_t *session);
+void lws2_session_pop(LWSCtx_t *lws_ctx, LWSSession_t *session);
+
 void lws2_session_write(LWSSession_t *session);
 void lws2_session_write_q_push(LWSSession_t *session, char *payload, int payload_len);
 void lws2_session_write_q_broadcast(LWSCtx_t *lws_ctx, char *payload, int payload_len);
 int lws2_session_count(LWSCtx_t *lws_ctx);
 
-int lws2_lock(LWSCtx_t *lws_ctx);
-int lws2_unlock(LWSCtx_t *lws_ctx);
+void lws2_lock(LWSCtx_t *lws_ctx);
+void lws2_unlock(LWSCtx_t *lws_ctx);
 
 void lws2_cli_init(LWSCtx_t *lws_ctx, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
 void lws2_cli_open(LWSCtx_t *lws_ctx, char *address, int port, char *filename);
-void lws2_cli_close(LWSCtx_t *lws_ctx);
+//void lws2_cli_close(LWSCtx_t *lws_ctx);
 
 void lws2_srv_init(LWSCtx_t *lws_ctx, int port, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
-void lws2_srv_open(LWSCtx_t *lws_ctx, int timeout_ms);
-void lws2_srv_close(LWSCtx_t *lws_ctx);
+
+void lws2_thread_stop(LWSCtx_t *lws_ctx);
+void lws2_thread_close(LWSCtx_t *lws_ctx);
+void lws2_thread_init(LWSCtx_t *lws_ctx);
 
 #endif
 
@@ -3715,7 +3809,6 @@ void lws2_srv_close(LWSCtx_t *lws_ctx);
 #ifdef UTIL_EX_MQTT
 #include <mosquitto.h>
 
-#define LEN_OF_TOPIC LEN_OF_BUF1024
 #define LEN_OF_CLIENT_ID LEN_OF_VAL32
 #define MAX_OF_QPUB     30
 #define MAX_OF_QSUB     30
@@ -3766,9 +3859,10 @@ typedef struct MQTTSession_Struct
 	char user[LEN_OF_USER];
 	char pass[LEN_OF_PASS];
 
-	char *certificate_file;
-	char *privatekey_file;
-	char *ca_file;
+	char tls_version[LEN_OF_VAL16];
+	char certificate_file[LEN_OF_FULLNAME];
+	char privatekey_file[LEN_OF_FULLNAME];
+	char ca_file[LEN_OF_FULLNAME];
 
 	int isconnect;
 	int count;
@@ -3833,12 +3927,33 @@ int mqtt_timewait(MQTTCtx_t *mqtt_ctx, int ms);
 void mqtt_wait(MQTTCtx_t *mqtt_ctx);
 void mqtt_wakeup(MQTTCtx_t *mqtt_ctx);
 
+int mqtt_isquit(MQTTCtx_t *mqtt_ctx);
+
 void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx);
 void mqtt_thread_close(MQTTCtx_t *mqtt_ctx);
 void mqtt_thread_init(MQTTCtx_t *mqtt_ctx);
 
 #endif
 
+#ifdef UTIL_EX_CRON
+
+typedef enum
+{
+	CRON_ID_MINUTE = 0,
+	CRON_ID_HOUR,
+	CRON_ID_MDAY,
+	CRON_ID_MONTH,
+	CRON_ID_WDAY,
+	CRON_ID_YEAR,
+	CRON_ID_MAX,
+} CRON_ID;
+
+#define CRON_YEAR_START_2020 2020
+#define CRON_YEAR_END_2120 2120
+#define MAX_OF_CRON_RANGE 200 // > (CRON_YEAR_END_2020-CRON_YEAR_START_2020)
+int cronx_validate(char *cron_txt, struct tm *kick_tm);
+
+#endif
 
 //******************************************************************************
 //** END **

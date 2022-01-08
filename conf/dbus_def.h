@@ -35,6 +35,8 @@
 #define DBUS_DEST_YK_P2P_DAEMON                   "com.luffanet.www.yk_p2p_daemon"
 #define DBUS_DEST_OTA_DAEMON                      "com.luffanet.www.ota_daemon"
 
+#define DBUS_DEST_BARESIP                         "com.github.Baresip"
+
 //path - PhilioTech
 #define ZWAVE_DBUS_DEV_PATH                       "/com/PhilioTech/zwave/device"
 #define ZIGBEE_DBUS_DEV_PATH                      "/com/PhilioTech/zigbee/device"
@@ -54,6 +56,8 @@
 #define DBUS_PATH_DBUS_123                        "/com/xbox/dbus_123"
 #define DBUS_PATH_DBUS_456                        "/com/xbox/dbus_456"
 
+//path - urmet_mqtt_daemon
+#define DBUS_PATH_URMET_MQTT_DAEMON               "/com/umt/urmet_mqtt_daemon"
 
 //******************************************************************************
 // libsdk
@@ -268,6 +272,7 @@
 //#define DBUS_METHOD_GET_TARGET_NAME_LIST          "get_target_name_list"
 //#define DBUS_METHOD_GET_TITLE_LIST                "get_title_list"
 #define DBUS_METHOD_GETDAT                        "getDat"
+#define DBUS_METHOD_INVOKE                        "invoke"
 #define DBUS_METHOD_JSONDEL                       "jsondel"
 #define DBUS_METHOD_JSONGETALL                    "jsongetall"
 #define DBUS_METHOD_JSONGETEVENTBYSEQ             "jsongeteventbyseq"
@@ -412,6 +417,16 @@
 #define DBUS_S_MATCH_PAN27                        "type='signal',interface='com.PhilioTech.signal.pan27'"
 
 //#define DBUS_METHOD_SWITCH_SIGNAL                 "switch_signal"
+
+//******************************************************************************
+// Baresip
+//******************************************************************************
+// -> Baresip
+#define DBUS_M_IFAC_BARESIP_CMD                   "com.github.Baresip" // sync
+
+// Baresip => all
+#define DBUS_S_IFAC_BARESIP                       "com.github.Baresip"
+#define DBUS_S_MATCH_BARESIP                      "type='signal',interface='com.github.Baresip'"
 
 //******************************************************************************
 // dbus_demo

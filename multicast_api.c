@@ -19,12 +19,12 @@ mctt_recv_fn mctt_recv_cb = NULL;
 void mctt_publish(ChainXCtx_t *chainX_req, char *payload, int payload_len)
 {
 	MCTT_t packet;
+
 	packet.bom = MCTT_BOM;
-	
 	packet.payload_len = payload_len;
 	SAFE_MEMCPY(packet.payload, payload, payload_len, payload_len);
 	packet.checksum = buff_crc16(packet.payload, packet.payload_len, 0xFFFF);
-	
+
 	int packet_len = sizeof(unsigned short) * 2 + sizeof(int) + payload_len;
 
 	chainX_multi_sender(chainX_req, (char*)&packet, packet_len);

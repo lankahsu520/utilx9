@@ -14,7 +14,7 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-#if (1) // ID 0658:0200 Sigma Designs, Inc. Aeotec Z-Stick Gen5 (ZW090) - UZB
+#if (0) // ID 0658:0200 Sigma Designs, Inc. Aeotec Z-Stick Gen5 (ZW090) - UZB
 #define VENDOR_ID 0x0658
 #define PRODUCT_ID 0x0200
 #endif
@@ -29,6 +29,11 @@
 #define PRODUCT_ID LIBUSB_HOTPLUG_MATCH_ANY
 #endif
 
+#if (1) // ID 10C4:8468 Tiqiaa
+#define VENDOR_ID 0x10C4
+#define PRODUCT_ID 0x8468
+#endif
+
 int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, libusb_hotplug_event event, void *user_data);
 
 UsbXCtx_t usbx_main =
@@ -37,13 +42,13 @@ UsbXCtx_t usbx_main =
 	.usb_dev_handle = NULL,
 	.usb_cnt = -1,
 
-	.usb_cnt = -1,
-
 	.vendor_id = VENDOR_ID,
 	.product_id = PRODUCT_ID,
 
 	.usb_hotplug_handle = -1,
 	.usb_hotplug_fn = usb_hotplug_cb,
+
+	.usb_reset = 0,
 
 	.usb_iface_idx = 0,
 	.usb_claim = -1,
@@ -188,6 +193,8 @@ int main(int argc, char* argv[])
 		//usbX_dev_write(&usbx_main, &nwrite, 2000);
 		//usbX_dev_read(&usbx_main, 2000);
 	}
+
+	usbX_dev_close(&usbx_main);
 	usbX_listen_close(&usbx_main);
 #else
 	usb_hotplug_loop();

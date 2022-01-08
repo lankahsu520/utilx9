@@ -10,11 +10,11 @@ define generate_expiration
 	@echo "#endif" >> util_expiration.h
 
 	mkdir -p conf
-	[ -f $(SDK_CONFIG_AUTOCONF_H) ] && (cp -avf $(SDK_CONFIG_AUTOCONF_H) conf/autoconf_def.h;) || echo "skip !!!"
-	#[ -f $(SDK_CONFIG_CONFIG) ] && (cp -avf $(SDK_CONFIG_CONFIG) conf/;) || echo "skip !!!"
-	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] && (cp -avf $(SDK_CONFIG_CUSTOMER_DEF_H) conf/;) || echo "skip !!!"
-	[ -f $(SDK_CONFIG_CUSTOMER) ] && (cp -avf $(SDK_CONFIG_CUSTOMER) conf/;) || echo "skip !!!"
-	[ -d $(PJ_ROOT)/include ] && (cp -avf $(PJ_ROOT)/include/* conf/;) || echo "skip !!!"
+	[ -f $(SDK_CONFIG_AUTOCONF_H) ] && (cp -avf $(SDK_CONFIG_AUTOCONF_H) conf/autoconf_def.h;) || echo "skip !!! (SDK_CONFIG_AUTOCONF_H)"
+	#[ -f $(SDK_CONFIG_CONFIG) ] && (cp -avf $(SDK_CONFIG_CONFIG) conf/;) || echo "skip !!! (SDK_CONFIG_CONFIG)"
+	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] && (cp -avf $(SDK_CONFIG_CUSTOMER_DEF_H) conf/;) || echo "skip !!! (SDK_CONFIG_CUSTOMER_DEF_H)"
+	[ -f $(SDK_CONFIG_CUSTOMER) ] && (cp -avf $(SDK_CONFIG_CUSTOMER) conf/;) || echo "skip !!! (SDK_CONFIG_CUSTOMER)"
+	[ -d $(PJ_ROOT)/include ] && (cp -avf $(PJ_ROOT)/include/* conf/;) || echo "skip !!! (PJ_ROOT)"
 endef
 
 .configured:

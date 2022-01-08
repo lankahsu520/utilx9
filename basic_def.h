@@ -27,11 +27,19 @@ extern "C" {
 //******************************************************************************
 //** define **
 //******************************************************************************
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 #define LEN_OF_USER 64// must be > LEN_OF_UUID
 #define LEN_OF_PASS 16
 
 #define LEN_OF_NAME32 32
 #define LEN_OF_NAME64 64
+#define LEN_OF_NAME128 128
 
 #define LEN_OF_NAME_CPU LEN_OF_NAME32
 #define LEN_OF_NAME_PROC LEN_OF_NAME32
@@ -57,17 +65,23 @@ extern "C" {
 #define LEN_OF_BUF2048 2048
 #define LEN_OF_BUF3072 3072
 #define LEN_OF_BUF4096 4096
+#define LEN_OF_BUF_1MB (1*1024*1024)
+#define LEN_OF_BUF_2MB (2*1024*1024)
+#define LEN_OF_BUF_4MB (4*1024*1024)
+#define LEN_OF_BUF_8MB (8*1024*1024)
 
 #define LEN_OF_CMDLINE LEN_OF_BUF1024
 #define LEN_OF_NEWLINE LEN_OF_BUF1024
-#define LEN_OF_RESPONSE LEN_OF_BUF3072
 
 #define LEN_OF_FILENAME256 256
 #define LEN_OF_FILENAME512 512
 #define LEN_OF_FILENAME1024 1024
-#define LEN_OF_FILENAME2048 2048
-#define LEN_OF_FILENAME3072 3072
-#define LEN_OF_FILENAME4096 4096
+
+#define LEN_OF_DIRNAME LEN_OF_FILENAME256
+#define LEN_OF_FULLNAME LEN_OF_FILENAME1024
+//#define LEN_OF_FILENAME2048 2048
+//#define LEN_OF_FILENAME3072 3072
+//#define LEN_OF_FILENAME4096 4096
 
 #define MAX_OF_OVERLOAD 3 // Uptime_t
 #define MAX_OF_FDSIZE 40 // ProcInfo_t
@@ -85,6 +99,9 @@ extern "C" {
 #define LEN_OF_URL512 512
 #define LEN_OF_URL1024 1024
 #define LEN_OF_URL2048 2048
+
+#define LEN_OF_TOPIC LEN_OF_BUF1024
+#define LEN_OF_TOPIC_TOKEN (LEN_OF_UUID+8)
 
 // HttpCtx_t, NetworkInfo_t, WSList_t
 #define LEN_OF_URL LEN_OF_URL2048
@@ -174,6 +191,7 @@ typedef enum
 #define DBG_TXT_START "Start !!!"
 #define DBG_TXT_UTF8_ERROR "UTF-8 error !!!"
 #define DBG_TXT_WRONG "Wrong !!!"
+#define DBG_TXT_RUN_LOOP "Run loop ..."
 
 //** debug **
 #define COLOR_NONE "\033[0m"
@@ -238,7 +256,7 @@ typedef enum
 			if ( (pcheck(ibuf)) && (pcheck(obuf)) ) \
 			{ \
 				int k =0; \
-				for (k = 0; k < ilen; k++) \
+				for (k = 0; (k < ilen) && (__ret <(olen-4) ) ; k++) \
 				{ \
 					if (k>0) __ret += snprintf(obuf + __ret, olen-__ret, delim""prefix"%02X", (0xff & (char)ibuf[k]) ); \
 					else __ret += snprintf(obuf + __ret, olen-__ret, prefix"%02X", (0xff & (char)ibuf[k]) ); \

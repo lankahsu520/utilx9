@@ -13,8 +13,8 @@
  *
  ***************************************************************************/
 #include "utilx9.h"
-#include "zlib.h" // for compress and uncompress
 
+#if (0)
 #define USE_TEST_COMPRESS
 #define USE_TEST_SEC_ENC_AND_DEC
 #define USE_TEST_BIN_CHECK
@@ -23,6 +23,7 @@
 #define USE_TEST_FILE_PATH
 #define USE_TEST_COPY_FILE
 #define USE_TIME_TEST
+#endif
 
 int newline_lookupokup_cb(char *newline, void *arg)
 {
@@ -133,17 +134,46 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef USE_TEST_COPY_FILE
-	char filename[LEN_OF_FILENAME256] ="";
+	char filename[LEN_OF_FULLNAME] ="";
 	int i = 0;
 	for (i=0; i< 256; i++)
 	{
-		SAFE_SPRINTF(filename, "./snapshot_%03d.jpg", i);
+		SAFE_SPRINTF_EX(filename, "./snapshot_%03d.jpg", i);
 		file_copy("./snapshot.jpg", filename);
 	}
 #endif
 
 #ifdef USE_TIME_TEST
 	DBG_IF_LN("(time_now_full: %s)", time_now_full(time(NULL)));
+#endif
+
+#if (1)
+	HttpCtx_t http_req;
+	DBG_IF_LN("(mode: %zd)", sizeof(http_req.mode) );
+	DBG_IF_LN("(curl: %zd)", sizeof(http_req.curl) );
+	DBG_IF_LN("(url: %zd)", sizeof(http_req.url) );
+	DBG_IF_LN("(port: %zd)", sizeof(http_req.port) );
+	DBG_IF_LN("(user: %zd)", sizeof(http_req.user) );
+	DBG_IF_LN("(log: %zd)", sizeof(http_req.log) );
+
+	DBG_IF_LN("------------");
+	DBG_IF_LN("(res_size: %zd)", sizeof(http_req.simple_req.res_size) );
+	DBG_IF_LN("(response: %zd)", sizeof(http_req.simple_req.response) );
+	DBG_IF_LN("(method: %zd)", sizeof(http_req.simple_req.method) );
+	DBG_IF_LN("(curl_slist: %zd)", sizeof(http_req.simple_req.headers) );
+
+	DBG_IF_LN("------------");
+	DBG_IF_LN("(max_size: %zd)", sizeof(http_req.mjpeg_req.max_size) );
+	DBG_IF_LN("(filename: %zd)", sizeof(http_req.mjpeg_req.filename) );
+	DBG_IF_LN("(fp: %zd)", sizeof(http_req.mjpeg_req.fp) );
+	DBG_IF_LN("(qbuf: %zd)", sizeof(http_req.mjpeg_req.qbuf) );
+	DBG_IF_LN("(boundary: %zd)", sizeof(http_req.mjpeg_req.boundary) );
+	DBG_IF_LN("(state: %zd)", sizeof(http_req.mjpeg_req.state) );
+
+	DBG_IF_LN("------------");
+	RTSPRequest_t rtsp_req;
+	DBG_IF_LN("(track: %zd)", sizeof(rtsp_req.track) );
+	DBG_IF_LN("(track[0]: %zd)", sizeof(rtsp_req.track[0]) );
 #endif
 
 	exit(0);

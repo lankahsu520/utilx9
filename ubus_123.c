@@ -169,7 +169,7 @@ void ubus_srv_publish(void)
 	p_count++;
 
 	char tmpbuf[LEN_OF_VAL32] = "";
-	SAFE_SPRINTF(tmpbuf, "p_count: %d", p_count);
+	SAFE_SPRINTF_EX(tmpbuf, "p_count: %d", p_count);
 
 	ubus_srv_notify_simple(UBUS_M_ECHO, &ubus_srv_m_obj, UBUS_P_ECHO_MSG, tmpbuf);
 }
@@ -182,7 +182,7 @@ void ubus_srv_event(void)
 	e_count++;
 
 	char tmpbuf[LEN_OF_VAL32] = "";
-	SAFE_SPRINTF(tmpbuf, "(e_count: %d)", e_count);
+	SAFE_SPRINTF_EX(tmpbuf, "(e_count: %d)", e_count);
 
 	ubus_srv_send_event_simple(UBUS_B_O_ECHO, UBUS_P_ECHO_MSG, tmpbuf);
 }
@@ -465,7 +465,7 @@ static void app_ParseArguments(int argc, char **argv)
 			case 'm':
 				if (optarg)
 				{
-					SAFE_SPRINTF(msg, "%s", optarg);
+					SAFE_SPRINTF_EX(msg, "%s", optarg);
 				}
 				break;
 			case 's':

@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 	tidx_data.thread_cb = thread_handler;
 	tidx_data.data = (void *)&tidx_data;
 
-	threadx_init(&tidx_data);
+	threadx_init(&tidx_data, "thread_123");
 
 	while ( (threadx_isquit(&tidx_data)==0) )
 	{

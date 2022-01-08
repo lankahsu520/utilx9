@@ -114,9 +114,9 @@ static int tty_init(void)
 	while ( app_quit() == 0 )
 	{
 		char buff[LEN_OF_VAL32]="";
-		//SAFE_SPRINTF(buff, "%03d\r\n", i++);
-		SAFE_SPRINTF(buff, "AT\r\n");
-		DBG_IF_LN("(buff: %s, %d)", buff, strlen(buff));
+		//SAFE_SPRINTF_EX(buff, "%03d\r\n", i++);
+		SAFE_SPRINTF_EX(buff, "AT\r\n");
+		DBG_IF_LN("(buff: %s, %zd)", buff, strlen(buff));
 		SOCKETX_WRITE(&chainX_T, buff, strlen(buff));
 		sleep(5);
 	}

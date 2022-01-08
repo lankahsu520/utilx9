@@ -25,6 +25,8 @@
 // ** app **
 static int is_quit = 0;
 
+char mqtt_cert_path[LEN_OF_DIRNAME] = "/work/IoT/mqtt/common";
+
 #ifdef USE_UV
 #define USE_ASYNC_CREATE
 #define USE_TIMER_CREATE
@@ -70,9 +72,11 @@ static MQTTSession_t mqtt123_session = {
 	.clean_session = true,
 	.user=JVAL_C_USERNAME_BROADCAST,
 	.pass="guest",
-	.certificate_file = NULL,
-	.privatekey_file = NULL,
-	.ca_file = NULL,
+
+	.tls_version = "tlsv1.2",
+	.certificate_file = "/work/IoT/mqtt/common/mqtt_beex.crt",
+	.privatekey_file = "/work/IoT/mqtt/common/mqtt_beex.key",
+	.ca_file = "/work/IoT/mqtt/common/mqtt.ca",
 	.isconnect = 0,
 
 	.log_cb = NULL,
@@ -98,11 +102,11 @@ static void mqtt123_init(MQTTCtx_t *mqtt_ctx)
 
 	if (session->topic_id == MQTT_TOPIC_ID_USER)
 	{
-		SAFE_SPRINTF(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, session->user, "/");
+		SAFE_SPRINTF_EX(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, session->user, "/");
 	}
 	else
 	{
-		SAFE_SPRINTF(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, "", "");
+		SAFE_SPRINTF_EX(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, "", "");
 	}
 	mqtt_thread_init( mqtt_ctx );
 }
@@ -141,11 +145,11 @@ void timer_1sec_loop(uv_timer_t *handle)
 
 		if (mqtt123_session.topic_id == MQTT_TOPIC_ID_USER)
 		{
-			SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, mqtt123_session.user, "/", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
+			SAFE_SPRINTF_EX(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, mqtt123_session.user, "/", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
 		}
 		else
 		{
-			SAFE_SPRINTF(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, "", "", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
+			SAFE_SPRINTF_EX(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, "", "", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
 		}
 		//mqtt_publish(mqtt123_data.session, "0/0/9C65F9361C00/CCC3F3BB/2/0/0001000C", "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}");
 		//mqtt_qpub_add(mqtt123_data.session, "0/0/9C65F9361C00/CCC3F3BB/2/0/0001000C", "{\"name\":\"Motion Sensor\",\"val\":\"idle\"}", NULL);
@@ -224,6 +228,10 @@ static void app_loop(void)
 {
 #ifdef USE_MQTT_DEMO
 	{
+		SAFE_SPRINTF(mqtt123_session.certificate_file, "%s/mqtt_beex.crt", mqtt_cert_path);
+		SAFE_SPRINTF(mqtt123_session.privatekey_file, "%s/mqtt_beex.key", mqtt_cert_path);
+		SAFE_SPRINTF(mqtt123_session.ca_file, "%s/mqtt.ca", mqtt_cert_path);
+
 		mqtt123_init(&mqtt123_data);
 	}
 #endif
@@ -305,7 +313,7 @@ static void app_signal_register(void)
 }
 
 int option_index = 0;
-const char* short_options = "d:f:p:i:u:w:c:r:k:h";
+const char* short_options = "d:f:p:i:u:w:c:h";
 static struct option long_options[] =
 {
 	{ "debug",       required_argument,   NULL,    'd'  },
@@ -316,9 +324,7 @@ static struct option long_options[] =
 	{ "user",        required_argument,   NULL,    'u'  },
 	{ "pass",        required_argument,   NULL,    'w'  },
 
-	{ "cafile",      required_argument,   NULL,    'c'  },
-	{ "cert",        required_argument,   NULL,    'r'  },
-	{ "key",         required_argument,   NULL,    'k'  },
+	{ "certpath",    required_argument,   NULL,    'c'  },
 
 	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
@@ -333,9 +339,7 @@ static void app_showusage(int exit_code)
 					"  -i, --iface       iface\n"
 					"  -u, --user        user\n"
 					"  -w, --pass        pass\n"
-					"  -c, --cafile      cafile\n"
-					"  -r, --cert        cert\n"
-					"  -k, --key         key\n"
+					"  -c, --certpath    certpath\n"
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
@@ -357,7 +361,7 @@ static void app_ParseArguments(int argc, char **argv)
 #ifdef USE_MQTT_DEMO
 				if (optarg)
 				{
-					SAFE_SPRINTF(session->hostname, "%s", optarg);
+					SAFE_SPRINTF_EX(session->hostname, "%s", optarg);
 				}
 #endif
 				break;
@@ -372,7 +376,7 @@ static void app_ParseArguments(int argc, char **argv)
 			case 'i':
 				if (optarg)
 				{
-					SAFE_SPRINTF(iface_dev, "%s", optarg);
+					SAFE_SPRINTF_EX(iface_dev, "%s", optarg);
 				}
 				break;
 			case 'd':
@@ -385,7 +389,7 @@ static void app_ParseArguments(int argc, char **argv)
 #ifdef USE_MQTT_DEMO
 				if (optarg)
 				{
-					SAFE_SPRINTF(session->user, "%s", optarg);
+					SAFE_SPRINTF_EX(session->user, "%s", optarg);
 				}
 #endif
 				break;
@@ -393,33 +397,12 @@ static void app_ParseArguments(int argc, char **argv)
 #ifdef USE_MQTT_DEMO
 				if (optarg)
 				{
-					SAFE_SPRINTF(session->pass, "%s", optarg);
+					SAFE_SPRINTF_EX(session->pass, "%s", optarg);
 				}
 #endif
 				break;
 			case 'c':
-#ifdef USE_MQTT_DEMO
-				if (optarg)
-				{
-					session->ca_file = optarg;
-				}
-#endif
-				break;
-			case 'r':
-#ifdef USE_MQTT_DEMO
-				if (optarg)
-				{
-					session->certificate_file = optarg;
-				}
-#endif
-				break;
-			case 'k':
-#ifdef USE_MQTT_DEMO
-				if (optarg)
-				{
-					session->privatekey_file = optarg;
-				}
-#endif
+				SAFE_SPRINTF_EX(mqtt_cert_path, "%s", optarg);
 				break;
 			default:
 				app_showusage(-1);

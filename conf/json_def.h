@@ -118,14 +118,17 @@
 #define JKEY_COMM_BASIC_VALUE                     "basicvalue"
 #define JKEY_COMM_BOOTUP                          "bootup"
 #define JKEY_COMM_BRANCH                          "branch"
+#define JKEY_COMM_BRAND                           "brand"
 #define JKEY_COMM_BUILDER                         "builder"
 #define JKEY_COMM_BUILDNO                         "buildno"
 #define JKEY_COMM_BUILDTIME                       "buildtime"
+#define JKEY_COMM_BUTTON                          "button"
 #define JKEY_COMM_CDT                             "cdt"
 #define JKEY_COMM_CFGS                            "cfgs"
 #define JKEY_COMM_CHANNEL                         "channel"
 #define JKEY_COMM_CHECKSUM                        "checksum"
 #define JKEY_COMM_CHID                            "chid"
+#define JKEY_COMM_CLASS                           "class"
 #define JKEY_COMM_CLOUD_BACKUP                    "cloud_backup"
 #define JKEY_COMM_CMD                             "cmd"
 #define JKEY_COMM_CODE                            "code"
@@ -142,9 +145,11 @@
 #define JKEY_COMM_CODE_NUM                        "codenum"
 #define JKEY_COMM_COMPARISON                      "comparison"
 #define JKEY_COMM_CPU_USAGE                       "cpu_usage"
+#define JKEY_COMM_CRONTAB                         "crontab"
 #define JKEY_COMM_CURR_VAL                        "curr_val"
 #define JKEY_COMM_DAYM                            "daym"
 #define JKEY_COMM_DAYW                            "dayw"
+#define JKEY_COMM_DATA                            "data"
 #define JKEY_COMM_DATA1                           "data1"
 #define JKEY_COMM_DATA10                          "data10"
 #define JKEY_COMM_DATA2                           "data2"
@@ -162,6 +167,7 @@
 #define JKEY_COMM_DIM_ON_VALUE                    "Dim_ON_Value"
 #define JKEY_COMM_DUR                             "dur"
 #define JKEY_COMM_DURATION                        "duration"
+#define JKEY_COMM_ENABLE                          "enable"
 #define JKEY_COMM_ERRORCODE                       "ErrorCode"
 #define JKEY_COMM_ERROR_CODE                      "error_code"
 #define JKEY_COMM_EVENT                           "event"
@@ -216,6 +222,7 @@
 #define JKEY_COMM_MD5SUM                          "md5sum"
 #define JKEY_COMM_MEM                             "mem"
 #define JKEY_COMM_MIN                             "min"
+#define JKEY_COMM_MIXTURE_NAME                    "mixture_name"
 #define JKEY_COMM_MODEL                           "model"
 #define JKEY_COMM_MODULE                          "module"
 #define JKEY_COMM_MODULES_UIDS                    "modulesUids"
@@ -226,6 +233,7 @@
 #define JKEY_COMM_NOSAVE                          "nosave"
 #define JKEY_COMM_NOW_TIMESTAMP                   "Now_timeStamp"
 #define JKEY_COMM_NUMERO                          "numero"
+#define JKEY_COMM_REPRESENT                       "represent"
 #define JKEY_COMM_ROOT                            "root"
 #define JKEY_COMM_OFFSET                          "offset"
 #define JKEY_COMM_ORDER                           "order"
@@ -233,6 +241,7 @@
 #define JKEY_COMM_PANID                           "panid"
 #define JKEY_COMM_PASS                            "pass"
 #define JKEY_COMM_PORT                            "port"
+#define JKEY_COMM_PROTOCOL_ID                     "protocol_id"
 #define JKEY_COMM_PROTOCOL_NAME                   "protocol_name"
 #define JKEY_COMM_PRODUCT_TYPE                    "product_type"
 #define JKEY_COMM_PRODUCT_UID                     "productUid"
@@ -277,6 +286,8 @@
 #define JKEY_COMM_TIME                            "time"
 #define JKEY_COMM_TIME_UTC                        "time_utc"
 #define JKEY_COMM_TOGGLE                          "toggle"
+#define JKEY_COMM_TONE_ID                         "tone_id"
+#define JKEY_COMM_TONE_VOL                        "tone_vol"
 #define JKEY_COMM_TOPIC                           "topic"
 #define JKEY_COMM_TOTALRAM                        "totalram"
 #define JKEY_COMM_TRIGGER                         "trigger"
@@ -302,7 +313,6 @@
 #define JKEY_COMM_PRV_VALUE                       "prv_value"
 #define JKEY_COMM_USER_PID                        "pid"
 #define JKEY_COMM_USER_STATUS                     "status"
-#define JKEY_COMM_SUCCESS                         "success"
 #define JKEY_COMM_USE_BUILDIN_SIREN               "use_buildin_siren"
 #define JKEY_COMM_UUID                            "uuid"
 #define JKEY_COMM_VALUE                           "value"
@@ -355,6 +365,7 @@
 
 #define JKEY_REPORT_HEAT                          "heat"
 #define JKEY_REPORT_HUMIDITY                      "humidity"
+#define JKEY_REPORT_INFRARED                      "infrared"
 #define JKEY_REPORT_LUMINANCE                     "luminance"
 
 #define JKEY_REPORT_METER                         "meter"
@@ -488,11 +499,15 @@
 #define JVAL_BRANCH_V3                            "v3"
 
 #define JVAL_COMM_CLOSED                          "closed"
+#define JVAL_COMM_SUCCESS                         "success"
 #define JVAL_COMM_FAIL                            "fail"
 #define JVAL_COMM_IDLE                            "idle"
 #define JVAL_COMM_OFF                             "off"
 #define JVAL_COMM_ON                              "on"
 #define JVAL_COMM_OPEN                            "open"
+#define JVAL_COMM_LOCK                            "lock"
+#define JVAL_COMM_UNLOCK                          "unlock"
+#define JVAL_COMM_UNKNOWN                         "unknown"
 
 #define JVAL_WATER_LEAK                           "water_leak"
 #define JVAL_WATER_LEVEL_DROPPED                  "water_level_dropped"
@@ -507,33 +522,39 @@
 #define JVAL_METER_VOLTAGE                        "voltage"
 #define JVAL_METER_WATT                           "watt"
 
-#define JVAL_NAME_MAC_ADDRESS                     "MAC Address"
-#define JVAL_NAME_GROUPID                         "Group ID"
-#define JVAL_NAME_PROTOCOLID                      "Protocol ID"
-#define JVAL_NAME_UUID                            "UUID"
-#define JVAL_NAME_NODEID                          "Node ID"
-#define JVAL_NAME_EPID                            "Endpoint ID"
+#define JVAL_CLASS_MAC_ADDRESS                    "MAC Address"
+#define JVAL_CLASS_GROUPID                        "Group ID"
+#define JVAL_CLASS_UUID                           "UUID"
+#define JVAL_CLASS_NODEID                         "Node ID"
+#define JVAL_CLASS_EPID                           "Endpoint ID"
 
-#define JVAL_NAME_BASIC                           "Basic"
-#define JVAL_NAME_BASIC_SET                       "Basic Set"
-#define JVAL_NAME_BATTERY                         "Battery"
-#define JVAL_NAME_CONFIGURATION                   "Configuration"
-#define JVAL_NAME_CONTROLLER                      "Controller"
-#define JVAL_NAME_CENTRAL_SCENE                   "Central Scene"
-#define JVAL_NAME_DIMMER                          "Dimmer"
-#define JVAL_NAME_DOOR                            "Door/Window Sensor"
-#define JVAL_NAME_FLOOD                           "Flood Sensor"
-#define JVAL_NAME_HUMIDITY_SENSOR                 "Humidity Sensor"
-#define JVAL_NAME_LUMINANCE_SENSOR                "Luminance Sensor"
-#define JVAL_NAME_MOTION_SENSOR                   "Motion Sensor"
-#define JVAL_NAME_POWER_METER                     "Power Meter"
-#define JVAL_NAME_SMART_SWITCH                    "Smart switch"
-#define JVAL_NAME_SMOKE_SENSOR                    "Smoke Sensor"
-#define JVAL_NAME_SWITCH                          "Switch"
-#define JVAL_NAME_TAMPER_SENSOR                   "Tamper Sensor"
-#define JVAL_NAME_TEMPERATURE_SENSOR              "Temperature Sensor"
-#define JVAL_NAME_WAKE_UP_INTERVAL                "Wakeup Interval"
-#define JVAL_NAME_WAKE_UP_SENSOR                  "Wakeup Sensor"
+#define JVAL_CLASS_BASIC                          "Basic"
+#define JVAL_CLASS_BASIC_SET                      "Basic Set"
+#define JVAL_CLASS_BATTERY                        "Battery"
+#define JVAL_CLASS_CONFIGURATION                  "Configuration"
+#define JVAL_CLASS_CONTROLLER                     "Controller"
+#define JVAL_CLASS_CENTRAL_SCENE                  "Central Scene"
+#define JVAL_CLASS_CRON                           "Cron"
+#define JVAL_CLASS_DIMMER                         "Dimmer"
+#define JVAL_CLASS_DOOR                           "Door/Window Sensor"
+#define JVAL_CLASS_DOOR_LOCK                      "Door Lock"
+#define JVAL_CLASS_FLOOD                          "Flood Sensor"
+#define JVAL_CLASS_HUMIDITY_SENSOR                "Humidity Sensor"
+#define JVAL_CLASS_INFRARED                       "Infrared"
+#define JVAL_CLASS_INFRARED_CONFIGURATION         "Infrared Configuration"
+#define JVAL_CLASS_LUMINANCE_SENSOR               "Luminance Sensor"
+#define JVAL_CLASS_MIXTURE                        "Mixture"
+#define JVAL_CLASS_MOTION_SENSOR                  "Motion Sensor"
+#define JVAL_CLASS_PHONE                          "Phone"
+#define JVAL_CLASS_POWER_METER                    "Power Meter"
+#define JVAL_CLASS_SMART_SWITCH                   "Smart switch"
+#define JVAL_CLASS_SMOKE_SENSOR                   "Smoke Sensor"
+#define JVAL_CLASS_SOUND_SWITCH                   "Sound Switch"
+#define JVAL_CLASS_SWITCH                         "Switch"
+#define JVAL_CLASS_TAMPER_SENSOR                  "Tamper Sensor"
+#define JVAL_CLASS_TEMPERATURE_SENSOR             "Temperature Sensor"
+#define JVAL_CLASS_WAKE_UP_INTERVAL               "Wakeup Interval"
+#define JVAL_CLASS_WAKE_UP_SENSOR                 "Wakeup Sensor"
 
 #define JVAL_NODE_ALIVE                           "alive"
 #define JVAL_NODE_SLEEPING                        "sleeping"
@@ -554,17 +575,17 @@
 //******************************************************************************
 // ** report **
 // methodid/protocolid/c_macid/c_uuid/c_nodeid/epid/issue/mode/submode/category/ts/val_len/val
-#define JVAL_C_USERNAME_BROADCAST                "FFFFFFFF-FFFF-FFFF-FFFF"
+#define JVAL_C_USERNAME_BROADCAST                "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 
 #define JVAL_C_MAC_NULL                          "000000000000"
 #define JVAL_C_MAC_BROADCAST                     "FFFFFFFFFFFF"
-#define JVAL_C_UUID_NULL                         "00000000-0000-0000-0000"
-#define JVAL_C_UUID_BROADCAST                    "FFFFFFFF-FFFF-FFFF-FFFF"
+#define JVAL_C_UUID_NULL                         "00000000-0000-0000-0000-000000000000"
+#define JVAL_C_UUID_BROADCAST                    "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 
-#define JVAL_C_NODEID_NULL                       "00000000-0000-0000-0000"
+#define JVAL_C_NODEID_NULL                       "00000000-0000-0000-0000-000000000000"
 #define JVAL_C_NODEID_0                          "0"
 #define JVAL_C_NODEID_1                          "1"
-#define JVAL_C_NODEID_BROADCAST                  "FFFFFFFF-FFFF-FFFF-FFFF"
+#define JVAL_C_NODEID_BROADCAST                  "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 #define JVAL_NODEID_CONTROLLER                   1
 #define JVAL_EPID_BASE                           0
 
@@ -575,6 +596,13 @@
 #define JVAL_METHODID_MIXTURE                    JVAL_METHODID_GET//4
 #define JVAL_METHODID_MIXTURE_RESPONSE           JVAL_METHODID_RESPONSE//5
 
+#define JVAL_C_METHODID_EVENT                    "0"
+#define JVAL_C_METHODID_PUT                      "1"
+#define JVAL_C_METHODID_GET                      "2"
+#define JVAL_C_METHODID_RESPONSE                 "3"
+#define JVAL_C_METHODID_MIXTURE                  JVAL_C_METHODID_GET//4
+#define JVAL_C_METHODID_MIXTURE_RESPONSE         JVAL_C_METHODID_RESPONSE//5
+
 #define JVAL_PROTOCOLID_BASE                     0
 #define JVAL_PROTOCOLID_ZWAVE                    1
 #define JVAL_PROTOCOLID_ZWAVES2                  2
@@ -584,6 +612,7 @@
 #define JVAL_PROTOCOLID_ONVIF                    11
 #define JVAL_PROTOCOLID_WIFI_PHILIO              21
 #define JVAL_PROTOCOLID_ZIGBEE_PHILIO            41
+#define JVAL_PROTOCOLID_TIQIAA                   51 // IR
 #define JVAL_PROTOCOLID_HONEY_MAEKET             0xFFFB
 #define JVAL_PROTOCOLID_HONEYCOMB                0xFFFC
 #define JVAL_PROTOCOLID_ECHO                     0xFFFD
@@ -770,7 +799,9 @@
 
 #define JKEY_ISSUEID_CC_PROTECTION               0x00097501 // protection
 
-#define JKEY_ISSUEID_CC_BATTERY                  0x00098001 // battery
+#define JKEY_ISSUEID_CC_SOUND_SWITCH             0x00097901 // COMMAND_CLASS_SOUND_SWITCH
+
+#define JKEY_ISSUEID_CC_BATTERY                  0x00098001 // COMMAND_CLASS_BATTERY
 
 #define JKEY_ISSUEID_CC_WAKE_UP_INTERVAL         0x00098401 // wakeup_interval
 #define JKEY_ISSUEID_CC_WAKE_UP_NOTIFICATION     0x00098402 // wakeup_notification
@@ -786,6 +817,14 @@
 
 #define JKEY_ISSUEID_CC_SIMPLE_AV_CONTROL_SET    0x00099401 // simple_av_control_set
 #define JKEY_ISSUEID_CC_SIMPLE_AV_CONTROL        0x00099402 // simple_av_control
+
+// USER-DEFINDED
+#define JKEY_ISSUEID_CC_INFRARED                 0x000A9501 //
+#define JKEY_ISSUEID_CC_INFRARED_CODE            0x000A9502 //
+
+#define JKEY_ISSUEID_CC_CRON                     0x000A9601 //
+
+#define JKEY_ISSUEID_CC_PHONE                    0x000A9701 //
 
 // JKEY_ISSUEID_GW, 
 #define ZWAVE_EVT_GW_CFG                        95
@@ -1130,6 +1169,11 @@
 //******************************************************************************
 #define JVAL_BASIC_OFF                            0
 #define JVAL_BASIC_ON                             255
+
+#define JVAL_DIMMER_OFF                           0x0
+#define JVAL_DIMMER_99                            0x63
+#define JVAL_DIMMER_ON                            0xFF
+#define JVAL_DIMMER_UNKNOWN                       0xFE
 
 #define JVAL_BATTERY_AC_255                       255
 #define JVAL_BATTERY_AC_MINUS_1                   -1

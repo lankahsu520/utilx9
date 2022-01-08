@@ -562,7 +562,7 @@ struct ubus_context *ubus_conn_get(void)
 
 void ubus_root_set(char *path)
 {
-	SAFE_SPRINTF(ubus_root, "%s", path);
+	SAFE_SPRINTF_EX(ubus_root, "%s", path);
 }
 
 char *ubus_root_get(void)

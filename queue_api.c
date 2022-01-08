@@ -418,7 +418,7 @@ QueueInfo_t *queue_thread_init(char *name, int queue_size, int data_size, queue_
 
 	if (queue)
 	{
-		SAFE_SPRINTF(queue->name, "%s", name);
+		SAFE_SPRINTF_EX(queue->name, "%s", name);
 		//queue->in_mtx = PTHREAD_MUTEX_INITIALIZER;
 		//queue->in_cond = PTHREAD_COND_INITIALIZER;
 
@@ -432,7 +432,7 @@ QueueInfo_t *queue_thread_init(char *name, int queue_size, int data_size, queue_
 			ThreadX_t *tidx_req = &queue->tidx;
 			tidx_req->thread_cb = queue_thread_handler;
 			tidx_req->data = queue;
-			threadx_init(tidx_req);
+			threadx_init(tidx_req, queue->name);
 		}
 	}
 	return queue;

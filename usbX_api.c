@@ -249,10 +249,8 @@ int usbX_dev_read_poll(UsbXCtx_t *usbX_req, libusb_transfer_cb_fn callback)
 	int endpoint_in = usbX_req->usb_endpoint | LIBUSB_ENDPOINT_IN;
 	enum libusb_transfer_type ep_type = (enum libusb_transfer_type) usbX_req->bmAttributes & 0x03;
 
-	//static unsigned char response[LEN_OF_BUF512];
-	//int length = sizeof(response);
 	unsigned char *response = usbX_req->response;
-	int length = LEN_OF_BUF512;
+	int length = LEN_OF_USB_BUFFER;
 
 	switch ( ep_type )
 	{
@@ -284,7 +282,7 @@ int usbX_dev_read(UsbXCtx_t *usbX_req, unsigned int usb_timeout)
 {
 	int retry = RETRY_OF_ACCESS_USBX;
 	unsigned char *response = usbX_req->response;
-	SAFE_MEMSET(response, 0, LEN_OF_BUF256);
+	SAFE_MEMSET(response, 0, LEN_OF_USB_BUFFER);
 
 	int ret = 0;
 	int nread = 0;
@@ -349,7 +347,16 @@ do_write:
 			DBG_ER_LN("%s (LIBUSB_TRANSFER_TYPE_ISOCHRONOUS)", DBG_TXT_NO_SUPPORT);
 			break;
 		case LIBUSB_TRANSFER_TYPE_BULK:
-			DBG_ER_LN("%s (LIBUSB_TRANSFER_TYPE_BULK)", DBG_TXT_NO_SUPPORT);
+			{
+				DBG_TR_DUMP(usbX_req->request, usbX_req->req_size, " ", "call libusb_bulk_transfer ... (retry: %d, endpoint_out: 0x%02X, req_size: %zd, usb_timeout: %d)", retry, endpoint_out, usbX_req->req_size, usb_timeout);
+				ret = libusb_bulk_transfer(usbX_req->usb_dev_handle, endpoint_out, (unsigned char *)usbX_req->request, usbX_req->req_size, nwrite, usb_timeout);
+				if ( ( LIBUSB_ERROR_TIMEOUT == ret ) && ( retry >= 0 ) )
+				{
+					DBG_WN_LN("call libusb_interrupt_transfer ... (retry: %d)", retry);
+					usleep(200*1000);
+					goto do_write;
+				}
+			}
 			break;
 		case LIBUSB_TRANSFER_TYPE_INTERRUPT:
 			{
@@ -388,7 +395,7 @@ void usbX_dev_path(struct libusb_device *usb_dev, char *usb_path, int len)
 		for (idx = 0; idx < port_numbers_count; ++idx)
 		{
 			char port_number[LEN_OF_VAL16] = "";
-			SAFE_SPRINTF(port_number, "%d", port_number_ary[idx]);
+			SAFE_SPRINTF_EX(port_number, "%d", port_number_ary[idx]);
 			SAFE_STRCAT(usb_path, port_number);
 			if (idx+1 < port_numbers_count)
 			{
@@ -433,6 +440,11 @@ int usbX_dev_open(UsbXCtx_t *usbX_req, struct libusb_device *usb_dev)
 	{
 		DBG_ER_LN("libusb_open_device_with_vid_pid error !!! (0x%04X, 0x%04X)", usbX_req->vendor_id, usbX_req->product_id);
 		goto exit_dev;
+	}
+
+	if ( usbX_req->usb_reset )
+	{
+		libusb_reset_device(usbX_req->usb_dev_handle);
 	}
 
 	int config = 1;
@@ -558,6 +570,75 @@ int usbX_hotplug_register(UsbXCtx_t *usbX_req)
 	return ret;
 }
 
+void usbX_lock(UsbXCtx_t *usbX_req)
+{
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		threadx_lock(tidx_req);
+	}
+}
+
+void usbX_unlock(UsbXCtx_t *usbX_req)
+{
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		threadx_unlock(tidx_req);
+	}
+}
+
+void usbX_signal(UsbXCtx_t *usbX_req)
+{
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		threadx_wakeup(tidx_req);
+	}
+}
+
+int usbX_timewait(UsbXCtx_t *usbX_req, int ms)
+{
+	int ret = EINVAL;
+
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		ret = threadx_timewait(tidx_req, ms);
+	}
+
+	return ret;
+}
+
+void usbX_wait(UsbXCtx_t *usbX_req)
+{
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		threadx_wait(tidx_req);
+	}
+}
+
+int usbX_timewait_simple(UsbXCtx_t *usbX_req, int ms)
+{
+	int ret = EINVAL;
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		ret = threadx_timewait_simple(tidx_req, ms);
+	}
+	return ret;
+}
+
+void usbX_wakeup_simple(UsbXCtx_t *usbX_req)
+{
+	if (usbX_req)
+	{
+		ThreadX_t *tidx_req = &usbX_req->tidx;
+		threadx_wakeup_simple(tidx_req);
+	}
+}
+
 static void *usbX_thread_handler(void *arg)
 {
 	UsbXCtx_t *usbX_req = (UsbXCtx_t *)arg;
@@ -619,7 +700,7 @@ static int usbX_thread_init(UsbXCtx_t *usbX_req)
 	{
 		usbX_req->tidx.thread_cb = usbX_thread_handler;
 		usbX_req->tidx.data = usbX_req;
-		if ( threadx_init(&usbX_req->tidx) != 0 )
+		if ( threadx_init(&usbX_req->tidx, "usbX_api") != 0 )
 		{
 			DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 			return -1;

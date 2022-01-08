@@ -2,12 +2,20 @@
 
 STRIP ?= $(PJ_STRIP)
 
+#[major].[minor].[revision].[build]
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+VERSION_REVISION = 0
+VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_REVISION)
+LIBNAME = utilx9
+
 #** CFLAGS & LDFLAGS **
 CFLAGS += $(CFLAGS_CUSTOMER)
 
 CFLAGS += \
 					-Wall -O2 \
-					-I./ -I$(SDK_INC_DIR)
+					-I./ \
+					-I$(SDK_INC_DIR)
 ifeq ("$(PJ_ARCH)", "x86")
 CFLAGS += \
 					-Wno-unused-value \
@@ -30,6 +38,7 @@ LIBXXX_OBJS += \
 							multicast_api.o \
 							statex_api.o \
 							thread_api.o \
+							cronx_api.o \
 							utilx9.o
 
 #** LIBXXX_yes **
@@ -55,6 +64,8 @@ CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 
 #** Target (CLEAN_BINS) **
 CLEAN_BINS += \
+						nlink_123 \
+						nlink_456 \
 						proc_list_123 \
 						proc_watch \
 						queue_123 \
@@ -75,7 +86,6 @@ SHELL_BINS = \
 
 include define.mk
 
-.SUFFIXES:
 .SUFFIXES: .c .o
 
 .PHONY: all clean distclean install romfs expired
@@ -95,7 +105,7 @@ $(CLEAN_BINS): $(CLEAN_OBJS) $(CLEAN_LIBS)
 
 clean:
 	rm -f Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
-	rm -f $(CLEAN_LIBS) $(CLEAN_OBJS)
+	rm -f $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS)
 	rm -f $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	rm -f util_expiration.h
 	#rm -rf conf
@@ -123,7 +133,9 @@ distclean: clean
 
 %.so: $(LIBXXX_OBJS)
 	@echo 'Building lib (shared): $@'
-	$(CC) -shared -o $@ $(LIBXXX_OBJS)
+	$(CC) -shared $(LDFLAGS) -Wl,-soname,$@.$(VERSION_MAJOR) -o $@.$(VERSION) $(LIBXXX_OBJS)
+	ln -sf $@.$(VERSION) $@.$(VERSION_MAJOR)
+	ln -sf $@.$(VERSION_MAJOR) $@
 	@echo 'Finished building lib (shared): $@'
 	@echo ' '
 
@@ -133,8 +145,8 @@ install: all
 		$(STRIP) $(SDK_BIN_DIR)/$$subbin; \
 	done
 	@for sublib in $(CLEAN_LIBS); do \
-		cp -avf $$sublib $(SDK_LIB_DIR); \
-		$(STRIP) $(SDK_LIB_DIR)/$$sublib; \
+		cp -avf $$sublib* $(SDK_LIB_DIR); \
+		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION); \
 	done
 	@for subheader in $(HEADER_FILES); do \
 		cp -avf $$subheader $(SDK_INC_DIR); \
@@ -150,8 +162,8 @@ ifneq ("$(HOMEX_ROOT_DIR)", "")
 		$(STRIP) $(HOMEX_BIN_DIR)/$$subbin; \
 	done
 	@for sublib in $(CLEAN_LIBS); do \
-		cp -avf $$sublib $(HOMEX_LIB_DIR); \
-		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib; \
+		cp -avf $$sublib* $(HOMEX_LIB_DIR); \
+		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION); \
 	done
 	#@for subheader in $(HEADER_FILES); do \
 	#	cp -avf $$subheader $(HOMEX_INC_DIR); \

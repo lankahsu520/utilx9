@@ -22,7 +22,7 @@ void led_gosleep(LedRequest_t *ledreq)
 	threadx_set_pause(tidx_req, 1);
 }
 
-void led_wakeup(LedRequest_t *ledreq)
+void led_wakeup_simple(LedRequest_t *ledreq)
 {
 	if (ledreq==NULL) return;
 
@@ -139,7 +139,7 @@ LedRequest_t *led_thread_init(char *name, int infinite, LedOn_t *ledon_ary, led_
 
 	if (ledreq)
 	{
-		SAFE_SPRINTF(ledreq->name, "%s", name);
+		SAFE_SPRINTF_EX(ledreq->name, "%s", name);
 
 		ledreq->infinite = infinite;
 		ledreq->ledon_ary = ledon_ary;
@@ -149,7 +149,7 @@ LedRequest_t *led_thread_init(char *name, int infinite, LedOn_t *ledon_ary, led_
 			ThreadX_t *tidx_req = &ledreq->tidx;
 			tidx_req->thread_cb = led_thread_handler;
 			tidx_req->data = ledreq;
-			threadx_init(tidx_req);
+			threadx_init(tidx_req, ledreq->name);
 		}
 	}
 	return ledreq;

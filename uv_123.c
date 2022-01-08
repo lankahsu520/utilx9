@@ -18,7 +18,6 @@
 #include "uv_123.h"
 
 #define USE_ASYNC_CREATE
-
 #define USE_TIMER_CREATE
 //#define USE_THREAD_CREATE
 #define USE_QUEUE_CREATE
@@ -142,7 +141,7 @@ void idle_loop(uv_idle_t* handle)
 #endif
 
 #ifdef USE_FS_CREATE
-char filename_r[LEN_OF_FILENAME256] = "/etc/xinetd.conf";
+char filename_r[LEN_OF_FULLNAME] = "/etc/xinetd.conf";
 
 char buffer[LEN_OF_BUF256];
 static uv_buf_t buf_req;
@@ -478,7 +477,7 @@ static void app_ParseArguments(int argc, char **argv)
 			case 'f':
 				if (optarg)
 				{
-					SAFE_SPRINTF(filename_r, "%s", optarg);
+					SAFE_SPRINTF_EX(filename_r, "%s", optarg);
 				}
 				break;
 #endif

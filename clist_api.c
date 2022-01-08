@@ -226,6 +226,18 @@ void *clist_pop(clist_t list)
 	return l;
 }
 
+void clist_pop_ex(clist_t list, clist_item_free_fn free_cb)
+{
+	while (clist_length(list) > 0)
+	{
+		void *item = clist_pop(list);
+		if (item)
+		{
+			if (free_cb) free_cb(item);
+		}
+	}
+}
+
 /*---------------------------------------------------------------------------*/
 /**
  * Remove a specific element from a list.

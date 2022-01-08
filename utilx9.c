@@ -14,6 +14,9 @@
  ***************************************************************************/
 #include "utilx9.h"
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define DBG_TMP_Y(format,args...) //DBG_LN_Y(format, ## args)
 #define DBG_TMP_DUMP(ibuf,len,delim,format,args...) //DBG_TR_DUMP(ibuf,len,delim,format,## args)
@@ -68,12 +71,14 @@ void* pcheck( void* a )
 	if ( expired_t == 0 )
 	{
 		diff_t++;
-		sleep(diff_t);
+		//sleep(diff_t);
+		printf("%ld==0",expired_t);
 	}
 	else if ( run_t > expired_t )
 	{
 		diff_t = time_diff_days(run_t, expired_t);
-		sleep(diff_t);
+		//sleep(diff_t);
+		printf("%ld>%ld", run_t, expired_t);
 	}
 	return a ;
 }
@@ -129,7 +134,7 @@ char *version_show(void)
 	if ( SAFE_STRLEN(buff) == 0 )
 	{
 		time_t bootup_t = time(NULL);
-		SAFE_SPRINTF(buff, "%s, %s, %s, %s, %ld", PJ_VERSION, PJ_REVISION, PJ_BUILDNO, PJ_BUILDER, bootup_t);
+		SAFE_SPRINTF_EX(buff, "%s, %s, %s, %s, %ld", PJ_VERSION, PJ_REVISION, PJ_BUILDNO, PJ_BUILDER, bootup_t);
 	}
 
 	return buff;
@@ -140,11 +145,13 @@ int system_ex(char *fmt, ...)
 	va_list vargs;
 	char *cmd = NULL;
 	int rc = 0;
+	int ret = -1;
 
 	va_start(vargs, fmt);
-	vasprintf(&cmd, fmt, vargs);
+	ret = vasprintf(&cmd, fmt, vargs);
 	va_end(vargs);
 
+	if (ret<0) DBG_ER_LN("vasprintf error !!!");
 	if (cmd)
 	{
 		DBG_DB_LN("(cmd: %s)", cmd);
@@ -854,7 +861,7 @@ char *time_now_full(time_t now_t) // output: 2020-03-06 15:01:47
 	static char buff[LEN_OF_VAL128] = "";
 	//time_t now_t = time(NULL);
 	struct tm *timeinfo  = localtime (&now_t);
-	SAFE_SPRINTF(buff, "%04d-%02d-%02d %02d:%02d:%02d",
+	SAFE_SPRINTF_EX(buff, "%04d-%02d-%02d %02d:%02d:%02d",
 			timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday,
 			timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
@@ -866,7 +873,7 @@ char *time_now_short(time_t now_t) // output: 20200306 150147
 	static char buff[LEN_OF_VAL128] = "";
 	//time_t now_t = time(NULL);
 	struct tm *timeinfo  = localtime (&now_t);
-	SAFE_SPRINTF(buff, "%04d%02d%02d %02d%02d%02d",
+	SAFE_SPRINTF_EX(buff, "%04d%02d%02d %02d%02d%02d",
 			timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday,
 			timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
@@ -954,7 +961,7 @@ char *file_path(char *filename, char *actualpath)
 #if (0)
 	char *dirc, *basec, *bname, *dname;
 	//char path[128] = "";//"/etc/passwd";
-	//SAFE_SPRINTF(path, "/etc/%s", "../etc/passwd");
+	//SAFE_SPRINTF_EX(path, "/etc/%s", "../etc/passwd");
 
 	dirc = strdup(filename);
 	basec = strdup(filename);
@@ -1181,42 +1188,49 @@ void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg)
 	}
 }
 
-char *os_random_uuid(char *buf)
+char *os_random_uuid(char *buf, int buf_len)
 {
-	const char *c = "89ab";
-	char *p = buf;
-	int n;
-
-	srand(time(NULL));
-
-	for( n = 0; n < 16; ++n )
+	if ( (buf) && (buf_len>=LEN_OF_UUID) )
 	{
-		int b = rand()%255;
-		switch( n )
-		{
-			case 6:
-				SAFE_SPRINTF(p, "4%X", b%15 );
-				break;
-			case 8:
-				SAFE_SPRINTF(p, "%c%X", c[rand()%strlen(c)], b%15 );
-				break;
-			default:
-				SAFE_SPRINTF(p, "%02X", b);
-				break;
-		}
+		const char *c = "89ab";
+		char *p = buf;
+		int n;
 
-		p += 2;
-		switch( n )
+		srand(time(NULL));
+
+		for( n = 0; n < 16; ++n )
 		{
-		case 3:
-		case 5:
-		case 7:
-		case 9:
-			*p++ = '-';
-			break;
+			int b = rand()%255;
+			switch( n )
+			{
+				case 6:
+					SAFE_SPRINTF(p, "4%X", b%15 );
+					break;
+				case 8:
+					SAFE_SPRINTF(p, "%c%X", c[rand()%strlen(c)], b%15 );
+					break;
+				default:
+					SAFE_SPRINTF(p, "%02X", b);
+					break;
+			}
+
+			p += 2;
+			switch( n )
+			{
+				case 3:
+				case 5:
+				case 7:
+				case 9:
+					*p++ = '-';
+					break;
+			}
 		}
+		*p = 0;
 	}
-	*p = 0;
+	else
+	{
+		DBG_ER_LN("%s (buf: %p, buf_len: %d < %d)", DBG_TXT_WRONG, buf, buf_len, LEN_OF_UUID);
+	}
 	return buf;
 }
 
@@ -1376,7 +1390,6 @@ int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key)
 	SAFE_FREE(in_base);
 	return ret;
 }
-
 #endif
 
 #ifdef UTIL_EX_BASIC_QBUF
@@ -1799,7 +1812,7 @@ void sys_info_ex(SysInfoEx_t *info_ctx)
 		{
 			int day, hrs, min, sec;
 			time_sec2day(info_ctx->uptime.bootup_t, &day, &hrs, &min, &sec);
-			SAFE_SPRINTF(info_ctx->uptime.bootup_fmt, "%02d:%02d:%02d:%02d", day, hrs, min, sec);
+			SAFE_SPRINTF_EX(info_ctx->uptime.bootup_fmt, "%02d:%02d:%02d:%02d", day, hrs, min, sec);
 		}
 		info_ctx->meminfo.mem_unit = info.mem_unit;
 		info_ctx->meminfo.totalram = info.totalram;
@@ -1903,7 +1916,7 @@ static const char* get_items(const char*buffer ,unsigned int item)
 
 unsigned long proc_cpu_info(ProcInfo_t *procinfo_ctx)
 {
-	char filename[LEN_OF_FILENAME256]="";
+	char filename[LEN_OF_FULLNAME]="";
 	char newline[LEN_OF_NEWLINE];
 
 	if (procinfo_ctx->pid == 0)
@@ -1912,7 +1925,7 @@ unsigned long proc_cpu_info(ProcInfo_t *procinfo_ctx)
 		return 0;
 	}
 
-	SAFE_SPRINTF(filename,"/proc/%ld/stat", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(filename,"/proc/%ld/stat", procinfo_ctx->pid);
 	DBG_TR_LN("enter (%s)", filename);
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
@@ -1972,7 +1985,7 @@ float proc_cpu_usage(ProcInfo_t *procinfo_ctx)
 
 void proc_mem_info(ProcInfo_t *procinfo_ctx)
 {
-	char filename[LEN_OF_FILENAME256]="";
+	char filename[LEN_OF_FULLNAME]="";
 	char newline[LEN_OF_NEWLINE];
 
 	if (procinfo_ctx->pid == 0)
@@ -1981,7 +1994,7 @@ void proc_mem_info(ProcInfo_t *procinfo_ctx)
 		return;
 	}
 
-	SAFE_SPRINTF(filename, "/proc/%ld/statm", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(filename, "/proc/%ld/statm", procinfo_ctx->pid);
 	DBG_TR_LN("enter (%s)", filename);
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
@@ -2018,7 +2031,7 @@ void proc_fdsize_info(ProcInfo_t *procinfo_ctx)
 		return;
 	}
 
-	SAFE_SPRINTF(cmdline,"cat /proc/%ld/status | grep 'Name\\|FDSize'", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(cmdline,"cat /proc/%ld/status | grep 'Name\\|FDSize'", procinfo_ctx->pid);
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
@@ -2035,7 +2048,7 @@ void proc_fdsize_info(ProcInfo_t *procinfo_ctx)
 
 			if (SAFE_STRCMP(key, "Name") ==0)
 			{
-				SAFE_SPRINTF(procinfo_ctx->name, "%s", vals);
+				SAFE_SPRINTF_EX(procinfo_ctx->name, "%s", vals);
 			}
 			else if (SAFE_STRCMP(key, "FDSize") ==0)
 			{
@@ -2065,7 +2078,7 @@ void proc_fddetail_info(ProcInfo_t *procinfo_ctx)
 		return;
 	}
 
-	SAFE_SPRINTF(cmdline,"ls -l /proc/%ld/fd", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(cmdline,"ls -l /proc/%ld/fd", procinfo_ctx->pid);
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
@@ -2164,10 +2177,10 @@ unsigned long pidof(char *name)
 #ifdef UTIL_EX_FASTCGI
 char *fastcgi_path_get(char *filename, int port)
 {
-	static char path[LEN_OF_BUF512] = "";
+	static char path[LEN_OF_URL] = "";
 
 	SAFE_MEMSET(path, 0, sizeof(path));
-	SAFE_SPRINTF(path, "localhost:%d/%s", port, filename);
+	SAFE_SPRINTF_EX(path, "localhost:%d/%s", port, filename);
 
 	return path;
 }

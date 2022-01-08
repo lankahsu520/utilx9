@@ -215,8 +215,8 @@ void soap_load_request(SoapCtx_t *soap, char *action)
 {
 	{
 		// open file and to xml node
-		char filename[LEN_OF_FILENAME256] = "";
-		SAFE_SPRINTF(filename, "./%s.xml", action);
+		char filename[LEN_OF_FULLNAME] = "";
+		SAFE_SPRINTF_EX(filename, "./%s.xml", action);
 		soap->request_node = soap_load_file(filename);
 	}
 }

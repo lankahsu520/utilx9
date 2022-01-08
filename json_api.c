@@ -14,10 +14,25 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+void json_dump_simple(json_t *jparent, char *name)
+{
+	char *dump = JSON_DUMPS_EASY(jparent);
+	if (dump)
+	{
+		DBG_LN_Y("(%s: %s)", name, dump);
+	}
+	else
+	{
+		DBG_LN_Y("(%s: %p)", name, dump);
+	}
+	SAFE_FREE(dump);
+}
+
 int json_pass_base64_dec(json_t *jparent, const char *key, char *pass, int len)
 {
 	int ret = -1;
 
+#ifdef UTIL_EX_SSL
 	if ( (jparent) && (key) && (pass) && (len) )
 	{
 		json_t *jobj = NULL;
@@ -36,6 +51,7 @@ int json_pass_base64_dec(json_t *jparent, const char *key, char *pass, int len)
 			}
 		}
 	}
+#endif
 
 	return ret;
 }
@@ -44,6 +60,7 @@ int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len)
 {
 	int ret = -1;
 
+#ifdef UTIL_EX_SSL
 	if ( (jparent) && (key) && (pass) && (len) )
 	{
 		int enc_len = 0;
@@ -56,6 +73,7 @@ int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len)
 			SAFE_FREE(pass_enc);
 		}
 	}
+#endif
 
 	return ret;
 }
@@ -83,6 +101,100 @@ json_t *json_obj_create(json_t *jparent, const char *key)
 		JSON_OBJ_SET_OBJ(jparent , key, jobj);
 	}
 	return jobj;
+}
+
+// idx_need=-1, to return the last one
+json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act)
+{
+	json_t *jfound = NULL;
+	topicx_ctx->deepth_topic = -1;
+	topicx_ctx->deepth_json = -1;
+	SAFE_MEMSET(topicx_ctx->tokenx_ary, 0, MAX_OF_TOKENX_ARY*sizeof(JSON_TokenX_t));
+
+	if ( (topicx_ctx->jroot) && (SAFE_STRLEN(topicx_ctx->topic) > 0) )
+	{
+		int idx_topic = -1;
+		int idx_json = -1;
+		json_t *jparent = topicx_ctx->jroot;
+
+		char topic_walk[LEN_OF_TOPIC] = "";
+		char *topic_cpy = NULL;
+		SAFE_ASPRINTF(topic_cpy, "%s", topicx_ctx->topic);
+		char *saveptr = NULL;
+		char *token = NULL;
+
+		token = SAFE_STRTOK_R(topic_cpy, "/", &saveptr);
+		while ( token )
+		{
+			idx_topic ++;
+			JSON_TokenX_t *tokenx_ctx = (JSON_TokenX_t *)&topicx_ctx->tokenx_ary[idx_topic];
+			switch (act)
+			{
+				case JSON_ACTID_APPEND:
+					tokenx_ctx->jdata = JSON_OBJ_GET_OBJ_EX(jparent, token);
+					break;
+				case JSON_ACTID_READ:
+				case JSON_ACTID_DEL:
+				default:
+					tokenx_ctx->jdata = JSON_OBJ_GET_OBJ(jparent, token);
+					break;
+			}
+
+			SAFE_SPRINTF_EX(tokenx_ctx->token, "%s", token);
+			SAFE_SPRINTF_EX(tokenx_ctx->topic, "%s%s", topic_walk, token);
+
+			SAFE_STRCAT_EX(topic_walk, token, "/");
+
+			if (tokenx_ctx->jdata)
+			{
+				if (idx_need == idx_topic)
+				{
+					jfound = tokenx_ctx->jdata;
+				}
+				else if (idx_need == -1)
+				{
+					jfound = tokenx_ctx->jdata;
+				}
+				idx_json++;
+			}
+			else
+			{
+				// Not found in database
+			}
+			jparent = tokenx_ctx->jdata;
+
+			if (idx_topic>=MAX_OF_TOKENX_ARY) break;
+			token = SAFE_STRTOK_R(NULL, "/", &saveptr);
+		}
+
+		SAFE_FREE(topic_cpy);
+
+		topicx_ctx->deepth_topic = idx_topic;
+		topicx_ctx->deepth_json = idx_json;
+	}
+
+	if (topicx_ctx->deepth_topic != topicx_ctx->deepth_json)
+	{
+		jfound = NULL;
+	}
+
+	if ( (jfound) && (act==JSON_ACTID_DEL) )
+	{
+		json_t *jparent = topicx_ctx->jroot;
+		int idx = topicx_ctx->deepth_topic;
+		if (idx==0)
+		{
+			JSON_OBJ_DEL(jparent, topicx_ctx->tokenx_ary[idx].token);
+		}
+		else
+		{
+			jparent = topicx_ctx->tokenx_ary[idx-1].jdata;
+			JSON_OBJ_DEL(jparent, topicx_ctx->tokenx_ary[idx].token);
+		}
+		jfound = NULL;
+	}
+
+	return jfound;
 }
 
 json_t *json_ary_find_val(json_t *jparent, json_t *jval, int *idx)
@@ -173,14 +285,17 @@ json_t *json_object_find_with_keys(json_t *jparent, const char *keys)
 	return jobj;
 }
 
-json_t *json_object_lookup(json_t *jparent, const char *key, int deepth)
+json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int deepth, char *topic_parent, json_t *jfound_ary)
 {
 	if ( jparent == NULL ) return NULL;
+	if ( topic_parent == NULL ) return NULL;
 
+	char topic[LEN_OF_TOPIC] = "";
 	json_t *jobj = NULL;
 	json_t *jobj_found = NULL;
 	int nextth = 0;
 
+	SAFE_SPRINTF_EX(topic, "%s", topic_parent);
 	if (deepth<0)
 	{
 		// infinite
@@ -188,7 +303,10 @@ json_t *json_object_lookup(json_t *jparent, const char *key, int deepth)
 	}
 	else if (deepth==0)
 	{
-		return jobj;
+		if (jfound_ary==NULL)
+		{
+			return jobj;
+		}
 	}
 	else
 	{
@@ -201,17 +319,15 @@ json_t *json_object_lookup(json_t *jparent, const char *key, int deepth)
 		{
 			int idx = 0;
 			JSON_ARY_FOREACH(jparent, idx, jobj_found) {
-				if ( (JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, nextth)) )
+				if ( (JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found =json_object_lookup(jobj_found, key, jval, nextth, topic, jfound_ary)) )
 				{
-					// found !!!
 					jobj = jobj_found;
-					break;
+					if (jfound_ary == NULL) break;
 				}
-				else if ( (JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, nextth)) )
+				else if ( (JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found =json_object_lookup(jobj_found, key, jval, nextth, topic, jfound_ary)) )
 				{
-					// found !!!
 					jobj = jobj_found;
-					break;
+					if (jfound_ary == NULL) break;
 				}
 			}
 		}
@@ -219,23 +335,61 @@ json_t *json_object_lookup(json_t *jparent, const char *key, int deepth)
 		{
 			const char *key_found = NULL;
 			JSON_OBJ_FOREACH(jparent, key_found, jobj_found) {
+				char topic_new[LEN_OF_TOPIC] = "";
+
+				if (SAFE_STRLEN(topic) > 0)
+				{
+					SAFE_SPRINTF_EX(topic_new, "%s/%s", topic, key_found);
+				}
+				else
+				{
+					SAFE_SPRINTF_EX(topic_new, "%s", key_found);
+				}
+
 				if (SAFE_STRCMP((char*)key_found, (char*)key) ==0)
 				{
-					// found !!!
-					jobj = jobj_found;
-					break;
+					if (jval)
+					{
+						if ( 1 == JSON_EQUAL(jobj_found, jval) )
+						{
+							jobj = jparent;
+						}
+					}
+					else
+					{
+						jobj = jobj_found;
+					}
+
+					if (jobj)
+					{
+						if (jfound_ary)
+						{
+							json_t *jnew = JSON_OBJ_NEW();
+							if (jval)
+							{
+								JSON_OBJ_SET_STR(jnew, JKEY_COMM_TOPIC, topic);
+							}
+							else
+							{
+								JSON_OBJ_SET_STR(jnew, JKEY_COMM_TOPIC, topic_new);
+							}
+							//json_t *jobj_cpy = JSON_COPY(jobj);
+							//JSON_OBJ_SET_OBJ(jnew, JKEY_COMM_DATA, jobj_cpy);
+							JSON_OBJ_SET_OBJ_LINK(jnew, JKEY_COMM_DATA, jobj);
+							JSON_ARY_APPEND_OBJ(jfound_ary, jnew);
+						}
+						break;
+					}
 				}
-				else if ( (JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, nextth)) )
+				else if ( (JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, jval, nextth, topic_new, jfound_ary)) )
 				{
-					// found !!!
 					jobj = jobj_found;
-					break;
+					if (jfound_ary == NULL) break;
 				}
-				else if ( (JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, nextth)) )
+				else if ( (JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, jval, nextth, topic_new, jfound_ary)) )
 				{
-					// found !!!
 					jobj = jobj_found;
-					break;
+					if (jfound_ary == NULL) break;
 				}
 			}
 		}

@@ -23,7 +23,7 @@
 
 static int is_quit = 0;
 
-char filename[LEN_OF_FILENAME256] = "";
+char filename[LEN_OF_FULLNAME] = "";
 char whoami[LEN_OF_USER] = "";
 char hostname[LEN_OF_HOSTNAME] = "";
 
@@ -358,7 +358,7 @@ int newline_lookupokup_cb(char *newline, void *arg)
 
 static void tunnel_create_system(void)
 {
-	char file_auth_key[LEN_OF_FILENAME256] = "";
+	char file_auth_key[LEN_OF_FULLNAME] = "";
 
 	SAFE_SNPRINTF(file_auth_key, sizeof(file_auth_key), "%s/.ssh/authorized_keys", sys_homedir());
 	DBG_DB_LN("(file_auth_key: %s)", file_auth_key);

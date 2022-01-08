@@ -106,8 +106,8 @@ static void app_loop(void)
 
 		spawn_req->loop = uv_loop;
 
-		//SAFE_SPRINTF(spawn_req->name, "./util_123");
-		SAFE_SPRINTF(spawn_req->name, "ping");
+		//SAFE_SPRINTF_EX(spawn_req->name, "./util_123");
+		SAFE_SPRINTF_EX(spawn_req->name, "ping");
 		spawn_req->argc = 0;
 		spawn_req->args[spawn_req->argc++] = spawn_req->name;
 		spawn_req->args[spawn_req->argc++] = "8.8.8.8";

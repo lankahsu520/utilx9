@@ -41,8 +41,8 @@ int http_download_mjpeg(char *url, char *prefixname)
 			.mjpeg_req.fp = NULL,
 			.mjpeg_req.num = 0,
 		};
-		SAFE_SPRINTF(http_req.url, "%s", url);
-		SAFE_SPRINTF(http_req.mjpeg_req.prefixname, "%s", prefixname);
+		SAFE_SPRINTF_EX(http_req.url, "%s", url);
+		SAFE_SPRINTF_EX(http_req.mjpeg_req.prefixname, "%s", prefixname);
 		SAFE_MEMSET(http_req.mjpeg_req.boundary, 0, sizeof(http_req.mjpeg_req.boundary));
 		SAFE_MEMSET(http_req.mjpeg_req.ctype, 0, sizeof(http_req.mjpeg_req.ctype));
 		http_req.mjpeg_req.clength = 0;
@@ -76,8 +76,8 @@ int http_download_rtsp(char *url, char *filename)
 			.rtsp_req.progress = 1,
 		};
 
-		SAFE_SPRINTF(http_req.url, "%s", url);
-		SAFE_SPRINTF(http_req.rtsp_req.filename, "%s", filename);
+		SAFE_SPRINTF_EX(http_req.url, "%s", url);
+		SAFE_SPRINTF_EX(http_req.rtsp_req.filename, "%s", filename);
 		ret = http_request(&http_req);
 	}
 	return ret;
@@ -96,8 +96,8 @@ int http_download_normal(char *url, char *filename)
 			.file_req.filename = "",
 			.file_req.fp = NULL,
 		};
-		SAFE_SPRINTF(http_req.url, "%s", url);
-		SAFE_SPRINTF(http_req.file_req.filename, "%s", filename);
+		SAFE_SPRINTF_EX(http_req.url, "%s", url);
+		SAFE_SPRINTF_EX(http_req.file_req.filename, "%s", filename);
 		ret = http_request(&http_req);
 	}
 	return ret;
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 	char *request = NULL;
 	char content_length[LEN_OF_VAL48] ="";
 	SAFE_ASPRINTF(request, "%s", "Hello World!!!");
-	//SAFE_SPRINTF(content_length, "Content-Length: %d", strlen(request));
+	//SAFE_SPRINTF_EX(content_length, "Content-Length: %d", strlen(request));
 	headers = curl_slist_append(headers, content_length);
 
 	//http_simple("http://192.168.50.206:8089/test.jpg", HTTP_METHOD_ID_PUT, headers, strlen(request), request, NULL, http_response_cb);
@@ -146,13 +146,13 @@ int main(int argc, char* argv[])
 	//http_download_mjpeg("http://iris.not.iac.es/axis-cgi/mjpg/video.cgi?resolution=320x240", "./1234");
 
 	// https://en.ipcams.ch/WebCam.aspx?nr=1729
-	SAFE_SPRINTF(user, "");
-	SAFE_SPRINTF(pass, "");
+	SAFE_SPRINTF_EX(user, "");
+	SAFE_SPRINTF_EX(pass, "");
 	http_download_mjpeg("https://webcam1.lpl.org/axis-cgi/mjpg/video.cgi", "./456");
 
 	// single
-	SAFE_SPRINTF(user, "admin");
-	SAFE_SPRINTF(pass, "888888");
+	SAFE_SPRINTF_EX(user, "admin");
+	SAFE_SPRINTF_EX(pass, "888888");
 	//http_download_mjpeg("http://192.168.50.170/web/cgi-bin/hi3510/snap.cgi?&-getstream&-snapone", "./170");
 	http_download_mjpeg("http://192.168.50.238:80/dms?nowprofileid=1", "./238");
 

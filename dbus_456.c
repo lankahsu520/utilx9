@@ -211,7 +211,7 @@ static void app_ParseArguments(int argc, char **argv)
 			case 'e':
 				if (optarg)
 				{
-					SAFE_SPRINTF(msg, "%s", optarg);
+					SAFE_SPRINTF_EX(msg, "%s", optarg);
 				}
 				break;
 			case 's':

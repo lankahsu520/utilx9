@@ -14,6 +14,8 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+#include <sys/stat.h> // for fstat
+
 #define DBG_TMP_Y(format,args...) //DBG_DB_LN
 #define DBG_TMP_DUMP(ibuf,ilen,delim,format,args...) //DBG_TR_DUMP
 
@@ -552,6 +554,7 @@ static void rtsp_describe_parse(HttpCtx_t *http_req)
 				char sps_str[LEN_OF_VAL64] = "";
 				char *sps = SAFE_STRSTR(token, "sprop-parameter-sets=");
 
+#ifdef UTIL_EX_SSL
 				if (sps)
 				{ // h264
 					SAFE_SSCANF(sps, "sprop-parameter-sets=%s", sps_str);
@@ -575,6 +578,7 @@ static void rtsp_describe_parse(HttpCtx_t *http_req)
 						SAFE_FREE(sps_dec);
 					}
 				}
+#endif
 			}
 			else if (SAFE_STRNCMP(token, "m=audio", strlen("m=audio")) == 0)
 			{
@@ -961,7 +965,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 
 			if(curl_res != CURLE_OK)
 			{
-				SAFE_SPRINTF(http_req->log, "%d %s !!! (url: %s, filename: %s)", curl_res, curl_easy_strerror(curl_res), http_req->url, rtsp_req->filename );
+				SAFE_SPRINTF_EX(http_req->log, "%d %s !!! (url: %s, filename: %s)", curl_res, curl_easy_strerror(curl_res), http_req->url, rtsp_req->filename );
 			}
 			else
 			{
@@ -980,7 +984,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 	}
 	else
 	{
-		SAFE_SPRINTF(http_req->log, "SAFE_FOPEN error !!! (url: %s, filename: %s)", http_req->url, rtsp_req->filename );
+		SAFE_SPRINTF_EX(http_req->log, "SAFE_FOPEN error !!! (url: %s, filename: %s)", http_req->url, rtsp_req->filename );
 	}
 	DBG_TR_LN("ret: %d, %s", ret, http_req->log);
 	return ret;
@@ -1000,7 +1004,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 		struct stat file_info;
 		if(fstat(SAFE_FILENO(file_req->fp), &file_info) != 0)
 		{
-			SAFE_SPRINTF(http_req->log, "fstat error !!! (url: %s, filename: %s)", http_req->url, file_req->filename );
+			SAFE_SPRINTF_EX(http_req->log, "fstat error !!! (url: %s, filename: %s)", http_req->url, file_req->filename );
 		}
 		else
 		{
@@ -1059,7 +1063,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 			/* Check for errors */ 
 			if(curl_res != CURLE_OK)
 			{
-				SAFE_SPRINTF(http_req->log, "%d %s !!! (url: %s, filename: %s)", curl_res, curl_easy_strerror(curl_res), http_req->url, file_req->filename );
+				SAFE_SPRINTF_EX(http_req->log, "%d %s !!! (url: %s, filename: %s)", curl_res, curl_easy_strerror(curl_res), http_req->url, file_req->filename );
 			}
 			else
 			{
@@ -1069,7 +1073,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 				curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD, &speed_download);
 				curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &total_time);
 
-				SAFE_SPRINTF(http_req->log, "Download Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", file_req->filename, size_download, speed_download, total_time);
+				SAFE_SPRINTF_EX(http_req->log, "Download Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", file_req->filename, size_download, speed_download, total_time);
 				ret = 0;
 			}
 			/* always cleanup */ 
@@ -1081,7 +1085,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 	}
 	else
 	{
-		SAFE_SPRINTF(http_req->log, "SAFE_FOPEN error !!! (url: %s, filename: %s)", http_req->url, file_req->filename );
+		SAFE_SPRINTF_EX(http_req->log, "SAFE_FOPEN error !!! (url: %s, filename: %s)", http_req->url, file_req->filename );
 	}
 	DBG_TR_LN("ret: %d, %s", ret, http_req->log);
 	return ret;
@@ -1330,7 +1334,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 		struct stat file_info;
 		if(fstat(SAFE_FILENO(mjpeg_req->fp), &file_info) != 0)
 		{
-			SAFE_SPRINTF(http_req->log, "fstat error !!! (url: %s, filename: %s)", http_req->url, mjpeg_req->filename );
+			SAFE_SPRINTF_EX(http_req->log, "fstat error !!! (url: %s, filename: %s)", http_req->url, mjpeg_req->filename );
 		}
 		else
 		{
@@ -1386,7 +1390,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 			/* Check for errors */ 
 			if ( (curl_res != CURLE_OK) && (mjpeg_req->num==0) )
 			{
-				SAFE_SPRINTF(http_req->log, "%d %s !!! (url: %s, filename: %s)", curl_res, curl_easy_strerror(curl_res), http_req->url, mjpeg_req->filename );
+				SAFE_SPRINTF_EX(http_req->log, "%d %s !!! (url: %s, filename: %s)", curl_res, curl_easy_strerror(curl_res), http_req->url, mjpeg_req->filename );
 			}
 			else
 			{
@@ -1396,7 +1400,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 				curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD, &speed_download);
 				curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &total_time);
 
-				SAFE_SPRINTF(http_req->log, "Download Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", mjpeg_req->filename, size_download, speed_download, total_time);
+				SAFE_SPRINTF_EX(http_req->log, "Download Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", mjpeg_req->filename, size_download, speed_download, total_time);
 				ret = 0;
 			}
 			/* always cleanup */ 
@@ -1409,7 +1413,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 	}
 	else
 	{
-		SAFE_SPRINTF(http_req->log, "SAFE_FOPEN error !!! (url: %s, filename: %s)", http_req->url, mjpeg_req->filename );
+		SAFE_SPRINTF_EX(http_req->log, "SAFE_FOPEN error !!! (url: %s, filename: %s)", http_req->url, mjpeg_req->filename );
 	}
 	DBG_TR_LN("ret: %d, %s", ret, http_req->log);
 	return ret;
@@ -1518,8 +1522,8 @@ int http_upload(const char *url, const char *filename)
 			.file_req.fp = NULL,
 			.file_req.method = HTTP_METHOD_ID_PUT,
 		};
-		SAFE_SPRINTF(http_req.url, "%s", url);
-		SAFE_SPRINTF(http_req.file_req.filename, "%s", filename);
+		SAFE_SPRINTF_EX(http_req.url, "%s", url);
+		SAFE_SPRINTF_EX(http_req.file_req.filename, "%s", filename);
 		ret = http_request(&http_req);
 
 		http_request_free(&http_req);
@@ -1540,8 +1544,8 @@ int http_upload_with_response(const char *url, const char *filename, void *userd
 			.file_req.fp = NULL,
 			.file_req.method = HTTP_METHOD_ID_POST,
 		};
-		SAFE_SPRINTF(http_req.url, "%s", url);
-		SAFE_SPRINTF(http_req.file_req.filename, "%s", filename);
+		SAFE_SPRINTF_EX(http_req.url, "%s", url);
+		SAFE_SPRINTF_EX(http_req.file_req.filename, "%s", filename);
 		ret = http_request(&http_req);
 
 		//FileRequest_t *file_req = (FileRequest_t *)&http_req.file_req;
@@ -1571,7 +1575,7 @@ int http_simple(const char *url, HTTP_METHOD_ID method, struct curl_slist *heade
 			.simple_req.request = request,
 		};
 		//DBG_ER_LN("(request: %s)", http_req.simple_req.request);
-		SAFE_SPRINTF(http_req.url, "%s", url);
+		SAFE_SPRINTF_EX(http_req.url, "%s", url);
 		ret = http_request(&http_req);
 
 		if (cb)

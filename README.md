@@ -61,6 +61,7 @@ $ make
 - mqtt_123 - a mqtt example.
 - multicast_cli & multicast_srv - multicast example.
 - ~~nlink_123 & nlink_456 - netlink example. got from internet.~~
+- nlink_789 netlink example. use chainX_api.c (CHAINX_MODE_ID_NETLINK).
 - onvif_client_123 - onvif client example.
 - ping_123 - ping example.
 - proc_list_123 & proc_watch - a system and proc information example.
@@ -68,7 +69,7 @@ $ make
 - sshX_123 - ssh example.
 - statex_123 - state machine example. use statex_api.c.
 - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
-- thread_123 - thread example.
+- thread_123 - thread example. 
 - tty_123 - a tty example. use chainX_api.c.
 - tunnel_123 - ssh tunnel example.
 - ubox_123 - ubox example.

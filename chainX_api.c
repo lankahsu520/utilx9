@@ -15,6 +15,8 @@
 #include <netdb.h> // gethostbyname
 #include <linux/route.h> // RTF_UP, RTF_GATEWAY
 #include <ifaddrs.h> // struct ifaddrs
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
 
 #include <netinet/tcp.h> //TCP_NODELAY
 #include <arpa/inet.h> //inet_pton
@@ -33,6 +35,38 @@ static int chainX_tty_open(ChainXCtx_t *chainX_req)
 static int chainX_icmp_open(void)
 {
 	int sockfd = SAFE_SOPEN(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+
+	return sockfd;
+}
+
+static int chainX_netlink_socket(void)
+{
+	int sockfd = SAFE_SOPEN(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+
+	struct nlmsghdr* n;
+	struct ifinfomsg *ifi;
+	u_int8_t req[sizeof(struct nlmsghdr) + sizeof(struct ifinfomsg) + sizeof(struct ifaddrmsg) + 4096];
+
+	memset(&req, 0, sizeof(req));
+	n = (struct nlmsghdr*) req;
+	n->nlmsg_len = NLMSG_LENGTH(sizeof(*ifi));
+	n->nlmsg_type = RTM_GETLINK;
+	n->nlmsg_seq = 1;
+	n->nlmsg_flags = NLM_F_ROOT | NLM_F_MATCH | NLM_F_REQUEST;
+	n->nlmsg_pid = 0;
+
+	ifi = NLMSG_DATA(n);
+	ifi->ifi_family = AF_UNSPEC;
+	ifi->ifi_change = -1;
+
+	if (send(sockfd, n, n->nlmsg_len, 0) < 0)
+	{
+		DBG_ER_LN("send error !!! (errno: %d %s)", errno, strerror(errno));
+		SAFE_SCLOSE(sockfd);
+	}
+	else
+	{
+	}
 
 	return sockfd;
 }
@@ -2018,6 +2052,49 @@ void chainX_close(ChainXCtx_t *chainX_req)
 	}
 }
 
+static int chainX_netlink_bind(ChainXCtx_t *chainX_req, int multi)
+{
+	int ret = -1;
+
+	if (chainX_fd_get(chainX_req)>=0)
+	{
+		//chainX_fcntl_socket(chainX_req);
+
+		struct sockaddr_nl local_addr;
+		SAFE_MEMSET(&local_addr, 0, sizeof(local_addr));
+		local_addr.nl_family = AF_NETLINK;
+		local_addr.nl_groups = RTMGRP_LINK;
+		local_addr.nl_pid = getpid();
+
+		DBG_IF_LN("bind ... (AF_NETLINK)");
+
+		ret = 0;
+		/* bind to receive address */
+		if (SAFE_BIND(chainX_fd_get(chainX_req), (struct sockaddr *)&local_addr, sizeof(local_addr)) < 0)
+		{
+			DBG_ER_LN("bind error !!!");
+			ret = -1;
+		}
+
+		//netlink_recv( chainX_fd_get(chainX_req) );
+
+		if (ret != 0)
+		{
+			chainX_close(chainX_req);
+		}
+		else
+		{
+			chainX_status_set(chainX_req, 1);
+		}
+	}
+	else
+	{
+		DBG_ER_LN("chainX_fd_get error !!!");
+	}
+
+	return ret;
+}
+
 static int chainX_udp_bind(ChainXCtx_t *chainX_req, int multi)
 {
 	int ret = -1;
@@ -2498,6 +2575,9 @@ static int chainX_check(ChainXCtx_t *chainX_req)
 		case CHAINX_MODE_ID_MULTI_RECEIVER:
 			ret = chainX_netinfo_check(chainX_req);
 			break;
+		case CHAINX_MODE_ID_NETLINK:
+			ret = 0;
+			break;
 #ifdef UTIL_EX_TTY
 		case CHAINX_MODE_ID_TTY:
 			ret = chainX_tty_check(chainX_req);
@@ -2542,6 +2622,14 @@ static int chainX_init(ChainXCtx_t *chainX_req)
 				{
 					chainX_req->sockfd = chainX_udp_socket();
 					ret = chainX_udp_bind(chainX_req, 1);
+				}
+			}
+			break;
+		case CHAINX_MODE_ID_NETLINK:
+			{
+				{
+					chainX_req->sockfd = chainX_netlink_socket();
+					ret = chainX_netlink_bind(chainX_req, 1);
 				}
 			}
 			break;
@@ -3027,6 +3115,219 @@ udp_exit:
 	return NULL;
 }
 
+static void chainX_netlink_parse_rtattr (struct rtattr **tb, int max, struct rtattr *rta, int len)
+{
+	while (RTA_OK (rta, len))
+	{
+		if (rta->rta_type <= max)
+		tb[rta->rta_type] = rta;
+		rta = RTA_NEXT (rta, len);
+	}
+}
+
+// for netlink
+void chainX_netlink_register(ChainXCtx_t *chainX_req, chainX_netlink_fn cb)
+{
+	chainX_req->netlink_cb = cb;
+}
+
+/* Recieving netlink message. */
+void chainX_netlink_recv(ChainXCtx_t * chainX_req)
+{
+	char buf[LEN_OF_BUF4096];
+	struct iovec iov = { buf, sizeof(buf) };
+	struct sockaddr_nl snl;
+	struct msghdr msg = { (void*)&snl, sizeof(snl), &iov, 1, NULL, 0, 0};
+	struct nlmsghdr *h;
+	struct rtattr *tb[IFLA_MAX > IFA_MAX ? IFLA_MAX : IFA_MAX + 1];
+	struct ifinfomsg *ifi;
+
+	int status = recvmsg(chainX_fd_get(chainX_req), &msg, 0);
+	if (status < 0)
+	{
+		DBG_ER_LN("recvmsg error !!!");
+		return;
+	}
+	else if (status == 0)
+	{
+		DBG_WN_LN("recvmsg warning (status: %d)", status);
+		return;
+	}
+
+	if (msg.msg_namelen != sizeof(snl))
+	{
+		DBG_ER_LN("recvmsg error - received invalid netlink message !!! ");
+		return;
+	}
+
+	if (msg.msg_flags & MSG_TRUNC)
+	{
+		DBG_ER_LN("recvmsg error - MSG_TRUNC !!! ");
+		return;
+	}
+	for (h = (struct nlmsghdr *) buf; NLMSG_OK(h, status); h = NLMSG_NEXT(h, status))
+	{
+		switch (h->nlmsg_type)
+		{
+			case NLMSG_DONE:
+				return;
+
+			case NLMSG_ERROR:
+				NLMSG_DATA(h);
+
+				if (h->nlmsg_len < NLMSG_LENGTH(sizeof(struct nlmsgerr)))
+				{
+					DBG_ER_LN("recvmsg error - received invalid netlink message !!! ");
+					return;
+				}
+				return;
+
+			case RTM_NEWLINK:
+			case RTM_DELLINK:
+				ifi = NLMSG_DATA(h);
+				int len = h->nlmsg_len - NLMSG_LENGTH(sizeof(struct ifinfomsg));
+				char ifname[IF_NAMESIZE + 1];
+
+				if (len < 0)
+					continue;
+
+				memset(tb, 0, sizeof(tb));
+				chainX_netlink_parse_rtattr(tb, IFLA_MAX, IFLA_RTA(ifi), len);
+
+				if (tb[IFLA_IFNAME] == NULL)
+					continue;
+
+				strncpy(ifname, (char *) RTA_DATA(tb[IFLA_IFNAME]), IF_NAMESIZE);
+
+				switch (h->nlmsg_type)
+				{
+					case RTM_NEWLINK:
+						if (ifi->ifi_flags & IFF_RUNNING)
+						{
+							if (chainX_req->netlink_cb)
+							{
+								chainX_req->netlink_cb(chainX_req, ifname, ifi->ifi_index, "UP");
+							}
+							//printf("interface %s(%d): UP\n", ifname, ifi->ifi_index);
+						}
+						else 
+						{
+							if (chainX_req->netlink_cb)
+							{
+								chainX_req->netlink_cb(chainX_req, ifname, ifi->ifi_index, "DOWN");
+							}
+							//printf("interface %s(%d): DOWN\n", ifname, ifi->ifi_index);
+						}
+						break;
+
+					case RTM_DELLINK:
+						if (chainX_req->netlink_cb)
+						{
+							chainX_req->netlink_cb(chainX_req, ifname, ifi->ifi_index, "REMOVED");
+						}
+						//printf("interface %s(%d): REMOVED\n", ifname, ifi->ifi_index);
+						break;
+				}
+
+				break;
+
+			default:
+				continue;
+		}
+	}
+}
+
+static void chainX_loop_netlink(ChainXCtx_t *chainX_req)
+{
+	if (chainX_req==NULL) return;
+
+	if (chainX_req->linked_cb) chainX_req->linked_cb(chainX_req);
+
+	while ( ( chainX_quit_check(chainX_req)== 0 ) && ( chainX_linked_check(chainX_req) == 0 ) &&
+					((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)) )
+	{
+		int result = 0;
+		//int nread = 0;
+
+		chainX_fdset_clear(chainX_req);
+		chainX_fdset_setall(chainX_req);
+
+		if ( chainX_infinite_get(chainX_req) == 0 )
+		{
+			chainX_recycle_dec(chainX_req);
+		}
+
+		result = chainX_RW_select(chainX_req);
+		if (result == -1)
+		{
+			if (errno==EINTR) continue;
+			DBG_TR_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
+			break;
+		}
+		else if (result==0)
+		{
+			// no isset
+		}
+		else if ( CHAINX_FD_ISSET_R(chainX_req) ) 
+		{
+			chainX_netlink_recv(chainX_req);
+		}
+		else
+		{
+			DBG_ER_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
+			break;
+		}
+	}
+
+	DBG_TR_LN("out !!! (%s:%u, quit: %d, status: %d)", chainX_req->netinfo.addr.ipv4 , chainX_req->netinfo.port, chainX_quit_check(chainX_req), chainX_linked_check(chainX_req));
+
+	chainX_status_set(chainX_req, 0);
+	if (chainX_req->linked_cb) chainX_req->linked_cb(chainX_req);
+	chainX_fdset_clear(chainX_req);
+}
+
+static void *chainX_thread_handler_netlink(void *arg)
+{
+	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ThreadX_t *tidx_req = &chainX_req->tidx;
+
+	threadx_detach(tidx_req);
+
+	if (chainX_req==NULL)
+	{
+		goto udp_exit;
+	}
+
+	chainX_status_set(chainX_req, 0);
+	chainX_infinite_set(chainX_req, 1);
+	chainX_recycle_set(chainX_req, 0);
+
+	while (chainX_quit_check(chainX_req) == 0)
+	{
+		int net_last = 0;
+		{
+			chainX_close(chainX_req);
+
+			if ( chainX_init(chainX_req) == 0)
+			{
+				net_last = 1;
+				DBG_IF_LN("netlink-bind ok !!! (netlink, dbg: %d, net_status: %d, sockfd: %d, net_security: %d)", dbg_lvl_get(), chainX_req->status, chainX_fd_get(chainX_req), chainX_security_get(chainX_req));
+				chainX_loop_netlink(chainX_req);
+			}
+			DBG_WN_LN("netlink-bind broken !!! (netlink, dbg: %d)", dbg_lvl_get());
+			chainX_status_set(chainX_req, 0);
+		}
+
+		if (net_last == 0) chainX_retry_wait(chainX_req);
+	}
+	DBG_TR_LN("exit (%s:%u)", chainX_req->netinfo.addr.ipv4 , chainX_req->netinfo.port);
+
+udp_exit:
+	threadx_leave(tidx_req);
+
+	return NULL;
+}
+
 #ifdef UTIL_EX_TTY
 static void *chainX_thread_handler_tty(void *arg)
 {
@@ -3131,6 +3432,17 @@ int chainX_thread_init(ChainXCtx_t *chainX_req)
 				tidx_req->thread_cb = chainX_thread_handler_udp;
 				tidx_req->data = chainX_req;
 				if (threadx_init(tidx_req, "chainX_api - UDP") != 0)
+				{
+					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
+					return -1;
+				}
+			}
+			break;
+		case CHAINX_MODE_ID_NETLINK:
+			{
+				tidx_req->thread_cb = chainX_thread_handler_netlink;
+				tidx_req->data = chainX_req;
+				if (threadx_init(tidx_req, "chainX_api - netlink") != 0)
 				{
 					DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 					return -1;

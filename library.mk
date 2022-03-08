@@ -67,7 +67,7 @@ CLEAN_BINS += \
 						lws_123
 LIBXXX_OBJS += \
 							lws_api.o
-LIBS_yes += -lwebsockets
+LIBS_yes += -lwebsockets -lwebsockets-evlib_uv
 endif
 
 ifeq ("$(PJ_HAS_CURL)", "yes")

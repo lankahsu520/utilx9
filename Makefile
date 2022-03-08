@@ -14,8 +14,7 @@ CFLAGS += $(CFLAGS_CUSTOMER)
 
 CFLAGS += \
 					-Wall -O2 \
-					-I./ \
-					-I$(SDK_INC_DIR)
+					-I./
 ifeq ("$(PJ_ARCH)", "x86")
 CFLAGS += \
 					-Wno-unused-value \
@@ -23,9 +22,7 @@ CFLAGS += \
 					-Wno-format-truncation
 endif
 LDFLAGS += \
-					-L./ \
-					-L$(SDK_LIB_DIR) \
-					-Wl,-rpath -Wl,$(SDK_LIB_DIR)
+					-L./
 ARFLAGS = rcs
 
 #** LIBXXX_OBJS **
@@ -42,10 +39,10 @@ LIBXXX_OBJS += \
 							utilx9.o
 
 #** LIBXXX_yes **
-#LIBXXX_A = libutilx9.a
-LIBXXX_SO = libutilx9.so
+#LIBXXX_A = lib$(LIBNAME).a
+LIBXXX_SO = lib$(LIBNAME).so
 LIBXXXS_$(PJ_HAS_STATIC_LIB) += $(LIBXXX_A)
-LIBXXXS_$(PJ_HAS_SHARE_LIB) += -lutilx9
+LIBXXXS_$(PJ_HAS_SHARE_LIB) += -l$(LIBNAME)
 
 #** HEADER_FILES **
 HEADER_FILES = utilx9.h basic_def.h ubus_ex.h
@@ -66,6 +63,7 @@ CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 CLEAN_BINS += \
 						nlink_123 \
 						nlink_456 \
+						nlink_789 \
 						proc_list_123 \
 						proc_watch \
 						queue_123 \
@@ -80,9 +78,11 @@ DUMMY_BINS = \
 CLEAN_BINS += $(DUMMY_BINS)
 CLEAN_OBJS += $(addsuffix .o, $(CLEAN_BINS))
 
-#** Target (SHELL_BINS) **
-SHELL_BINS = \
+#** Target (SHELL_SBINS) **
+SHELL_SBINS = \
 						proc_watch.sh
+
+DUMMY_SBINS = $(SHELL_SBINS)
 
 include define.mk
 
@@ -119,7 +119,7 @@ clean:
 	@for subheader in $(HEADER_FILES); do \
 		(rm -f $(SDK_INC_DIR)/$$subheader;); \
 	done
-	@for subshell in $(SHELL_BINS); do \
+	@for subshell in $(SHELL_SBINS); do \
 		(rm -f $(SDK_SBIN_DIR)/$$subshell;); \
 	done
 
@@ -141,35 +141,35 @@ distclean: clean
 
 install: all
 	@for subbin in $(CLEAN_BINS); do \
-		cp -avf $$subbin $(SDK_BIN_DIR); \
+		$(PJ_CP) $$subbin $(SDK_BIN_DIR); \
 		$(STRIP) $(SDK_BIN_DIR)/$$subbin; \
 	done
 	@for sublib in $(CLEAN_LIBS); do \
-		cp -avf $$sublib* $(SDK_LIB_DIR); \
+		$(PJ_CP) $$sublib* $(SDK_LIB_DIR); \
 		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION); \
 	done
 	@for subheader in $(HEADER_FILES); do \
-		cp -avf $$subheader $(SDK_INC_DIR); \
+		$(PJ_CP) $$subheader $(SDK_INC_DIR); \
 	done
-	@for subshell in $(SHELL_BINS); do \
-		cp -avf $$subshell $(SDK_SBIN_DIR); \
+	@for subshell in $(SHELL_SBINS); do \
+		$(PJ_CP) $$subshell $(SDK_SBIN_DIR); \
 	done
 
 romfs: install
 ifneq ("$(HOMEX_ROOT_DIR)", "")
 	@for subbin in $(DUMMY_BINS); do \
-		cp -avf $$subbin $(HOMEX_BIN_DIR); \
+		$(PJ_CP) $$subbin $(HOMEX_BIN_DIR); \
 		$(STRIP) $(HOMEX_BIN_DIR)/$$subbin; \
 	done
 	@for sublib in $(CLEAN_LIBS); do \
-		cp -avf $$sublib* $(HOMEX_LIB_DIR); \
+		$(PJ_CP) $$sublib* $(HOMEX_LIB_DIR); \
 		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION); \
 	done
 	#@for subheader in $(HEADER_FILES); do \
-	#	cp -avf $$subheader $(HOMEX_INC_DIR); \
+	#	$(PJ_CP) $$subheader $(HOMEX_INC_DIR); \
 	#done
-	@for subshell in $(SHELL_BINS); do \
-		cp -avf $$subshell $(HOMEX_SBIN_DIR); \
+	@for subshell in $(DUMMY_SBINS); do \
+		$(PJ_CP) $$subshell $(HOMEX_SBIN_DIR); \
 	done
 endif
 

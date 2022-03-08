@@ -1546,6 +1546,7 @@ typedef enum
 	CHAINX_MODE_ID_UDP_SERVER,
 	CHAINX_MODE_ID_MULTI_SENDER,
 	CHAINX_MODE_ID_MULTI_RECEIVER,
+	CHAINX_MODE_ID_NETLINK,
 #ifdef UTIL_EX_TTY
 	CHAINX_MODE_ID_TTY,
 #endif
@@ -1560,6 +1561,7 @@ typedef void (*chainX_post_fn)(ChainXCtx_t *chainX_req, char *buff, int buff_len
 #ifdef UTIL_EX_TTY
 typedef void (*chainX_serial_fn)(ChainXCtx_t *chainX_req, char *buff, int buff_len);
 #endif
+typedef void (*chainX_netlink_fn)(ChainXCtx_t *chainX_req, char *ifname, int index, char *status);
 typedef void (*chainX_linked_fn)(ChainXCtx_t *chainX_req);
 
 typedef struct Addr_STRUCT
@@ -1646,6 +1648,7 @@ typedef struct ChainXCtx_STRUCT
 #ifdef UTIL_EX_TTY
 		chainX_serial_fn serial_cb;
 #endif
+		chainX_netlink_fn netlink_cb; // for netlink
 	};
 	chainX_linked_fn linked_cb;
 
@@ -1777,6 +1780,7 @@ void chainX_serial_register(ChainXCtx_t *chainX_req, chainX_serial_fn cb);
 #endif
 void chainX_post_register(ChainXCtx_t *chainX_req, chainX_post_fn cb);
 void chainX_pipe_register(ChainXCtx_t *chainX_req, chainX_pipe_fn cb);
+void chainX_netlink_register(ChainXCtx_t *chainX_req, chainX_netlink_fn cb);
 
 void chainX_thread_stop(ChainXCtx_t *chainX_req);
 void chainX_thread_close(ChainXCtx_t *chainX_req);

@@ -2,8 +2,9 @@
 
 HINT="$0 {start|stop|restart|status|debug|trigger|logger|clean} iface"
 ROOTFS_PATH="/work/rootfs"
+ROOTFS_PATH_ARG=""
 PWD=`pwd`
-SBIN_PATH="$PWD/./sbin"
+SBIN_PATH="$ROOTFS_PATH/sbin"
 [ -d "$SBIN_PATH" ] || SBIN_PATH="/sbin"
 [ -x "/usr/bin/sudo" ] && SUDO_B="sudo -E -b" && SUDO="sudo -E"
 [ -x "/usr/bin/whoami" ] && WHO=`whoami`
@@ -17,12 +18,11 @@ DAEMON="proc_watch"
 BIN_FILE="./$DAEMON"
 [ -x "$BIN_FILE" ] || [ "$PWD" = "/" ] || BIN_FILE="$PWD/bin/$DAEMON"
 [ -x "$BIN_FILE" ] || BIN_FILE="/bin/$DAEMON"
+[ -x "$BIN_FILE" ] || BIN_FILE="/usr/bin/$DAEMON"
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
 
-IOT_PATH="./IoT"
-[ -d "$IOT_PATH" ] || IOT_PATH="/IoT"
-[ -d "$IOT_PATH" ] || IOT_PATH="/work/IoT"
+IOT_PATH="/work/rootfs/IoT"
 SAVE_PATH="/work/IoT"
 SAVE_PATH_ARG=""
 WORK_PATH="/tmp/IoT"
@@ -35,6 +35,9 @@ DEBUG="2"
 DEBUG_ARG=""
 LOG=""
 LOG_ARG="2>&1"
+[ "$LOG" != "" ] && LOG_ARG=">>$LOG 2>&1"
+TEE_ARG="2>&1"
+[ "$LOG" != "" ] && TEE_ARG="| tee -a $LOG"
 LOGGER_TAG="$DAEMON"
 LOGGER="logger"
 LOGGER_ARG=""
@@ -85,21 +88,17 @@ cfg_fn()
 	return 0
 }
 
-# for MIPS
-# SAVE_PATH /mnt
-# WORK_PATH /tmp/IoT
 arguments_fn()
 {
 	#[ ! -z $SAVE_PATH ] || { die_fn "SAVE_PATH is NULL !!!";}
 	#[ -d "$SAVE_PATH" ] || { die_fn "Please create $SAVE_PATH first !!!";}
 	#SAVE_PATH_ARG="-s $SAVE_PATH"
+	#ROOTFS_PATH_ARG="-r $ROOTFS_PATH"
 
 	#[ ! -z $WORK_PATH ] || { die_fn "WORK_PATH is NULL !!!";}
 	#WORK_PATH_ARG=""
 
 	[ "$DEBUG" != "" ] && DEBUG_ARG="-d $DEBUG"
-
-	[ "$LOG" != "" ] && LOG_ARG=">$LOG 2>&1"
 
 	[ "$LOGGER" != "" ] && LOGGER_ARG="| $LOGGER -t $LOGGER_TAG"
 
@@ -202,7 +201,10 @@ trigger_fn()
 
 logger_fn()
 {
-	(logread -f -e $LOGGER_TAG;) || (tail -f /var/log/syslog | grep $LOGGER_TAG;) 
+	echo "$RUN_SH ($PID) logger_fn [$LOGGER_TAG] ... "
+	DO_COMMAND="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f | grep $LOGGER_TAG 2>/dev/null; ) || (tail -f /var/log/syslog  $LOGGER_COLOR | grep $LOGGER_TAG;)"
+	echo "[$DO_COMMAND]"
+	sh -c "$DO_COMMAND"
 
 	return 0
 }
@@ -217,7 +219,7 @@ showusage_fn()
 trap_ctrlc()
 {
 	echo "Ctrl-C caught ..."
- 
+
 	[ -z $INTERACTIVE ] || stop_fn
 }
 

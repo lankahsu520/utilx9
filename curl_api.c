@@ -166,7 +166,7 @@ static int http_request_simple(HttpCtx_t *http_req)
 					curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 					curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
 					//curl_easy_setopt(curl, CURLOPT_SSLVERSION, 3);
-					curl_easy_setopt(curl, CURLOPT_CAINFO, "/cert/curl/cacert.pem");
+					curl_easy_setopt(curl, CURLOPT_CAINFO, PJ_INSTALL_IOT "/cert/curl/cacert.pem");
 				}
 				if ((http_req->user) && (http_req->password))
 				{

@@ -8,17 +8,19 @@ define generate_expiration
 		echo "#define UTIL_EX_EXPIRATION_DATE $(1)" >> util_expiration.h; \
 	fi
 	@echo "#endif" >> util_expiration.h
-
-	mkdir -p conf
-	[ -f $(SDK_CONFIG_AUTOCONF_H) ] && (cp -avf $(SDK_CONFIG_AUTOCONF_H) conf/autoconf_def.h;) || echo "skip !!! (SDK_CONFIG_AUTOCONF_H)"
-	#[ -f $(SDK_CONFIG_CONFIG) ] && (cp -avf $(SDK_CONFIG_CONFIG) conf/;) || echo "skip !!! (SDK_CONFIG_CONFIG)"
-	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] && (cp -avf $(SDK_CONFIG_CUSTOMER_DEF_H) conf/;) || echo "skip !!! (SDK_CONFIG_CUSTOMER_DEF_H)"
-	[ -f $(SDK_CONFIG_CUSTOMER) ] && (cp -avf $(SDK_CONFIG_CUSTOMER) conf/;) || echo "skip !!! (SDK_CONFIG_CUSTOMER)"
-	[ -d $(PJ_ROOT)/include ] && (cp -avf $(PJ_ROOT)/include/* conf/;) || echo "skip !!! (PJ_ROOT)"
 endef
 
 .configured:
 	$(call generate_expiration, $(PJ_EXPIRATION_DATE))
+
+ifeq ("$(PJ_NAME)", "github")
+	mkdir -p $(PJ_NAME)
+	[ -f $(SDK_CONFIG_AUTOCONF_H) ] && (cp -avf $(SDK_CONFIG_AUTOCONF_H) $(PJ_NAME)/autoconf_def.h;) || echo "skip !!! (SDK_CONFIG_AUTOCONF_H)"
+	#[ -f $(SDK_CONFIG_CONFIG) ] && (cp -avf $(SDK_CONFIG_CONFIG) $(PJ_NAME)/;) || echo "skip !!! (SDK_CONFIG_CONFIG)"
+	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] && (cp -avf $(SDK_CONFIG_CUSTOMER_DEF_H) $(PJ_NAME)/;) || echo "skip !!! (SDK_CONFIG_CUSTOMER_DEF_H)"
+	[ -f $(SDK_CONFIG_CUSTOMER) ] && (cp -avf $(SDK_CONFIG_CUSTOMER) $(PJ_NAME)/;) || echo "skip !!! (SDK_CONFIG_CUSTOMER)"
+	[ -d $(PJ_ROOT)/include ] && (cp -avf $(PJ_ROOT)/include/* $(PJ_NAME)/;) || echo "skip !!! (PJ_ROOT)"
+endif
 
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 	sed -i "s|#undef UTIL_EX_SSL.*|#define UTIL_EX_SSL|g" utilx9.h

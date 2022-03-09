@@ -72,13 +72,13 @@ void* pcheck( void* a )
 	{
 		diff_t++;
 		//sleep(diff_t);
-		printf("%ld==0",expired_t);
+		printf("%ld==0\n",expired_t);
 	}
 	else if ( run_t > expired_t )
 	{
 		diff_t = time_diff_days(run_t, expired_t);
 		//sleep(diff_t);
-		printf("%ld>%ld", run_t, expired_t);
+		printf("%ld>%ld\n", run_t, expired_t);
 	}
 	return a ;
 }
@@ -111,6 +111,7 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 
 #ifdef UTIL_EX_BASIC 
 #include <fcntl.h>
+#include <stdarg.h>
 
 #if (0)
 int str_isspace(char *str)

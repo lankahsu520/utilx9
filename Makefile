@@ -72,7 +72,6 @@ CLEAN_BINS += \
 
 #** Target (DUMMY_BINS) **
 DUMMY_BINS = \
-						jqx \
 						util_123
 
 CLEAN_BINS += $(DUMMY_BINS)
@@ -108,13 +107,16 @@ clean:
 	rm -f $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS)
 	rm -f $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	rm -f util_expiration.h
-	#rm -rf conf
 	rm -f .configured
+ifeq ("$(PJ_NAME)", "github")
+	[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
+endif
+
 	@for subbin in $(CLEAN_BINS); do \
 		(rm -f $(SDK_BIN_DIR)/$$subbin;); \
 	done
 	@for sublib in $(CLEAN_LIBS); do \
-		(rm -f $(SDK_LIB_DIR)/$$sublib;); \
+		(rm -f $(SDK_LIB_DIR)/$$sublib*;); \
 	done
 	@for subheader in $(HEADER_FILES); do \
 		(rm -f $(SDK_INC_DIR)/$$subheader;); \
@@ -140,27 +142,33 @@ distclean: clean
 	@echo ' '
 
 install: all
+	mkdir -p $(SDK_BIN_DIR)
 	@for subbin in $(CLEAN_BINS); do \
 		$(PJ_CP) $$subbin $(SDK_BIN_DIR); \
 		$(STRIP) $(SDK_BIN_DIR)/$$subbin; \
 	done
+	mkdir -p $(SDK_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
 		$(PJ_CP) $$sublib* $(SDK_LIB_DIR); \
 		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION); \
 	done
+	mkdir -p $(SDK_INC_DIR)
 	@for subheader in $(HEADER_FILES); do \
 		$(PJ_CP) $$subheader $(SDK_INC_DIR); \
 	done
+	mkdir -p $(SDK_SBIN_DIR)
 	@for subshell in $(SHELL_SBINS); do \
 		$(PJ_CP) $$subshell $(SDK_SBIN_DIR); \
 	done
 
 romfs: install
 ifneq ("$(HOMEX_ROOT_DIR)", "")
+	mkdir -p $(HOMEX_BIN_DIR)
 	@for subbin in $(DUMMY_BINS); do \
 		$(PJ_CP) $$subbin $(HOMEX_BIN_DIR); \
 		$(STRIP) $(HOMEX_BIN_DIR)/$$subbin; \
 	done
+	mkdir -p $(HOMEX_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
 		$(PJ_CP) $$sublib* $(HOMEX_LIB_DIR); \
 		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION); \
@@ -168,6 +176,7 @@ ifneq ("$(HOMEX_ROOT_DIR)", "")
 	#@for subheader in $(HEADER_FILES); do \
 	#	$(PJ_CP) $$subheader $(HOMEX_INC_DIR); \
 	#done
+	mkdir -p $(HOMEX_SBIN_DIR)
 	@for subshell in $(DUMMY_SBINS); do \
 		$(PJ_CP) $$subshell $(HOMEX_SBIN_DIR); \
 	done

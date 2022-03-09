@@ -769,6 +769,7 @@ int usbX_listen_open(UsbXCtx_t *usbX_req, void *user_data)
 		}
 
 		libusb_set_debug(usbX_req->usb_ctx, usbX_req->dbg_lvl);
+		//libusb_set_option(usbX_req->usb_ctx, usbX_req->dbg_lvl);
 
 		usbX_thread_init(usbX_req);
 

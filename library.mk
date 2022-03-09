@@ -33,6 +33,7 @@ endif
 
 ifeq ("$(PJ_HAS_JANSSON)", "yes")
 CLEAN_BINS += \
+						jqx \
 						json_123
 LIBXXX_OBJS += \
 							json_api.o
@@ -67,7 +68,7 @@ CLEAN_BINS += \
 						lws_123
 LIBXXX_OBJS += \
 							lws_api.o
-LIBS_yes += -lwebsockets -lwebsockets-evlib_uv
+LIBS_yes += -lwebsockets #-lwebsockets-evlib_uv
 endif
 
 ifeq ("$(PJ_HAS_CURL)", "yes")

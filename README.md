@@ -1,4 +1,4 @@
-# Overview
+# 1. Overview
 utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 
 主要訴求是 -
@@ -9,8 +9,11 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 
 經過多年的工作經驗，心想只是為了糊口飯吃，為什麼還要浪費在這些 Open-source 的文件裏打轉，於是一點一滴才整理出這些.
 
+It is hard to read any usages of Open-source. They are lengthy. 
+utilx9 is the utility api. 
+Here giving small api packages and easily to use. We can also get  the ideals from the demo programs
 
-# Depend on
+# 2. Depend on
 - ubuntu_ - https://github.com/lankahsu520/ubuntu_
 - curl (PJ_HAS_CURL) - https://curl.haxx.se
 - dbus (PJ_HAS_DBUS) - https://www.freedesktop.org/wiki/Software/dbus/
@@ -33,19 +36,18 @@ utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
 - uci (PJ_HAS_UCI) - https://openwrt.org/docs/techref/uci
 
 
-# Current Status
+# 3. Current Status
 因為這是多年工作下的成果，一定還有發展空間.如果有 bug 請多多包函.
 
 
-# Build
-   ```
-$ . conf/config_customer
-	My prefix is /work/codebase/lankahsu520/xbox_github/install/github_/.
-	Please replace the string.
+# 4. Build
+```bash
+$ . conf/config.conf
+$ . conf/customer2def.sh
 $ make
-   ```
+```
 
-# Example or Usage
+# 5. Example or Usage
 - chainX_123 - socket example. use chainX_api.c.
 - client_123 - socket client. use chainX_api.c.
 - clist_123 - link list example. use clist_api.c , use contiki\core\lib\list.*.
@@ -69,7 +71,7 @@ $ make
 - sshX_123 - ssh example.
 - statex_123 - state machine example. use statex_api.c.
 - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
-- thread_123 - thread example. 
+- thread_123 - thread example.
 - tty_123 - a tty example. use chainX_api.c.
 - tunnel_123 - ssh tunnel example.
 - ubox_123 - ubox example.
@@ -83,9 +85,9 @@ $ make
 - wsdiscovery_123 - WS-Discovery example.
 
 
-# License
+# 6. License
 utilx9 is under the New BSD License (BSD-3-Clause).
 
 
-# Documentation
+# 7. Documentation
 Run an example and read it.

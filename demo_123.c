@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
 	DBG_IF_LN("(time_now_full: %s)", time_now_full(time(NULL)));
 #endif
 
-#if (1)
+#ifdef UTIL_EX_CURL
 	HttpCtx_t http_req;
 	DBG_IF_LN("(mode: %zd)", sizeof(http_req.mode) );
 	DBG_IF_LN("(curl: %zd)", sizeof(http_req.curl) );

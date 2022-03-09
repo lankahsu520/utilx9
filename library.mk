@@ -1,4 +1,5 @@
 CLEAN_BINS = 
+DUMMY_BINS = 
 
 #** chainX_api **
 CLEAN_BINS += \
@@ -32,8 +33,9 @@ LIBS_yes += -lusb-1.0
 endif
 
 ifeq ("$(PJ_HAS_JANSSON)", "yes")
+DUMMY_BINS += \
+						jqx
 CLEAN_BINS += \
-						jqx \
 						json_123
 LIBXXX_OBJS += \
 							json_api.o

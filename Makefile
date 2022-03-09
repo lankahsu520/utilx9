@@ -71,7 +71,7 @@ CLEAN_BINS += \
 						demo_000
 
 #** Target (DUMMY_BINS) **
-DUMMY_BINS = \
+DUMMY_BINS += \
 						util_123
 
 CLEAN_BINS += $(DUMMY_BINS)
@@ -109,7 +109,7 @@ clean:
 	rm -f util_expiration.h
 	rm -f .configured
 ifeq ("$(PJ_NAME)", "github")
-	[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
+	@[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
 endif
 
 	@for subbin in $(CLEAN_BINS); do \

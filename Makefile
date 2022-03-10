@@ -108,6 +108,7 @@ clean:
 	rm -f $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	rm -f util_expiration.h
 	rm -f .configured
+	rm -f .patched
 ifeq ("$(PJ_NAME)", "github")
 	@[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
 endif

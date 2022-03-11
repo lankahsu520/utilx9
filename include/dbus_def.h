@@ -1,10 +1,10 @@
-#ifndef PHILIO_DBUS_DEF_H
-#define PHILIO_DBUS_DEF_H
+#ifndef __DBUS_DEF_H__
+#define __DBUS_DEF_H__
 
 //******************************************************************************
 // DEST
 //******************************************************************************
-#define DBUS_DEST_DEMO                            "com.luffanet.www.demo"
+#define DBUS_DEST_DEMO                            "com.lankahsu520.www.demo"
 
 //******************************************************************************
 // PATH
@@ -22,10 +22,10 @@
 // dbus_demo
 //******************************************************************************
 // -> dbus_demo
-#define DBUS_M_IFAC_DEMO_CMD                      "com.lankahsu520.demo.command" // sync
+#define DBUS_M_IFAC_DEMO_CMD                      "com.lankahsu520.www.demo.method" // sync
 
 // dbus_demo => all
-#define DBUS_S_IFAC_DEMO                          "com.lankahsu520.signal.demo"
+#define DBUS_S_IFAC_DEMO                          "com.lankahsu520.www.demo.signal"
 #define DBUS_S_MATCH_DEMO                         "type='signal',interface='com.lankahsu520.signal.demo'"
 
 #define DBUS_METHOD_ECHO                          "echo"

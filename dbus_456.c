@@ -43,11 +43,11 @@ static DBusHandlerResult dbus_filter_cb(DBusConnection *connection, DBusMessage 
 	//const char *iface = dbus_message_get_interface(message);
 	//const char *path = dbus_message_get_path(message);
 
-	if (dbus_message_is_signal(message, DBUS_S_IFAC_DEMO, DBUS_METHOD_COMMAND))
+	if (dbus_message_is_signal(message, DBUS_S_IFAC_DBUS_DEMO, DBUS_S_NAME_COMMAND))
 	{
 		handled = demo_signal_cb(connection, message, NULL);
 	}
-	else if ( dbus_message_is_method_call(message, DBUS_M_IFAC_DEMO_CMD, DBUS_METHOD_COMMAND))
+	else if ( dbus_message_is_method_call(message, DBUS_M_IFAC_DBUS_DEMO, DBUS_METHOD_COMMAND))
 	{
 		handled = echo_method_cb(connection, message, NULL);
 	}
@@ -60,10 +60,10 @@ static int dbus_match_cb(DBusConnection *dbus_listen, DBusError *err, void *usr_
 	int ret = -1;
 
 	// add a rule for which messages we want to see
-	dbus_bus_add_match(dbus_listen, DBUS_S_MATCH_DEMO, err); // see signals from the given interface
+	dbus_bus_add_match(dbus_listen, DBUS_S_MATCH_DBUS_DEMO, err); // see signals from the given interface
 	if (dbus_error_is_set(err))
 	{
-		DBG_ER_LN("dbus_bus_add_match error !!! (%s, %s)", DBUS_S_MATCH_DEMO, err->message);
+		DBG_ER_LN("dbus_bus_add_match error !!! (%s, %s)", DBUS_S_MATCH_DBUS_DEMO, err->message);
 		goto exit_match;
 	}
 
@@ -114,9 +114,9 @@ static void app_loop(void)
 	{
 		dbusx_client_init(&dbusx_456);
 
-		dbusx_signal_str(&dbusx_456, DBUS_S_IFAC_DEMO, DBUS_METHOD_COMMAND, msg);
+		dbusx_signal_str(&dbusx_456, DBUS_S_IFAC_DBUS_DEMO, DBUS_S_NAME_COMMAND, msg);
 
-		char *retStr = dbusx_method_str2str(&dbusx_456, DBUS_DEST_DEMO, DBUS_M_IFAC_DEMO_CMD, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
+		char *retStr = dbusx_method_str2str(&dbusx_456, DBUS_DEST_DEMO, DBUS_M_IFAC_DBUS_DEMO, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
 		DBG_IF_LN("(retStr: %s)", retStr);
 		SAFE_FREE(retStr);
 

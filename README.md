@@ -29,7 +29,7 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 - libyuarel (PJ_HAS_LIBYUAREL) - https://github.com/jacketizer/libyuarel
 - minixml (PJ_HAS_MXML)- https://www.msweet.org/mxml
 - mosquitto (PJ_HAS_MOSQUITTO) - https://mosquitto.org
-- mxml (PJ_HAS_MXML) - https://www.msweet.org/mxml/
+- mxml (PJ_HAS_MXML) - https://www.msweet.org/mxml/ (need to patch, please check patches/mxml-2.11)
 - openssl (PJ_HAS_OPENSSL) - https://www.openssl.org
 - ~~swconfig (PJ_HAS_SWCONFIG) - openwrt/package/network/config/swconfig~~
 - ubus (PJ_HAS_UBUS) - https://openwrt.org/docs/techref/ubus

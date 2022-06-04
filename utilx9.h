@@ -66,7 +66,7 @@ extern "C" {
 #define UTIL_EX_CURL
 #define UTIL_EX_RTP // Makefile?
 
-#define UTIL_EX_MXML
+#undef UTIL_EX_MXML
 #ifdef UTIL_EX_MXML
 #define UTIL_EX_ONVIF // Makefile?
 #define UTIL_EX_SOAP // Makefile?
@@ -82,7 +82,7 @@ extern "C" {
 #undef UTIL_EX_UCI
 #undef UTIL_EX_UBOX
 #undef UTIL_EX_FASTCGI
-#define UTIL_EX_YUAREL
+#undef UTIL_EX_YUAREL
 #define UTIL_EX_WEBSOCKETS
 #define UTIL_EX_MQTT
 
@@ -1568,7 +1568,7 @@ typedef struct Addr_STRUCT
 {
 	char ipv4[LEN_OF_IP];
 	char ipv6[LEN_OF_IP];
-	char hostname[LEN_OF_HOSTNAME];
+	char hostname[LEN_OF_HOSTNAME32];
 } Addr_t;
 
 typedef struct NetworkInfo_STRUCT
@@ -1586,7 +1586,7 @@ typedef struct NetworkInfo_STRUCT
 	union
 	{ // must < 32, for 1.x, it needs to save to flash with the fixed size.
 		char reserve[LEN_OF_RESERVE32];
-		char reversename[LEN_OF_HOSTNAME];
+		char reversename[LEN_OF_HOSTNAME32];
 	};
 } NetworkInfo_t;
 
@@ -3225,6 +3225,8 @@ typedef struct UvWriteEx_STRUCT
 	uv_write_cb cb;
 } UvWriteEx_t;
 
+#define MAX_OF_SPAWN_ARGS 10
+
 typedef struct
 {
 	char name[LEN_OF_CMDLINE];
@@ -3234,7 +3236,7 @@ typedef struct
 	uv_process_t child_req;
 
 	int argc;
-	char *args[5];
+	char *args[MAX_OF_SPAWN_ARGS];
 
 	uv_stdio_container_t stdio[3];
 
@@ -3265,6 +3267,7 @@ void uv_write_ex(uv_stream_t *dest, size_t size, char *buf, uv_write_cb cb);
 
 void uv_spawn_close_ex(SpawnCtx_t *spawn_req);
 void uv_spawn_open_ex(SpawnCtx_t *spawn_req);
+void uv_spawn_simple_detached(SpawnCtx_t *spawn_req, int num, ...);
 
 void uv_event_close_ex(UvEventCtx_t *event_req);
 void uv_event_open_ex(UvEventCtx_t *event_req);
@@ -3681,7 +3684,7 @@ yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_ctx);
 #define WEBSOCKETS_PORT_7681 7681
 #define WEBSOCKETS_URMET_PORT_7682 7682
 
-#define LEN_OF_WEBSOCKET LEN_OF_BUF1024
+#define LEN_OF_WEBSOCKET LEN_OF_BUF_2MB
 #define LEN_OF_LWS (LWS_SEND_BUFFER_PRE_PADDING + LEN_OF_WEBSOCKET + LWS_SEND_BUFFER_POST_PADDING)
 #define MAX_OF_RING 8
 #define MAX_OF_SESSION 8

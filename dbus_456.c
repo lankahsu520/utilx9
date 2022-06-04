@@ -16,7 +16,6 @@
 #include <getopt.h>
 
 #include "utilx9.h"
-#include "dbus_def.h"
 
 #define TAG "dbus_123"
 

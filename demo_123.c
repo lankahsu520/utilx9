@@ -105,11 +105,11 @@ int main(int argc, char* argv[])
 #ifdef USE_TEST_HOSTNAME
 	{
 		char myhostname[LEN_OF_HOSTNAME]="";
-		gethostname(myhostname, LEN_OF_HOSTNAME);
+		gethostname(myhostname, sizeof(myhostname));
 		DBG_IF_LN("(gethostname: %s)", myhostname);
 
 		char mydomainname[LEN_OF_HOSTNAME]="";
-		int res = getdomainname(mydomainname, LEN_OF_HOSTNAME);
+		int res = getdomainname(mydomainname, sizeof(mydomainname));
 		DBG_IF_LN("(getdomainname: %s, res: %d)", mydomainname, res);
 	}
 #endif

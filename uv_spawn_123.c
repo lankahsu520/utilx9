@@ -18,6 +18,9 @@
 #include "utilx9.h"
 
 #define USE_ASYNC_CREATE
+#define USE_TIMER_CREATE
+//#define USE_SPAWN_CREATE
+#define USE_SPAWN_SIMPLE_CREATE
 
 #define TAG "uv_spawn_123"
 
@@ -25,10 +28,102 @@
 static int is_quit = 0;
 static uv_loop_t *uv_loop = NULL;
 
+#ifdef USE_SPAWN_CREATE
 SpawnCtx_t spawn_info = {
 	.loop = NULL,
 	.argc = 0,
 };
+#endif
+
+#ifdef USE_SPAWN_CREATE
+void uv_spawn_ping(void)
+{
+	SpawnCtx_t *spawn_req  = &spawn_info;
+
+	spawn_req->loop = uv_loop;
+
+	//SAFE_SPRINTF_EX(spawn_req->name, "./util_123");
+	SAFE_SPRINTF_EX(spawn_req->name, "ping");
+	spawn_req->argc = 0;
+	spawn_req->args[spawn_req->argc++] = spawn_req->name;
+	spawn_req->args[spawn_req->argc++] = "8.8.8.8";
+	spawn_req->args[spawn_req->argc++] = NULL;
+
+	uv_spawn_open_ex(spawn_req);
+}
+#endif
+
+#ifdef USE_SPAWN_SIMPLE_CREATE
+// please put child_req and options in global area
+uv_process_t child_req;
+uv_process_options_t child_options;
+
+void uv_spawn_simple_test(char *hostname)
+{
+	char *child_args[20];
+	child_args[0] = "ping";
+	child_args[1] = hostname;
+	child_args[2] = NULL;
+
+	child_options.exit_cb = NULL;
+	child_options.file = "ping";
+	child_options.args = child_args;
+	child_options.flags = UV_PROCESS_DETACHED;
+
+	int r;
+	if ((r = uv_spawn(uv_loop, &child_req, &child_options)))
+	{
+		DBG_IF_LN("uv_spawn error !!! (%s)", uv_strerror(r));
+	}
+	else
+	{
+		DBG_IF_LN("uv_spawn ... (ping %s)", hostname);
+	}
+	uv_unref((uv_handle_t*) &child_req);
+}
+#endif
+
+
+#ifdef USE_TIMER_CREATE
+uv_timer_t uv_timer_1sec_fd;
+void timer_1sec_loop(uv_timer_t *handle)
+{
+	static int count = 0;
+	count++;
+	DBG_IF_LN("(count: %d)", count);
+
+	if (count==2)
+	{
+#ifdef USE_SPAWN_CREATE
+		uv_spawn_ping();
+#endif
+	}
+	else if ( (count%5) == 0 )
+	{
+#ifdef USE_SPAWN_SIMPLE_CREATE
+		//uv_spawn_simple_test("192.168.50.72");
+		//uv_spawn_simple_detached(uv_loop, &child_req, &child_options, 2, "ping", "192.168.50.72");
+
+		{
+			SpawnCtx_t *spawn_req = (SpawnCtx_t *)SAFE_CALLOC(1, sizeof(SpawnCtx_t));
+			spawn_req->loop = uv_loop;
+			spawn_req->child_req.data = spawn_req;
+			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs_intercom/sbin/iot_kvsWebrtc.sh", "restart", "1");
+		}
+
+		{
+			SpawnCtx_t *spawn_req = (SpawnCtx_t *)SAFE_CALLOC(1, sizeof(SpawnCtx_t));
+			spawn_req->loop = uv_loop;
+			spawn_req->child_req.data = spawn_req;
+			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs_intercom/sbin/baresip_123.sh", "restart", "1");
+		}
+
+		//uv_spawn_simple_test("192.168.50.1");
+		//uv_spawn_simple_detached(uv_loop, &child_req, &child_options, 2, "ping", "192.168.50.1");
+#endif
+	}
+}
+#endif
 
 static int app_quit(void)
 {
@@ -43,19 +138,30 @@ void app_stop_uv(uv_async_t *handle, int force)
 		is_free = 1;
 		if (uv_loop)
 		{
+			DBG_IF_LN("call SAFE_UV_TIMER_CLOSE ...");
+#ifdef USE_TIMER_CREATE
+			SAFE_UV_TIMER_CLOSE(&uv_timer_1sec_fd, NULL);
+#endif
+
+			DBG_IF_LN("call uv_spawn_close_ex ...");
+#ifdef USE_SPAWN_CREATE
+			uv_spawn_close_ex(&spawn_info);
+#endif
+
+			DBG_IF_LN("call SAFE_UV_CLOSE ...");
 			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			uv_spawn_close_ex(&spawn_info);
-
+			DBG_IF_LN("call SAFE_UV_LOOP_CLOSE ...");
 			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
 		}
 	}
+	DBG_IF_LN("exit");
 }
 
 #ifdef USE_ASYNC_CREATE
@@ -101,20 +207,10 @@ static void app_loop(void)
 	SAFE_UV_ASYNC_INIT(uv_loop, &uv_async_fd, async_loop);
 #endif
 
-	{
-		SpawnCtx_t *spawn_req  = &spawn_info;
-
-		spawn_req->loop = uv_loop;
-
-		//SAFE_SPRINTF_EX(spawn_req->name, "./util_123");
-		SAFE_SPRINTF_EX(spawn_req->name, "ping");
-		spawn_req->argc = 0;
-		spawn_req->args[spawn_req->argc++] = spawn_req->name;
-		spawn_req->args[spawn_req->argc++] = "8.8.8.8";
-		spawn_req->args[spawn_req->argc++] = NULL;
-
-		uv_spawn_open_ex(spawn_req);
-	}
+#ifdef USE_TIMER_CREATE
+	SAFE_UV_TIMER_INIT(uv_loop, &uv_timer_1sec_fd);
+	SAFE_UV_TIMER_START(&uv_timer_1sec_fd, timer_1sec_loop, 1000, 1000); // 1st: 1, 2nd: 1+1, 3rd: 1+1+1, 4th: 1+1+1+1 .....
+#endif
 
 	SAFE_UV_LOOP_RUN(uv_loop);
 	SAFE_UV_LOOP_CLOSE(uv_loop);

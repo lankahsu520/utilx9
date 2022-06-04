@@ -126,6 +126,44 @@ int main(int argc, char* argv[])
 			JSON_FREE(jroot);
 		}
 	}
+
+	{
+		// {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043}
+		json_t *jsunrise_sunset = JSON_LOADS_EASY("{\"sunrise\":\"3:22:56 AM\",\"sunset\":\"5:10:20 PM\",\"time_utc\":1652853043}");
+		if (jsunrise_sunset)
+		{
+			json_t *jobj = NULL;
+			const char *sunrise = JSON_OBJ_GET_STR(jsunrise_sunset, jobj, JKEY_COMM_SUNRISE);
+			const char *sunset = JSON_OBJ_GET_STR(jsunrise_sunset, jobj, JKEY_COMM_SUNSET);
+			int utc = JSON_OBJ_GET_INT_DEF(jsunrise_sunset, jobj, JKEY_COMM_TIME_UTC, 0);
+
+			DBG_LN_Y("(sunrise: %s)", sunrise);
+			DBG_LN_Y("(sunset: %s)", sunset);
+			DBG_LN_Y("(utc: %d)", utc);
+
+			JSON_FREE(jsunrise_sunset);
+		}
+	}
+
+	{
+		// {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043}
+		json_t *jsunrise_sunset = JSON_OBJ_NEW();
+		if (jsunrise_sunset)
+		{
+			JSON_OBJ_SET_STR(jsunrise_sunset, JKEY_COMM_SUNRISE, "3:22:56 AM");
+			JSON_OBJ_SET_STR(jsunrise_sunset, JKEY_COMM_SUNSET, "5:10:20 PM");
+			JSON_OBJ_SET_INT(jsunrise_sunset, JKEY_COMM_TIME_UTC, 1652853043);
+
+			char *cJson = JSON_DUMPS_EASY( jsunrise_sunset );
+			if (cJson)
+			{
+				DBG_LN_Y("(cJson: %s)", cJson);
+				SAFE_FREE(cJson);
+			}
+
+			JSON_FREE(jsunrise_sunset);
+		}
+	}
 #endif
 
 	exit(0);

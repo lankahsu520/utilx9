@@ -88,7 +88,8 @@ extern "C" {
 #define LEN_OF_SLINK 128 // FDInfo_t
 
 #define LEN_OF_IP 30 // fro IPv4 and IPv6
-#define LEN_OF_HOSTNAME 32 // must be < 68= 128-30*2
+#define LEN_OF_HOSTNAME32 32 // must be < 68= 128-30*2
+#define LEN_OF_HOSTNAME 128
 #define LEN_OF_SSID 32
 
 #define LEN_OF_MAC 24

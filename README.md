@@ -26,10 +26,9 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 - libusb (PJ_HAS_LIBUSB) - https://github.com/libusb/libusb
 - libuv (PJ_HAS_LIBUV) - https://github.com/libuv/libuv
 - libwebsockets (PJ_HAS_LIBWEBSOCKETS) - https://libwebsockets.org
-- libyuarel (PJ_HAS_LIBYUAREL) - https://github.com/jacketizer/libyuarel
-- minixml (PJ_HAS_MXML)- https://www.msweet.org/mxml
+- libyuarel (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL) - https://github.com/jacketizer/libyuarel
 - mosquitto (PJ_HAS_MOSQUITTO) - https://mosquitto.org
-- mxml (PJ_HAS_MXML) - https://www.msweet.org/mxml/ (need to patch, please check patches/mxml-2.11)
+- mxml (PJ_HAS_MXML / UTIL_EX_MXML) - https://www.msweet.org/mxml/ (need to patch, please check patches/mxml-2.11)
 - openssl (PJ_HAS_OPENSSL) - https://www.openssl.org
 - ~~swconfig (PJ_HAS_SWCONFIG) - openwrt/package/network/config/swconfig~~
 - ubus (PJ_HAS_UBUS) - https://openwrt.org/docs/techref/ubus
@@ -42,12 +41,64 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 
 # 4. Build
 ```bash
-$ . conf/config.conf
+$ . conf/github.conf
 $ . conf/customer2def.sh
+# to create
+# include/customer_def.h
+# include/config_customer
+# include/config_customer.export
+# include/meson_options.txt
 $ make
+```
+## 4.1. environment (without libmxml and libyuarel)
+```bash
+$ sudo apt-get install libjansson-dev
+$ sudo apt-get install libuv1-dev
+
+$ sudo apt-get install libdbus-1-dev
+#or
+$ sudo apt-get install libdbus-dev
+
+$ cd /usr/include
+$ sudo ln dbus-1.0/dbus/ -s dbus
+$ cd /usr/include/dbus
+$ sudo cp /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h ./
+
+$ sudo apt-get install libwebsockets-dev
+
+$ sudo apt-get install libusb-dev
+$ sudo apt-get install libusb-1.0-0-dev
+
+$ sudo apt-get install libmosquitto-dev
+$ sudo apt-get install libjson-c-dev
+
+```
+
+## 4.2. libmxml
+
+```bash
+$ vi conf/github.conf
+export PJ_HAS_MXML=yes
+
+$ vi utilx9.h
+#define UTIL_EX_MXML
+
+#please patch mxml-2.11 with patches/mxml-2.11
+```
+
+## 4.3. libyuarel
+
+```bash
+$ vi conf/github.conf
+export PJ_HAS_LIBYUAREL=yes
+
+$ vi utilx9.h
+#define UTIL_EX_YUAREL
+
 ```
 
 # 5. Example or Usage
+
 - chainX_123 - socket example. use chainX_api.c.
 - client_123 - socket client. use chainX_api.c.
 - clist_123 - link list example. use clist_api.c , use contiki\core\lib\list.*.

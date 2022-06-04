@@ -9,18 +9,22 @@ SBIN_PATH="$ROOTFS_PATH/sbin"
 [ -x "/usr/bin/sudo" ] && SUDO_B="sudo -E -b" && SUDO="sudo -E"
 [ -x "/usr/bin/whoami" ] && WHO=`whoami`
 [ ! -z "$WHO" ] || WHO="admin"
-export DBUS_SYSTEM_BUS_ADDRESS="unix:path=/tmp/sfsvsf456415"
+export DBUS_SYSTEM_BUS_ADDRESS=""
+[ ! -z "$DBUS_SYSTEM_BUS_ADDRESS" ] || unset DBUS_SYSTEM_BUS_ADDRESS
 
 ACTION=$1
 
 RUN_SH=`basename $0`
 DAEMON="proc_watch"
-BIN_FILE="./$DAEMON"
-[ -x "$BIN_FILE" ] || [ "$PWD" = "/" ] || BIN_FILE="$PWD/bin/$DAEMON"
-[ -x "$BIN_FILE" ] || BIN_FILE="/bin/$DAEMON"
-[ -x "$BIN_FILE" ] || BIN_FILE="/usr/bin/$DAEMON"
+[ -z "$DAEMON" ] || BIN_FILE="./$DAEMON"
+[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || [ "$PWD" = "/" ] || BIN_FILE="$PWD/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="/usr/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="$ROOTFS_PATH/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="$ROOTFS_PATH/usr/bin/$DAEMON"
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
+[ -z "$DAEMON" ] || PID=$(pidof $DAEMON)
 
 IOT_PATH="/work/rootfs/IoT"
 SAVE_PATH="/work/IoT"
@@ -29,6 +33,7 @@ WORK_PATH="/tmp/IoT"
 WORK_PATH_ARG=""
 GROUP_NAME="xxx"
 CFG_PATH=""
+CFG_PATH_ARG=""
 CFG_FILE=""
 CFG_FILE_ARG=""
 DEBUG="2"
@@ -57,16 +62,14 @@ die_fn()
 
 bin_check_fn()
 {
-	if [ ! -z "$BIN_FILE" ]; then
-		[ -x "$BIN_FILE" ] || { die_fn "$DAEMON isn't found !!!";}
-	fi
+	[ -z "$DAEMON" ] || [ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || { die_fn "$BIN_FILE isn't found !!!";}
 
 	return 0
 }
 
 runpid_fn()
 {
-	PID=$(pidof $DAEMON)
+	[ -z "$DAEMON" ] || PID=$(pidof $DAEMON)
 
 	return 0
 }
@@ -78,7 +81,7 @@ init_fn()
 
 clean_fn()
 {
-	echo "$RUN_SH ($PID) clean ... "
+	echo "$RUN_SH ($PID) clean_fn ... "
 
 	return 0
 }
@@ -90,21 +93,27 @@ cfg_fn()
 
 arguments_fn()
 {
-	#[ ! -z $SAVE_PATH ] || { die_fn "SAVE_PATH is NULL !!!";}
-	#[ -d "$SAVE_PATH" ] || { die_fn "Please create $SAVE_PATH first !!!";}
-	#SAVE_PATH_ARG="-s $SAVE_PATH"
-	#ROOTFS_PATH_ARG="-r $ROOTFS_PATH"
+	[ -z $ROOTFS_PATH ] || [ -d "$ROOTFS_PATH" ] || { die_fn "Please create ROOTFS_PATH($ROOTFS_PATH) first !!!";}
+	#[ "$ROOTFS_PATH" != "" ] && ROOTFS_PATH_ARG="-r $ROOTFS_PATH"
 
-	#[ ! -z $WORK_PATH ] || { die_fn "WORK_PATH is NULL !!!";}
-	#WORK_PATH_ARG=""
+	[ -z $SAVE_PATH ] || [ -d "$SAVE_PATH" ] || { die_fn "Please create SAVE_PATH($SAVE_PATH) first !!!";}
+	#[ "$SAVE_PATH" != "" ] && SAVE_PATH_ARG="-s $SAVE_PATH"
+
+	[ -z $CFG_PATH ] || [ -d "$CFG_PATH" ] || { die_fn "Please create CFG_PATH($CFG_PATH) first !!!";}
+	#[ "$CFG_PATH" != "" ] && CFG_PATH_ARG="-f $CFG_PATH"
+
+	[ -z $WORK_PATH ] || [ -d "$WORK_PATH" ] || { die_fn "Please create WORK_PATH($WORK_PATH) first !!!";}
+	#[ "$WORK_PATH" != "" ] && WORK_PATH_ARG=""
+
+	[ -z $IOT_PATH ] || [ -d "$IOT_PATH" ] || { die_fn "Please create IOT_PATH($IOT_PATH) first !!!";}
 
 	[ "$DEBUG" != "" ] && DEBUG_ARG="-d $DEBUG"
 
 	[ "$LOGGER" != "" ] && LOGGER_ARG="| $LOGGER -t $LOGGER_TAG"
 
-	#IFACE_ARG="-i $IFACE"
+	[ "$IFACE" != "" ] && IFACE_ARG="-i $IFACE"
 
-	#[ -d "$IOT_PATH" ] || { die_fn "Please create $IOT_PATH first !!!";}
+	[ "$CFG_FILE" != "" ] && CFG_FILE_ARG="-s $CFG_FILE"
 
 	return 0
 }
@@ -139,7 +148,7 @@ start_fn()
 	runpid_fn
 
 	echo "$RUN_SH ($PID) start_fn ... "
-	[ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
+	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
 
 	init_fn
 	arguments_fn
@@ -166,7 +175,7 @@ stop_fn()
 
 	echo "$RUN_SH ($PID) stop_fn ... "
 
-	[ ! -z "$PID" ] && $KILL_EX $PID
+	[ ! -z "$DAEMON" ] && [ ! -z "$PID" ] && $KILL_EX $PID
 
 	clean_fn
 
@@ -179,14 +188,18 @@ status_fn()
 {
 	runpid_fn
 
-	[ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
-	[ -z "$PID" ] && { die_fn "$RUN_SH () isn't running.";}
+	echo "$RUN_SH ($PID) status_fn ... "
+
+	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
+	[ ! -z "$DAEMON" ] && [ -z "$PID" ] && { die_fn "$RUN_SH () isn't running.";}
 
 	return 0
 }
 
 debug_fn()
 {
+	echo "$RUN_SH ($PID) debug_fn ... "
+
 	$KILLALL_EX -USR2 $DAEMON
 
 	return 0
@@ -194,6 +207,8 @@ debug_fn()
 
 trigger_fn()
 {
+	echo "$RUN_SH ($PID) trigger_fn ... "
+
 	$KILLALL_EX -USR1 $DAEMON
 
 	return 0
@@ -202,7 +217,8 @@ trigger_fn()
 logger_fn()
 {
 	echo "$RUN_SH ($PID) logger_fn [$LOGGER_TAG] ... "
-	DO_COMMAND="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f | grep $LOGGER_TAG 2>/dev/null; ) || (tail -f /var/log/syslog  $LOGGER_COLOR | grep $LOGGER_TAG;)"
+
+	DO_COMMAND="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f $LOGGER_COLOR | grep $LOGGER_TAG 2>/dev/null; ) || (tail -f /var/log/syslog  $LOGGER_COLOR | grep $LOGGER_TAG;)"
 	echo "[$DO_COMMAND]"
 	sh -c "$DO_COMMAND"
 
@@ -218,7 +234,7 @@ showusage_fn()
 
 trap_ctrlc()
 {
-	echo "Ctrl-C caught ..."
+	echo "$RUN_SH ($PID) trap_ctrlc ..."
 
 	[ -z $INTERACTIVE ] || stop_fn
 }
@@ -263,7 +279,7 @@ main_fn()
 	esac
 }
 
-trap "trap_ctrlc" 2
+[ -z $INTERACTIVE ] || trap "trap_ctrlc" 2
 main_fn
 
 exit 0

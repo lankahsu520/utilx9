@@ -172,6 +172,54 @@ void uv_spawn_open_ex(SpawnCtx_t *spawn_req)
 	}
 }
 
+void uv_spawn_on_exit(uv_process_t *req, int64_t exit_status, int term_signal)
+{
+	DBG_DB_LN("(exit_status: %d, term_signal: %d)", exit_status, term_signal);
+	SAFE_FREE(req->data);
+
+	uv_close((uv_handle_t*) req, NULL);
+}
+
+void uv_spawn_simple_detached(SpawnCtx_t *spawn_req, int num, ...)
+{
+	if ( (spawn_req) && (spawn_req->loop) && (num < MAX_OF_SPAWN_ARGS) )
+	{
+		int i = 0;
+
+		va_list args;
+		va_start(args, num);
+		for (i = 0; i < num; i++)
+		{
+			spawn_req->args[i] = va_arg(args, char*);
+		}
+		spawn_req->args[num] = NULL;
+		va_end(args);
+
+		if (spawn_req->options.exit_cb == NULL)
+		{
+			spawn_req->options.exit_cb = uv_spawn_on_exit;
+		}
+		spawn_req->options.file = spawn_req->args[0];
+		spawn_req->options.args = spawn_req->args;
+		spawn_req->options.flags |= UV_PROCESS_DETACHED;
+
+		int r;
+		if ((r = uv_spawn(spawn_req->loop, &spawn_req->child_req, &spawn_req->options)))
+		{
+			DBG_IF_LN("uv_spawn error !!! (%s)", uv_strerror(r));
+		}
+		else
+		{
+			DBG_IF_LN("uv_spawn ... (child_args[0]: %s)", spawn_req->args[0]);
+		}
+		uv_unref((uv_handle_t*) &spawn_req->child_req);
+	}
+	else
+	{
+		DBG_ER_LN("error !!! (spawn_req: %p, uv_loop: %p, num %d >= 20)", spawn_req, spawn_req->loop, num);
+	}
+}
+
 static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events, int status)
 {
 	if (handle)

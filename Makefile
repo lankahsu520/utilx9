@@ -41,21 +41,24 @@ LIBXXX_OBJS += \
 #** LIBXXX_yes **
 #LIBXXX_A = lib$(LIBNAME).a
 LIBXXX_SO = lib$(LIBNAME).so
-LIBXXXS_$(PJ_HAS_STATIC_LIB) += $(LIBXXX_A)
-LIBXXXS_$(PJ_HAS_SHARE_LIB) += -l$(LIBNAME)
+#LIBXXXS_$(PJ_HAS_STATIC_LIB) += $(LIBXXX_A)
+#LIBXXXS_$(PJ_HAS_SHARE_LIB) += -l$(LIBNAME)
+LIBXXXS_yes += -l$(LIBNAME)
 
 #** HEADER_FILES **
-HEADER_FILES = utilx9.h basic_def.h ubus_ex.h
+HEADER_FILES = \
+							basic_def.h \
+							ubus_ex.h \
+							utilx9.h
 
+#** librarys **
 LIBS_yes = $(LIBXXXS_yes)
 -include ./library.mk
 
-#** librarys **
-LIBS += -lz
-#-ldl -lpthread -lm
+LIBS += $(LIBS_yes)
+#-lz -ldl -lpthread -lm
 
 #** Clean **
-#CLEAN_BINS =
 CLEAN_OBJS = $(LIBXXX_OBJS)
 CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 
@@ -83,8 +86,15 @@ SHELL_SBINS = \
 
 DUMMY_SBINS = $(SHELL_SBINS)
 
+#** Target (CONFS) **
+CONFS = \
+
+TO_FOLDER =
+
+#** include *.mk **
 include define.mk
 
+.DEFAULT_GOAL = all
 .SUFFIXES: .c .o
 
 .PHONY: all clean distclean install romfs expired
@@ -104,15 +114,11 @@ $(CLEAN_BINS): $(CLEAN_OBJS) $(CLEAN_LIBS)
 
 clean:
 	rm -f Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
-	rm -f $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS)
-	rm -f $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
+	rm -f .configured .patched $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS) $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	rm -f util_expiration.h
-	rm -f .configured
-	rm -f .patched
 ifeq ("$(PJ_NAME)", "github")
 	@[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
 endif
-
 	@for subbin in $(CLEAN_BINS); do \
 		(rm -f $(SDK_BIN_DIR)/$$subbin;); \
 	done
@@ -125,6 +131,7 @@ endif
 	@for subshell in $(SHELL_SBINS); do \
 		(rm -f $(SDK_SBIN_DIR)/$$subshell;); \
 	done
+	@rm -rf build_xxx .meson_config build.meson meson_options.txt meson_public
 
 distclean: clean
 
@@ -143,45 +150,46 @@ distclean: clean
 	@echo ' '
 
 install: all
-	mkdir -p $(SDK_BIN_DIR)
+	$(PJ_SH_MKDIR) $(SDK_BIN_DIR)
 	@for subbin in $(CLEAN_BINS); do \
-		$(PJ_CP) $$subbin $(SDK_BIN_DIR); \
+		$(PJ_SH_CP) $$subbin $(SDK_BIN_DIR); \
 		$(STRIP) $(SDK_BIN_DIR)/$$subbin; \
 	done
-	mkdir -p $(SDK_LIB_DIR)
+	$(PJ_SH_MKDIR) $(SDK_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
-		$(PJ_CP) $$sublib* $(SDK_LIB_DIR); \
+		$(PJ_SH_CP) $$sublib* $(SDK_LIB_DIR); \
 		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION); \
 	done
-	mkdir -p $(SDK_INC_DIR)
+	$(PJ_SH_MKDIR) $(SDK_INC_DIR)
 	@for subheader in $(HEADER_FILES); do \
-		$(PJ_CP) $$subheader $(SDK_INC_DIR); \
+		$(PJ_SH_CP) $$subheader $(SDK_INC_DIR); \
 	done
-	mkdir -p $(SDK_SBIN_DIR)
+	$(PJ_SH_MKDIR) $(SDK_SBIN_DIR)
 	@for subshell in $(SHELL_SBINS); do \
-		$(PJ_CP) $$subshell $(SDK_SBIN_DIR); \
+		$(PJ_SH_CP) $$subshell $(SDK_SBIN_DIR); \
 	done
 
 romfs: install
 ifneq ("$(HOMEX_ROOT_DIR)", "")
-	mkdir -p $(HOMEX_BIN_DIR)
+	$(PJ_SH_MKDIR) $(HOMEX_BIN_DIR)
 	@for subbin in $(DUMMY_BINS); do \
-		$(PJ_CP) $$subbin $(HOMEX_BIN_DIR); \
+		$(PJ_SH_CP) $$subbin $(HOMEX_BIN_DIR); \
 		$(STRIP) $(HOMEX_BIN_DIR)/$$subbin; \
 	done
-	mkdir -p $(HOMEX_LIB_DIR)
+	$(PJ_SH_MKDIR) $(HOMEX_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
-		$(PJ_CP) $$sublib* $(HOMEX_LIB_DIR); \
+		$(PJ_SH_CP) $$sublib* $(HOMEX_LIB_DIR); \
 		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION); \
 	done
 	#@for subheader in $(HEADER_FILES); do \
-	#	$(PJ_CP) $$subheader $(HOMEX_INC_DIR); \
+	#	$(PJ_SH_CP) $$subheader $(HOMEX_INC_DIR); \
 	#done
-	mkdir -p $(HOMEX_SBIN_DIR)
+	$(PJ_SH_MKDIR) $(HOMEX_SBIN_DIR)
 	@for subshell in $(DUMMY_SBINS); do \
-		$(PJ_CP) $$subshell $(HOMEX_SBIN_DIR); \
+		$(PJ_SH_CP) $$subshell $(HOMEX_SBIN_DIR); \
 	done
 endif
 
+.PHONY: expired
 expired:
 	$(call generate_expiration, $(shell date -d "+4 years" "+%s"))

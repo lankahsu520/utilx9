@@ -24,9 +24,8 @@
 // ** app **
 static int is_quit = 0;
 
-char iface_dev[LEN_OF_NAME_DEV] = "eth0";
 char iface_mac[LEN_OF_MAC]= "";
-char save_path[LEN_OF_DIRNAME] = "";
+char clock_alarm[LEN_OF_BUF128] = "39 17 * * 1-5 2022 ";
 
 #ifdef USE_CRONX_123_UV
 static uv_loop_t *uv_loop = NULL;
@@ -62,7 +61,10 @@ void timer_1sec_loop(uv_timer_t *handle)
 	{
 		//cronx_validate("*/3 0,9,10-13,21-23 * * * ", now_tm);
 		//cronx_validate("* 0,9,10-13,21-23 * * * 2021 ", now_tm);
-		cronx_validate("45 17 * * 1-5 2021 ", now_tm);
+		if (0 < cronx_validate(clock_alarm, now_tm) )
+		{
+			DBG_WN_LN("Alarm !!! (%s)", clock_alarm);
+		}
 	}
 }
 
@@ -160,10 +162,7 @@ static void app_stop(void)
 
 static void app_loop(void)
 {
-	{
-		chainX_if_hwaddr(iface_dev, iface_mac, sizeof(iface_mac), "");
-		//SAFE_SPRINTF_EX(iface_mac, "%s", MAC_BROADCAST);
-	}
+	DBG_WN_LN("%s (clock_alarm: [%s])", DBG_TXT_RUN_LOOP, clock_alarm);
 
 #ifdef USE_CRONX_123_UV
 	{
@@ -245,12 +244,11 @@ static void app_signal_register(void)
 }
 
 int option_index = 0;
-const char* short_options = "d:s:i:h";
+const char* short_options = "d:a:h";
 static struct option long_options[] =
 {
 	{ "debug",       required_argument,   NULL,    'd'  },
-	{ "savepath",    required_argument,   NULL,    's'  },
-	{ "iface",       required_argument,   NULL,    'i'  },
+	{ "alarm",       required_argument,   NULL,    'a'  },
 	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
 };
@@ -259,8 +257,7 @@ static void app_showusage(int exit_code)
 {
 	printf( "Usage: %s\n"
 					"  -d, --debug       debug level\n"
-					"  -s, --savepath    save path\n"
-					"  -i, --iface       iface\n"
+					"  -a, --alarm       alarm\n"
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
@@ -276,22 +273,16 @@ static void app_ParseArguments(int argc, char **argv)
 	{
 		switch (opt)
 		{
-			case 's':
-				if (optarg)
-				{
-					SAFE_SPRINTF_EX(save_path, "%s", optarg);
-				}
-				break;
-			case 'i':
-				if (optarg)
-				{
-					SAFE_SPRINTF_EX(iface_dev, "%s", optarg);
-				}
-				break;
 			case 'd':
 				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
+				}
+				break;
+			case 'a':
+				if (optarg)
+				{
+					SAFE_SPRINTF_EX(clock_alarm, "%s", optarg);
 				}
 				break;
 			default:
@@ -301,7 +292,7 @@ static void app_ParseArguments(int argc, char **argv)
 	}
 }
 
-// ./bin/beex_123 -d 2 -s /tmp -i enp0s9 
+// cronx_123 -d 3 -a "39 17 * * 1-5 2022 "
 int main(int argc, char *argv[])
 {
 	app_ParseArguments(argc, argv);

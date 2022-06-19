@@ -24,7 +24,6 @@
 // ** app **
 static int is_quit = 0;
 
-char iface_mac[LEN_OF_MAC]= "";
 char clock_alarm[LEN_OF_BUF128] = "39 17 * * 1-5 2022 ";
 
 #ifdef USE_CRONX_123_UV
@@ -292,6 +291,7 @@ static void app_ParseArguments(int argc, char **argv)
 	}
 }
 
+// cronx_123 -a "*/1 * * * * 2022 " -d 2
 // cronx_123 -d 3 -a "39 17 * * 1-5 2022 "
 int main(int argc, char *argv[])
 {

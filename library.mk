@@ -153,6 +153,18 @@ LIBS_yes += -lnl-tiny
 CFLAGS += -I$(SDK_INC_DIR)/libnl-tiny
 endif
 
+ifeq ("$(PJ_HAS_GLIB_SYSROOT)", "yes")
+CLEAN_BINS += \
+						xbus_123
+LIBXXX_OBJS += \
+							xbus_api.o \
+							xbus_ifac.o
+LIBS_yes += -lgobject-2.0 -lgio-2.0 -lglib-2.0
+ifeq ("$(PJ_CROSS)", "")
+CFLAGS += $(shell pkg-config --cflags gio-2.0 gio-unix-2.0 glib-2.0)
+endif
+endif
+
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 LIBS_yes += -lssl -lcrypto
 endif

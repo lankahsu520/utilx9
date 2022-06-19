@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node>
+  <interface name="com.github.lankahsu520.agent">
+    <method name="SetName">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="response" type="s" direction="out"/>
+    </method>
+    <method name="SetAge">
+      <arg name="age" type="i" direction="in"/>
+      <arg name="response" type="s" direction="out"/>
+    </method>
+    <method name="SetNameAge">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="age" type="i" direction="in"/>
+      <arg name="response" type="s" direction="out"/>
+    </method>
+    <signal name="Bonjour">
+      <arg name="greeting" type="s"/>
+    </signal>
+  </interface>
+  <interface name="com.github.lankahsu520.boss">
+    <method name="SetNameAge">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="age" type="i" direction="in"/>
+      <arg name="response" type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

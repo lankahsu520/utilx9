@@ -1,5 +1,6 @@
 #!/bin/sh
 
+RUN_SH=`basename $0`
 HINT="$0 {start|stop|restart|status|debug|trigger|logger|clean} iface"
 ROOTFS_PATH="/work/rootfs"
 ROOTFS_PATH_ARG=""
@@ -14,17 +15,20 @@ export DBUS_SYSTEM_BUS_ADDRESS=""
 
 ACTION=$1
 
-RUN_SH=`basename $0`
 DAEMON="proc_watch"
 [ -z "$DAEMON" ] || BIN_FILE="./$DAEMON"
-[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || [ "$PWD" = "/" ] || BIN_FILE="$PWD/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="/usr/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="$ROOTFS_PATH/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || BIN_FILE="$ROOTFS_PATH/usr/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || [ "$PWD" = "/" ] || BIN_FILE="$PWD/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/usr/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/usr/bin/$DAEMON"
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
 [ -z "$DAEMON" ] || PID=$(pidof $DAEMON)
+
+IS_INTERACTIVE=""
+IS_ECHO="0"
+IS_QUIT=0
 
 IOT_PATH="/work/rootfs/IoT"
 SAVE_PATH="/work/IoT"
@@ -46,9 +50,6 @@ TEE_ARG="2>&1"
 LOGGER_TAG="$DAEMON"
 LOGGER="logger"
 LOGGER_ARG=""
-ECHO="0"
-
-INTERACTIVE=""
 
 IFACE=$2
 [ ! -z "$IFACE" ] || IFACE="enp0s8"
@@ -62,7 +63,7 @@ die_fn()
 
 bin_check_fn()
 {
-	[ -z "$DAEMON" ] || [ -z "$BIN_FILE" ] || [ -x "$BIN_FILE" ] || { die_fn "$BIN_FILE isn't found !!!";}
+	[ -z "$DAEMON" ] || [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || { die_fn "$BIN_FILE isn't found !!!";}
 
 	return 0
 }
@@ -151,8 +152,8 @@ start_fn()
 	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
 
 	init_fn
-	arguments_fn
 	cfg_fn
+	arguments_fn
 
 	if [ "$SUDO" = "" ]; then
 		DO_COMMAND="$BIN_FILE $DEBUG_ARG $LOG_ARG $LOGGER_ARG &"
@@ -174,6 +175,8 @@ stop_fn()
 	runpid_fn
 
 	echo "$RUN_SH ($PID) stop_fn ... "
+
+	IS_QUIT=1
 
 	[ ! -z "$DAEMON" ] && [ ! -z "$PID" ] && $KILL_EX $PID
 
@@ -218,7 +221,10 @@ logger_fn()
 {
 	echo "$RUN_SH ($PID) logger_fn [$LOGGER_TAG] ... "
 
-	DO_COMMAND="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f $LOGGER_COLOR | grep $LOGGER_TAG 2>/dev/null; ) || (tail -f /var/log/syslog  $LOGGER_COLOR | grep $LOGGER_TAG;)"
+	LOGREAD=`which logread`
+	LOGREAD_ARG=" [ ! -z '$LOGREAD' ] "
+	[ -z "$LOGREAD" ] || LOGREAD_ARG="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f $LOGGER_COLOR | grep $LOGGER_TAG 2>/dev/null; )"
+	DO_COMMAND="$LOGREAD_ARG || (tail -f /var/log/syslog $LOGGER_COLOR | grep $LOGGER_TAG;)"
 	echo "[$DO_COMMAND]"
 	sh -c "$DO_COMMAND"
 
@@ -236,7 +242,7 @@ trap_ctrlc()
 {
 	echo "$RUN_SH ($PID) trap_ctrlc ..."
 
-	[ -z $INTERACTIVE ] || stop_fn
+	[ -z $IS_INTERACTIVE ] || stop_fn
 }
 
 [ "$ACTION" != "" ] || showusage_fn
@@ -279,7 +285,7 @@ main_fn()
 	esac
 }
 
-[ -z $INTERACTIVE ] || trap "trap_ctrlc" 2
+[ -z $IS_INTERACTIVE ] || trap "trap_ctrlc" 2
 main_fn
 
 exit 0

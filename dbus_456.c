@@ -17,7 +17,7 @@
 
 #include "utilx9.h"
 
-#define TAG "dbus_123"
+#define TAG "dbus_456"
 
 // ** app **
 static int is_quit = 0;
@@ -30,7 +30,7 @@ static DbusX dbusx_456 = {
 	.isfree = 0,
 	.isinit = 0,
 
-	.path = DBUS_PATH_DBUS_456,
+	.path = DBUS_PATH_DEMO,
 	.dbus_conn = NULL,
 	.dbus_conn_listen = NULL,
 };

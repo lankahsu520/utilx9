@@ -10,6 +10,19 @@ define generate_expiration
 	@echo "#endif" >> util_expiration.h
 endef
 
+export XBUS_C_FILENAME=xbus_ifac
+#export XBUS_PREFIXNAME=lankahsu520
+#export XBUS_IFAC_NAME=com.lankahsu520.www.
+export XBUS_XML_FILENAME=Interface-com.github.lankahsu520.xml
+
+$(XBUS_C_FILENAME).c: $(XBUS_XML_FILENAME)
+	#https://www.freedesktop.org/software/gstreamer-sdk/data/docs/latest/gio/gdbus-codegen.html
+	gdbus-codegen \
+		--generate-c-code $(XBUS_C_FILENAME) \
+		$(XBUS_XML_FILENAME)
+	#	--c-namespace $(XBUS_PREFIXNAME)
+	#	--interface-prefix $(XBUS_IFAC_NAME)
+
 .patched:
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 	sed -i "s|#undef UTIL_EX_SSL.*|#define UTIL_EX_SSL|g" utilx9.h
@@ -108,7 +121,7 @@ else
 endif
 	touch $@
 
-.configured: .patched
+.configured: .patched $(XBUS_C_FILENAME).c
 	$(call generate_expiration, $(PJ_EXPIRATION_DATE))
 
 	touch $@

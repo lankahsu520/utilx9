@@ -55,7 +55,7 @@ HEADER_FILES = \
 LIBS_yes = $(LIBXXXS_yes)
 -include ./library.mk
 
-LIBS += $(LIBS_yes)
+LIBS += $(LIBS_yes) -lz
 #-lz -ldl -lpthread -lm
 
 #** Clean **

@@ -174,7 +174,7 @@ void uv_spawn_open_ex(SpawnCtx_t *spawn_req)
 
 void uv_spawn_on_exit(uv_process_t *req, int64_t exit_status, int term_signal)
 {
-	DBG_DB_LN("(exit_status: %d, term_signal: %d)", exit_status, term_signal);
+	DBG_DB_LN("(exit_status: %ld, term_signal: %d)", exit_status, term_signal);
 	SAFE_FREE(req->data);
 
 	uv_close((uv_handle_t*) req, NULL);

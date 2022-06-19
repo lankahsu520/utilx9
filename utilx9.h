@@ -87,6 +87,7 @@ extern "C" {
 #define UTIL_EX_MQTT
 
 #define UTIL_EX_CRON
+#define UTIL_EX_XBUS // GDBUS
 
 //******************************************************************************
 //** UTIL_EX_DBG **
@@ -3959,6 +3960,149 @@ typedef enum
 #define CRON_YEAR_END_2120 2120
 #define MAX_OF_CRON_RANGE 200 // > (CRON_YEAR_END_2020-CRON_YEAR_START_2020)
 int cronx_validate(char *cron_txt, struct tm *kick_tm);
+
+#endif
+
+//******************************************************************************
+//** UTIL_EX_XBUS **
+//******************************************************************************
+#ifdef UTIL_EX_XBUS
+#include <glib/gprintf.h>
+#include <gio/gio.h>
+
+// https://developer.gimp.org/api/2.0/glib/glib-String-Utility-Functions.html
+#define SAFE_G_SPRINTF(X, FMT, args...) \
+	({ int __ret =0; do { if (pcheck(X)) __ret = g_sprintf(X, FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
+#define SAFE_G_STRDUP(FMT, args...) \
+	({ gchar *__ret = NULL; \
+		do { \
+			__ret = g_strdup_printf(FMT, ## args); \
+		} while(0); \
+		__ret; \
+	})
+#define SAFE_G_FREE(X) \
+	do { if ( (X) != NULL ) {g_free(X); X=NULL;} } while(0)
+#define SAFE_G_UNREF(X) \
+	do { if ( (X) != NULL ) {g_object_unref(X); X=NULL;} } while(0)
+#define SAFE_G_ERR_FREE(X) \
+	do { if ( (X) != NULL ) {g_error_free(X); X=NULL;} } while(0)
+
+#define SAFE_G_LOOP_RUN(loop) \
+	do { \
+		if (pcheck(loop)) \
+		{ \
+			g_main_loop_run(loop); \
+		} \
+	} while(0)
+#define SAFE_G_LOOP_QUIT(loop) \
+	do { \
+		if (pcheck(loop)) \
+		{ \
+			g_main_loop_quit(loop); \
+			loop=NULL; \
+		} \
+	} while(0)
+
+#define XBUS_CONCAT1_EX(s1) s1
+#define XBUS_CONCAT1_HELPER(s1) XBUS_CONCAT1_EX(s1)
+
+#define XBUS_CONCAT2_EX(s1, s2) s1##s2
+#define XBUS_CONCAT2_HELPER(s1, s2) XBUS_CONCAT2_EX(s1, s2)
+
+#define XBUS_CONCAT3_EX(s1, s2, s3) s1##s2##s3
+#define XBUS_CONCAT3_HELPER(s1, s2, s3) XBUS_CONCAT3_EX(s1, s2, s3)
+
+#define XBUS_CONCAT4_EX(s1, s2, s3, s4) s1##s2##s3##s4
+#define XBUS_CONCAT4_HELPER(s1, s2, s3, s4) XBUS_CONCAT4_EX(s1, s2, s3, s4)
+
+#define XBUS_SIGNAL_EMIT(name, match) XBUS_CONCAT3_HELPER(name, _emit, match)
+
+#define XBUS_METHOD_ASYNC(name, method) XBUS_CONCAT3_HELPER(name, _call, method)
+#define XBUS_METHOD_FINISH(name, method) XBUS_CONCAT4_HELPER(name, _call, method, _finish)
+#define XBUS_METHOD_SYNC(name, method) XBUS_CONCAT4_HELPER(name, _call, method, _sync)
+#define XBUS_METHOD_COMPLETE(name, method) XBUS_CONCAT3_HELPER(name, _complete, method)
+
+#define XBUS_PROXY_NEW(name) XBUS_CONCAT2_HELPER(name, _proxy_new)
+#define XBUS_PROXY_NEW_FINISH(name) XBUS_CONCAT2_HELPER(name, _proxy_new_finish)
+#define XBUS_PROXY_NEW_SYNC(name) XBUS_CONCAT2_HELPER(name, _proxy_new_sync)
+#define XBUS_PROXY_NEW_FOR_BUS(name) XBUS_CONCAT2_HELPER(name, _proxy_new_for_bus)
+#define XBUS_PROXY_NEW_FOR_BUS_FINISH(name) XBUS_CONCAT2_HELPER(name, _proxy_new_for_bus_finish)
+#define XBUS_PROXY_NEW_FOR_BUS_SYNC(name) XBUS_CONCAT2_HELPER(name, _proxy_new_for_bus_sync)
+
+#define XBUS_SKELETON_NEW(name) XBUS_CONCAT2_HELPER(name, _skeleton_new)
+
+#define XBUS_IFAC_FUNC_CONCAT(s1,s2) XBUS_CONCAT2_HELPER(s1, s2)
+
+#if (0)
+// please check your NAME
+#define XBUS_IFAC_FUNC_PREFIXNAME com_github_lankahsu520
+#define XBUS_IFAC_FUN_DEMO XBUS_IFAC_FUNC_CONCAT(XBUS_IFAC_FUNC_PREFIXNAME, _demo)
+
+#define XBUS_METHOD_ASYNC_demo XBUS_METHOD_ASYNC(XBUS_IFAC_FUN_DEMO, _set_name)
+#define XBUS_METHOD_FINISH_demo XBUS_METHOD_FINISH(XBUS_IFAC_FUN_DEMO, _set_name)
+#define XBUS_METHOD_SYNC_demo XBUS_METHOD_SYNC(XBUS_IFAC_FUN_DEMO, _set_name)
+#define XBUS_METHOD_demo XBUS_METHOD(XBUS_IFAC_FUN_DEMO, _set_name)
+
+#define XBUS_PROXY_NEW_demo XBUS_PROXY_NEW(XBUS_IFAC_NAME_DEMO)
+#define XBUS_PROXY_NEW_FINISH_demo XBUS_PROXY_NEW_FINISH(XBUS_IFAC_NAME_DEMO)
+#define XBUS_PROXY_NEW_SYNC_demo XBUS_PROXY_NEW_SYNC(XBUS_IFAC_NAME_DEMO)
+#define XBUS_PROXY_NEW_FOR_BUS_demo XBUS_PROXY_NEW_FOR_BUS(XBUS_IFAC_NAME_DEMO)
+#define XBUS_PROXY_NEW_FOR_BUS_FINISH_demo XBUS_PROXY_NEW_FOR_BUS_FINISH(XBUS_IFAC_NAME_DEMO)
+#define XBUS_PROXY_NEW_FOR_BUS_SYNC_demo XBUS_PROXY_NEW_FOR_BUS_SYNC(XBUS_IFAC_NAME_DEMO)
+#define XBUS_SKELETON_NEW_demo XBUS_SKELETON_NEW(XBUS_IFAC_NAME_DEMO)
+#endif
+
+#define XBUS_TYPE_SESSION G_BUS_TYPE_SESSION
+#define XBUS_PROXY_FLAGS G_DBUS_PROXY_FLAGS_NONE
+#define XBUS_OWNER_FLAGS G_BUS_NAME_OWNER_FLAGS_NONE
+#define XBUS_OBJECT GObject
+
+typedef void *(*proxy_register_fn) (void *);
+
+typedef struct Xbus_Struct
+{
+	char name[LEN_OF_NAME32];
+
+	ThreadX_t tidx;
+
+	int isquit;
+	int isfree;
+	int isinit;
+
+	int isservice;
+
+	GMainLoop *g_Loop;
+	GDBusConnection *g_connection;
+	guint g_type;
+
+	char *iface_name;
+	char *path_name;
+
+	guint proxy_flags;
+	GObject *g_proxy;
+	proxy_register_fn proxy_register_cb;
+
+	guint g_ownid;
+	guint owner_flags;
+	GObject *g_skeletion;
+	GBusAcquiredCallback bus_acquired_handler;
+	GBusNameAcquiredCallback name_acquired_handler;
+	GBusNameLostCallback name_lost_handler;
+
+	void *data;
+} Xbus;
+
+void xbus_signal_int(Xbus *xbus_req, char *signal_name, void *signal_cb);
+void xbus_client_int(Xbus *xbus_req);
+
+void xbus_name_acquired_cb(GDBusConnection *connection, const gchar *name, gpointer user_data);
+void xbus_name_lost_cb(GDBusConnection *connection, const gchar *name, gpointer user_data);
+void xbus_server_int(Xbus *xbus_req);
+
+void *xbus_dummy_thread_handler(void *user);
+
+void xbus_stop(Xbus *xbus_req);
+void xbus_start(Xbus *xbus_req, char *thread_name, thread_fn thread_cb, proxy_register_fn proxy_register_cb, GBusAcquiredCallback bus_acquired_handler, GBusNameAcquiredCallback name_acquired_handler, GBusNameLostCallback name_lost_handler);
 
 #endif
 

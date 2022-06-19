@@ -134,6 +134,7 @@ $ vi utilx9.h
 - uv_123 - uv example.
 - uv_spawn_123 - uv spawn example.
 - wsdiscovery_123 - WS-Discovery example.
+- xbus_123 - a gdbus example. use xbus_api.c.
 
 
 # 6. License

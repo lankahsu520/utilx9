@@ -24,7 +24,7 @@ static int is_quit = 0;
 static int is_service = 0;
 char msg[LEN_OF_BUF256]="";
 
-static DbusX dbusx_456 = {
+static DbusX_t dbusx_456 = {
 	.name = "dbusx_456",
 
 	.isfree = 0,

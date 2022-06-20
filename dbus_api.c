@@ -144,7 +144,7 @@ exit_send:
 	return ret;
 }
 
-int dbusx_signal_str(DbusX *dbusx_ctx, const char *ifac, char *cmd, char *arg)
+int dbusx_signal_str(DbusX_t *dbusx_ctx, const char *ifac, char *cmd, char *arg)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
 	char *dbus_path = dbusx_path_get(dbusx_ctx);
@@ -361,14 +361,14 @@ exit_send:
 	return retStr;
 }
 
-char *dbusx_method_str2str(DbusX *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+char *dbusx_method_str2str(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
 	char *dbus_path = dbusx_path_get(dbusx_ctx);
 	return dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_STRING, timeout);
 }
 
-char *dbusx_method_str2int(DbusX *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+char *dbusx_method_str2int(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
 	char *dbus_path = dbusx_path_get(dbusx_ctx);
@@ -376,7 +376,7 @@ char *dbusx_method_str2int(DbusX *dbusx_ctx, const char *dest, const char *ifac,
 	return retStr;
 }
 
-char *dbusx_method_xint2uint(DbusX *dbusx_ctx, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout)
+char *dbusx_method_xint2uint(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
 	char *dbus_path = dbusx_path_get(dbusx_ctx);
@@ -386,7 +386,7 @@ char *dbusx_method_xint2uint(DbusX *dbusx_ctx, const char *dest, const char *ifa
 static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *message, void *usr_data)
 {
 	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-	DbusX *dbusx_ctx = (DbusX *)usr_data;
+	DbusX_t *dbusx_ctx = (DbusX_t *)usr_data;
 	if (dbusx_ctx)
 	{
 		const char *method = dbus_message_get_member(message);
@@ -408,7 +408,7 @@ static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *m
 	return handled;
 }
 
-void dbusx_conn_free(DbusX *dbusx_ctx)
+void dbusx_conn_free(DbusX_t *dbusx_ctx)
 {
 	if ( (dbusx_ctx) && ((dbusx_ctx->dbus_conn_listen) || (dbusx_ctx->dbus_conn)) )
 	{
@@ -418,7 +418,7 @@ void dbusx_conn_free(DbusX *dbusx_ctx)
 	}
 }
 
-int dbusx_client_init(DbusX *dbusx_ctx)
+int dbusx_client_init(DbusX_t *dbusx_ctx)
 {
 	int ret = -1;
 	DBusError dbus_err;
@@ -449,7 +449,7 @@ exit_init:
 static int dbusx_add_match(DBusConnection *dbus_listen, DBusError *err, void *usr_data)
 {
 	int ret = -1;
-	DbusX *dbusx_ctx = (DbusX*)usr_data;
+	DbusX_t *dbusx_ctx = (DbusX_t*)usr_data;
 
 	if (dbusx_ctx)
 	{
@@ -464,7 +464,7 @@ static int dbusx_add_match(DBusConnection *dbus_listen, DBusError *err, void *us
 
 static void *dbusx_thread_handler(void *user)
 {
-	DbusX *dbusx_ctx = (DbusX*)user;
+	DbusX_t *dbusx_ctx = (DbusX_t*)user;
 
 	if (dbusx_ctx)
 	{
@@ -521,7 +521,7 @@ exit_dbus:
 	return NULL;
 }
 
-DBusConnection *dbusx_listen_get(DbusX *dbusx_ctx)
+DBusConnection *dbusx_listen_get(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 		return dbusx_ctx->dbus_conn_listen;
@@ -529,7 +529,7 @@ DBusConnection *dbusx_listen_get(DbusX *dbusx_ctx)
 	return NULL;
 }
 
-DBusConnection *dbusx_conn_get(DbusX *dbusx_ctx)
+DBusConnection *dbusx_conn_get(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 		return dbusx_ctx->dbus_conn;
@@ -537,7 +537,7 @@ DBusConnection *dbusx_conn_get(DbusX *dbusx_ctx)
 	return NULL;
 }
 
-char *dbusx_path_get(DbusX *dbusx_ctx)
+char *dbusx_path_get(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 		return dbusx_ctx->path;
@@ -545,7 +545,7 @@ char *dbusx_path_get(DbusX *dbusx_ctx)
 	return NULL;
 }
 
-void dbusx_lock(DbusX *dbusx_ctx)
+void dbusx_lock(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -554,7 +554,7 @@ void dbusx_lock(DbusX *dbusx_ctx)
 	}
 }
 
-void dbusx_unlock(DbusX *dbusx_ctx)
+void dbusx_unlock(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -563,7 +563,7 @@ void dbusx_unlock(DbusX *dbusx_ctx)
 	}
 }
 
-void dbusx_wakeup_simple(DbusX *dbusx_ctx)
+void dbusx_wakeup_simple(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -572,7 +572,7 @@ void dbusx_wakeup_simple(DbusX *dbusx_ctx)
 	}
 }
 
-void dbusx_wakeup(DbusX *dbusx_ctx)
+void dbusx_wakeup(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -581,7 +581,7 @@ void dbusx_wakeup(DbusX *dbusx_ctx)
 	}
 }
 
-int dbusx_timewait_simple(DbusX *dbusx_ctx, int ms)
+int dbusx_timewait_simple(DbusX_t *dbusx_ctx, int ms)
 {
 	int ret = EINVAL;
 
@@ -594,7 +594,7 @@ int dbusx_timewait_simple(DbusX *dbusx_ctx, int ms)
 	return ret;
 }
 
-int dbusx_timewait(DbusX *dbusx_ctx, int ms)
+int dbusx_timewait(DbusX_t *dbusx_ctx, int ms)
 {
 	int ret = EINVAL;
 
@@ -607,7 +607,7 @@ int dbusx_timewait(DbusX *dbusx_ctx, int ms)
 	return ret;
 }
 
-void dbusx_wait_simple(DbusX *dbusx_ctx)
+void dbusx_wait_simple(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -616,7 +616,7 @@ void dbusx_wait_simple(DbusX *dbusx_ctx)
 	}
 }
 
-void dbusx_wait(DbusX *dbusx_ctx)
+void dbusx_wait(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -625,7 +625,7 @@ void dbusx_wait(DbusX *dbusx_ctx)
 	}
 }
 
-READY_ID dbusx_ready(DbusX *dbusx_ctx)
+READY_ID dbusx_ready(DbusX_t *dbusx_ctx)
 {
 	ThreadX_t *tidx_req = &dbusx_ctx->tidx;
 
@@ -647,7 +647,7 @@ READY_ID dbusx_ready(DbusX *dbusx_ctx)
 	}
 }
 
-int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX *dbusx_ctx)
+int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_ctx)
 {
 	dbusx_ctx->add_match_cb = match_cb;
 	dbusx_ctx->filter_user_cb = filter_cb;
@@ -662,7 +662,7 @@ int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, Dbus
 	return 0;
 }
 
-void dbusx_thread_stop(DbusX *dbusx_ctx)
+void dbusx_thread_stop(DbusX_t *dbusx_ctx)
 {
 	if (dbusx_ctx)
 	{
@@ -671,7 +671,7 @@ void dbusx_thread_stop(DbusX *dbusx_ctx)
 	}
 }
 
-void dbusx_thread_close(DbusX *dbusx_ctx)
+void dbusx_thread_close(DbusX_t *dbusx_ctx)
 {
 	if ((dbusx_ctx) && (dbusx_ctx->isfree == 0))
 	{

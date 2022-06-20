@@ -14,7 +14,7 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-void xbus_signal_int(Xbus *xbus_req, char *signal_name, void *signal_cb)
+void xbus_signal_int(Xbus_t *xbus_req, char *signal_name, void *signal_cb)
 {
 	if (xbus_req->g_proxy)
 	{
@@ -23,7 +23,7 @@ void xbus_signal_int(Xbus *xbus_req, char *signal_name, void *signal_cb)
 	}
 }
 
-void xbus_client_int(Xbus *xbus_req)
+void xbus_client_int(Xbus_t *xbus_req)
 {
 	GError *g_err = NULL;
 
@@ -53,14 +53,14 @@ void xbus_client_int(Xbus *xbus_req)
 // name_acquired_handler
 void xbus_name_acquired_cb(GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
-	Xbus *xbus_req = (Xbus*)user_data;
+	Xbus_t *xbus_req = (Xbus_t*)user_data;
 	DBG_IF_LN("(xbus_req->name: %s, name: %s)", xbus_req->name, name);
 }
 
 // name_lost_handler
 void xbus_name_lost_cb(GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
-	Xbus *xbus_req = (Xbus*)user_data;
+	Xbus_t *xbus_req = (Xbus_t*)user_data;
 	DBG_IF_LN("(xbus_req->name: %s, name: %s)", xbus_req->name, name);
 
 	if (connection == NULL)
@@ -70,7 +70,7 @@ void xbus_name_lost_cb(GDBusConnection *connection, const gchar *name, gpointer 
 	SAFE_G_LOOP_QUIT(xbus_req->g_Loop);
 }
 
-void xbus_server_int(Xbus *xbus_req)
+void xbus_server_int(Xbus_t *xbus_req)
 {
 	GError *g_err = NULL;
 
@@ -92,7 +92,7 @@ void xbus_server_int(Xbus *xbus_req)
 
 void *xbus_dummy_thread_handler(void *user)
 {
-	Xbus *xbus_req = (Xbus *)user;
+	Xbus_t *xbus_req = (Xbus_t *)user;
 	ThreadX_t *tidx_req = (ThreadX_t*)&xbus_req->tidx;
 
 	threadx_detach(tidx_req);
@@ -127,7 +127,7 @@ void *xbus_dummy_thread_handler(void *user)
 
 	return NULL;
 }
-void xbus_stop(Xbus *xbus_req)
+void xbus_stop(Xbus_t *xbus_req)
 {
 	if ((xbus_req) && (xbus_req->g_Loop))
 	{
@@ -140,7 +140,7 @@ void xbus_stop(Xbus *xbus_req)
 	SAFE_G_UNREF(xbus_req->g_skeletion);
 }
 
-void xbus_start(Xbus *xbus_req, char *thread_name, thread_fn thread_cb, proxy_register_fn proxy_register_cb, GBusAcquiredCallback bus_acquired_handler, GBusNameAcquiredCallback name_acquired_handler, GBusNameLostCallback name_lost_handler)
+void xbus_start(Xbus_t *xbus_req, char *thread_name, thread_fn thread_cb, proxy_register_fn proxy_register_cb, GBusAcquiredCallback bus_acquired_handler, GBusNameAcquiredCallback name_acquired_handler, GBusNameLostCallback name_lost_handler)
 {
 	xbus_req->tidx.thread_cb = thread_cb;
 	xbus_req->tidx.data = (void *)xbus_req;

@@ -228,11 +228,11 @@ void* pcheck( void* a );
 
 /** string **/
 #define SAFE_STRLEN(X) \
-		({ int __ret =0; do { if (pcheck(X)) __ret = strlen(X); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
+	({ int __ret =0; do { if (pcheck(X)) __ret = strlen(X); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SPRINTF(X, FMT, args...) \
 	({ int __ret =0; do { if (pcheck(X)) __ret = sprintf(X, FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SPRINTF_EX(X, FMT, args...) \
-		({ int __ret =0; do { if (pcheck(X)) __ret = snprintf(X, sizeof(X), FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
+	({ int __ret =0; do { if (pcheck(X)) __ret = snprintf(X, sizeof(X), FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SNPRINTF(X, Y, FMT, args...) \
 	({ int __ret =0; do { if ((pcheck(X)) && (Y>0)) __ret = snprintf(X, Y, FMT, ## args); else DBG_ER_LN("%s is NULL or Y (%zd <= 0) !!!", #X, (size_t)Y); } while(0); __ret; })
 
@@ -3315,42 +3315,42 @@ typedef struct DbusX_Struct
 	dbusx_filter_fn *filter_user_cb;
 
 	void *data;
-} DbusX;
+} DbusX_t;
 
 DBusHandlerResult demo_signal_cb(DBusConnection *connection, DBusMessage *message, void *usr_data);
 DBusHandlerResult echo_method_cb(DBusConnection *connection, DBusMessage *message, void *usr_data);
 
 int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *ifac,char *cmd, int itype, void *arg);
-int dbusx_signal_str(DbusX *dbusx_ctx, const char *ifac, char *cmd, char *arg);
+int dbusx_signal_str(DbusX_t *dbusx_ctx, const char *ifac, char *cmd, char *arg);
 int dbusx_signal_xint2uint(DBusConnection *dbus_conn, char *dbus_path, const char *ifac, char *cmd, int itype, unsigned int *arg);
 
 char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *key, const char *val, int timeout);
 char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, int itype, void *arg, int otype, int timeout);
-char *dbusx_method_str2str(DbusX *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
-char *dbusx_method_str2int(DbusX *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
-char *dbusx_method_xint2uint(DbusX *dbusx_ctx, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout);
+char *dbusx_method_str2str(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
+char *dbusx_method_str2int(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
+char *dbusx_method_xint2uint(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout);
 
-void dbusx_conn_free(DbusX *dbusx_ctx);
-int dbusx_client_init(DbusX *dbusx_ctx);
+void dbusx_conn_free(DbusX_t *dbusx_ctx);
+int dbusx_client_init(DbusX_t *dbusx_ctx);
 
-DBusConnection *dbusx_listen_get(DbusX *dbusx_ctx);
-DBusConnection *dbusx_conn_get(DbusX *dbusx_ctx);
-char *dbusx_path_get(DbusX *dbusx_ctx);
+DBusConnection *dbusx_listen_get(DbusX_t *dbusx_ctx);
+DBusConnection *dbusx_conn_get(DbusX_t *dbusx_ctx);
+char *dbusx_path_get(DbusX_t *dbusx_ctx);
 
-void dbusx_lock(DbusX *dbusx_ctx);
-void dbusx_unlock(DbusX *dbusx_ctx);
-void dbusx_wakeup_simple(DbusX *dbusx_ctx);
-void dbusx_wakeup(DbusX *dbusx_ctx);
-int dbusx_timewait_simple(DbusX *dbusx_ctx, int ms);
-int dbusx_timewait(DbusX *dbusx_ctx, int ms);
-void dbusx_wait_simple(DbusX *dbusx_ctx);
-void dbusx_wait(DbusX *dbusx_ctx);
+void dbusx_lock(DbusX_t *dbusx_ctx);
+void dbusx_unlock(DbusX_t *dbusx_ctx);
+void dbusx_wakeup_simple(DbusX_t *dbusx_ctx);
+void dbusx_wakeup(DbusX_t *dbusx_ctx);
+int dbusx_timewait_simple(DbusX_t *dbusx_ctx, int ms);
+int dbusx_timewait(DbusX_t *dbusx_ctx, int ms);
+void dbusx_wait_simple(DbusX_t *dbusx_ctx);
+void dbusx_wait(DbusX_t *dbusx_ctx);
 
-READY_ID dbusx_ready(DbusX *dbusx_ctx);
+READY_ID dbusx_ready(DbusX_t *dbusx_ctx);
 
-int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX *dbusx_ctx);
-void dbusx_thread_stop(DbusX *dbusx_ctx);
-void dbusx_thread_close(DbusX *dbusx_ctx);
+int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_ctx);
+void dbusx_thread_stop(DbusX_t *dbusx_ctx);
+void dbusx_thread_close(DbusX_t *dbusx_ctx);
 
 #endif
 
@@ -4090,19 +4090,19 @@ typedef struct Xbus_Struct
 	GBusNameLostCallback name_lost_handler;
 
 	void *data;
-} Xbus;
+} Xbus_t;
 
-void xbus_signal_int(Xbus *xbus_req, char *signal_name, void *signal_cb);
-void xbus_client_int(Xbus *xbus_req);
+void xbus_signal_int(Xbus_t *xbus_req, char *signal_name, void *signal_cb);
+void xbus_client_int(Xbus_t *xbus_req);
 
 void xbus_name_acquired_cb(GDBusConnection *connection, const gchar *name, gpointer user_data);
 void xbus_name_lost_cb(GDBusConnection *connection, const gchar *name, gpointer user_data);
-void xbus_server_int(Xbus *xbus_req);
+void xbus_server_int(Xbus_t *xbus_req);
 
 void *xbus_dummy_thread_handler(void *user);
 
-void xbus_stop(Xbus *xbus_req);
-void xbus_start(Xbus *xbus_req, char *thread_name, thread_fn thread_cb, proxy_register_fn proxy_register_cb, GBusAcquiredCallback bus_acquired_handler, GBusNameAcquiredCallback name_acquired_handler, GBusNameLostCallback name_lost_handler);
+void xbus_stop(Xbus_t *xbus_req);
+void xbus_start(Xbus_t *xbus_req, char *thread_name, thread_fn thread_cb, proxy_register_fn proxy_register_cb, GBusAcquiredCallback bus_acquired_handler, GBusNameAcquiredCallback name_acquired_handler, GBusNameLostCallback name_lost_handler);
 
 #endif
 

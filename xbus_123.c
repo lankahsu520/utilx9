@@ -33,7 +33,7 @@ static int is_service = 0;
 #define XBUS_IFAC_FUNC_AGENT XBUS_IFAC_FUNC_CONCAT(XBUS_IFAC_FUNC_PREFIXNAME, _agent)
 #define XBUS_OBJECT_AGENT ComGithubLankahsu520Agent
 
-static Xbus xbus_agent = {
+static Xbus_t xbus_agent = {
 	.name = "xbus_agent",
 
 	.isfree = 0,
@@ -57,7 +57,7 @@ static Xbus xbus_agent = {
 };
 
 // com_github_lankahsu520_agent_call_set_name_sync
-static void xbus_method_Agent_SetName(Xbus *xbus_req, const gchar *arg_name)
+static void xbus_method_Agent_SetName(Xbus_t *xbus_req, const gchar *arg_name)
 {
 	gchar *out_response = NULL;
 	GError *g_err = NULL;
@@ -81,7 +81,7 @@ static void xbus_method_Agent_SetName(Xbus *xbus_req, const gchar *arg_name)
 }
 
 // com_github_lankahsu520_agent_call_set_age_sync
-static void xbus_method_Agent_SetAge(Xbus *xbus_req, gint arg_age)
+static void xbus_method_Agent_SetAge(Xbus_t *xbus_req, gint arg_age)
 {
 	gchar *out_response = NULL;
 	GError *g_err = NULL;
@@ -105,7 +105,7 @@ static void xbus_method_Agent_SetAge(Xbus *xbus_req, gint arg_age)
 }
 
 // com_github_lankahsu520_agent_call_set_name_age_sync
-static void xbus_method_Agent_SetNameAge(Xbus *xbus_req, const gchar *arg_name, gint arg_age)
+static void xbus_method_Agent_SetNameAge(Xbus_t *xbus_req, const gchar *arg_name, gint arg_age)
 {
 	gchar *out_response = NULL;
 	GError *g_err = NULL;
@@ -136,7 +136,7 @@ static gboolean xbus_signal_Agent_Bonjour_cb(XBUS_OBJECT_AGENT *object, const gc
 }
 
 // com_github_lankahsu520_agent_emit_bonjour
-static void xbus_signal_Agent_Bonjour(Xbus *xbus_req)
+static void xbus_signal_Agent_Bonjour(Xbus_t *xbus_req)
 {
 	if (xbus_req->g_skeletion)
 	{
@@ -195,7 +195,7 @@ static gboolean Agent_setNameAge(XBUS_OBJECT_AGENT *object, GDBusMethodInvocatio
 // bus_acquired_handler
 static void xbus_bus_acquired_Agent_cb(GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
-	Xbus *xbus_req = (Xbus*)user_data;
+	Xbus_t *xbus_req = (Xbus_t*)user_data;
 	GError *g_err = NULL;
 
 	xbus_req->g_skeletion = (GObject*)XBUS_SKELETON_NEW(XBUS_IFAC_FUNC_AGENT)();
@@ -228,7 +228,7 @@ static void xbus_bus_acquired_Agent_cb(GDBusConnection *connection, const gchar 
 
 static void *xbus_proxy_register_Agent_cb(void *user)
 {
-	Xbus *xbus_req = (Xbus *)user;
+	Xbus_t *xbus_req = (Xbus_t *)user;
 
 	DBG_DB_LN("%s (xbus_req->name: %s, isservice: %d)", DBG_TXT_ENTER, xbus_req->name, xbus_req->isservice);
 	if (xbus_req->g_connection)
@@ -270,14 +270,14 @@ static void *xbus_proxy_register_Agent_cb(void *user)
 
 void Agent_stop(void)
 {
-	Xbus *xbus_req = (Xbus *)&xbus_agent;
+	Xbus_t *xbus_req = (Xbus_t *)&xbus_agent;
 
 	xbus_stop(xbus_req);
 }
 
 void Agent_start(void)
 {
-	Xbus *xbus_req = (Xbus *)&xbus_agent;
+	Xbus_t *xbus_req = (Xbus_t *)&xbus_agent;
 
 	xbus_req->tidx.data = (void *)xbus_req;
 
@@ -293,7 +293,7 @@ void Agent_start(void)
 #define XBUS_IFAC_FUNC_BOSS XBUS_IFAC_FUNC_CONCAT(XBUS_IFAC_FUNC_PREFIXNAME, _boss)
 #define XBUS_OBJECT_BOSS ComGithubLankahsu520Boss
 
-static Xbus xbus_boss = {
+static Xbus_t xbus_boss = {
 	.name = "xbus_boss",
 
 	.isfree = 0,
@@ -317,7 +317,7 @@ static Xbus xbus_boss = {
 };
 	
 // com_github_lankahsu520_boss_call_set_name_age_sync
-static void xbus_method_Boss_SetNameAge(Xbus *xbus_req, const gchar *arg_name, gint arg_age)
+static void xbus_method_Boss_SetNameAge(Xbus_t *xbus_req, const gchar *arg_name, gint arg_age)
 {
 	gchar *out_response = NULL;
 	GError *g_err = NULL;
@@ -357,7 +357,7 @@ static gboolean Boss_setNameAge(XBUS_OBJECT_BOSS *object, GDBusMethodInvocation 
 // bus_acquired_handler
 static void xbus_bus_acquired_Boss_cb(GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
-	Xbus *xbus_req = (Xbus*)user_data;
+	Xbus_t *xbus_req = (Xbus_t*)user_data;
 	GError *g_err = NULL;
 
 	xbus_req->g_skeletion = (GObject*)XBUS_SKELETON_NEW(XBUS_IFAC_FUNC_BOSS)();
@@ -388,7 +388,7 @@ static void xbus_bus_acquired_Boss_cb(GDBusConnection *connection, const gchar *
 
 static void *xbus_proxy_register_Boss_cb(void *user)
 {
-	Xbus *xbus_req = (Xbus *)user;
+	Xbus_t *xbus_req = (Xbus_t *)user;
 
 	DBG_DB_LN("%s (xbus_req->name: %s, isservice: %d)", DBG_TXT_ENTER, xbus_req->name, xbus_req->isservice);
 	if (xbus_req->g_connection)
@@ -425,14 +425,14 @@ static void *xbus_proxy_register_Boss_cb(void *user)
 
 void Boss_stop(void)
 {
-	Xbus *xbus_req = (Xbus *)&xbus_boss;
+	Xbus_t *xbus_req = (Xbus_t *)&xbus_boss;
 
 	xbus_stop(xbus_req);
 }
 
 void Boss_start(void)
 {
-	Xbus *xbus_req = (Xbus *)&xbus_boss;
+	Xbus_t *xbus_req = (Xbus_t *)&xbus_boss;
 
 	xbus_req->tidx.data = (void *)xbus_req;
 

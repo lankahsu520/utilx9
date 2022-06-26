@@ -68,11 +68,11 @@ static void proc_entry_cpuusage(clist_t head)
 	ProcList_t *cur;
 	for (cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
 	{
-		ProcInfo_t *procinfo_ctx = &cur->procinfo;
-		if (procinfo_ctx->pid!=0)
+		ProcInfo_t *procinfo_req = &cur->procinfo;
+		if (procinfo_req->pid!=0)
 		{
-			proc_cpu_info(procinfo_ctx);
-			procinfo_ctx->cpu_usage = 0.0;
+			proc_cpu_info(procinfo_req);
+			procinfo_req->cpu_usage = 0.0;
 		}
 	}
 
@@ -81,14 +81,14 @@ static void proc_entry_cpuusage(clist_t head)
 	sys_cpu_info(&cpuinfo);
 	for (cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
 	{
-		ProcInfo_t *procinfo_ctx = &cur->procinfo;
-		if (procinfo_ctx->pid!=0)
+		ProcInfo_t *procinfo_req = &cur->procinfo;
+		if (procinfo_req->pid!=0)
 		{
-			proc_cpu_info(procinfo_ctx);
+			proc_cpu_info(procinfo_req);
 
 			if ( 0 != cpuinfo.duration)
 			{ 
-				procinfo_ctx->cpu_usage = 100.0 * (procinfo_ctx->duration)/(cpuinfo.duration);
+				procinfo_req->cpu_usage = 100.0 * (procinfo_req->duration)/(cpuinfo.duration);
 			}
 		}
 	}
@@ -99,8 +99,8 @@ void proc_entry_reset(clist_t head)
 	ProcList_t *cur = NULL;
 	for (cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
 	{
-		ProcInfo_t *procinfo_ctx = &cur->procinfo;
-		procinfo_ctx->pid = 0;
+		ProcInfo_t *procinfo_req = &cur->procinfo;
+		procinfo_req->pid = 0;
 	}
 }
 
@@ -140,8 +140,8 @@ void proc_entry_scan(clist_t head)
 				if ( proc_entry )
 				{
 					proc_entry->procinfo.pid = pid;
-					ProcInfo_t *procinfo_ctx = &proc_entry->procinfo;
-					proc_info_static(procinfo_ctx);
+					ProcInfo_t *procinfo_req = &proc_entry->procinfo;
+					proc_info_static(procinfo_req);
 				}
 			}
 			SAFE_FCLOSE(fp);
@@ -156,16 +156,16 @@ void proc_entry_print_ex(clist_t head, int fdlist)
 	ProcList_t *cur = NULL;
 	for (cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
 	{
-		ProcInfo_t *procinfo_ctx = &cur->procinfo;
+		ProcInfo_t *procinfo_req = &cur->procinfo;
 
-		//DBG_LN_Y("%s (pid: %ld, name: %s, size: %ld, resident: %ld, cpu_usage: %d, fdSize: %ld, fdcount: %ld)", cur->name, procinfo_ctx->pid, procinfo_ctx->name, procinfo_ctx->size, procinfo_ctx->resident, (int)procinfo_ctx->cpu_usage, procinfo_ctx->fdsize, procinfo_ctx->fdcount );
-		DBG_LN_Y("%5ld:%-20s (VmSize: %6ld, VmRSS: %6ld, shared: %6ld, fdcount: %3ld)", procinfo_ctx->pid, cur->name, procinfo_ctx->size, procinfo_ctx->resident, procinfo_ctx->shared, procinfo_ctx->fdcount );
+		//DBG_LN_Y("%s (pid: %ld, name: %s, size: %ld, resident: %ld, cpu_usage: %d, fdSize: %ld, fdcount: %ld)", cur->name, procinfo_req->pid, procinfo_req->name, procinfo_req->size, procinfo_req->resident, (int)procinfo_req->cpu_usage, procinfo_req->fdsize, procinfo_req->fdcount );
+		DBG_LN_Y("%5ld:%-20s (VmSize: %6ld, VmRSS: %6ld, shared: %6ld, fdcount: %3ld)", procinfo_req->pid, cur->name, procinfo_req->size, procinfo_req->resident, procinfo_req->shared, procinfo_req->fdcount );
 		if (fdlist)
 		{
 			int i = 0;
-			for (i=0; i<procinfo_ctx->fdcount; i++)
+			for (i=0; i<procinfo_req->fdcount; i++)
 			{
-			  DBG_LN_Y(" (fd: %d/%ld -> %s)", procinfo_ctx->fdinfo[i].fd, procinfo_ctx->fdcount, procinfo_ctx->fdinfo[i].slink);
+			  DBG_LN_Y(" (fd: %d/%ld -> %s)", procinfo_req->fdinfo[i].fd, procinfo_req->fdcount, procinfo_req->fdinfo[i].slink);
 			}
 		}
 	}

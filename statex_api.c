@@ -16,12 +16,12 @@
 
 #define MAX_OF_QSTATEX     30
 
-StateXFnCtx_t *statex_fn_last(StateXCtx_t *statex_req)
+StateXFn_t *statex_fn_last(StateX_t *statex_req)
 {
 	return statex_req->fn_last;
 }
 
-static void statex_free(StateXCtx_t *statex_req, StateXFnCtx_t *fn_curr)
+static void statex_free(StateX_t *statex_req, StateXFn_t *fn_curr)
 {
 	if (fn_curr->init_count)
 	{
@@ -33,15 +33,15 @@ static void statex_free(StateXCtx_t *statex_req, StateXFnCtx_t *fn_curr)
 	}
 }
 
-void statex_debug_q(StateXCtx_t *statex_req, int dbg_more)
+void statex_debug_q(StateX_t *statex_req, int dbg_more)
 {
 	if (statex_req)
 	{
-		queue_debug(statex_req->statex_q, dbg_more);
+		queuex_debug(statex_req->statex_q, dbg_more);
 	}
 }
 
-void statex_debug(StateXCtx_t *statex_req, int dbg_more)
+void statex_debug(StateX_t *statex_req, int dbg_more)
 {
 	if (statex_req)
 	{
@@ -50,12 +50,12 @@ void statex_debug(StateXCtx_t *statex_req, int dbg_more)
 }
 
 // curr-init -> last-leave -> curr-enter
-static int statex_rotate(StateXCtx_t *statex_req, int run)
+static int statex_rotate(StateX_t *statex_req, int run)
 {
 	int ret = 0;
-	StateXFnCtx_t *fn_last = statex_req->fn_last;
-	StateXFnCtx_t *fn_links = statex_req->fn_links;
-	StateXFnCtx_t *fn_curr = NULL;
+	StateXFn_t *fn_last = statex_req->fn_last;
+	StateXFn_t *fn_links = statex_req->fn_links;
+	StateXFn_t *fn_curr = NULL;
 
 	int idx = 0;
 	int change = 0;
@@ -107,10 +107,10 @@ exit_rotate:
 	return ret;
 }
 
-static void statex_switch(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
+static void statex_switch(StateX_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
 {
-	StateXFnCtx_t *fn_links = statex_req->fn_links;
-	StateXFnCtx_t *fn_curr = &fn_links[idx];
+	StateXFn_t *fn_links = statex_req->fn_links;
+	StateXFn_t *fn_curr = &fn_links[idx];
 
 	if (action == ACTION_ID_ON)
 	{ // init
@@ -134,7 +134,7 @@ static void statex_switch(StateXCtx_t *statex_req, int idx, int subitem, ACTION_
 	}
 }
 
-static void statex_new(StateXPuck_t *puck_new, StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
+static void statex_new(StateXPuck_t *puck_new, StateX_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
 {
 	puck_new->idx = idx;
 	puck_new->subitem = subitem;
@@ -143,14 +143,14 @@ static void statex_new(StateXPuck_t *puck_new, StateXCtx_t *statex_req, int idx,
 	puck_new->statex_req = statex_req;
 }
 
-void statex_add(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
+void statex_add(StateX_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
 {
 	if ( ( statex_req ) && (statex_req->statex_q) )
 	{
 		StateXPuck_t puck_new;
 
 		statex_new(&puck_new, statex_req, idx, subitem, action, run);
-		queue_add(statex_req->statex_q, (void*)&puck_new);
+		queuex_add(statex_req->statex_q, (void*)&puck_new);
 	}
 	else
 	{
@@ -158,14 +158,14 @@ void statex_add(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action,
 	}
 }
 
-void statex_push(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
+void statex_push(StateX_t *statex_req, int idx, int subitem, ACTION_ID action, int run)
 {
 	if ( ( statex_req ) && (statex_req->statex_q) )
 	{
 		StateXPuck_t puck_new;
 
 		statex_new(&puck_new, statex_req, idx, subitem, action, run);
-		queue_push(statex_req->statex_q, (void*)&puck_new);
+		queuex_push(statex_req->statex_q, (void*)&puck_new);
 	}
 	else
 	{
@@ -190,8 +190,8 @@ static int statex_q_exec_cb(void *arg)
 
 	if ( (data_pop) && (data_pop->statex_req) )
 	{
-		StateXCtx_t *statex_req = data_pop->statex_req;
-		QueueInfo_t *statex_q = statex_req->statex_q;
+		StateX_t *statex_req = data_pop->statex_req;
+		QueueX_t *statex_q = statex_req->statex_q;
 	
 		char *name = statex_q->name;
 		int idx = data_pop->idx;
@@ -209,13 +209,13 @@ static int statex_q_exec_cb(void *arg)
 	return 0;
 }
 
-int statex_open(StateXCtx_t *statex_req, char *name)
+int statex_open(StateX_t *statex_req, char *name)
 {
 	int ret = 0;
-	statex_req->statex_q = queue_thread_init(name, MAX_OF_QSTATEX, sizeof(StateXPuck_t), statex_q_exec_cb, statex_q_free_cb);
+	statex_req->statex_q = queuex_thread_init(name, MAX_OF_QSTATEX, sizeof(StateXPuck_t), statex_q_exec_cb, statex_q_free_cb);
 	if (statex_req->statex_q)
 	{
-		queue_isready(statex_req->statex_q, 20);
+		queuex_isready(statex_req->statex_q, 20);
 	}
 	else
 	{
@@ -225,15 +225,15 @@ int statex_open(StateXCtx_t *statex_req, char *name)
 	return ret;
 }
 
-void statex_close(StateXCtx_t *statex_req)
+void statex_close(StateX_t *statex_req)
 {
 	{
-		queue_thread_stop(statex_req->statex_q);
-		queue_thread_close(statex_req->statex_q);
+		queuex_thread_stop(statex_req->statex_q);
+		queuex_thread_close(statex_req->statex_q);
 	}
 	{
-		StateXFnCtx_t *fn_links = statex_req->fn_links;
-		StateXFnCtx_t *fn_curr = NULL;
+		StateXFn_t *fn_links = statex_req->fn_links;
+		StateXFn_t *fn_curr = NULL;
 
 		int idx = 0;
 		while ( ( fn_curr = &fn_links[idx] ) && ( fn_curr->enter_cb ) )

@@ -171,42 +171,42 @@ static rtp_pkt	*rtp_header_parse(char *msg, int  sz)
 	return (rtp_pkt_msg);
 }
 
-void rtp_context_print(sess_context_t *sess_ctx)
+void rtp_context_print(sess_context_t *sess_req)
 {
-	if (sess_ctx == NULL)
+	if (sess_req == NULL)
 	{
-		DBG_ER_LN("return, sess_ctx is NULL !!!");
+		DBG_ER_LN("return, sess_req is NULL !!!");
 		return;
 	}
 
 	int i;
 	DBG_DB_LN("***************************************************");
-	DBG_DB_LN("SSRC number                      [0x%08x]", sess_ctx->my_ssrc);
-	DBG_DB_LN("Number of packets sent           [%d]", sess_ctx->sending_pkt_count);
-	DBG_DB_LN("Number of bytes sent             [%d]", sess_ctx->sending_octet_count);
-	DBG_DB_LN("Version                          [%d]", sess_ctx->version);
-	DBG_DB_LN("Marker flag                      [%d]", sess_ctx->marker);
-	DBG_DB_LN("Padding length                   [%d]", sess_ctx->padding);
-	DBG_DB_LN("CSRC length                      [%d]", sess_ctx->CSRClen);
-	DBG_DB_LN("Payload type                     [%d]", sess_ctx->pt);
-	for(i = 0; i < sess_ctx->CSRClen; i++)
+	DBG_DB_LN("SSRC number                      [0x%08x]", sess_req->my_ssrc);
+	DBG_DB_LN("Number of packets sent           [%d]", sess_req->sending_pkt_count);
+	DBG_DB_LN("Number of bytes sent             [%d]", sess_req->sending_octet_count);
+	DBG_DB_LN("Version                          [%d]", sess_req->version);
+	DBG_DB_LN("Marker flag                      [%d]", sess_req->marker);
+	DBG_DB_LN("Padding length                   [%d]", sess_req->padding);
+	DBG_DB_LN("CSRC length                      [%d]", sess_req->CSRClen);
+	DBG_DB_LN("Payload type                     [%d]", sess_req->pt);
+	for(i = 0; i < sess_req->CSRClen; i++)
 	{
-		DBG_DB_LN("CSRC list[%i]                     [%d]", i, sess_ctx->CSRCList[i]);
+		DBG_DB_LN("CSRC list[%i]                     [%d]", i, sess_req->CSRCList[i]);
 	}
-	DBG_DB_LN("First value of timestamp         [%u]", sess_ctx->init_RTP_timestamp);
-	DBG_DB_LN("Current value of timestamp       [%u]", sess_ctx->RTP_timestamp);
-	DBG_DB_LN("Time elapsed since the beginning [%u]", sess_ctx->time_elapsed);
-	DBG_DB_LN("First sequence number            [%d]", sess_ctx->init_seq_no);
-	DBG_DB_LN("Current sequence number          [%d]", sess_ctx->seq_no);
-	DBG_DB_LN("Lost sequence count              [%d]", (sess_ctx->seq_no - sess_ctx->init_seq_no + 1) - sess_ctx->sending_pkt_count );
+	DBG_DB_LN("First value of timestamp         [%u]", sess_req->init_RTP_timestamp);
+	DBG_DB_LN("Current value of timestamp       [%u]", sess_req->RTP_timestamp);
+	DBG_DB_LN("Time elapsed since the beginning [%u]", sess_req->time_elapsed);
+	DBG_DB_LN("First sequence number            [%d]", sess_req->init_seq_no);
+	DBG_DB_LN("Current sequence number          [%d]", sess_req->seq_no);
+	DBG_DB_LN("Lost sequence count              [%d]", (sess_req->seq_no - sess_req->init_seq_no + 1) - sess_req->sending_pkt_count );
 	
-	if (sess_ctx->hdr_extension)
+	if (sess_req->hdr_extension)
 	{
-		DBG_DB_LN("Extension header Type            [%d]", sess_ctx->hdr_extension->ext_type);
-		DBG_DB_LN("Extension header Len             [%d]", sess_ctx->hdr_extension->ext_len);
-		for(i = 0; i < sess_ctx->hdr_extension->ext_len; i++)
+		DBG_DB_LN("Extension header Type            [%d]", sess_req->hdr_extension->ext_type);
+		DBG_DB_LN("Extension header Len             [%d]", sess_req->hdr_extension->ext_len);
+		for(i = 0; i < sess_req->hdr_extension->ext_len; i++)
 		{
-			DBG_DB_LN("Extension header[%d]              [%ld]", i, sess_ctx->hdr_extension->hd_ext[i]);
+			DBG_DB_LN("Extension header[%d]              [%ld]", i, sess_req->hdr_extension->hd_ext[i]);
 		}
 	}
 }
@@ -222,91 +222,91 @@ static void rtp_context_parse(rtp_pkt *pkt, char *msg, int sz)
 		return;
 	}
 	
-	sess_context_t *sess_ctx = pkt->sess_ctx;
+	sess_context_t *sess_req = pkt->sess_req;
 
 	/* SSRC number - send/receive */
-	sess_ctx->my_ssrc = pkt->RTP_header->ssrc;
+	sess_req->my_ssrc = pkt->RTP_header->ssrc;
 
 	/* Number of packets sent - send/receive */
-	sess_ctx->sending_pkt_count++;
+	sess_req->sending_pkt_count++;
 
 	/* Number of bytes sent - send/receive */
-	sess_ctx->sending_octet_count += sz;
+	sess_req->sending_octet_count += sz;
 
 	/* Version - receive */
-	sess_ctx->version = (pkt->RTP_header->flags & 0xd0) >> 6;
+	sess_req->version = (pkt->RTP_header->flags & 0xd0) >> 6;
 
 	/* Marker flag - receive */
-	sess_ctx->marker = (pkt->RTP_header->mk_pt & 0x10) >> 7;
+	sess_req->marker = (pkt->RTP_header->mk_pt & 0x10) >> 7;
 
 	/* Padding length - receive */
-	sess_ctx->padding = rtp_padding(pkt->RTP_header, msg, sz);
+	sess_req->padding = rtp_padding(pkt->RTP_header, msg, sz);
 
 	/* CSRC length - send/receive */
-	sess_ctx->CSRClen = (pkt->RTP_header->flags & 0x0f);
+	sess_req->CSRClen = (pkt->RTP_header->flags & 0x0f);
 
 	/* Payload type - send/receive */
-	sess_ctx->pt = (pkt->RTP_header->mk_pt & 0x7f);
+	sess_req->pt = (pkt->RTP_header->mk_pt & 0x7f);
 
 	/* CSRC list - send/receive */
-	//MEM_SALLOC(sess_ctx->CSRCList, (sess_ctx->CSRClen * 4));
-	sess_ctx->CSRCList = (unsigned int *)SAFE_CALLOC(1, sess_ctx->CSRClen * 4);
-	memcpy(sess_ctx->CSRCList, pkt->RTP_header->csrc, (sess_ctx->CSRClen * 4));
+	//MEM_SALLOC(sess_req->CSRCList, (sess_req->CSRClen * 4));
+	sess_req->CSRCList = (unsigned int *)SAFE_CALLOC(1, sess_req->CSRClen * 4);
+	memcpy(sess_req->CSRCList, pkt->RTP_header->csrc, (sess_req->CSRClen * 4));
 
 	/* current value of timestamp - receive */
-	sess_ctx->RTP_timestamp = pkt->RTP_header->ts;
+	sess_req->RTP_timestamp = pkt->RTP_header->ts;
 
 	/* First value of timestamp - send/receive */
-	if (sess_ctx->sending_pkt_count == 1)
+	if (sess_req->sending_pkt_count == 1)
 	{
-		sess_ctx->init_RTP_timestamp = sess_ctx->RTP_timestamp;
+		sess_req->init_RTP_timestamp = sess_req->RTP_timestamp;
 	}
 
 	/* Time elapsed since the beginning - send/receive */
-	if (sess_ctx->sending_pkt_count == 1)
+	if (sess_req->sending_pkt_count == 1)
 	{
-		sess_ctx->time_elapsed = 0;
+		sess_req->time_elapsed = 0;
 	}
 	else
 	{
-		sess_ctx->time_elapsed = sess_ctx->RTP_timestamp  - sess_ctx->init_RTP_timestamp;
+		sess_req->time_elapsed = sess_req->RTP_timestamp  - sess_req->init_RTP_timestamp;
 	}
 
 	/* Current sequence number - send/receive */
-	sess_ctx->seq_no = pkt->RTP_header->sq_nb; //ntohs(pkt->RTP_header->sq_nb);
+	sess_req->seq_no = pkt->RTP_header->sq_nb; //ntohs(pkt->RTP_header->sq_nb);
 
 	/* First sequence number - send/receive */
-	if (sess_ctx->sending_pkt_count == 1)
+	if (sess_req->sending_pkt_count == 1)
 	{
-		sess_ctx->init_seq_no = sess_ctx->seq_no;
+		sess_req->init_seq_no = sess_req->seq_no;
 	}
 
-	//DBG_TR_LN("(sess_ctx->pt: %d, sess_ctx->seq_no: %d, pkt->RTP_extension: %p)", sess_ctx->pt, sess_ctx->seq_no, pkt->RTP_extension);
+	//DBG_TR_LN("(sess_req->pt: %d, sess_req->seq_no: %d, pkt->RTP_extension: %p)", sess_req->pt, sess_req->seq_no, pkt->RTP_extension);
 
 	if (pkt->RTP_extension)
 	{
 		/* Extension header - send/receive */
-		//MEM_ALLOC(sess_ctx[cid]->hdr_extension);
-		sess_ctx->hdr_extension = (rtp_ext*)SAFE_CALLOC(1, sizeof(rtp_ext));
-		sess_ctx->hdr_extension->ext_len = pkt->RTP_extension->ext_len;
-		sess_ctx->hdr_extension->ext_type = pkt->RTP_extension->ext_type;
+		//MEM_ALLOC(sess_req[cid]->hdr_extension);
+		sess_req->hdr_extension = (rtp_ext*)SAFE_CALLOC(1, sizeof(rtp_ext));
+		sess_req->hdr_extension->ext_len = pkt->RTP_extension->ext_len;
+		sess_req->hdr_extension->ext_type = pkt->RTP_extension->ext_type;
 
-		DBG_TR_LN("(sess_ctx->hdr_extension->ext_len: %d)", sess_ctx->hdr_extension->ext_len);
-		DBG_TR_LN("(sess_ctx->hdr_extension->ext_type: %d)", sess_ctx->hdr_extension->ext_type);
-		if (sess_ctx->hdr_extension->ext_len)
+		DBG_TR_LN("(sess_req->hdr_extension->ext_len: %d)", sess_req->hdr_extension->ext_len);
+		DBG_TR_LN("(sess_req->hdr_extension->ext_type: %d)", sess_req->hdr_extension->ext_type);
+		if (sess_req->hdr_extension->ext_len)
 		{
-			//MEM_SALLOC(sess_ctx->hdr_extension->hd_ext,  (4 * sess_ctx->hdr_extension->ext_len));
-			sess_ctx->hdr_extension->hd_ext = (unsigned long*)SAFE_CALLOC(1, (4 * sess_ctx->hdr_extension->ext_len));
-			memcpy(sess_ctx->hdr_extension->hd_ext, pkt->RTP_extension->hd_ext, (4 * sess_ctx->hdr_extension->ext_len));  
-			for(i = 0; i < sess_ctx->hdr_extension->ext_len; i++)
+			//MEM_SALLOC(sess_req->hdr_extension->hd_ext,  (4 * sess_req->hdr_extension->ext_len));
+			sess_req->hdr_extension->hd_ext = (unsigned long*)SAFE_CALLOC(1, (4 * sess_req->hdr_extension->ext_len));
+			memcpy(sess_req->hdr_extension->hd_ext, pkt->RTP_extension->hd_ext, (4 * sess_req->hdr_extension->ext_len));  
+			for(i = 0; i < sess_req->hdr_extension->ext_len; i++)
 			{
-				sess_ctx->hdr_extension->hd_ext[i] = sess_ctx->hdr_extension->hd_ext[i];
+				sess_req->hdr_extension->hd_ext[i] = sess_req->hdr_extension->hd_ext[i];
 			}
 		}
 	}
 }
 
-static int h264_write_nal(RTPCtx_t *rtp_req)
+static int h264_write_nal(RTPX_t *rtp_req)
 {
 	if ( rtp_req )
 	{
@@ -326,7 +326,7 @@ static int h264_write_nal(RTPCtx_t *rtp_req)
 	return -1;
 }
 
-static int h264_write(RTPCtx_t *rtp_req, char *buf, size_t count)
+static int h264_write(RTPX_t *rtp_req, char *buf, size_t count)
 {
 	if ( rtp_req )
 	{
@@ -346,7 +346,7 @@ static int h264_write(RTPCtx_t *rtp_req, char *buf, size_t count)
 	return -1;
 }
 
-static int rtp_h264(RTPCtx_t *rtp_req, char *payload, long payload_len)
+static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 {
 	int ret = -1;
 	if ( rtp_req )
@@ -440,7 +440,7 @@ static int rtp_h264(RTPCtx_t *rtp_req, char *payload, long payload_len)
 	return ret;
 }
 
-int dummy_write(RTPCtx_t *rtp_req, void *buf, size_t count)
+int dummy_write(RTPX_t *rtp_req, void *buf, size_t count)
 {
 	if ( rtp_req )
 	{
@@ -468,7 +468,7 @@ static void rtp_body_free(rtp_pkt *pkt)
 		return;
 	}
 	
-	sess_context_t *sess_ctx = pkt->sess_ctx;
+	sess_context_t *sess_req = pkt->sess_req;
 
 	/*
 	 * Free Memoire. 
@@ -485,16 +485,16 @@ static void rtp_body_free(rtp_pkt *pkt)
 	}
 	SAFE_FREE(pkt);
 
-	if (sess_ctx->hdr_extension)
+	if (sess_req->hdr_extension)
 	{
-		SAFE_FREE(sess_ctx->hdr_extension->hd_ext);
-		SAFE_FREE(sess_ctx->hdr_extension);
+		SAFE_FREE(sess_req->hdr_extension->hd_ext);
+		SAFE_FREE(sess_req->hdr_extension);
 	}
-	SAFE_FREE(sess_ctx->CSRCList);
+	SAFE_FREE(sess_req->CSRCList);
 	return;
 }
 
-void rtp_body_parse(RTPCtx_t *rtp_req, char *buff, int buff_len)
+void rtp_body_parse(RTPX_t *rtp_req, char *buff, int buff_len)
 {
 	if ( rtp_req )
 	{
@@ -503,12 +503,12 @@ void rtp_body_parse(RTPCtx_t *rtp_req, char *buff, int buff_len)
 
 		if (pkt)
 		{
-			pkt->sess_ctx = &rtp_req->sess_data;
+			pkt->sess_req = &rtp_req->sess_data;
 			
 			rtp_context_parse(pkt, buff, buff_len);
 
 #ifdef DBG_RTP_INFO
-			if (pkt->sess_ctx->sending_pkt_count==1)
+			if (pkt->sess_req->sending_pkt_count==1)
 			{
 				rtp_header_print(pkt);
 			}
@@ -531,7 +531,7 @@ void rtp_body_parse(RTPCtx_t *rtp_req, char *buff, int buff_len)
 
 				if (result==-1)
 				{
-					HttpCtx_t *http_req = NULL;
+					HttpX_t *http_req = NULL;
 					if ( (http_req = rtp_req->http_req) )
 					{
 						http_req->rtsp_req.stop = 1;
@@ -544,16 +544,16 @@ void rtp_body_parse(RTPCtx_t *rtp_req, char *buff, int buff_len)
 	}
 }
 
-static void rtp_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
+static void rtp_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
 	if ( (chainX_req) && (chainX_req->c_data) )
 	{
-		RTPCtx_t *rtp_req = (RTPCtx_t *)chainX_req->c_data;
+		RTPX_t *rtp_req = (RTPX_t *)chainX_req->c_data;
 		rtp_body_parse(rtp_req, buff, buff_len);
 	}
 }
 
-void rtp_free(RTPCtx_t *rtp_req)
+void rtp_free(RTPX_t *rtp_req)
 {
 	if (rtp_req)
 	{
@@ -565,9 +565,9 @@ void rtp_free(RTPCtx_t *rtp_req)
 	}
 }
 
-RTPCtx_t *rtp_init(int port, int interleaved)
+RTPX_t *rtp_init(int port, int interleaved)
 {
-	RTPCtx_t *rtp_req = (RTPCtx_t*)SAFE_CALLOC(1, sizeof(RTPCtx_t));
+	RTPX_t *rtp_req = (RTPX_t*)SAFE_CALLOC(1, sizeof(RTPX_t));
 
 	if (rtp_req)
 	{
@@ -575,7 +575,7 @@ RTPCtx_t *rtp_init(int port, int interleaved)
 
 		if (interleaved==0)
 		{
-			ChainXCtx_t *chainX_req = (ChainXCtx_t*)SAFE_CALLOC(1, sizeof(ChainXCtx_t));
+			ChainX_t *chainX_req = (ChainX_t*)SAFE_CALLOC(1, sizeof(ChainX_t));
 			if (chainX_req)
 			{
 				rtp_req->total = 0;

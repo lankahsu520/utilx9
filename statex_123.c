@@ -14,22 +14,22 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-void sys_init2_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_free2_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_leave2_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_enter2_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_init2_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_free2_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_leave2_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_enter2_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
 
-void sys_init1_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_free1_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_leave1_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_enter1_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_init1_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_free1_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_leave1_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_enter1_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
 
-void sys_init0_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_free0_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_leave0_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
-void sys_enter0_cb(StateXFnCtx_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_init0_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_free0_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_leave0_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
+void sys_enter0_cb(StateXFn_t *fn_link, void *data) { DBG_ER_LN(DBG_TXT_ENTER); }
 
-StateXFnCtx_t sys_fn_links[] =
+StateXFn_t sys_fn_links[] =
 {
 	// action, init_cb, free_cb, leave_cb, enter_cb
 	{0, -1, ACTION_ID_OFF, sys_init0_cb, sys_free0_cb, sys_leave0_cb, sys_enter0_cb},
@@ -38,7 +38,7 @@ StateXFnCtx_t sys_fn_links[] =
 	{3, -1, ACTION_ID_OFF, NULL, NULL, NULL, NULL}, /* terminator */
 };
 
-StateXCtx_t statex_sys = {
+StateX_t statex_sys = {
 	.fn_last = NULL,
 	.fn_links = sys_fn_links,
 

@@ -104,7 +104,7 @@ extern "C" {
 #define LEN_OF_TOPIC LEN_OF_BUF1024
 #define LEN_OF_TOPIC_TOKEN (LEN_OF_UUID+8)
 
-// HttpCtx_t, NetworkInfo_t, WSList_t
+// HttpX_t, NetworkInfo_t, WSList_t
 #define LEN_OF_URL LEN_OF_URL2048
 // BackupInfo_t
 #define LEN_OF_URL_BACKUP LEN_OF_URL
@@ -115,7 +115,7 @@ extern "C" {
 
 #define LEN_OF_SSL_BUFFER (16*1024)
 
-#define LEN_OF_LOG (2048+1024) // HttpCtx_t
+#define LEN_OF_LOG (2048+1024) // HttpX_t
 #define LEN_OF_RESERVE32 32
 
 #define LEN_OF_2BYTES_DEFINE 0xffff
@@ -195,22 +195,22 @@ typedef enum
 #define DBG_TXT_RUN_LOOP "Run loop ..."
 
 //** debug **
-#define COLOR_NONE "\033[0m"
-#define COLOR_RED "\033[0;32;31m"
-#define COLOR_LIGHT_RED "\033[1;31m"
-#define COLOR_GREEN "\033[0;32;32m"
-#define COLOR_LIGHT_GREEN "\033[1;32m"
-#define COLOR_BLUE "\033[0;32;34m"
-#define COLOR_LIGHT_BLUE "\033[1;34m"
-#define COLOR_DARY_GRAY "\033[1;30m"
-#define COLOR_CYAN "\033[0;36m"
-#define COLOR_LIGHT_CYAN "\033[1;36m"
-#define COLOR_PURPLE "\033[0;35m"
-#define COLOR_LIGHT_PURPLE "\033[1;35m"
-#define COLOR_BROWN "\033[0;33m"
-#define COLOR_YELLOW "\033[1;33m"
-#define COLOR_LIGHT_GRAY "\033[0;37m"
-#define COLOR_WHITE "\033[1;37m"
+#define COLORX_NONE "\033[0m"
+#define COLORX_RED "\033[0;32;31m"
+#define COLORX_LIGHT_RED "\033[1;31m"
+#define COLORX_GREEN "\033[0;32;32m"
+#define COLORX_LIGHT_GREEN "\033[1;32m"
+#define COLORX_BLUE "\033[0;32;34m"
+#define COLORX_LIGHT_BLUE "\033[1;34m"
+#define COLORX_DARY_GRAY "\033[1;30m"
+#define COLORX_CYAN "\033[0;36m"
+#define COLORX_LIGHT_CYAN "\033[1;36m"
+#define COLORX_PURPLE "\033[0;35m"
+#define COLORX_LIGHT_PURPLE "\033[1;35m"
+#define COLORX_BROWN "\033[0;33m"
+#define COLORX_YELLOW "\033[1;33m"
+#define COLORX_LIGHT_GRAY "\033[0;37m"
+#define COLORX_WHITE "\033[1;37m"
 
 #define DBG_LVL_ERROR        0
 #define DBG_LVL_WARN         1
@@ -219,37 +219,37 @@ typedef enum
 #define DBG_LVL_TRACE        4
 #define DBG_LVL_MAX          5
 
-#define DBG_LN_COLOR(color, format, args...) printf(color"[%02ld/%u] %s:%d - "format""COLOR_NONE"\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
-#define DBG_LN_COLOR_0(color, format, args...) printf(color""format""COLOR_NONE"", ## args)
+#define DBG_LN_COLOR(color, format, args...) printf(color"[%02ld/%u] %s:%d - "format""COLORX_NONE"\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
+#define DBG_LN_COLOR_0(color, format, args...) printf(color""format""COLORX_NONE"\n", ## args)
 
-#define DBG_LN_R(format,args...) DBG_LN_COLOR(COLOR_RED, format, ## args)
-#define DBG_LN_R_0(format,args...) DBG_LN_COLOR_0(COLOR_RED, format, ## args)
-#define DBG_LN_LR(format,args...) DBG_LN_COLOR(COLOR_LIGHT_RED, format, ## args)
-#define DBG_LN_LR_0(format,args...) DBG_LN_COLOR_0(COLOR_LIGHT_RED, format, ## args)
-#define DBG_LN_G(format,args...) DBG_LN_COLOR(COLOR_GREEN, format, ## args)
-#define DBG_LN_G_0(format,args...) DBG_LN_COLOR_0(COLOR_GREEN, format, ## args)
-#define DBG_LN_LG(format,args...) DBG_LN_COLOR(COLOR_LIGHT_GREEN, format, ## args)
-#define DBG_LN_LG_0(format,args...) DBG_LN_COLOR_0(COLOR_LIGHT_GREEN, format, ## args)
-#define DBG_LN_B(format,args...) DBG_LN_COLOR(COLOR_BLUE, format, , ## args)
-#define DBG_LN_B_0(format,args...) DBG_LN_COLOR_0(COLOR_BLUE, format, ## args)
-#define DBG_LN_LB(format,args...) DBG_LN_COLOR(COLOR_LIGHT_BLUE, format, ## args)
-#define DBG_LN_LB_0(format,args...) DBG_LN_COLOR_0(COLOR_LIGHT_BLUE, format, ## args)
-#define DBG_LN_DGR(format,args...) DBG_LN_COLOR(COLOR_DARY_GRAY, format, ## args)
-#define DBG_LN_C(format,args...) DBG_LN_COLOR(COLOR_CYAN, format, ## args)
-#define DBG_LN_C_0(format,args...) DBG_LN_COLOR_0(COLOR_CYAN, format, ## args)
-#define DBG_LN_LC(format,args...) DBG_LN_COLOR(COLOR_LIGHT_CYAN, format, ## args)
-#define DBG_LN_LC_0(format,args...) DBG_LN_COLOR_0(COLOR_LIGHT_CYAN, format, ## args)
-#define DBG_LN_P(format,args...) DBG_LN_COLOR(COLOR_PURPLE, format, ## args)
-#define DBG_LN_P_0(format,args...) DBG_LN_COLOR_0(COLOR_PURPLE, format, ## args)
-#define DBG_LN_LP(format,args...) DBG_LN_COLOR(COLOR_LIGHT_PURPLE, format, ## args)
-#define DBG_LN_LP_0(format,args...) DBG_LN_COLOR_0(COLOR_PURPLE, format, ## args)
-#define DBG_LN_BR(format,args...) DBG_LN_COLOR(COLOR_BROWN, format, ## args)
-#define DBG_LN_Y(format,args...) DBG_LN_COLOR(COLOR_YELLOW, format, ## args)
-#define DBG_LN_Y_0(format,args...) DBG_LN_COLOR_0(COLOR_YELLOW, format, ## args)
-#define DBG_LN_LGR(format,args...) DBG_LN_COLOR(COLOR_LIGHT_GRAY, format, ## args)
-#define DBG_LN_LGR_0(format,args...) DBG_LN_COLOR_0(COLOR_LIGHT_GRAY, format, ## args)
-#define DBG_LN_W(format,args...) DBG_LN_COLOR(COLOR_WHITE, format, ## args)
-#define DBG_LN_W_0(format,args...) DBG_LN_COLOR_0(COLOR_WHITE, format, ## args)
+#define DBG_LN_R(format,args...) DBG_LN_COLOR(COLORX_RED, format, ## args)
+#define DBG_LN_R_0(format,args...) DBG_LN_COLOR_0(COLORX_RED, format, ## args)
+#define DBG_LN_LR(format,args...) DBG_LN_COLOR(COLORX_LIGHT_RED, format, ## args)
+#define DBG_LN_LR_0(format,args...) DBG_LN_COLOR_0(COLORX_LIGHT_RED, format, ## args)
+#define DBG_LN_G(format,args...) DBG_LN_COLOR(COLORX_GREEN, format, ## args)
+#define DBG_LN_G_0(format,args...) DBG_LN_COLOR_0(COLORX_GREEN, format, ## args)
+#define DBG_LN_LG(format,args...) DBG_LN_COLOR(COLORX_LIGHT_GREEN, format, ## args)
+#define DBG_LN_LG_0(format,args...) DBG_LN_COLOR_0(COLORX_LIGHT_GREEN, format, ## args)
+#define DBG_LN_B(format,args...) DBG_LN_COLOR(COLORX_BLUE, format, , ## args)
+#define DBG_LN_B_0(format,args...) DBG_LN_COLOR_0(COLORX_BLUE, format, ## args)
+#define DBG_LN_LB(format,args...) DBG_LN_COLOR(COLORX_LIGHT_BLUE, format, ## args)
+#define DBG_LN_LB_0(format,args...) DBG_LN_COLOR_0(COLORX_LIGHT_BLUE, format, ## args)
+#define DBG_LN_DGR(format,args...) DBG_LN_COLOR(COLORX_DARY_GRAY, format, ## args)
+#define DBG_LN_C(format,args...) DBG_LN_COLOR(COLORX_CYAN, format, ## args)
+#define DBG_LN_C_0(format,args...) DBG_LN_COLOR_0(COLORX_CYAN, format, ## args)
+#define DBG_LN_LC(format,args...) DBG_LN_COLOR(COLORX_LIGHT_CYAN, format, ## args)
+#define DBG_LN_LC_0(format,args...) DBG_LN_COLOR_0(COLORX_LIGHT_CYAN, format, ## args)
+#define DBG_LN_P(format,args...) DBG_LN_COLOR(COLORX_PURPLE, format, ## args)
+#define DBG_LN_P_0(format,args...) DBG_LN_COLOR_0(COLORX_PURPLE, format, ## args)
+#define DBG_LN_LP(format,args...) DBG_LN_COLOR(COLORX_LIGHT_PURPLE, format, ## args)
+#define DBG_LN_LP_0(format,args...) DBG_LN_COLOR_0(COLORX_PURPLE, format, ## args)
+#define DBG_LN_BR(format,args...) DBG_LN_COLOR(COLORX_BROWN, format, ## args)
+#define DBG_LN_Y(format,args...) DBG_LN_COLOR(COLORX_YELLOW, format, ## args)
+#define DBG_LN_Y_0(format,args...) DBG_LN_COLOR_0(COLORX_YELLOW, format, ## args)
+#define DBG_LN_LGR(format,args...) DBG_LN_COLOR(COLORX_LIGHT_GRAY, format, ## args)
+#define DBG_LN_LGR_0(format,args...) DBG_LN_COLOR_0(COLORX_LIGHT_GRAY, format, ## args)
+#define DBG_LN_W(format,args...) DBG_LN_COLOR(COLORX_WHITE, format, ## args)
+#define DBG_LN_W_0(format,args...) DBG_LN_COLOR_0(COLORX_WHITE, format, ## args)
 
 #define BUFF_DUMP_BUFF(ibuf, ilen, delim, prefix, obuf, olen) \
 	({ int __ret = 0; \
@@ -284,7 +284,7 @@ typedef enum
 			if ((k%16) ==0) printf("\n    %02X", (0xff & (char)dbuf[k]) ); \
 			else printf(delim"%02X", (0xff & (char)dbuf[k]) ); \
 		} \
-			printf("\n}\n"COLOR_NONE); \
+			printf("\n}\n"COLORX_NONE); \
 	}
 
 

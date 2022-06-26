@@ -211,7 +211,7 @@ soap_node_t *soap_load_string(char *xmlbuffer)
 	}
 }
 
-void soap_load_request(SoapCtx_t *soap, char *action)
+void soap_load_request(SoapX_t *soap, char *action)
 {
 	{
 		// open file and to xml node
@@ -221,7 +221,7 @@ void soap_load_request(SoapCtx_t *soap, char *action)
 	}
 }
 
-void soap_http_access(SoapCtx_t *soap, HttpCtx_t *http_req)
+void soap_http_access(SoapX_t *soap, HttpX_t *http_req)
 {
 	if ((soap) && (soap->request_node) && (http_req) )
 	{
@@ -239,7 +239,7 @@ void soap_http_access(SoapCtx_t *soap, HttpCtx_t *http_req)
 	}
 }
 
-void soap_free(SoapCtx_t *soap)
+void soap_free(SoapX_t *soap)
 {
 	//http_request_free(soap->http_req);
 	//SAFE_FREE(soap->http_req);
@@ -251,9 +251,9 @@ void soap_free(SoapCtx_t *soap)
 	}
 }
 
-SoapCtx_t *soap_create(char *xmlbuffer)
+SoapX_t *soap_create(char *xmlbuffer)
 {
-	SoapCtx_t *soap = (SoapCtx_t*)SAFE_CALLOC(1, sizeof(SoapCtx_t));
+	SoapX_t *soap = (SoapX_t*)SAFE_CALLOC(1, sizeof(SoapX_t));
 	if (soap)
 	{
 		soap->request_node = soap_load_string(xmlbuffer);

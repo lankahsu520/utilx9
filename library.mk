@@ -115,9 +115,9 @@ endif
 
 ifeq ("$(PJ_HAS_DBUS)", "yes")
 CLEAN_BINS += \
-						dbus_456
+						dbusx_456
 LIBXXX_OBJS += \
-							dbus_api.o
+							dbusx_api.o
 LIBS_yes += -lexpat -ldbus-1
 CFLAGS += -I$(SDK_INC_DIR)/dbus-1.0/dbus -I$(SDK_INC_DIR)/dbus-1.0 -I$(SDK_LIB_DIR)/dbus-1.0/include
 endif
@@ -155,10 +155,10 @@ endif
 
 ifeq ("$(PJ_HAS_GLIB_SYSROOT)", "yes")
 CLEAN_BINS += \
-						xbus_123
+						gbusx_123
 LIBXXX_OBJS += \
-							xbus_api.o \
-							xbus_ifac.o
+							gbusx_api.o \
+							gbusx_ifac.o
 LIBS_yes += -lgobject-2.0 -lgio-2.0 -lglib-2.0
 ifeq ("$(PJ_CROSS)", "")
 CFLAGS += $(shell pkg-config --cflags gio-2.0 gio-unix-2.0 glib-2.0)

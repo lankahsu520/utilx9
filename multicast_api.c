@@ -16,7 +16,7 @@
 
 mctt_recv_fn mctt_recv_cb = NULL;
 
-void mctt_publish(ChainXCtx_t *chainX_req, char *payload, int payload_len)
+void mctt_publish(ChainX_t *chainX_req, char *payload, int payload_len)
 {
 	MCTT_t packet;
 
@@ -30,7 +30,7 @@ void mctt_publish(ChainXCtx_t *chainX_req, char *payload, int payload_len)
 	chainX_multi_sender(chainX_req, (char*)&packet, packet_len);
 }
 
-static void mctt_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
+static void mctt_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
 	if ((chainX_req) && (buff) && (buff_len > (4+sizeof(int))) )
 	{
@@ -49,7 +49,7 @@ static void mctt_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
 	}
 }
 
-void mctt_thread_close(ChainXCtx_t *chainX_req)
+void mctt_thread_close(ChainX_t *chainX_req)
 {
 	if ( (chainX_req) && ( chainX_req->isfree == 0 ) )
 	{
@@ -59,9 +59,9 @@ void mctt_thread_close(ChainXCtx_t *chainX_req)
 	}
 }
 
-ChainXCtx_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb)
+ChainX_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb)
 {
-	ChainXCtx_t *chainX_req = (ChainXCtx_t*)SAFE_CALLOC(1, sizeof(ChainXCtx_t));
+	ChainX_t *chainX_req = (ChainX_t*)SAFE_CALLOC(1, sizeof(ChainX_t));
 
 	if (chainX_req)
 	{

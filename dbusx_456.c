@@ -17,7 +17,7 @@
 
 #include "utilx9.h"
 
-#define TAG "dbus_456"
+#define TAG "dbusx_456"
 
 // ** app **
 static int is_quit = 0;

@@ -86,7 +86,7 @@ static MQTTSession_t mqtt123_session = {
 	.root_subscribe_cb = mqtt123_root_subscribe_cb,
 };
 
-MQTTCtx_t mqtt123_data = {
+MQTTX_t mqtt123_data = {
 	.name = "mqtt123_data",
 
 	.isfree = 0,
@@ -96,9 +96,9 @@ MQTTCtx_t mqtt123_data = {
 	.session = &mqtt123_session,
 };
 
-static void mqtt123_init(MQTTCtx_t *mqtt_ctx)
+static void mqtt123_init(MQTTX_t *mqtt_req)
 {
-	MQTTSession_t *session = mqtt_session_get(mqtt_ctx);
+	MQTTSession_t *session = mqtt_session_get(mqtt_req);
 
 	if (session->topic_id == MQTT_TOPIC_ID_USER)
 	{
@@ -108,7 +108,7 @@ static void mqtt123_init(MQTTCtx_t *mqtt_ctx)
 	{
 		SAFE_SPRINTF_EX(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, "", "");
 	}
-	mqtt_thread_init( mqtt_ctx );
+	mqtt_thread_init( mqtt_req );
 }
 
 #endif

@@ -22,7 +22,7 @@
 // ** app **
 static int is_quit = 0;
 
-ChainXCtx_t chainX_T = {
+ChainX_t chainX_T = {
 	.mode = CHAINX_MODE_ID_TTY,
 	.ttyfd = -1,
 
@@ -48,7 +48,7 @@ static int app_quit(void)
 }
 
 #ifdef UTIL_EX_TTY
-static void tty_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
+static void tty_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
 	if (( chainX_req ) && (buff))
 	{
@@ -91,7 +91,7 @@ static void tty_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
 	}
 }
 
-static void tty_linked(ChainXCtx_t *chainX_req)
+static void tty_linked(ChainX_t *chainX_req)
 {
 	if (chainX_linked_check(chainX_req)==0)
 	{

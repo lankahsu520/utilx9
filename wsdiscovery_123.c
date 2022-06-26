@@ -16,7 +16,7 @@
 
 static int is_quit = 0;
 
-static void wsd_ProbeMatches_cb(ChainXCtx_t *chainX_req, soap_node_t *ProbeMatch_node)
+static void wsd_ProbeMatches_cb(ChainX_t *chainX_req, soap_node_t *ProbeMatch_node)
 {
 	if (chainX_req)
 	{
@@ -54,7 +54,7 @@ static void wsd_ProbeMatches_cb(ChainXCtx_t *chainX_req, soap_node_t *ProbeMatch
 	}
 }
 
-static void wsd_Probe_cb(ChainXCtx_t *chainX_req, soap_node_t *parent_node)
+static void wsd_Probe_cb(ChainX_t *chainX_req, soap_node_t *parent_node)
 {
 	if (chainX_req)
 	{
@@ -64,7 +64,7 @@ static void wsd_Probe_cb(ChainXCtx_t *chainX_req, soap_node_t *parent_node)
 	DBG_IF_LN("%s\n", DBG_TXT_NON_IMPLEMENT);
 }
 
-static void wsd_Hello_cb(ChainXCtx_t *chainX_req, soap_node_t *Hello_node)
+static void wsd_Hello_cb(ChainX_t *chainX_req, soap_node_t *Hello_node)
 {
 	if (chainX_req)
 	{
@@ -100,7 +100,7 @@ static void wsd_Hello_cb(ChainXCtx_t *chainX_req, soap_node_t *Hello_node)
 	}
 }
 
-static void wsd_Others_cb(ChainXCtx_t *chainX_req, soap_node_t *parent_node)
+static void wsd_Others_cb(ChainX_t *chainX_req, soap_node_t *parent_node)
 {
 	if (chainX_req)
 	{
@@ -115,11 +115,11 @@ static void wsd_Others_cb(ChainXCtx_t *chainX_req, soap_node_t *parent_node)
 	}
 }
 
-void chainX_linked_cb(ChainXCtx_t *chainX_req)
+void chainX_linked_cb(ChainX_t *chainX_req)
 {
 	if (chainX_linked_check(chainX_req)==0)
 	{
-		WSDiscoveryCtx_t *wsd_req = (WSDiscoveryCtx_t *)chainX_req->c_data;
+		WSDiscoveryX_t *wsd_req = (WSDiscoveryX_t *)chainX_req->c_data;
 		// send 1st
 		wsdiscovery_sender(wsd_req, SOAP_ACTION_ID_PROBE_DEVICE);
 	}
@@ -128,7 +128,7 @@ void chainX_linked_cb(ChainXCtx_t *chainX_req)
 	}
 }
 
-void chainX_post_cb(ChainXCtx_t *chainX_req, char *buff, int buff_len)
+void chainX_post_cb(ChainX_t *chainX_req, char *buff, int buff_len)
 {
 	DBG_IF_LN("%s", buff);
 }

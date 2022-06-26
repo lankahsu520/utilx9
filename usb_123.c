@@ -36,9 +36,9 @@
 
 int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, libusb_hotplug_event event, void *user_data);
 
-UsbXCtx_t usbx_main =
+UsbX_t usbx_main =
 {
-	.usb_ctx= NULL,
+	.usb_req= NULL,
 	.usb_dev_handle = NULL,
 	.usb_cnt = -1,
 
@@ -66,7 +66,7 @@ UsbXCtx_t usbx_main =
 
 int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, libusb_hotplug_event event, void *user_data)
 {
-	UsbXCtx_t *usbX_req = (UsbXCtx_t *)user_data;
+	UsbX_t *usbX_req = (UsbX_t *)user_data;
 
 	DBG_WN_LN("(event: %d)", event);
 	switch ( event )
@@ -87,7 +87,7 @@ int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, li
 	return 0;
 }
 
-void request_version(UsbXCtx_t *usbX_req)
+void request_version(UsbX_t *usbX_req)
 {
 	int idx = 0;
 	unsigned char *request = usbX_req->request;

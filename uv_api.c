@@ -66,7 +66,7 @@ static void uv_spawn_exit_cb(uv_process_t *process, int64_t exit_status, int ter
 {
 	if (process)
 	{
-		SpawnCtx_t *spawn_req = (SpawnCtx_t *)process->data;
+		SpawnX_t *spawn_req = (SpawnX_t *)process->data;
 
 		if (spawn_req)
 		{
@@ -79,7 +79,7 @@ static void uv_spawn_exit_cb(uv_process_t *process, int64_t exit_status, int ter
 	}
 }
 
-static void uv_spawn_pipe_init(SpawnCtx_t *spawn_req)
+static void uv_spawn_pipe_init(SpawnX_t *spawn_req)
 {
 	spawn_req->stdio[0].flags = UV_CREATE_PIPE | UV_READABLE_PIPE;
 	spawn_req->stdio[0].data.stream = (uv_stream_t *) &spawn_req->pipe_in;
@@ -108,7 +108,7 @@ static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv
 	}
 	else if (nread > 0)
 	{
-		SpawnCtx_t *spawn_req = (SpawnCtx_t *)stream->data;
+		SpawnX_t *spawn_req = (SpawnX_t *)stream->data;
 		if ( (spawn_req) && (spawn_req->pipe_out_cb) )
 		{
 			spawn_req->pipe_out_cb(stream, nread, buf);
@@ -126,7 +126,7 @@ static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv
 	}
 }
 
-void uv_spawn_close_ex(SpawnCtx_t *spawn_req)
+void uv_spawn_close_ex(SpawnX_t *spawn_req)
 {
 	if ( (spawn_req) && (spawn_req->quit==0) )
 	{
@@ -141,7 +141,7 @@ void uv_spawn_close_ex(SpawnCtx_t *spawn_req)
 	}
 }
 
-void uv_spawn_open_ex(SpawnCtx_t *spawn_req)
+void uv_spawn_open_ex(SpawnX_t *spawn_req)
 {
 	if (spawn_req)
 	{
@@ -180,7 +180,7 @@ void uv_spawn_on_exit(uv_process_t *req, int64_t exit_status, int term_signal)
 	uv_close((uv_handle_t*) req, NULL);
 }
 
-void uv_spawn_simple_detached(SpawnCtx_t *spawn_req, int num, ...)
+void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...)
 {
 	if ( (spawn_req) && (spawn_req->loop) && (num < MAX_OF_SPAWN_ARGS) )
 	{
@@ -224,7 +224,7 @@ static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events,
 {
 	if (handle)
 	{
-		UvEventCtx_t *event_req = (UvEventCtx_t *)handle->data;
+		UvEvent_t *event_req = (UvEvent_t *)handle->data;
 		if (event_req)
 		{
 			if (event_req->detect_cb)
@@ -239,7 +239,7 @@ static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events,
 	}
 }
 
-void uv_event_close_ex(UvEventCtx_t *event_req)
+void uv_event_close_ex(UvEvent_t *event_req)
 {
 	if ( (event_req) && (event_req->isquit==0) )
 	{
@@ -249,7 +249,7 @@ void uv_event_close_ex(UvEventCtx_t *event_req)
 	}
 }
 
-void uv_event_open_ex(UvEventCtx_t *event_req)
+void uv_event_open_ex(UvEvent_t *event_req)
 {
 	if ( (event_req) && (event_req->loop) )
 	{

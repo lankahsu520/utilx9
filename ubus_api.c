@@ -473,22 +473,22 @@ static void ubus_srv_equeue_free(void)
 
 static void ubus_srv_conn_lost(struct ubus_context *ctx)
 {
-	struct ubus_context *ubus_ctx = ubus_conn_get();
-	DBG_ER_LN("(local_id: 0x%08X)", ubus_ctx->local_id);
+	struct ubus_context *ubus_req = ubus_conn_get();
+	DBG_ER_LN("(local_id: 0x%08X)", ubus_req->local_id);
 }
 
 struct ubus_context *ubus_srv_init(void)
 {
-	struct ubus_context *ubus_ctx = ubus_conn_init();
-	if ( ubus_ctx == NULL )
+	struct ubus_context *ubus_req = ubus_conn_init();
+	if ( ubus_req == NULL )
 	{
 		goto exit_ubus;
 	}
 
-	ubus_ctx->connection_lost = ubus_srv_conn_lost;
+	ubus_req->connection_lost = ubus_srv_conn_lost;
 
 exit_ubus:
-	return ubus_ctx;
+	return ubus_req;
 }
 
 #ifdef SEND_EVENT_DIRECTLY
@@ -618,14 +618,14 @@ void ubus_add_uloop_ex(struct ubus_context *ctx)
 
 static void *ubus_thread_handler(void *arg)
 {
-	//struct ubus_context *ubus_ctx = (struct ubus_object *)arg;
+	//struct ubus_context *ubus_req = (struct ubus_object *)arg;
 	//SAFE_THREAD_DETACH( pthread_self() );
 
-	//struct ubus_context *ubus_ctx = ubus_srv_conn_get();
-	//if ( ubus_ctx != NULL )
+	//struct ubus_context *ubus_req = ubus_srv_conn_get();
+	//if ( ubus_req != NULL )
 	if ( (ubus_conn_get()) )
 	{
-		//DBG_IF_LN("ubus listen ... (ubus_root: %s, local_id: 0x%08X)", ubus_root, ubus_ctx->local_id);
+		//DBG_IF_LN("ubus listen ... (ubus_root: %s, local_id: 0x%08X)", ubus_root, ubus_req->local_id);
 		DBG_IF_LN("ubus listen ... (ubus_root: %s)", ubus_root);
 		uloop_init();
 		ubus_add_uloop_ex( ubus_conn_get() );

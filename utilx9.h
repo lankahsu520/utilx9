@@ -37,6 +37,7 @@ extern "C" {
 #include <errno.h> // EINVAL
 #include <sys/time.h>
 
+
 //******************************************************************************
 //** UTIL_EX_XXX **
 //******************************************************************************
@@ -54,7 +55,7 @@ extern "C" {
 #define UTIL_EX_MCTT
 #endif
 #define UTIL_EX_PROC_TABLE
-#define UTIL_EX_QUEUE
+#define UTIL_EX_QUEUEX
 #define UTIL_EX_STATEX
 
 #define UTIL_EX_SSL
@@ -87,7 +88,7 @@ extern "C" {
 #define UTIL_EX_MQTT
 
 #define UTIL_EX_CRON
-#define UTIL_EX_XBUS // GDBUS
+
 
 //******************************************************************************
 //** UTIL_EX_DBG **
@@ -95,11 +96,11 @@ extern "C" {
 #ifdef UTIL_EX_DBG
 extern int dbg_more;
 
-#define DBG_ER_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_DUMP_COLOR(COLOR_RED, ibuf, ilen, delim, format, ## args)
-#define DBG_WN_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_WARN) DBG_DUMP_COLOR(COLOR_PURPLE, ibuf, ilen, delim, format, ## args)
-#define DBG_IF_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_INFO) DBG_DUMP_COLOR(COLOR_YELLOW, ibuf, ilen, delim, format, ## args)
-#define DBG_DB_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_DEBUG) DBG_DUMP_COLOR(COLOR_WHITE, ibuf, ilen, delim, format, ## args)
-#define DBG_TR_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_TRACE) DBG_DUMP_COLOR(COLOR_LIGHT_GRAY, ibuf, ilen, delim, format, ## args)
+#define DBG_ER_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_DUMP_COLOR(COLORX_RED, ibuf, ilen, delim, format, ## args)
+#define DBG_WN_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_WARN) DBG_DUMP_COLOR(COLORX_PURPLE, ibuf, ilen, delim, format, ## args)
+#define DBG_IF_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_INFO) DBG_DUMP_COLOR(COLORX_YELLOW, ibuf, ilen, delim, format, ## args)
+#define DBG_DB_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_DEBUG) DBG_DUMP_COLOR(COLORX_WHITE, ibuf, ilen, delim, format, ## args)
+#define DBG_TR_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_TRACE) DBG_DUMP_COLOR(COLORX_LIGHT_GRAY, ibuf, ilen, delim, format, ## args)
 
 #define DBG_ER_LN(format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_LN_R(format, ## args)
 #define DBG_ER_LN_0(format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_LN_R_0(format, ## args)
@@ -1047,12 +1048,12 @@ typedef struct MemInfo_STRUCT
 } MemInfo_t;
 
 //
-typedef struct SysInfo_STRUCT
+typedef struct SysInfoX_STRUCT
 {
 	Kernel_t kernelinfo;
 	MemInfo_t meminfo;
 	Uptime_t uptime;
-} SysInfoEx_t;
+} SysInfoX_t;
 
 // /proc/stat
 typedef struct
@@ -1103,22 +1104,22 @@ typedef struct
 	FDInfo_t fdinfo[MAX_OF_FDSIZE];
 }	ProcInfo_t;
 
-void sys_kernel(Kernel_t *kernel_ctx);
+void sys_kernel(Kernel_t *kernel_req);
 
 const char *sys_username(void);
 const char *sys_homedir(void);
 
-void sys_info_ex(SysInfoEx_t *info_ctx);
-unsigned long sys_cpu_info(CPUInfo_t *cpuinfo_ctx);
+void sys_info_ex(SysInfoX_t *infox_req);
+unsigned long sys_cpu_info(CPUInfo_t *cpuinfox_req);
 void sys_mem_purge(int freeram_min);
 
-unsigned long proc_cpu_info(ProcInfo_t *procinfo_ctx);
-float proc_cpu_usage(ProcInfo_t *procinfo_ctx);
-void proc_mem_info(ProcInfo_t *procinfo_ctx);
-void proc_fdsize_info(ProcInfo_t *procinfo_ctx);
-void proc_fddetail_info(ProcInfo_t *procinfo_ctx);
-void proc_info_static(ProcInfo_t *procinfo_ctx);
-void proc_info(ProcInfo_t *procinfo_ctx);
+unsigned long proc_cpu_info(ProcInfo_t *procinfo_req);
+float proc_cpu_usage(ProcInfo_t *procinfo_req);
+void proc_mem_info(ProcInfo_t *procinfo_req);
+void proc_fdsize_info(ProcInfo_t *procinfo_req);
+void proc_fddetail_info(ProcInfo_t *procinfo_req);
+void proc_info_static(ProcInfo_t *procinfo_req);
+void proc_info(ProcInfo_t *procinfo_req);
 
 unsigned long pidof(char *name);
 
@@ -1349,7 +1350,7 @@ typedef struct RTSPRequest_STRUCT
 	void *rtp_req;
 } RTSPRequest_t;
 
-typedef struct HttpCtx_STRUCT
+typedef struct HttpX_STRUCT
 {
 	HTTP_MODE_ID mode;
 	CURL *curl;
@@ -1370,16 +1371,16 @@ typedef struct HttpCtx_STRUCT
 		MJPEGRequest_t mjpeg_req;
 		RTSPRequest_t rtsp_req;
 	};
-} HttpCtx_t;
+} HttpX_t;
 
 typedef void (*http_response_fn)(void *userdata, size_t res_size, char *response);
 
-void http_connect_timeout_set(HttpCtx_t *http_req, int timeout);
-void http_timeout_set(HttpCtx_t *http_req, int timeout);
-void http_request_stop(HttpCtx_t *http_req);
+void http_connect_timeout_set(HttpX_t *http_req, int timeout);
+void http_timeout_set(HttpX_t *http_req, int timeout);
+void http_request_stop(HttpX_t *http_req);
 
-void http_request_free(HttpCtx_t *http_req);
-int http_request(HttpCtx_t *http_req);
+void http_request_free(HttpX_t *http_req);
+int http_request(HttpX_t *http_req);
 
 int http_upload(const char *url, const char *filename);
 int http_upload_with_response(const char *url, const char *filename, void *userdata, http_response_fn cb);
@@ -1435,16 +1436,16 @@ typedef enum
 	SOAP_ACTION_ID_MAX,
 } SOAP_ACTION_ID;
 
-typedef struct SoapCtx_STRUCT SoapCtx_t;
-typedef void (*soap_parse_fn)(SoapCtx_t *soap);
+typedef struct SoapX_STRUCT SoapX_t;
+typedef void (*soap_parse_fn)(SoapX_t *soap);
 
-typedef struct SoapCtx_STRUCT
+typedef struct SoapX_STRUCT
 {
-	//HttpCtx_t *http_req;
+	//HttpX_t *http_req;
 
 	soap_node_t *request_node;
 	soap_node_t *response_node;
-} SoapCtx_t;
+} SoapX_t;
 
 char *soap_element_2string(soap_node_t *parent_node);
 void soap_element_dump(soap_node_t *parent_node);
@@ -1466,11 +1467,11 @@ void soap_element_delete(soap_node_t *parent_node);
 
 soap_node_t *soap_load_file(char *filename);
 soap_node_t *soap_load_string(char *xmlbuffer);
-void soap_load_request(SoapCtx_t *soap, char *action);
+void soap_load_request(SoapX_t *soap, char *action);
 
-void soap_http_access(SoapCtx_t *soap, HttpCtx_t *http_req);
-void soap_free(SoapCtx_t *soap);
-SoapCtx_t *soap_create(char *xmlbuffer);
+void soap_http_access(SoapX_t *soap, HttpX_t *http_req);
+void soap_free(SoapX_t *soap);
+SoapX_t *soap_create(char *xmlbuffer);
 #endif
 
 
@@ -1555,15 +1556,15 @@ typedef enum
 	CHAINX_MODE_ID_MAX,
 } CHAINX_MODE_ID;
 
-typedef struct ChainXCtx_STRUCT ChainXCtx_t;
+typedef struct ChainX_STRUCT ChainX_t;
 
-typedef void (*chainX_pipe_fn)(ChainXCtx_t *chainX_req, char *buff, int buff_len);
-typedef void (*chainX_post_fn)(ChainXCtx_t *chainX_req, char *buff, int buff_len);
+typedef void (*chainX_pipe_fn)(ChainX_t *chainX_req, char *buff, int buff_len);
+typedef void (*chainX_post_fn)(ChainX_t *chainX_req, char *buff, int buff_len);
 #ifdef UTIL_EX_TTY
-typedef void (*chainX_serial_fn)(ChainXCtx_t *chainX_req, char *buff, int buff_len);
+typedef void (*chainX_serial_fn)(ChainX_t *chainX_req, char *buff, int buff_len);
 #endif
-typedef void (*chainX_netlink_fn)(ChainXCtx_t *chainX_req, char *ifname, int index, char *status);
-typedef void (*chainX_linked_fn)(ChainXCtx_t *chainX_req);
+typedef void (*chainX_netlink_fn)(ChainX_t *chainX_req, char *ifname, int index, char *status);
+typedef void (*chainX_linked_fn)(ChainX_t *chainX_req);
 
 typedef struct Addr_STRUCT
 {
@@ -1609,7 +1610,7 @@ typedef struct TtyInfo_STRUCT
 } TtyInfo_t;
 #endif
 
-typedef struct ChainXCtx_STRUCT
+typedef struct ChainX_STRUCT
 {
 	ThreadX_t tidx;
 
@@ -1691,7 +1692,7 @@ typedef struct ChainXCtx_STRUCT
 
 	void *c_data; // for soap or ...
 	char session[LEN_OF_VAL48]; // > LEN_OF_UUID
-} ChainXCtx_t;
+} ChainX_t;
 
 #ifndef IF_NAMESIZE
 #define IF_NAMESIZE 16
@@ -1713,81 +1714,81 @@ int chainX_if_gateway(char *iface, char *gateway, int gateway_len);
 int chainX_if_hwaddr(char *iface, char *mac, int mac_len, char *split);
 int chainX_if_ssid(char *iface, char *ssid, int ssid_len);
 
-int chainX_fd_get(ChainXCtx_t *chainX_req);
+int chainX_fd_get(ChainX_t *chainX_req);
 
-int chainX_port_get(ChainXCtx_t *chainX_req);
-int chainX_port_set(ChainXCtx_t *chainX_req, int port);
-int chainX_ip_len(ChainXCtx_t * chainX_req);
-char *chainX_ip_get(ChainXCtx_t *chainX_req);
-void chainX_ip_set(ChainXCtx_t *chainX_req, char *ip);
-struct sockaddr_in *chainX_addr_to_get(ChainXCtx_t *chainX_req);
-int chainX_addr_to_set_ex(ChainXCtx_t *chainX_req, int ai_family, char *ip_addr, int port);
-int chainX_addr_to_set(ChainXCtx_t *chainX_req, char *ipv4, int port);
-struct sockaddr_in *chainX_addr_from_get(ChainXCtx_t *chainX_req);
-char *chainX_hostname_get(ChainXCtx_t *chainX_req);
-void chainX_hostname_set(ChainXCtx_t *chainX_req, char *hostname);
+int chainX_port_get(ChainX_t *chainX_req);
+int chainX_port_set(ChainX_t *chainX_req, int port);
+int chainX_ip_len(ChainX_t * chainX_req);
+char *chainX_ip_get(ChainX_t *chainX_req);
+void chainX_ip_set(ChainX_t *chainX_req, char *ip);
+struct sockaddr_in *chainX_addr_to_get(ChainX_t *chainX_req);
+int chainX_addr_to_set_ex(ChainX_t *chainX_req, int ai_family, char *ip_addr, int port);
+int chainX_addr_to_set(ChainX_t *chainX_req, char *ipv4, int port);
+struct sockaddr_in *chainX_addr_from_get(ChainX_t *chainX_req);
+char *chainX_hostname_get(ChainX_t *chainX_req);
+void chainX_hostname_set(ChainX_t *chainX_req, char *hostname);
 
-int chainX_reversename_len(ChainXCtx_t *chainX_req);
-char *chainX_reversename_get(ChainXCtx_t *chainX_req);
-void chainX_reversename_set(ChainXCtx_t *chainX_req, char *hostname);
+int chainX_reversename_len(ChainX_t *chainX_req);
+char *chainX_reversename_get(ChainX_t *chainX_req);
+void chainX_reversename_set(ChainX_t *chainX_req, char *hostname);
 
-int chainX_security_get(ChainXCtx_t *chainX_req);
-int chainX_security_set(ChainXCtx_t *chainX_req, int mode);
+int chainX_security_get(ChainX_t *chainX_req);
+int chainX_security_set(ChainX_t *chainX_req, int mode);
 
-int chainX_recycle_get(ChainXCtx_t *chainX_req);
-int chainX_recycle_dec(ChainXCtx_t *chainX_req);
-int chainX_recycle_set(ChainXCtx_t *chainX_req, int recycle);
+int chainX_recycle_get(ChainX_t *chainX_req);
+int chainX_recycle_dec(ChainX_t *chainX_req);
+int chainX_recycle_set(ChainX_t *chainX_req, int recycle);
 
-int chainX_infinite_get(ChainXCtx_t *chainX_req);
-int chainX_infinite_set(ChainXCtx_t *chainX_req, int infinite);
+int chainX_infinite_get(ChainX_t *chainX_req);
+int chainX_infinite_set(ChainX_t *chainX_req, int infinite);
 
 int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_len, char *ipv6_addr, int ipv6_len);
 int chainX_nslookup6(char *hostname , char *ip, int ip_len);
 int chainX_nslookup(char *hostname , char *ip, int ip_len);
 int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len);
 
-int chainX_quit_check(ChainXCtx_t *chainX_req);
-void chainX_quit_set(ChainXCtx_t *chainX_req, int is_quit);
+int chainX_quit_check(ChainX_t *chainX_req);
+void chainX_quit_set(ChainX_t *chainX_req, int is_quit);
 
-int chainX_linked_check(ChainXCtx_t *chainX_req);
+int chainX_linked_check(ChainX_t *chainX_req);
 
-void chainX_wakeup_simple(ChainXCtx_t *chainX_req);
-int chainX_timewait_simple(ChainXCtx_t *chainX_req, int ms);
+void chainX_wakeup_simple(ChainX_t *chainX_req);
+int chainX_timewait_simple(ChainX_t *chainX_req, int ms);
 
-void chainXssl_certificate_file(ChainXCtx_t *chainX_req, char *filename);
-void chainXssl_privatekey_file(ChainXCtx_t *chainX_req, char *filename);
-void chainXssl_ca_file(ChainXCtx_t *chainX_req, char *filename);
+void chainXssl_certificate_file(ChainX_t *chainX_req, char *filename);
+void chainXssl_privatekey_file(ChainX_t *chainX_req, char *filename);
+void chainXssl_ca_file(ChainX_t *chainX_req, char *filename);
 #ifdef UTIL_EX_SOCKET_OPENSSL
-SSL *chainXssl_sslfd_get(ChainXCtx_t *chainX_req);
-int chainXssl_ctx_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len );
-int chainXssl_ctx_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len );
+SSL *chainXssl_sslfd_get(ChainX_t *chainX_req);
+int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len );
+int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len );
 #elif defined(UTIL_EX_SOCKET_MBEDTLS)
-mbedtls_ssl_context *chainXssl_sslfd_get(ChainXCtx_t *chainX_req);
+mbedtls_ssl_context *chainXssl_sslfd_get(ChainX_t *chainX_req);
 #endif
 
-void chainX_close(ChainXCtx_t *chainX_req);
-int chainX_multi_sender(ChainXCtx_t *chainX_req, char *buffer, int nbufs);
-int chainX_multi_sender_and_post(ChainXCtx_t *chainX_req, char *buffer, int nbufs);
+void chainX_close(ChainX_t *chainX_req);
+int chainX_multi_sender(ChainX_t *chainX_req, char *buffer, int nbufs);
+int chainX_multi_sender_and_post(ChainX_t *chainX_req, char *buffer, int nbufs);
 
-void chainX_linked_register(ChainXCtx_t *chainX_req, chainX_linked_fn cb);
+void chainX_linked_register(ChainX_t *chainX_req, chainX_linked_fn cb);
 #ifdef UTIL_EX_TTY
-char *chainX_tty_getname(ChainXCtx_t *chainX_req);
-void chainX_tty_setname(ChainXCtx_t *chainX_req, char *ttyname);
-void chainX_tty_setbaudrate(ChainXCtx_t *chainX_req, int baudrate);
-void chainX_tty_setparity(ChainXCtx_t *chainX_req, char parity);
-void chainX_tty_setdatabits(ChainXCtx_t *chainX_req, char databits);
+char *chainX_tty_getname(ChainX_t *chainX_req);
+void chainX_tty_setname(ChainX_t *chainX_req, char *ttyname);
+void chainX_tty_setbaudrate(ChainX_t *chainX_req, int baudrate);
+void chainX_tty_setparity(ChainX_t *chainX_req, char parity);
+void chainX_tty_setdatabits(ChainX_t *chainX_req, char databits);
 
-void chainX_serial_register(ChainXCtx_t *chainX_req, chainX_serial_fn cb);
+void chainX_serial_register(ChainX_t *chainX_req, chainX_serial_fn cb);
 #endif
-void chainX_post_register(ChainXCtx_t *chainX_req, chainX_post_fn cb);
-void chainX_pipe_register(ChainXCtx_t *chainX_req, chainX_pipe_fn cb);
-void chainX_netlink_register(ChainXCtx_t *chainX_req, chainX_netlink_fn cb);
+void chainX_post_register(ChainX_t *chainX_req, chainX_post_fn cb);
+void chainX_pipe_register(ChainX_t *chainX_req, chainX_pipe_fn cb);
+void chainX_netlink_register(ChainX_t *chainX_req, chainX_netlink_fn cb);
 
-void chainX_thread_stop(ChainXCtx_t *chainX_req);
-void chainX_thread_close(ChainXCtx_t *chainX_req);
-int chainX_thread_init(ChainXCtx_t *chainX_req);
+void chainX_thread_stop(ChainX_t *chainX_req);
+void chainX_thread_close(ChainX_t *chainX_req);
+int chainX_thread_init(ChainX_t *chainX_req);
 
-int chainX_ping(ChainXCtx_t *chainX_req);
+int chainX_ping(ChainX_t *chainX_req);
 
 #ifdef UTIL_EX_SOCKET_OPENSSL
 #define SOCKETX_READ(req, wbuff, wlen) \
@@ -1905,9 +1906,9 @@ typedef struct MCTT_Struct
 	unsigned char payload[MAX_OF_MCTT];
 } MCTT_t;
 
-void mctt_publish(ChainXCtx_t *chainX_req, char *payload, int payload_len);
-void mctt_thread_close(ChainXCtx_t *chainX_req);
-ChainXCtx_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb);
+void mctt_publish(ChainX_t *chainX_req, char *payload, int payload_len);
+void mctt_thread_close(ChainX_t *chainX_req);
+ChainX_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb);
 #endif
 
 #if defined(UTIL_EX_WSDISCOVERY) && defined(UTIL_EX_SOAP)
@@ -1922,27 +1923,27 @@ typedef struct WSList_STRUCT
 	char version[LEN_OF_VAL16];
 } WSList_t;
 
-typedef void (*wsdiscovery_response_fn)(ChainXCtx_t *chainX_req, soap_node_t *parent_node);
+typedef void (*wsdiscovery_response_fn)(ChainX_t *chainX_req, soap_node_t *parent_node);
 
 #define WSDISCOVERY_FILTER_MASK_ONVIF  0x00000001
 #define WSDISCOVERY_FILTER_MASK_OTHERS 0x00000002
 
-typedef struct WSDiscoveryCtx_STRUCT
+typedef struct WSDiscoveryX_STRUCT
 {
-	ChainXCtx_t *chainX_req;
+	ChainX_t *chainX_req;
 
 	wsdiscovery_response_fn hello_cb;
 	wsdiscovery_response_fn probe_cb;
 	wsdiscovery_response_fn probematches_cb;
 	wsdiscovery_response_fn others_cb;
-} WSDiscoveryCtx_t;
+} WSDiscoveryX_t;
 
 clist_t ws_list_head(void);
 void ws_entry_print(void);
 void ws_entry_init(void);
 void ws_entry_free(void);
 void ws_devices_refresh(void);
-void ws_device_add(ChainXCtx_t *chainX_req, soap_node_t *node);
+void ws_device_add(ChainX_t *chainX_req, soap_node_t *node);
 
 void wsdiscovery_probematches_register(wsdiscovery_response_fn cb);
 void wsdiscovery_probe_register(wsdiscovery_response_fn cb);
@@ -1950,13 +1951,13 @@ void wsdiscovery_hello_register(wsdiscovery_response_fn cb);
 void wsdiscovery_others_register(wsdiscovery_response_fn cb);
 void wsdiscovery_linked_register(chainX_linked_fn cb);
 
-void wsdiscovery_sender(WSDiscoveryCtx_t *wsd_req, SOAP_ACTION_ID act_id);
+void wsdiscovery_sender(WSDiscoveryX_t *wsd_req, SOAP_ACTION_ID act_id);
 void wsdiscovery_probe(chainX_post_fn cb);
 
-WSDiscoveryCtx_t *wsdiscovery_get(void);
+WSDiscoveryX_t *wsdiscovery_get(void);
 void wsdiscovery_stop(void);
 void wsdiscovery_close(void);
-WSDiscoveryCtx_t *wsdiscovery_open(void);
+WSDiscoveryX_t *wsdiscovery_open(void);
 
 #endif
 
@@ -2040,24 +2041,24 @@ typedef struct
 	char *payload; /* payload portion of RTP packet */
 	unsigned int payload_len; /* The length of the payload */
 
-	sess_context_t *sess_ctx;
+	sess_context_t *sess_req;
 } rtp_pkt;
 
-typedef struct RTPCtx_STRUCT
+typedef struct RTPX_STRUCT
 {
 	size_t max_size;
 	size_t total;
-	HttpCtx_t *http_req;
+	HttpX_t *http_req;
 
 	sess_context_t sess_data;
-} RTPCtx_t;
+} RTPX_t;
 
 int rtp_port_get(void);
-void rtp_context_print(sess_context_t *sess_ctx);
-int dummy_write(RTPCtx_t *rtp_req, void *buf, size_t count);
-void rtp_body_parse(RTPCtx_t *rtp_req, char *buff, int buff_len);
-void rtp_free(RTPCtx_t *rtp_req);
-RTPCtx_t *rtp_init(int port, int interleaved);
+void rtp_context_print(sess_context_t *sess_req);
+int dummy_write(RTPX_t *rtp_req, void *buf, size_t count);
+void rtp_body_parse(RTPX_t *rtp_req, char *buff, int buff_len);
+void rtp_free(RTPX_t *rtp_req);
+RTPX_t *rtp_init(int port, int interleaved);
 #endif
 
 
@@ -2180,7 +2181,7 @@ typedef struct ConnectionInfo_STRUCT
 	};
 } ConnectionInfo_t;
 
-typedef struct OnvifCtx_STRUCT
+typedef struct OnvifX_STRUCT
 {
 	SOAP_ACTION_ID act_id;
 	char act_ns[LEN_OF_NAME_ONVIF_ACT];
@@ -2189,19 +2190,19 @@ typedef struct OnvifCtx_STRUCT
 	NetworkInfo_t netinfo;
 
 	void *request;
-} OnvifCtx_t;
+} OnvifX_t;
 
-typedef void (*onvif_resuest_fn)(SoapCtx_t *soap, OnvifCtx_t *onvif_req);
+typedef void (*onvif_resuest_fn)(SoapX_t *soap, OnvifX_t *onvif_req);
 
-soap_node_t *onvif_open(OnvifCtx_t *onvif_req, onvif_resuest_fn request_cb);
+soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb);
 
-soap_node_t *onvif_GetCommon(OnvifCtx_t *onvif_req);
+soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req);
 //** device **
 
 //** media **
 
-int onvif_GetVideoClip(OnvifCtx_t *onvif_req, char *videoclip_uri, char *filename, int duration);
-int onvif_GetSnapshot(OnvifCtx_t *onvif_req, char *snapshot_uri, char *prefixname);
+int onvif_GetVideoClip(OnvifX_t *onvif_req, char *videoclip_uri, char *filename, int duration);
+int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname);
 #endif
 
 
@@ -2235,12 +2236,12 @@ void proc_table_close(void);
 
 
 //******************************************************************************
-//** UTIL_EX_QUEUE **
+//** UTIL_EX_QUEUEX **
 //******************************************************************************
-#ifdef UTIL_EX_QUEUE
-typedef int (*queue_fn)(void *arg);
+#ifdef UTIL_EX_QUEUEX
+typedef int (*queuex_fn)(void *arg);
 
-typedef struct QueueInfo_Struct
+typedef struct QueueX_Struct
 {
 	char name[LEN_OF_NAME32];
 
@@ -2266,31 +2267,31 @@ typedef struct QueueInfo_Struct
 	int max_data;
 #endif
 
-	queue_fn exec_cb;
-	queue_fn free_cb; // for un-processed data
-} QueueInfo_t;
+	queuex_fn exec_cb;
+	queuex_fn free_cb; // for un-processed data
+} QueueX_t;
 
-void queue_lock(QueueInfo_t *queue);
-void queue_unlock(QueueInfo_t *queue);
-void queue_signal(QueueInfo_t *queue);
-int queue_timewait(QueueInfo_t *queue, int ms);
-void queue_wait(QueueInfo_t *queue);
+void queuex_lock(QueueX_t *queuex_req);
+void queuex_unlock(QueueX_t *queuex_req);
+void queuex_signal(QueueX_t *queuex_req);
+int queuex_timewait(QueueX_t *queuex_req, int ms);
+void queuex_wait(QueueX_t *queuex_req);
 
-void queue_debug(QueueInfo_t *queue, int dbg_more);
-void queue_free(QueueInfo_t *queue);
-int queue_length(QueueInfo_t *queue);
-int queue_isfull(QueueInfo_t *queue);
-int queue_isempty(QueueInfo_t *queue);
-int queue_isready(QueueInfo_t *queue, int retry);
+void queuex_debug(QueueX_t *queuex_req, int dbg_more);
+void queuex_free(QueueX_t *queuex_req);
+int queuex_length(QueueX_t *queuex_req);
+int queuex_isfull(QueueX_t *queuex_req);
+int queuex_isempty(QueueX_t *queuex_req);
+int queuex_isready(QueueX_t *queuex_req, int retry);
 
-void queue_gosleep(QueueInfo_t *queue);
-void queue_wakeup(QueueInfo_t *queue);
-void queue_add(QueueInfo_t *queue, void *data_new);
-void queue_push(QueueInfo_t *queue, void *data_new);
+void queuex_gosleep(QueueX_t *queuex_req);
+void queuex_wakeup(QueueX_t *queuex_req);
+void queuex_add(QueueX_t *queuex_req, void *data_new);
+void queuex_push(QueueX_t *queuex_req, void *data_new);
 
-void queue_thread_stop(QueueInfo_t *queue);
-void queue_thread_close(QueueInfo_t *queue);
-QueueInfo_t *queue_thread_init(char *name, int queue_size, int data_size, queue_fn exec_cb, queue_fn free_cb);
+void queuex_thread_stop(QueueX_t *queuex_req);
+void queuex_thread_close(QueueX_t *queuex_req);
+QueueX_t *queuex_thread_init(char *name, int queue_size, int data_size, queuex_fn exec_cb, queuex_fn free_cb);
 #endif
 
 
@@ -2333,14 +2334,14 @@ typedef enum
 #define ACTION_RUN_ID_NORMAL ACTION_RUN_ID_INSTANTLY
 #define ACTION_RUN_ID_FULL (ACTION_RUN_ID_AGAIN | ACTION_RUN_ID_INSTANTLY)
 
-typedef struct StateXFnCtx_STRUCT StateXFnCtx_t;
+typedef struct StateXFn_STRUCT StateXFn_t;
 
-typedef void (*statex_init_fn)(StateXFnCtx_t *fn_link, void *data);
-typedef void (*statex_free_fn)(StateXFnCtx_t *fn_link, void *data);
-typedef void (*statex_leave_fn)(StateXFnCtx_t *fn_link, void *data);
-typedef void (*statex_enter_fn)(StateXFnCtx_t *fn_link, void *data);
+typedef void (*statex_init_fn)(StateXFn_t *fn_link, void *data);
+typedef void (*statex_free_fn)(StateXFn_t *fn_link, void *data);
+typedef void (*statex_leave_fn)(StateXFn_t *fn_link, void *data);
+typedef void (*statex_enter_fn)(StateXFn_t *fn_link, void *data);
 
-typedef struct StateXFnCtx_STRUCT
+typedef struct StateXFn_STRUCT
 {
 	int id;
 	int subitem;
@@ -2352,38 +2353,38 @@ typedef struct StateXFnCtx_STRUCT
 	statex_enter_fn enter_cb;
 
 	int init_count;
-} StateXFnCtx_t;
+} StateXFn_t;
 
-typedef struct StateXCtx_STRUCT StateXCtx_t;
+typedef struct StateX_STRUCT StateX_t;
 
 typedef struct StateXPuck_Struct
 {
-	StateXCtx_t *statex_req;
+	StateX_t *statex_req;
 	int idx;
 	int subitem;
 	ACTION_ID action;
 	int run;
 } StateXPuck_t;
 
-typedef struct StateXCtx_STRUCT
+typedef struct StateX_STRUCT
 {
-	QueueInfo_t *statex_q;
+	QueueX_t *statex_q;
 
-	StateXFnCtx_t *fn_last;
-	StateXFnCtx_t *fn_links;
+	StateXFn_t *fn_last;
+	StateXFn_t *fn_links;
 
 	int dbg_more;
 	void *data;
-} StateXCtx_t;
+} StateX_t;
 
-StateXFnCtx_t *statex_fn_last(StateXCtx_t *statex_req);
+StateXFn_t *statex_fn_last(StateX_t *statex_req);
 
-void statex_debug_q(StateXCtx_t *statex_req, int dbg_more);
-void statex_debug(StateXCtx_t *statex_req, int dbg_more);
-void statex_add(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run);
-void statex_push(StateXCtx_t *statex_req, int idx, int subitem, ACTION_ID action, int run);
-int statex_open(StateXCtx_t *statex_req, char *name);
-void statex_close(StateXCtx_t *statex_req);
+void statex_debug_q(StateX_t *statex_req, int dbg_more);
+void statex_debug(StateX_t *statex_req, int dbg_more);
+void statex_add(StateX_t *statex_req, int idx, int subitem, ACTION_ID action, int run);
+void statex_push(StateX_t *statex_req, int idx, int subitem, ACTION_ID action, int run);
+int statex_open(StateX_t *statex_req, char *name);
+void statex_close(StateX_t *statex_req);
 
 #endif
 
@@ -2704,7 +2705,7 @@ int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len);
 json_t *json_ary_create(json_t *jparent, const char *key);
 json_t *json_obj_create(json_t *jparent, const char *key);
 
-json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act);
+json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act);
 
 json_t *json_ary_find_val(json_t *jparent, json_t *jval, int *idx);
 json_t *json_ary_find_key_val(json_t *jparent, const char *key, json_t *jval, int *idx);
@@ -2752,7 +2753,7 @@ typedef struct SSH_STRUCT
 
 typedef struct Tunnel_STRUCT
 {
-	SSH_t ssh_ctx;
+	SSH_t ssh_req;
 
 	int open_port;
 
@@ -2764,24 +2765,24 @@ typedef struct Tunnel_STRUCT
 	int isquit;
 } Tunnel_t;
 
-int sshX_open_shell(SSH_t *ssh_ctx);
-int sshX_request_pty(SSH_t *ssh_ctx);
-int sshX_request_shell(SSH_t *ssh_ctx);
+int sshX_open_shell(SSH_t *ssh_req);
+int sshX_request_pty(SSH_t *ssh_req);
+int sshX_request_shell(SSH_t *ssh_req);
 
 void sshX_stream_copy(ssh_channel channel_frm, ssh_channel channel_to);
 
-void sshX_select_loop_with_tunnel(SSH_t *ssh_ctx, SSH_t *ssh_ctx_frm);
-void sshX_select_loop_with_fd(SSH_t *ssh_ctx, socket_t in_fd, socket_t out_fd, socket_t err_fd);
-ssh_channel sshX_open_channel(SSH_t *ssh_ctx);
-int sshX_interactive(SSH_t *ssh_ctx);
+void sshX_select_loop_with_tunnel(SSH_t *ssh_req, SSH_t *ssh_req_frm);
+void sshX_select_loop_with_fd(SSH_t *ssh_req, socket_t in_fd, socket_t out_fd, socket_t err_fd);
+ssh_channel sshX_open_channel(SSH_t *ssh_req);
+int sshX_interactive(SSH_t *ssh_req);
 
-int sshX_authenticate(SSH_t *ssh_ctx);
+int sshX_authenticate(SSH_t *ssh_req);
 
-void sshX_close_channel(SSH_t *ssh_ctx);
-void sshX_close_session(SSH_t *ssh_ctx);
-void sshX_stop(SSH_t *ssh_ctx);
+void sshX_close_channel(SSH_t *ssh_req);
+void sshX_close_session(SSH_t *ssh_req);
+void sshX_stop(SSH_t *ssh_req);
 
-ssh_session sshX_client(SSH_t *ssh_ctx);
+ssh_session sshX_client(SSH_t *ssh_req);
 
 #endif
 
@@ -2807,7 +2808,7 @@ typedef enum
 	SWLINK_CMD_ID_MAX,
 } SWLINK_CMD_ID;
 
-typedef struct SWLinkCtx_STRUCT
+typedef struct SWLinkX_STRUCT
 {
 	char cdev[LEN_OF_VAL32];
 	struct switch_dev *dev;
@@ -2818,7 +2819,7 @@ typedef struct SWLinkCtx_STRUCT
 	SWLINK_CMD_ID cmd; 
 	char ckey[LEN_OF_VAL32];
 
-} SWLinkCtx_t;
+} SWLinkX_t;
 
 #endif
 
@@ -3248,7 +3249,7 @@ typedef struct
 	unsigned int flags;
 	uv_process_options_t options;
 	uv_exit_cb exit_cb;
-} SpawnCtx_t;
+} SpawnX_t;
 
 typedef struct
 {
@@ -3261,17 +3262,17 @@ typedef struct
 
 	unsigned int flags; // UV_FS_EVENT_WATCH_ENTRY, UV_FS_EVENT_STAT, UV_FS_EVENT_RECURSIVE 
 	uv_fs_event_cb detect_cb;
-} UvEventCtx_t;
+} UvEvent_t;
 
 void uv_loop_close_ex(uv_loop_t *loop);
 void uv_write_ex(uv_stream_t *dest, size_t size, char *buf, uv_write_cb cb);
 
-void uv_spawn_close_ex(SpawnCtx_t *spawn_req);
-void uv_spawn_open_ex(SpawnCtx_t *spawn_req);
-void uv_spawn_simple_detached(SpawnCtx_t *spawn_req, int num, ...);
+void uv_spawn_close_ex(SpawnX_t *spawn_req);
+void uv_spawn_open_ex(SpawnX_t *spawn_req);
+void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...);
 
-void uv_event_close_ex(UvEventCtx_t *event_req);
-void uv_event_open_ex(UvEventCtx_t *event_req);
+void uv_event_close_ex(UvEvent_t *event_req);
+void uv_event_open_ex(UvEvent_t *event_req);
 
 #endif
 
@@ -3321,36 +3322,36 @@ DBusHandlerResult demo_signal_cb(DBusConnection *connection, DBusMessage *messag
 DBusHandlerResult echo_method_cb(DBusConnection *connection, DBusMessage *message, void *usr_data);
 
 int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *ifac,char *cmd, int itype, void *arg);
-int dbusx_signal_str(DbusX_t *dbusx_ctx, const char *ifac, char *cmd, char *arg);
+int dbusx_signal_str(DbusX_t *dbusx_req, const char *ifac, char *cmd, char *arg);
 int dbusx_signal_xint2uint(DBusConnection *dbus_conn, char *dbus_path, const char *ifac, char *cmd, int itype, unsigned int *arg);
 
 char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *key, const char *val, int timeout);
 char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, int itype, void *arg, int otype, int timeout);
-char *dbusx_method_str2str(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
-char *dbusx_method_str2int(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
-char *dbusx_method_xint2uint(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout);
+char *dbusx_method_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
+char *dbusx_method_str2int(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
+char *dbusx_method_xint2uint(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout);
 
-void dbusx_conn_free(DbusX_t *dbusx_ctx);
-int dbusx_client_init(DbusX_t *dbusx_ctx);
+void dbusx_conn_free(DbusX_t *dbusx_req);
+int dbusx_client_init(DbusX_t *dbusx_req);
 
-DBusConnection *dbusx_listen_get(DbusX_t *dbusx_ctx);
-DBusConnection *dbusx_conn_get(DbusX_t *dbusx_ctx);
-char *dbusx_path_get(DbusX_t *dbusx_ctx);
+DBusConnection *dbusx_listen_get(DbusX_t *dbusx_req);
+DBusConnection *dbusx_conn_get(DbusX_t *dbusx_req);
+char *dbusx_path_get(DbusX_t *dbusx_req);
 
-void dbusx_lock(DbusX_t *dbusx_ctx);
-void dbusx_unlock(DbusX_t *dbusx_ctx);
-void dbusx_wakeup_simple(DbusX_t *dbusx_ctx);
-void dbusx_wakeup(DbusX_t *dbusx_ctx);
-int dbusx_timewait_simple(DbusX_t *dbusx_ctx, int ms);
-int dbusx_timewait(DbusX_t *dbusx_ctx, int ms);
-void dbusx_wait_simple(DbusX_t *dbusx_ctx);
-void dbusx_wait(DbusX_t *dbusx_ctx);
+void dbusx_lock(DbusX_t *dbusx_req);
+void dbusx_unlock(DbusX_t *dbusx_req);
+void dbusx_wakeup_simple(DbusX_t *dbusx_req);
+void dbusx_wakeup(DbusX_t *dbusx_req);
+int dbusx_timewait_simple(DbusX_t *dbusx_req, int ms);
+int dbusx_timewait(DbusX_t *dbusx_req, int ms);
+void dbusx_wait_simple(DbusX_t *dbusx_req);
+void dbusx_wait(DbusX_t *dbusx_req);
 
-READY_ID dbusx_ready(DbusX_t *dbusx_ctx);
+READY_ID dbusx_ready(DbusX_t *dbusx_req);
 
-int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_ctx);
-void dbusx_thread_stop(DbusX_t *dbusx_ctx);
-void dbusx_thread_close(DbusX_t *dbusx_ctx);
+int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_req);
+void dbusx_thread_stop(DbusX_t *dbusx_req);
+void dbusx_thread_close(DbusX_t *dbusx_req);
 
 #endif
 
@@ -3367,13 +3368,13 @@ void dbusx_thread_close(DbusX_t *dbusx_ctx);
 #define USE_USBX_THREAD_CLOCK
 #define LEN_OF_USB_BUFFER LEN_OF_BUF512
 
-typedef struct UsbXCtx_STRUCT
+typedef struct UsbX_STRUCT
 {
 	ThreadX_t tidx;
 
 	int usb_isfree;
 
-	libusb_context *usb_ctx;
+	libusb_context *usb_req;
 	libusb_device_handle *usb_dev_handle;
 	struct libusb_transfer *usb_dev_transfer;
 
@@ -3406,44 +3407,44 @@ typedef struct UsbXCtx_STRUCT
 	int dbg_lvl;
 
 	void *user_data;
-} UsbXCtx_t;
+} UsbX_t;
 
 void usbX_dev_print_endpoint(const struct libusb_endpoint_descriptor *usb_endpoint);
 void usbX_dev_print_iface_desc(const struct libusb_interface_descriptor *usb_altsetting);
 void usbX_dev_print_iface(const struct libusb_interface *usb_interface);
 void usbX_dev_print_cfg(struct libusb_config_descriptor *usb_config);
 void usbX_dev_print_handle(libusb_device_handle *usb_dev_handle);
-void usbX_dev_print_ex(UsbXCtx_t *usbX_req);
+void usbX_dev_print_ex(UsbX_t *usbX_req);
 
-void usbX_dev_transfer_free(UsbXCtx_t *usbX_req);
-void usbX_dev_read_poll_free(UsbXCtx_t *usbX_req);
-int usbX_dev_read_poll(UsbXCtx_t *usbX_req, libusb_transfer_cb_fn callback);
+void usbX_dev_transfer_free(UsbX_t *usbX_req);
+void usbX_dev_read_poll_free(UsbX_t *usbX_req);
+int usbX_dev_read_poll(UsbX_t *usbX_req, libusb_transfer_cb_fn callback);
 
-void usbX_dev_response_reset(UsbXCtx_t *usbX_req);
-int usbX_dev_read(UsbXCtx_t *usbX_req, unsigned int usb_timeout);
-int usbX_dev_write(UsbXCtx_t *usbX_req, int *nwrite, unsigned int usb_timeout);
+void usbX_dev_response_reset(UsbX_t *usbX_req);
+int usbX_dev_read(UsbX_t *usbX_req, unsigned int usb_timeout);
+int usbX_dev_write(UsbX_t *usbX_req, int *nwrite, unsigned int usb_timeout);
 
 void usbX_dev_path(struct libusb_device *usb_dev, char *usb_path, int len);
-int usbX_dev_open(UsbXCtx_t *usbX_req, struct libusb_device *usb_dev);
-void usbX_dev_close(UsbXCtx_t *usbX_req);
+int usbX_dev_open(UsbX_t *usbX_req, struct libusb_device *usb_dev);
+void usbX_dev_close(UsbX_t *usbX_req);
 
-int usbX_hotplug_register(UsbXCtx_t *usbX_req);
+int usbX_hotplug_register(UsbX_t *usbX_req);
 
-void usbX_lock(UsbXCtx_t *usbX_req);
-void usbX_unlock(UsbXCtx_t *usbX_req);
-void usbX_signal(UsbXCtx_t *usbX_req);
-int usbX_timewait(UsbXCtx_t *usbX_req, int ms);
-void usbX_wait(UsbXCtx_t *usbX_req);
-int usbX_timewait_simple(UsbXCtx_t *usbX_req, int ms);
-void usbX_wakeup_simple(UsbXCtx_t *usbX_req);
+void usbX_lock(UsbX_t *usbX_req);
+void usbX_unlock(UsbX_t *usbX_req);
+void usbX_signal(UsbX_t *usbX_req);
+int usbX_timewait(UsbX_t *usbX_req, int ms);
+void usbX_wait(UsbX_t *usbX_req);
+int usbX_timewait_simple(UsbX_t *usbX_req, int ms);
+void usbX_wakeup_simple(UsbX_t *usbX_req);
 
-int usbX_thread_isloop(UsbXCtx_t *usbX_req);
+int usbX_thread_isloop(UsbX_t *usbX_req);
 
-void usbX_listen_close(UsbXCtx_t *usbX_req);
-int usbX_listen_open(UsbXCtx_t *usbX_req, void *user_data);
+void usbX_listen_close(UsbX_t *usbX_req);
+int usbX_listen_open(UsbX_t *usbX_req, void *user_data);
 
-void usbX_close(UsbXCtx_t *usbX_req);
-int usbX_browse(UsbXCtx_t *usbX_req, void *user_data);
+void usbX_close(UsbX_t *usbX_req);
+int usbX_browse(UsbX_t *usbX_req, void *user_data);
 
 #endif
 
@@ -3465,7 +3466,7 @@ int usbX_browse(UsbXCtx_t *usbX_req, void *user_data);
 		} \
 	} while(0)
 
-#define UCI_CTX_FREE(X) \
+#define uci_req_FREE(X) \
 	do { \
 		if ( (X) != NULL ) { \
 			uci_free_context(X); \
@@ -3481,7 +3482,7 @@ int usbX_browse(UsbXCtx_t *usbX_req, void *user_data);
 			{ \
 				if (UCI_OK != uci_load(__ret, filename, &pkg)) \
 				{ \
-					UCI_CTX_FREE(__ret); \
+					uci_req_FREE(__ret); \
 					DBG_ER_LN("uci_load error !!! (uci_filename: %s, uci_pkg: %p)", filename, pkg); \
 				} \
 			} \
@@ -3489,13 +3490,13 @@ int usbX_browse(UsbXCtx_t *usbX_req, void *user_data);
 		__ret; \
 	})
 
-typedef struct UCICtx_STRUCT
+typedef struct UCIX_STRUCT
 {
 	char *uci_filename;
-	struct uci_context *uci_ctx; 
+	struct uci_context *uci_req; 
 	struct uci_package *uci_pkg;
 
-} UCICtx_t;
+} UCIX_t;
 
 #define UCI_FOREACH_ITEM(_list, _ptr) uci_foreach_element(_list, _ptr)
 
@@ -3572,26 +3573,26 @@ typedef struct UCICtx_STRUCT
 		__ret; \
 	})
 
-int uci_list_free(UCICtx_t *uci_req, const char *u_name, const char *u_key);
-int uci_list_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, const char *u_val);
-int uci_list_add_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, const char *u_val);
+int uci_list_free(UCIX_t *uci_req, const char *u_name, const char *u_key);
+int uci_list_del_ex(UCIX_t *uci_req, const char *u_name, const char *u_key, const char *u_val);
+int uci_list_add_ex(UCIX_t *uci_req, const char *u_name, const char *u_key, const char *u_val);
 
-int uci_option_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key);
-int uci_option_set_str(UCICtx_t *uci_req, const char *u_name, const char *u_key, const char *u_val);
-const char *uci_option_get_str(UCICtx_t *uci_req, const char *u_name, const char *u_key);
-struct uci_option *uci_option_get_obj(UCICtx_t *uci_req, const char *u_name, const char *u_key);
+int uci_option_del_ex(UCIX_t *uci_req, const char *u_name, const char *u_key);
+int uci_option_set_str(UCIX_t *uci_req, const char *u_name, const char *u_key, const char *u_val);
+const char *uci_option_get_str(UCIX_t *uci_req, const char *u_name, const char *u_key);
+struct uci_option *uci_option_get_obj(UCIX_t *uci_req, const char *u_name, const char *u_key);
 
-struct uci_section *uci_section_get(UCICtx_t *uci_req, const char *u_name);
-int uci_section_del(UCICtx_t *uci_req, const char *u_name);
-struct uci_section *uci_section_set(UCICtx_t *uci_req, const char *u_type, const char *u_name);
+struct uci_section *uci_section_get(UCIX_t *uci_req, const char *u_name);
+int uci_section_del(UCIX_t *uci_req, const char *u_name);
+struct uci_section *uci_section_set(UCIX_t *uci_req, const char *u_type, const char *u_name);
 
 void uci_show_value_ex(struct uci_option *u_option);
 void uci_show_section_ex(struct uci_section *u_section);
-int uci_show_what_ex(UCICtx_t *uci_req, char *u_config);
-int uci_show_configs_ex(UCICtx_t *uci_req);
+int uci_show_what_ex(UCIX_t *uci_req, char *u_config);
+int uci_show_configs_ex(UCIX_t *uci_req);
 
-void uci_close(UCICtx_t *uci_req);
-int uci_open(UCICtx_t *uci_req);
+void uci_close(UCIX_t *uci_req);
+int uci_open(UCIX_t *uci_req);
 
 #endif
 
@@ -3610,13 +3611,13 @@ int uci_open(UCICtx_t *uci_req);
 
 #define ULOG_LVL_SET(x) ulog_threshold(x)
 
-#define ULOG_ER_LN(fmt, ...) ULOG_ERR(COLOR_RED"[%02ld/%u] %s:%d - "fmt""COLOR_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_ER_LN(fmt, ...) ULOG_ERR(COLORX_RED"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_ER(fmt, ...) ULOG_ERR(fmt, ## __VA_ARGS__)
-#define ULOG_WN_LN(fmt, ...) ULOG_WARN(COLOR_PURPLE"[%02ld/%u] %s:%d - "fmt""COLOR_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_WN_LN(fmt, ...) ULOG_WARN(COLORX_PURPLE"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_WN(fmt, ...) ULOG_WARN(fmt, ## __VA_ARGS__)
-#define ULOG_IF_LN(fmt, ...) ULOG_NOTE(COLOR_YELLOW"[%02ld/%u] %s:%d - "fmt""COLOR_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_IF_LN(fmt, ...) ULOG_NOTE(COLORX_YELLOW"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_IF(fmt, ...) ULOG_NOTE(fmt, ## __VA_ARGS__)
-#define ULOG_DB_LN(fmt, ...) ULOG_INFO(COLOR_WHITE"[%02ld/%u] %s:%d - "fmt""COLOR_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_DB_LN(fmt, ...) ULOG_INFO(COLORX_WHITE"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_DB(fmt, ...) ULOG_INFO(fmt, ## __VA_ARGS__)
 
 #define ULOG_CLOSE() ulog_close()
@@ -3667,10 +3668,10 @@ typedef struct QueryParam_Struct
 	yuarel_param_t params[MAX_OF_QUERY_PARAM];
 } QueryParam_t;
 
-char *query_uri_get(QueryParam_t *q_params_ctx);
-int query_count_get(QueryParam_t *q_params_ctx);
-yuarel_param_t *query_params_get(QueryParam_t *q_params_ctx);
-yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_ctx);
+char *query_uri_get(QueryParam_t *q_params_req);
+int query_count_get(QueryParam_t *q_params_req);
+yuarel_param_t *query_params_get(QueryParam_t *q_params_req);
+yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_req);
 
 #endif
 
@@ -3725,7 +3726,7 @@ typedef struct LWSSession_Struct
 	CLIST_STRUCT(msg_list);
 } LWSSession_t;
 
-typedef struct LWSCtx_Struct
+typedef struct LWSX_Struct
 {
 	char name[LEN_OF_NAME32];
 
@@ -3756,7 +3757,7 @@ typedef struct LWSCtx_Struct
 	int tx_size;
 	char rx[LEN_OF_LWS];
 	int rx_size;
-} LWSCtx_t;
+} LWSX_t;
 
 #define SAFE_LWS_MEMCPY(dst, src, count, maxcount) \
 	SAFE_MEMCPY(dst+LWS_SEND_BUFFER_PRE_PADDING, src, count, maxcount)
@@ -3768,7 +3769,7 @@ typedef struct LWSCtx_Struct
 #define LWS_TX_PRINT(x) \
 	if (pcheck(x)) \
 	{ \
-		LWSCtx_t *ctx = x; \
+		LWSX_t *ctx = x; \
 		char *body = ctx->tx + LWS_SEND_BUFFER_PRE_PADDING; \
 		if (ctx->dbg_more<DBG_LVL_MAX) DBG_IF_LN("(tx_size: %d, body: %s)", ctx->tx_size, body); \
 	}
@@ -3776,7 +3777,7 @@ typedef struct LWSCtx_Struct
 #define LWS_RX_PRINT(x) \
 	if (pcheck(x)) \
 	{ \
-		LWSCtx_t *ctx = x; \
+		LWSX_t *ctx = x; \
 		char *body = ctx->rx + LWS_SEND_BUFFER_PRE_PADDING; \
 		if (ctx->dbg_more<DBG_LVL_MAX) DBG_IF_LN("(rx_size: %d, body: %s)", ctx->rx_size, body); \
 	}
@@ -3784,29 +3785,29 @@ typedef struct LWSCtx_Struct
 
 char* translate_lws_cb(enum lws_callback_reasons reason);
 
-LWSCtx_t *lws2_protocol_user(struct lws *wsi);
+LWSX_t *lws2_protocol_user(struct lws *wsi);
 
 void lws2_session_lock(LWSSession_t *session);
 void lws2_session_unlock(LWSSession_t *session);
-void lws2_session_pop(LWSCtx_t *lws_ctx, LWSSession_t *session);
+void lws2_session_pop(LWSX_t *lws_req, LWSSession_t *session);
 
 void lws2_session_write(LWSSession_t *session);
 void lws2_session_write_q_push(LWSSession_t *session, char *payload, int payload_len);
-void lws2_session_write_q_broadcast(LWSCtx_t *lws_ctx, char *payload, int payload_len);
-int lws2_session_count(LWSCtx_t *lws_ctx);
+void lws2_session_write_q_broadcast(LWSX_t *lws_req, char *payload, int payload_len);
+int lws2_session_count(LWSX_t *lws_req);
 
-void lws2_lock(LWSCtx_t *lws_ctx);
-void lws2_unlock(LWSCtx_t *lws_ctx);
+void lws2_lock(LWSX_t *lws_req);
+void lws2_unlock(LWSX_t *lws_req);
 
-void lws2_cli_init(LWSCtx_t *lws_ctx, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
-void lws2_cli_open(LWSCtx_t *lws_ctx, char *address, int port, char *filename);
-//void lws2_cli_close(LWSCtx_t *lws_ctx);
+void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
+void lws2_cli_open(LWSX_t *lws_req, char *address, int port, char *filename);
+//void lws2_cli_close(LWSX_t *lws_req);
 
-void lws2_srv_init(LWSCtx_t *lws_ctx, int port, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
+void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop);
 
-void lws2_thread_stop(LWSCtx_t *lws_ctx);
-void lws2_thread_close(LWSCtx_t *lws_ctx);
-void lws2_thread_init(LWSCtx_t *lws_ctx);
+void lws2_thread_stop(LWSX_t *lws_req);
+void lws2_thread_close(LWSX_t *lws_req);
+void lws2_thread_init(LWSX_t *lws_req);
 
 #endif
 
@@ -3851,7 +3852,7 @@ typedef struct MQTTSub_Struct
 
 typedef struct MQTTSession_Struct
 {
-	void *mqtt_ctx;
+	void *mqtt_req;
 	struct mosquitto *mosq;
 	char macid[LEN_OF_MAC];
 
@@ -3875,8 +3876,8 @@ typedef struct MQTTSession_Struct
 	int isconnect;
 	int count;
 
-	QueueInfo_t *qpub;
-	QueueInfo_t *qsub;
+	QueueX_t *qpub;
+	QueueX_t *qsub;
 
 	CLIST_STRUCT(sub_list);
 
@@ -3902,7 +3903,7 @@ typedef struct MQTTTopic_Struct
 	mqtt_topic_fn *topic_cb;
 } MQTTTopic_t;
 
-typedef struct MQTTCtx_Struct
+typedef struct MQTTX_Struct
 {
 	char name[LEN_OF_NAME32];
 
@@ -3913,9 +3914,9 @@ typedef struct MQTTCtx_Struct
 	int dbg_more;
 
 	MQTTSession_t *session;
-} MQTTCtx_t;
+} MQTTX_t;
 
-MQTTSession_t *mqtt_session_get(MQTTCtx_t *mqtt_ctx);
+MQTTSession_t *mqtt_session_get(MQTTX_t *mqtt_req);
 
 int mqtt_publish(MQTTSession_t *session, char *topic, char *msg);
 
@@ -3928,18 +3929,18 @@ void mqtt_queue_gosleep(MQTTSession_t *session);
 
 void mqtt_srv_subscribe(MQTTSession_t *session);
 
-void mqtt_lock(MQTTCtx_t *mqtt_ctx);
-void mqtt_unlock(MQTTCtx_t *mqtt_ctx);
-void mqtt_signal(MQTTCtx_t *mqtt_ctx);
-int mqtt_timewait(MQTTCtx_t *mqtt_ctx, int ms);
-void mqtt_wait(MQTTCtx_t *mqtt_ctx);
-void mqtt_wakeup(MQTTCtx_t *mqtt_ctx);
+void mqtt_lock(MQTTX_t *mqtt_req);
+void mqtt_unlock(MQTTX_t *mqtt_req);
+void mqtt_signal(MQTTX_t *mqtt_req);
+int mqtt_timewait(MQTTX_t *mqtt_req, int ms);
+void mqtt_wait(MQTTX_t *mqtt_req);
+void mqtt_wakeup(MQTTX_t *mqtt_req);
 
-int mqtt_isquit(MQTTCtx_t *mqtt_ctx);
+int mqtt_isquit(MQTTX_t *mqtt_req);
 
-void mqtt_thread_stop(MQTTCtx_t *mqtt_ctx);
-void mqtt_thread_close(MQTTCtx_t *mqtt_ctx);
-void mqtt_thread_init(MQTTCtx_t *mqtt_ctx);
+void mqtt_thread_stop(MQTTX_t *mqtt_req);
+void mqtt_thread_close(MQTTX_t *mqtt_req);
+void mqtt_thread_init(MQTTX_t *mqtt_req);
 
 #endif
 
@@ -3960,149 +3961,6 @@ typedef enum
 #define CRON_YEAR_END_2120 2120
 #define MAX_OF_CRON_RANGE 200 // > (CRON_YEAR_END_2020-CRON_YEAR_START_2020)
 int cronx_validate(char *cron_txt, struct tm *kick_tm);
-
-#endif
-
-//******************************************************************************
-//** UTIL_EX_XBUS **
-//******************************************************************************
-#ifdef UTIL_EX_XBUS
-#include <glib/gprintf.h>
-#include <gio/gio.h>
-
-// https://developer.gimp.org/api/2.0/glib/glib-String-Utility-Functions.html
-#define SAFE_G_SPRINTF(X, FMT, args...) \
-	({ int __ret =0; do { if (pcheck(X)) __ret = g_sprintf(X, FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
-#define SAFE_G_STRDUP(FMT, args...) \
-	({ gchar *__ret = NULL; \
-		do { \
-			__ret = g_strdup_printf(FMT, ## args); \
-		} while(0); \
-		__ret; \
-	})
-#define SAFE_G_FREE(X) \
-	do { if ( (X) != NULL ) {g_free(X); X=NULL;} } while(0)
-#define SAFE_G_UNREF(X) \
-	do { if ( (X) != NULL ) {g_object_unref(X); X=NULL;} } while(0)
-#define SAFE_G_ERR_FREE(X) \
-	do { if ( (X) != NULL ) {g_error_free(X); X=NULL;} } while(0)
-
-#define SAFE_G_LOOP_RUN(loop) \
-	do { \
-		if (pcheck(loop)) \
-		{ \
-			g_main_loop_run(loop); \
-		} \
-	} while(0)
-#define SAFE_G_LOOP_QUIT(loop) \
-	do { \
-		if (pcheck(loop)) \
-		{ \
-			g_main_loop_quit(loop); \
-			loop=NULL; \
-		} \
-	} while(0)
-
-#define XBUS_CONCAT1_EX(s1) s1
-#define XBUS_CONCAT1_HELPER(s1) XBUS_CONCAT1_EX(s1)
-
-#define XBUS_CONCAT2_EX(s1, s2) s1##s2
-#define XBUS_CONCAT2_HELPER(s1, s2) XBUS_CONCAT2_EX(s1, s2)
-
-#define XBUS_CONCAT3_EX(s1, s2, s3) s1##s2##s3
-#define XBUS_CONCAT3_HELPER(s1, s2, s3) XBUS_CONCAT3_EX(s1, s2, s3)
-
-#define XBUS_CONCAT4_EX(s1, s2, s3, s4) s1##s2##s3##s4
-#define XBUS_CONCAT4_HELPER(s1, s2, s3, s4) XBUS_CONCAT4_EX(s1, s2, s3, s4)
-
-#define XBUS_SIGNAL_EMIT(name, match) XBUS_CONCAT3_HELPER(name, _emit, match)
-
-#define XBUS_METHOD_ASYNC(name, method) XBUS_CONCAT3_HELPER(name, _call, method)
-#define XBUS_METHOD_FINISH(name, method) XBUS_CONCAT4_HELPER(name, _call, method, _finish)
-#define XBUS_METHOD_SYNC(name, method) XBUS_CONCAT4_HELPER(name, _call, method, _sync)
-#define XBUS_METHOD_COMPLETE(name, method) XBUS_CONCAT3_HELPER(name, _complete, method)
-
-#define XBUS_PROXY_NEW(name) XBUS_CONCAT2_HELPER(name, _proxy_new)
-#define XBUS_PROXY_NEW_FINISH(name) XBUS_CONCAT2_HELPER(name, _proxy_new_finish)
-#define XBUS_PROXY_NEW_SYNC(name) XBUS_CONCAT2_HELPER(name, _proxy_new_sync)
-#define XBUS_PROXY_NEW_FOR_BUS(name) XBUS_CONCAT2_HELPER(name, _proxy_new_for_bus)
-#define XBUS_PROXY_NEW_FOR_BUS_FINISH(name) XBUS_CONCAT2_HELPER(name, _proxy_new_for_bus_finish)
-#define XBUS_PROXY_NEW_FOR_BUS_SYNC(name) XBUS_CONCAT2_HELPER(name, _proxy_new_for_bus_sync)
-
-#define XBUS_SKELETON_NEW(name) XBUS_CONCAT2_HELPER(name, _skeleton_new)
-
-#define XBUS_IFAC_FUNC_CONCAT(s1,s2) XBUS_CONCAT2_HELPER(s1, s2)
-
-#if (0)
-// please check your NAME
-#define XBUS_IFAC_FUNC_PREFIXNAME com_github_lankahsu520
-#define XBUS_IFAC_FUN_DEMO XBUS_IFAC_FUNC_CONCAT(XBUS_IFAC_FUNC_PREFIXNAME, _demo)
-
-#define XBUS_METHOD_ASYNC_demo XBUS_METHOD_ASYNC(XBUS_IFAC_FUN_DEMO, _set_name)
-#define XBUS_METHOD_FINISH_demo XBUS_METHOD_FINISH(XBUS_IFAC_FUN_DEMO, _set_name)
-#define XBUS_METHOD_SYNC_demo XBUS_METHOD_SYNC(XBUS_IFAC_FUN_DEMO, _set_name)
-#define XBUS_METHOD_demo XBUS_METHOD(XBUS_IFAC_FUN_DEMO, _set_name)
-
-#define XBUS_PROXY_NEW_demo XBUS_PROXY_NEW(XBUS_IFAC_NAME_DEMO)
-#define XBUS_PROXY_NEW_FINISH_demo XBUS_PROXY_NEW_FINISH(XBUS_IFAC_NAME_DEMO)
-#define XBUS_PROXY_NEW_SYNC_demo XBUS_PROXY_NEW_SYNC(XBUS_IFAC_NAME_DEMO)
-#define XBUS_PROXY_NEW_FOR_BUS_demo XBUS_PROXY_NEW_FOR_BUS(XBUS_IFAC_NAME_DEMO)
-#define XBUS_PROXY_NEW_FOR_BUS_FINISH_demo XBUS_PROXY_NEW_FOR_BUS_FINISH(XBUS_IFAC_NAME_DEMO)
-#define XBUS_PROXY_NEW_FOR_BUS_SYNC_demo XBUS_PROXY_NEW_FOR_BUS_SYNC(XBUS_IFAC_NAME_DEMO)
-#define XBUS_SKELETON_NEW_demo XBUS_SKELETON_NEW(XBUS_IFAC_NAME_DEMO)
-#endif
-
-#define XBUS_TYPE_SESSION G_BUS_TYPE_SESSION
-#define XBUS_PROXY_FLAGS G_DBUS_PROXY_FLAGS_NONE
-#define XBUS_OWNER_FLAGS G_BUS_NAME_OWNER_FLAGS_NONE
-#define XBUS_OBJECT GObject
-
-typedef void *(*proxy_register_fn) (void *);
-
-typedef struct Xbus_Struct
-{
-	char name[LEN_OF_NAME32];
-
-	ThreadX_t tidx;
-
-	int isquit;
-	int isfree;
-	int isinit;
-
-	int isservice;
-
-	GMainLoop *g_Loop;
-	GDBusConnection *g_connection;
-	guint g_type;
-
-	char *iface_name;
-	char *path_name;
-
-	guint proxy_flags;
-	GObject *g_proxy;
-	proxy_register_fn proxy_register_cb;
-
-	guint g_ownid;
-	guint owner_flags;
-	GObject *g_skeletion;
-	GBusAcquiredCallback bus_acquired_handler;
-	GBusNameAcquiredCallback name_acquired_handler;
-	GBusNameLostCallback name_lost_handler;
-
-	void *data;
-} Xbus_t;
-
-void xbus_signal_int(Xbus_t *xbus_req, char *signal_name, void *signal_cb);
-void xbus_client_int(Xbus_t *xbus_req);
-
-void xbus_name_acquired_cb(GDBusConnection *connection, const gchar *name, gpointer user_data);
-void xbus_name_lost_cb(GDBusConnection *connection, const gchar *name, gpointer user_data);
-void xbus_server_int(Xbus_t *xbus_req);
-
-void *xbus_dummy_thread_handler(void *user);
-
-void xbus_stop(Xbus_t *xbus_req);
-void xbus_start(Xbus_t *xbus_req, char *thread_name, thread_fn thread_cb, proxy_register_fn proxy_register_cb, GBusAcquiredCallback bus_acquired_handler, GBusNameAcquiredCallback name_acquired_handler, GBusNameLostCallback name_lost_handler);
 
 #endif
 

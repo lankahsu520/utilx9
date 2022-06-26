@@ -23,7 +23,7 @@
 // ** app **
 static int is_quit = 0;
 
-SWLinkCtx_t sw_req = {
+SWLinkX_t sw_req = {
 	.cdev = "switch0",
 	.port = 0,
 	.cmd = SWLINK_CMD_ID_GET,

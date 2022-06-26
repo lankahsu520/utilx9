@@ -27,7 +27,7 @@ int http_download_mjpeg(char *url, char *prefixname)
 	int ret = -1;
 	if ((url) && strlen(url) && (prefixname) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_MJPEG,
 			.url = "",
 			.log = "",
@@ -57,7 +57,7 @@ int http_download_rtsp(char *url, char *filename)
 	int ret = -1;
 	if ((url) && strlen(url) && (filename) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_RTSP,
 			.url = "",
 			.log = "",
@@ -88,7 +88,7 @@ int http_download_normal(char *url, char *filename)
 	int ret = -1;
 	if ((url) && strlen(url) && (filename) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_NORMAL,
 			.url = "",
 			.log = "",
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 	
 #if (0)
 #ifdef UTIL_EX_CURL
-	HttpCtx_t http_req ={
+	HttpX_t http_req ={
 		.mode = HTTP_MODE_ID_DOWNLOAFILE_NORMAL,
 		.url = "https://curl.haxx.se/download/curl-7.60.0.tar.gz",
 		.log = "",

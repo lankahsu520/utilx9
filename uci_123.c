@@ -14,18 +14,18 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-UCICtx_t uci_wireless_req = {
+UCIX_t uci_wireless_req = {
 	.uci_filename = UCI_CFG_WIRELESS,
 
-	.uci_ctx = NULL,
+	.uci_req = NULL,
 	.uci_pkg = NULL,
 };
 
-UCICtx_t uci_demo_req = {
+UCIX_t uci_demo_req = {
 	//.uci_filename = "demo",
 	.uci_filename = UCI_CFG_DEMO,
 
-	.uci_ctx = NULL,
+	.uci_req = NULL,
 	.uci_pkg = NULL,
 };
 
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	DBG_TR_LN("enter");
 
 	{
-		UCICtx_t *uci_req = &uci_wireless_req;
+		UCIX_t *uci_req = &uci_wireless_req;
 		if ( 0 == UCI_OPEN(uci_req) )
 		{
 			DBG_IF_LN("(ssid: %s)", UCI_OPTION_GET_STR(uci_req, "ap", "ssid" ) );
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	}
 
 	{
-		UCICtx_t *uci_req = &uci_demo_req;
+		UCIX_t *uci_req = &uci_demo_req;
 		if ( 0 == UCI_OPEN(uci_req) )
 		{
 #if (1)

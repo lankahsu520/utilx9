@@ -19,7 +19,7 @@
 
 CLIST(WSListHead);
 
-static WSDiscoveryCtx_t *wsd_info = NULL;
+static WSDiscoveryX_t *wsd_info = NULL;
 
 clist_t ws_list_head(void)
 {
@@ -98,7 +98,7 @@ void ws_entry_free(void)
 
 void ws_devices_refresh(void)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if (wsd_req)
 	{
 		ws_entry_free();
@@ -108,7 +108,7 @@ void ws_devices_refresh(void)
 	}
 }
 
-void ws_device_add(ChainXCtx_t *chainX_req, soap_node_t *node)
+void ws_device_add(ChainX_t *chainX_req, soap_node_t *node)
 {
 	const char *Types = NULL;
 	soap_node_t *Types_node = soap_element_fetch(node, NULL, "Types", NULL, NULL);
@@ -173,7 +173,7 @@ void ws_device_add(ChainXCtx_t *chainX_req, soap_node_t *node)
 
 void wsdiscovery_probematches_register(wsdiscovery_response_fn cb)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if (wsd_req)
 	{
 		wsd_req->probematches_cb = cb;
@@ -182,7 +182,7 @@ void wsdiscovery_probematches_register(wsdiscovery_response_fn cb)
 
 void wsdiscovery_probe_register(wsdiscovery_response_fn cb)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if (wsd_req)
 	{
 		wsd_req->probe_cb = cb;
@@ -191,7 +191,7 @@ void wsdiscovery_probe_register(wsdiscovery_response_fn cb)
 
 void wsdiscovery_hello_register(wsdiscovery_response_fn cb)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if (wsd_req)
 	{
 		wsd_req->hello_cb = cb;
@@ -200,7 +200,7 @@ void wsdiscovery_hello_register(wsdiscovery_response_fn cb)
 
 void wsdiscovery_others_register(wsdiscovery_response_fn cb)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if (wsd_req)
 	{
 		wsd_req->others_cb = cb;
@@ -209,19 +209,19 @@ void wsdiscovery_others_register(wsdiscovery_response_fn cb)
 
 void wsdiscovery_linked_register(chainX_linked_fn cb)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if ( (wsd_req) && (wsd_req->chainX_req) )
 	{
 		chainX_linked_register(wsd_req->chainX_req, cb);
 	}
 }
 
-static void wsdiscovery_response(ChainXCtx_t *chainX_req, char *buff, int buff_len)
+static void wsdiscovery_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
 	if ((chainX_req) && (buff) &&(buff_len))
 	{
 		//DBG_TMP_Y("%s:%d - [%s] \n", inet_ntoa(chainX_req->addr_frm.sin_addr), ntohs(chainX_req->addr_frm.sin_port), buff);
-		WSDiscoveryCtx_t *wsd_req = (WSDiscoveryCtx_t *)chainX_req->c_data;
+		WSDiscoveryX_t *wsd_req = (WSDiscoveryX_t *)chainX_req->c_data;
 		if (wsd_req)
 		{
 			soap_node_t *response_node = soap_load_string(buff);
@@ -275,10 +275,10 @@ static char *wsdiscovery_xml(SOAP_ACTION_ID act_id)
 	}
 }
 
-static void wsdiscovery_uuid_gen(ChainXCtx_t *chainX_req, soap_node_t *request_node)
+static void wsdiscovery_uuid_gen(ChainX_t *chainX_req, soap_node_t *request_node)
 {
-	//ChainXCtx_t *chainX_req = wsd_req->chainX_req;
-	//SoapCtx_t *soap = wsd_req->soap;
+	//ChainX_t *chainX_req = wsd_req->chainX_req;
+	//SoapX_t *soap = wsd_req->soap;
 
 	if ( (chainX_req) && (request_node) )
 	{
@@ -298,7 +298,7 @@ static void wsdiscovery_uuid_gen(ChainXCtx_t *chainX_req, soap_node_t *request_n
 	}
 }
 
-void wsdiscovery_sender(WSDiscoveryCtx_t *wsd_req, SOAP_ACTION_ID act_id)
+void wsdiscovery_sender(WSDiscoveryX_t *wsd_req, SOAP_ACTION_ID act_id)
 {
 	if (wsd_req)
 	{
@@ -324,7 +324,7 @@ void wsdiscovery_probe(chainX_post_fn cb)
 {
 	if (cb)
 	{
-		ChainXCtx_t chainXms = {
+		ChainX_t chainXms = {
 			.mode = CHAINX_MODE_ID_MULTI_SENDER,
 			.sockfd = -1,
 
@@ -362,12 +362,12 @@ void wsdiscovery_probe(chainX_post_fn cb)
 	}
 }
 
-WSDiscoveryCtx_t *wsdiscovery_get(void)
+WSDiscoveryX_t *wsdiscovery_get(void)
 {
 	return wsd_info;
 }
 
-static void wsdiscovery_free(WSDiscoveryCtx_t *wsd_req)
+static void wsdiscovery_free(WSDiscoveryX_t *wsd_req)
 {
 	if (wsd_req)
 	{
@@ -378,7 +378,7 @@ static void wsdiscovery_free(WSDiscoveryCtx_t *wsd_req)
 
 void wsdiscovery_stop(void)
 {
-	WSDiscoveryCtx_t *wsd_req = wsdiscovery_get();
+	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
 	if (wsd_req)
 	{
 		chainX_thread_stop(wsd_req->chainX_req);
@@ -387,7 +387,7 @@ void wsdiscovery_stop(void)
 
 void wsdiscovery_close(void)
 {
-	WSDiscoveryCtx_t *wsd_req = wsd_info;
+	WSDiscoveryX_t *wsd_req = wsd_info;
 	if (wsd_req)
 	{
 		chainX_thread_close(wsd_req->chainX_req);
@@ -396,12 +396,12 @@ void wsdiscovery_close(void)
 	}
 }
 
-static WSDiscoveryCtx_t *wsdiscovery_init(void)
+static WSDiscoveryX_t *wsdiscovery_init(void)
 {
-	WSDiscoveryCtx_t *wsd_req = (WSDiscoveryCtx_t*)SAFE_CALLOC(1, sizeof(WSDiscoveryCtx_t));
+	WSDiscoveryX_t *wsd_req = (WSDiscoveryX_t*)SAFE_CALLOC(1, sizeof(WSDiscoveryX_t));
 	if (wsd_req)
 	{
-		ChainXCtx_t *chainX_req = (ChainXCtx_t*)SAFE_CALLOC(1, sizeof(ChainXCtx_t));
+		ChainX_t *chainX_req = (ChainX_t*)SAFE_CALLOC(1, sizeof(ChainX_t));
 		if (chainX_req)
 		{
 			wsd_req->chainX_req = chainX_req;
@@ -427,7 +427,7 @@ static WSDiscoveryCtx_t *wsdiscovery_init(void)
 	return wsd_req;
 }
 
-WSDiscoveryCtx_t *wsdiscovery_open(void)
+WSDiscoveryX_t *wsdiscovery_open(void)
 {
 	if (wsd_info==NULL)
 	{

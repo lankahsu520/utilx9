@@ -14,7 +14,7 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-ChainXCtx_t chainX_n = {
+ChainX_t chainX_n = {
 	.mode = CHAINX_MODE_ID_NETLINK,
 	.sockfd = -1,
 	.status = 0,
@@ -28,7 +28,7 @@ ChainXCtx_t chainX_n = {
 	.c_data = NULL,
 };
 
-void netlink_recv(ChainXCtx_t *chainX_req, char *ifname, int index, char *status)
+void netlink_recv(ChainX_t *chainX_req, char *ifname, int index, char *status)
 {
 	DBG_IF_LN("Got !!! (ifname: %s, index: %d, status: %s)", ifname, index, status);
 }

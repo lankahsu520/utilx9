@@ -15,15 +15,15 @@
 #include "utilx9.h"
 #include <ctype.h>
 
-int uci_list_free(UCICtx_t *uci_req, const char *u_name, const char *u_key)
+int uci_list_free(UCIX_t *uci_req, const char *u_name, const char *u_key)
 {
 	return uci_option_del_ex(uci_req, u_name, u_key);
 }
 
-int uci_list_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, const char *u_val)
+int uci_list_del_ex(UCIX_t *uci_req, const char *u_name, const char *u_key, const char *u_val)
 {
 	int ret = -1;
-	if ( (uci_req->uci_ctx) && (u_name) && (u_key) )
+	if ( (uci_req->uci_req) && (u_name) && (u_key) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
@@ -35,14 +35,14 @@ int uci_list_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, co
 				.value =u_val,
 			};
 
-			if (UCI_OK != uci_del_list(uci_req->uci_ctx, &ptr) )
+			if (UCI_OK != uci_del_list(uci_req->uci_req, &ptr) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_del_list error !!!");
 			}
-			else if (UCI_OK != uci_commit(uci_req->uci_ctx, &uci_req->uci_pkg, false) )
+			else if (UCI_OK != uci_commit(uci_req->uci_req, &uci_req->uci_pkg, false) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_commit error !!!");
 			}
 			else
@@ -58,15 +58,15 @@ int uci_list_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, co
 	return ret;
 }
 
-int uci_list_add_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, const char *u_val)
+int uci_list_add_ex(UCIX_t *uci_req, const char *u_name, const char *u_key, const char *u_val)
 {
 	int ret = -1;
-	if ( (uci_req->uci_ctx) && (u_name) && (u_key) && (u_val) )
+	if ( (uci_req->uci_req) && (u_name) && (u_key) && (u_val) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
 		{
-			struct uci_option *o_key = uci_lookup_option(uci_req->uci_ctx, u_section, u_key);
+			struct uci_option *o_key = uci_lookup_option(uci_req->uci_req, u_section, u_key);
 			if ((NULL != o_key) && (UCI_TYPE_LIST == o_key->type))
 			{
 				struct uci_element *u_item;
@@ -89,14 +89,14 @@ int uci_list_add_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, co
 				.value = u_val,
 			};
 
-			if (UCI_OK != uci_add_list(uci_req->uci_ctx, &ptr) )
+			if (UCI_OK != uci_add_list(uci_req->uci_req, &ptr) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_set error !!!");
 			}
-			else if (UCI_OK != uci_commit(uci_req->uci_ctx, &uci_req->uci_pkg, false) )
+			else if (UCI_OK != uci_commit(uci_req->uci_req, &uci_req->uci_pkg, false) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_commit error !!!");
 			}
 			else
@@ -112,10 +112,10 @@ int uci_list_add_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key, co
 	return ret;
 }
 
-int uci_option_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key)
+int uci_option_del_ex(UCIX_t *uci_req, const char *u_name, const char *u_key)
 {
 	int ret = -1;
-	if ( (uci_req->uci_ctx) && (u_name) && (u_key) )
+	if ( (uci_req->uci_req) && (u_name) && (u_key) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
@@ -126,14 +126,14 @@ int uci_option_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key)
 				.option = u_key,
 			};
 
-			if (UCI_OK != uci_delete(uci_req->uci_ctx, &ptr) )
+			if (UCI_OK != uci_delete(uci_req->uci_req, &ptr) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_delete error !!!");
 			}
-			else if (UCI_OK != uci_commit(uci_req->uci_ctx, &uci_req->uci_pkg, false) )
+			else if (UCI_OK != uci_commit(uci_req->uci_req, &uci_req->uci_pkg, false) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_commit error !!!");
 			}
 			else
@@ -149,10 +149,10 @@ int uci_option_del_ex(UCICtx_t *uci_req, const char *u_name, const char *u_key)
 	return ret;
 }
 
-int uci_option_set_str(UCICtx_t *uci_req, const char *u_name, const char *u_key, const char *u_val)
+int uci_option_set_str(UCIX_t *uci_req, const char *u_name, const char *u_key, const char *u_val)
 {
 	int ret = -1;
-	if ( (uci_req->uci_ctx) && (u_name) && (u_key) && (u_val) )
+	if ( (uci_req->uci_req) && (u_name) && (u_key) && (u_val) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
@@ -165,14 +165,14 @@ int uci_option_set_str(UCICtx_t *uci_req, const char *u_name, const char *u_key,
 				.value = u_val,
 			};
 
-			if (UCI_OK != uci_set(uci_req->uci_ctx, &ptr) )
+			if (UCI_OK != uci_set(uci_req->uci_req, &ptr) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_set error !!!");
 			}
-			else if (UCI_OK != uci_commit(uci_req->uci_ctx, &uci_req->uci_pkg, false) )
+			else if (UCI_OK != uci_commit(uci_req->uci_req, &uci_req->uci_pkg, false) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_commit error !!!");
 			}
 			else
@@ -188,27 +188,27 @@ int uci_option_set_str(UCICtx_t *uci_req, const char *u_name, const char *u_key,
 	return ret;
 }
 
-const char *uci_option_get_str(UCICtx_t *uci_req, const char *u_name, const char *u_key)
+const char *uci_option_get_str(UCIX_t *uci_req, const char *u_name, const char *u_key)
 {
-	if ( (uci_req->uci_ctx) && (u_name) && (u_key) )
+	if ( (uci_req->uci_req) && (u_name) && (u_key) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
 		{
-			return uci_lookup_option_string(uci_req->uci_ctx, u_section, u_key);
+			return uci_lookup_option_string(uci_req->uci_req, u_section, u_key);
 		}
 	}
 	return NULL;
 }
 
-struct uci_option *uci_option_get_obj(UCICtx_t *uci_req, const char *u_name, const char *u_key)
+struct uci_option *uci_option_get_obj(UCIX_t *uci_req, const char *u_name, const char *u_key)
 {
-	if ( (uci_req->uci_ctx) && (u_name) && (u_key) )
+	if ( (uci_req->uci_req) && (u_name) && (u_key) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
 		{
-			return uci_lookup_option(uci_req->uci_ctx, u_section, u_key);
+			return uci_lookup_option(uci_req->uci_req, u_section, u_key);
 	}
 	}
 	return NULL;
@@ -234,19 +234,19 @@ static bool uci_validate_str_ex(const char *str, bool is_name, bool is_package)
 	return true;
 }
 
-struct uci_section *uci_section_get(UCICtx_t *uci_req, const char *u_name)
+struct uci_section *uci_section_get(UCIX_t *uci_req, const char *u_name)
 {
-	if ( (uci_req->uci_ctx) && (uci_req->uci_pkg) )
+	if ( (uci_req->uci_req) && (uci_req->uci_pkg) )
 	{
-		return uci_lookup_section(uci_req->uci_ctx, uci_req->uci_pkg, u_name);
+		return uci_lookup_section(uci_req->uci_req, uci_req->uci_pkg, u_name);
 	}
 	return NULL;
 }
 
-int uci_section_del(UCICtx_t *uci_req, const char *u_name)
+int uci_section_del(UCIX_t *uci_req, const char *u_name)
 {
 	int ret = -1;
-	if ( (uci_req->uci_ctx) && (u_name) )
+	if ( (uci_req->uci_req) && (u_name) )
 	{
 		struct uci_section *u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
@@ -256,14 +256,14 @@ int uci_section_del(UCICtx_t *uci_req, const char *u_name)
 				.s = u_section,
 			};
 
-			if (UCI_OK != uci_delete(uci_req->uci_ctx, &ptr) )
+			if (UCI_OK != uci_delete(uci_req->uci_req, &ptr) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_delete error !!!");
 			}
-			else if (UCI_OK != uci_commit(uci_req->uci_ctx, &uci_req->uci_pkg, false) )
+			else if (UCI_OK != uci_commit(uci_req->uci_req, &uci_req->uci_pkg, false) )
 			{
-				//uci_perror(uci_req->uci_ctx, NULL);
+				//uci_perror(uci_req->uci_req, NULL);
 				DBG_ER_LN("uci_commit error !!!");
 			}
 			else
@@ -279,7 +279,7 @@ int uci_section_del(UCICtx_t *uci_req, const char *u_name)
 	return ret;
 }
 
-struct uci_section *uci_section_set(UCICtx_t *uci_req, const char *u_type, const char *u_name)
+struct uci_section *uci_section_set(UCIX_t *uci_req, const char *u_type, const char *u_name)
 {
 	struct uci_section *u_section = NULL;
 
@@ -287,14 +287,14 @@ struct uci_section *uci_section_set(UCICtx_t *uci_req, const char *u_type, const
 	{
 		return u_section;
 	}
-	else if ( (uci_req) && (uci_req->uci_ctx) && (uci_req->uci_pkg) && (u_type) && (u_name) )
+	else if ( (uci_req) && (uci_req->uci_req) && (uci_req->uci_pkg) && (u_type) && (u_name) )
 	{
 		u_section = uci_section_get(uci_req, u_name);
 		if (u_section)
 		{
 			DBG_TR_LN("uci_section_get foind !!! (u_name: %s)", u_name);
 		}
-		else if ( UCI_OK == uci_add_section(uci_req->uci_ctx, uci_req->uci_pkg, u_type, &u_section))
+		else if ( UCI_OK == uci_add_section(uci_req->uci_req, uci_req->uci_pkg, u_type, &u_section))
 		{
 			//DBG_ER_LN("(name: %p)", section->e.name);
 			if ( (u_name) && (u_section->e.name) )
@@ -303,9 +303,9 @@ struct uci_section *uci_section_set(UCICtx_t *uci_req, const char *u_type, const
 				u_section->e.name = strdup(u_name);
 				u_section->anonymous = false;
 			}
-			if ( UCI_OK == uci_save(uci_req->uci_ctx, uci_req->uci_pkg) )
+			if ( UCI_OK == uci_save(uci_req->uci_req, uci_req->uci_pkg) )
 			{
-				uci_commit(uci_req->uci_ctx, &uci_req->uci_pkg, false);
+				uci_commit(uci_req->uci_req, &uci_req->uci_pkg, false);
 			}
 			else
 			{
@@ -392,11 +392,11 @@ exit_package:
 	return ret;
 }
 
-int uci_show_what_ex(UCICtx_t *uci_req, char *u_what)
+int uci_show_what_ex(UCIX_t *uci_req, char *u_what)
 {
 	int ret = -1;
 	struct uci_ptr u_ptr;
-	if (uci_lookup_ptr(uci_req->uci_ctx, &u_ptr, u_what, true) != UCI_OK)
+	if (uci_lookup_ptr(uci_req->uci_req, &u_ptr, u_what, true) != UCI_OK)
 	{
 		goto exit_what;
 	}
@@ -427,13 +427,13 @@ exit_what:
 	return ret;
 }
 
-int uci_show_configs_ex(UCICtx_t *uci_req)
+int uci_show_configs_ex(UCIX_t *uci_req)
 {
 	int ret = -1;
 	char **u_configs = NULL;
 	char **u_config;
 
-	if ((uci_list_configs(uci_req->uci_ctx, &u_configs) != UCI_OK) || !u_configs)
+	if ((uci_list_configs(uci_req->uci_req, &u_configs) != UCI_OK) || !u_configs)
 	{
 		goto exit_config;
 	}
@@ -450,17 +450,17 @@ exit_config:
 	return ret;
 }
 
-void uci_close(UCICtx_t *uci_req)
+void uci_close(UCIX_t *uci_req)
 {
-	UCI_PKG_FREE(uci_req->uci_ctx, uci_req->uci_pkg);
-	UCI_CTX_FREE(uci_req->uci_ctx);
+	UCI_PKG_FREE(uci_req->uci_req, uci_req->uci_pkg);
+	uci_req_FREE(uci_req->uci_req);
 }
 
-int uci_open(UCICtx_t *uci_req)
+int uci_open(UCIX_t *uci_req)
 {
 	int ret = 0;
-	uci_req->uci_ctx = UCI_LOAD(uci_req->uci_filename, uci_req->uci_pkg);
-	if (uci_req->uci_ctx == NULL)
+	uci_req->uci_req = UCI_LOAD(uci_req->uci_filename, uci_req->uci_pkg);
+	if (uci_req->uci_req == NULL)
 	{
 		ret = -1;
 		goto cleanup;

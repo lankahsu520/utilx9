@@ -10,7 +10,7 @@ define generate_expiration
 	@echo "#endif" >> util_expiration.h
 endef
 
-export XBUS_C_FILENAME=xbus_ifac
+export XBUS_C_FILENAME=gbusx_ifac
 #export XBUS_PREFIXNAME=lankahsu520
 #export XBUS_IFAC_NAME=com.lankahsu520.www.
 export XBUS_XML_FILENAME=Interface-com.github.lankahsu520.xml
@@ -118,6 +118,18 @@ ifeq ("$(PJ_HAS_MOSQUITTO)", "yes")
 	sed -i "s|#undef UTIL_EX_MQTT.*|#define UTIL_EX_MQTT|g" utilx9.h
 else
 	sed -i "s|#define UTIL_EX_MQTT.*|#undef UTIL_EX_MQTT|g" utilx9.h
+endif
+
+ifeq ("$(PJ_HAS_GLIB)", "yes")
+	sed -i "s|#undef UTIL_EX_XBUS.*|#define UTIL_EX_XBUS|g" gbusx_ex.h
+else
+	sed -i "s|#define UTIL_EX_XBUS.*|#undef UTIL_EX_XBUS|g" gbusx_ex.h
+endif
+
+ifeq ("$(PJ_HAS_GLIB_SYSROOT)", "yes")
+	sed -i "s|#undef UTIL_EX_XBUS.*|#define UTIL_EX_XBUS|g" gbusx_ex.h
+else
+	sed -i "s|#define UTIL_EX_XBUS.*|#undef UTIL_EX_XBUS|g" gbusx_ex.h
 endif
 	touch $@
 

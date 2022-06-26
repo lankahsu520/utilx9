@@ -29,7 +29,7 @@ static int is_quit = 0;
 static uv_loop_t *uv_loop = NULL;
 
 #ifdef USE_SPAWN_CREATE
-SpawnCtx_t spawn_info = {
+SpawnX_t spawn_info = {
 	.loop = NULL,
 	.argc = 0,
 };
@@ -38,7 +38,7 @@ SpawnCtx_t spawn_info = {
 #ifdef USE_SPAWN_CREATE
 void uv_spawn_ping(void)
 {
-	SpawnCtx_t *spawn_req  = &spawn_info;
+	SpawnX_t *spawn_req  = &spawn_info;
 
 	spawn_req->loop = uv_loop;
 
@@ -105,14 +105,14 @@ void timer_1sec_loop(uv_timer_t *handle)
 		//uv_spawn_simple_detached(uv_loop, &child_req, &child_options, 2, "ping", "192.168.50.72");
 
 		{
-			SpawnCtx_t *spawn_req = (SpawnCtx_t *)SAFE_CALLOC(1, sizeof(SpawnCtx_t));
+			SpawnX_t *spawn_req = (SpawnX_t *)SAFE_CALLOC(1, sizeof(SpawnX_t));
 			spawn_req->loop = uv_loop;
 			spawn_req->child_req.data = spawn_req;
 			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs_intercom/sbin/iot_kvsWebrtc.sh", "restart", "1");
 		}
 
 		{
-			SpawnCtx_t *spawn_req = (SpawnCtx_t *)SAFE_CALLOC(1, sizeof(SpawnCtx_t));
+			SpawnX_t *spawn_req = (SpawnX_t *)SAFE_CALLOC(1, sizeof(SpawnX_t));
 			spawn_req->loop = uv_loop;
 			spawn_req->child_req.data = spawn_req;
 			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs_intercom/sbin/baresip_123.sh", "restart", "1");

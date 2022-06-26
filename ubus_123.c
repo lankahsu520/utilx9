@@ -40,7 +40,7 @@ static void app_showusage(int exit_code);
 
 #ifdef USE_UBUS_UNICAST
 // sudo build_xxx/ubus call u_o_echo m_echo '{"msg":"lanka"}'
-static int ubus_srv_handler_echo(struct ubus_context *ubus_ctx, struct ubus_object *obj, struct ubus_request_data *req, const char *method, struct blob_attr *msg);
+static int ubus_srv_handler_echo(struct ubus_context *ubus_req, struct ubus_object *obj, struct ubus_request_data *req, const char *method, struct blob_attr *msg);
 
 const struct blobmsg_policy ubus_p_echo[] = {
 	[UBUS_P_ECHO_ID_MSG] = { .name = UBUS_P_ECHO_MSG, .type = BLOBMSG_TYPE_STRING },
@@ -96,7 +96,7 @@ void ubus_invoke_echo_cb(struct ubus_request *req, int type, struct blob_attr *m
 	SAFE_FREE(cMsg);
 }
 
-static int ubus_srv_handler_echo(struct ubus_context *ubus_ctx, struct ubus_object *obj, struct ubus_request_data *req, const char *method, struct blob_attr *msg)
+static int ubus_srv_handler_echo(struct ubus_context *ubus_req, struct ubus_object *obj, struct ubus_request_data *req, const char *method, struct blob_attr *msg)
 {
 	struct blob_attr *tb[UBUS_P_ECHO_ID_MAX];
 	blobmsg_parse(ubus_p_echo, ARRAY_SIZE(ubus_p_echo), tb, blob_data(msg), blob_len(msg));
@@ -118,7 +118,7 @@ static int ubus_srv_handler_echo(struct ubus_context *ubus_ctx, struct ubus_obje
 		char *rval = NULL;
 		SAFE_ASPRINTF(rval, "%s", cRequest);
 		blobmsg_add_string(&bbuf, UBUS_P_ECHO_MSG, rval);
-		ubus_send_reply(ubus_ctx, req, bbuf.head);
+		ubus_send_reply(ubus_req, req, bbuf.head);
 		SAFE_FREE(rval);
 		blob_buf_free(&bbuf);
 	}
@@ -128,12 +128,12 @@ static int ubus_srv_handler_echo(struct ubus_context *ubus_ctx, struct ubus_obje
 #endif
 
 #ifdef USE_UBUS_NOTIFY
-static void ubus_srv_subscribe_cb(struct ubus_context *ubus_ctx, struct ubus_object *obj_u)
+static void ubus_srv_subscribe_cb(struct ubus_context *ubus_req, struct ubus_object *obj_u)
 {
 	DBG_IF_LN("(has_subscribers: %d)", obj_u->has_subscribers);
 }
 
-static int ubus_cli_subscribe_cb(struct ubus_context *ubus_ctx, struct ubus_object *obj_u, struct ubus_request_data *req, const char *method, struct blob_attr *msg)
+static int ubus_cli_subscribe_cb(struct ubus_context *ubus_req, struct ubus_object *obj_u, struct ubus_request_data *req, const char *method, struct blob_attr *msg)
 {
 	char *cMsg = blobmsg_format_json_indent(msg, true, -1);
 
@@ -151,7 +151,7 @@ static int ubus_cli_subscribe_cb(struct ubus_context *ubus_ctx, struct ubus_obje
 	return 0;
 }
 
-static void ubus_cli_remove_cb(struct ubus_context *ubus_ctx, struct ubus_subscriber *obj_s, uint32_t id)
+static void ubus_cli_remove_cb(struct ubus_context *ubus_req, struct ubus_subscriber *obj_s, uint32_t id)
 {
 	if (obj_s)
 	{
@@ -228,14 +228,14 @@ static void app_loop(void)
 	}
 	else if (is_service)
 	{
-		struct ubus_context *ubus_ctx = NULL;
-		if ( (ubus_ctx = ubus_srv_init()) )
+		struct ubus_context *ubus_req = NULL;
+		if ( (ubus_req = ubus_srv_init()) )
 		{
 #ifdef USE_UBUS_UNICAST
-			ubus_srv_add_object_ex(ubus_ctx, &ubus_srv_u_obj);
+			ubus_srv_add_object_ex(ubus_req, &ubus_srv_u_obj);
 #endif
 #ifdef USE_UBUS_NOTIFY
-			ubus_srv_object_subscribe(ubus_ctx, &ubus_srv_m_obj, ubus_srv_subscribe_cb);
+			ubus_srv_object_subscribe(ubus_req, &ubus_srv_m_obj, ubus_srv_subscribe_cb);
 #endif
 
 #ifdef USE_UBUS_DEMO_AND_TIMER
@@ -244,9 +244,9 @@ static void app_loop(void)
 
 #ifdef USE_UBUS_ULOOP
 			{
-				DBG_IF_LN("ubus listen ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_ctx->local_id);
+				DBG_IF_LN("ubus listen ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_req->local_id);
 				uloop_init();
-				ubus_add_uloop_ex(ubus_ctx);
+				ubus_add_uloop_ex(ubus_req);
 				uloop_timeout_set_ex();
 
 				uloop_run();
@@ -283,15 +283,15 @@ static void app_loop(void)
 	else if (is_notify)
 	{
 #ifdef USE_UBUS_NOTIFY
-		struct ubus_context *ubus_ctx = NULL;
-		if ( (ubus_ctx = ubus_conn_init()) )
+		struct ubus_context *ubus_req = NULL;
+		if ( (ubus_req = ubus_conn_init()) )
 		{
 			if ( 0 == ubus_cli_subscribe(UBUS_M_O_ECHO, ubus_cli_subscribe_cb, ubus_cli_remove_cb) )
 			{
-				DBG_IF_LN("ubus client/notify ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_ctx->local_id);
+				DBG_IF_LN("ubus client/notify ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_req->local_id);
 #ifdef USE_UBUS_ULOOP
 				uloop_init();
-				ubus_add_uloop_ex(ubus_ctx);
+				ubus_add_uloop_ex(ubus_req);
 				uloop_run();
 				uloop_done();
 #else
@@ -312,14 +312,14 @@ static void app_loop(void)
 	else if (is_event)
 	{
 #ifdef USE_UBUS_EVENT
-			struct ubus_context *ubus_ctx = NULL;
-			if ( (ubus_ctx = ubus_conn_init()) )
+			struct ubus_context *ubus_req = NULL;
+			if ( (ubus_req = ubus_conn_init()) )
 			{
 				 if ( 0 == ubus_cli_register_event(UBUS_B_O_ECHO, ubus_cli_event_cb) )
 				{
-					DBG_IF_LN("ubus client/event ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_ctx->local_id);
+					DBG_IF_LN("ubus client/event ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_req->local_id);
 					uloop_init();
-					ubus_add_uloop_ex(ubus_ctx);
+					ubus_add_uloop_ex(ubus_req);
 					uloop_run();
 					uloop_done();
 				}
@@ -331,8 +331,8 @@ static void app_loop(void)
 	else if ( SAFE_STRLEN(msg) > 0 )
 	{
 #ifdef USE_UBUS_UNICAST
-		struct ubus_context *ubus_ctx = NULL;
-		if ( (ubus_ctx = ubus_conn_init()) )
+		struct ubus_context *ubus_req = NULL;
+		if ( (ubus_req = ubus_conn_init()) )
 		{
 			struct blob_buf bbuf = {};
 			blob_buf_init(&bbuf, 0);

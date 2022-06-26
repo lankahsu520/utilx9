@@ -46,25 +46,25 @@ static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 {
 	int ret = -1;
 
-	LWSCtx_t *lws_ctx = lws2_protocol_user(wsi);
+	LWSX_t *lws_req = lws2_protocol_user(wsi);
 
 	switch( reason )
 	{
 		case LWS_CALLBACK_CLIENT_RECEIVE: // 8
 			{
-				lws2_lock(lws_ctx);
+				lws2_lock(lws_req);
 				char tmpbuf[LEN_OF_WEBSOCKET] = "";
 				SAFE_MEMCPY(tmpbuf, in, len, LEN_OF_WEBSOCKET);
 				DBG_IF_LN("(tmpbuf: %s)", tmpbuf);
-				lws2_unlock(lws_ctx);
+				lws2_unlock(lws_req);
 				ret  = 0;
 			}
 			break;
 		case LWS_CALLBACK_RECEIVE: // 6
 			{
 				//LWSSession_t *session = (LWSSession_t*)user;//SAFE_CALLOC(1, sizeof(LWSSession_t));
-				DBG_IF_LN("(wsi: %p, user: %p, lws_ctx: %p, reason: %d - %s)", wsi, user, lws_ctx, reason, translate_lws_cb(reason));
-				//ret = lws_http_cb_receive(lws_ctx, session, in, len);
+				DBG_IF_LN("(wsi: %p, user: %p, lws_req: %p, reason: %d - %s)", wsi, user, lws_req, reason, translate_lws_cb(reason));
+				//ret = lws_http_cb_receive(lws_req, session, in, len);
 			}
 			break;
 
@@ -75,7 +75,7 @@ static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 	return ret;
 }
 
-LWSCtx_t lws_req = {
+LWSX_t lws_req = {
 	.name = TAG,
 	.isecho = 0,
 

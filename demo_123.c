@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef UTIL_EX_CURL
-	HttpCtx_t http_req;
+	HttpX_t http_req;
 	DBG_IF_LN("(mode: %zd)", sizeof(http_req.mode) );
 	DBG_IF_LN("(curl: %zd)", sizeof(http_req.curl) );
 	DBG_IF_LN("(url: %zd)", sizeof(http_req.url) );

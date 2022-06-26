@@ -104,22 +104,22 @@ json_t *json_obj_create(json_t *jparent, const char *key)
 }
 
 // idx_need=-1, to return the last one
-json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act)
+json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 {
 	json_t *jfound = NULL;
-	topicx_ctx->deepth_topic = -1;
-	topicx_ctx->deepth_json = -1;
-	SAFE_MEMSET(topicx_ctx->tokenx_ary, 0, MAX_OF_TOKENX_ARY*sizeof(JSON_TokenX_t));
+	topicx_req->deepth_topic = -1;
+	topicx_req->deepth_json = -1;
+	SAFE_MEMSET(topicx_req->tokenx_ary, 0, MAX_OF_TOKENX_ARY*sizeof(JSON_TokenX_t));
 
-	if ( (topicx_ctx->jroot) && (SAFE_STRLEN(topicx_ctx->topic) > 0) )
+	if ( (topicx_req->jroot) && (SAFE_STRLEN(topicx_req->topic) > 0) )
 	{
 		int idx_topic = -1;
 		int idx_json = -1;
-		json_t *jparent = topicx_ctx->jroot;
+		json_t *jparent = topicx_req->jroot;
 
 		char topic_walk[LEN_OF_TOPIC] = "";
 		char *topic_cpy = NULL;
-		SAFE_ASPRINTF(topic_cpy, "%s", topicx_ctx->topic);
+		SAFE_ASPRINTF(topic_cpy, "%s", topicx_req->topic);
 		char *saveptr = NULL;
 		char *token = NULL;
 
@@ -127,33 +127,33 @@ json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act)
 		while ( token )
 		{
 			idx_topic ++;
-			JSON_TokenX_t *tokenx_ctx = (JSON_TokenX_t *)&topicx_ctx->tokenx_ary[idx_topic];
+			JSON_TokenX_t *tokenx_req = (JSON_TokenX_t *)&topicx_req->tokenx_ary[idx_topic];
 			switch (act)
 			{
 				case JSON_ACTID_APPEND:
-					tokenx_ctx->jdata = JSON_OBJ_GET_OBJ_EX(jparent, token);
+					tokenx_req->jdata = JSON_OBJ_GET_OBJ_EX(jparent, token);
 					break;
 				case JSON_ACTID_READ:
 				case JSON_ACTID_DEL:
 				default:
-					tokenx_ctx->jdata = JSON_OBJ_GET_OBJ(jparent, token);
+					tokenx_req->jdata = JSON_OBJ_GET_OBJ(jparent, token);
 					break;
 			}
 
-			SAFE_SPRINTF_EX(tokenx_ctx->token, "%s", token);
-			SAFE_SPRINTF_EX(tokenx_ctx->topic, "%s%s", topic_walk, token);
+			SAFE_SPRINTF_EX(tokenx_req->token, "%s", token);
+			SAFE_SPRINTF_EX(tokenx_req->topic, "%s%s", topic_walk, token);
 
 			SAFE_STRCAT_EX(topic_walk, token, "/");
 
-			if (tokenx_ctx->jdata)
+			if (tokenx_req->jdata)
 			{
 				if (idx_need == idx_topic)
 				{
-					jfound = tokenx_ctx->jdata;
+					jfound = tokenx_req->jdata;
 				}
 				else if (idx_need == -1)
 				{
-					jfound = tokenx_ctx->jdata;
+					jfound = tokenx_req->jdata;
 				}
 				idx_json++;
 			}
@@ -161,7 +161,7 @@ json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act)
 			{
 				// Not found in database
 			}
-			jparent = tokenx_ctx->jdata;
+			jparent = tokenx_req->jdata;
 
 			if (idx_topic>=MAX_OF_TOKENX_ARY) break;
 			token = SAFE_STRTOK_R(NULL, "/", &saveptr);
@@ -169,27 +169,27 @@ json_t *json2topicx(JSON_TopicX_t *topicx_ctx, int idx_need, JSON_ACTID act)
 
 		SAFE_FREE(topic_cpy);
 
-		topicx_ctx->deepth_topic = idx_topic;
-		topicx_ctx->deepth_json = idx_json;
+		topicx_req->deepth_topic = idx_topic;
+		topicx_req->deepth_json = idx_json;
 	}
 
-	if (topicx_ctx->deepth_topic != topicx_ctx->deepth_json)
+	if (topicx_req->deepth_topic != topicx_req->deepth_json)
 	{
 		jfound = NULL;
 	}
 
 	if ( (jfound) && (act==JSON_ACTID_DEL) )
 	{
-		json_t *jparent = topicx_ctx->jroot;
-		int idx = topicx_ctx->deepth_topic;
+		json_t *jparent = topicx_req->jroot;
+		int idx = topicx_req->deepth_topic;
 		if (idx==0)
 		{
-			JSON_OBJ_DEL(jparent, topicx_ctx->tokenx_ary[idx].token);
+			JSON_OBJ_DEL(jparent, topicx_req->tokenx_ary[idx].token);
 		}
 		else
 		{
-			jparent = topicx_ctx->tokenx_ary[idx-1].jdata;
-			JSON_OBJ_DEL(jparent, topicx_ctx->tokenx_ary[idx].token);
+			jparent = topicx_req->tokenx_ary[idx-1].jdata;
+			JSON_OBJ_DEL(jparent, topicx_req->tokenx_ary[idx].token);
 		}
 		jfound = NULL;
 	}

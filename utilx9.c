@@ -1733,13 +1733,13 @@ void qbuf_free(QBUF_t *qbuf)
 #ifdef UTIL_EX_SYSTEMINFO
 
 #include <sys/utsname.h>
-void sys_kernel(Kernel_t *kernel_ctx)
+void sys_kernel(Kernel_t *kernel_req)
 {
-	struct utsname uname_ctx;
-	uname(&uname_ctx);
+	struct utsname uname_req;
+	uname(&uname_req);
 
-	SAFE_SNPRINTF(kernel_ctx->release, (int)sizeof(kernel_ctx->release), "%s version %s", uname_ctx.sysname, uname_ctx.release);
-	SAFE_SNPRINTF(kernel_ctx->buildtime, (int)sizeof(kernel_ctx->buildtime), "%s", uname_ctx.version);
+	SAFE_SNPRINTF(kernel_req->release, (int)sizeof(kernel_req->release), "%s version %s", uname_req.sysname, uname_req.release);
+	SAFE_SNPRINTF(kernel_req->buildtime, (int)sizeof(kernel_req->buildtime), "%s", uname_req.version);
 
 	char cmdline[LEN_OF_CMDLINE] = "cat /proc/version";
 	char newline[LEN_OF_NEWLINE];
@@ -1756,7 +1756,7 @@ void sys_kernel(Kernel_t *kernel_ctx)
 
 			if ((str_b) && (str_e) && (str_e >str_b))
 			{
-				SAFE_SNPRINTF( kernel_ctx->builder, (int)(str_e-str_b), "%s", str_b+1 );
+				SAFE_SNPRINTF( kernel_req->builder, (int)(str_e-str_b), "%s", str_b+1 );
 			}
 		}
 		else
@@ -1770,7 +1770,7 @@ void sys_kernel(Kernel_t *kernel_ctx)
 		DBG_ER_LN("SAFE_POPEN error !!! (%s)", cmdline );
 	}
 
-	DBG_TMP_Y("(release: %s, builder: %s, buildtime: %s)", kernel_ctx->release, kernel_ctx->builder, kernel_ctx->buildtime);
+	DBG_TMP_Y("(release: %s, builder: %s, buildtime: %s)", kernel_req->release, kernel_req->builder, kernel_req->buildtime);
 }
 
 #include <sys/types.h>
@@ -1802,37 +1802,37 @@ const char *sys_homedir(void)
 
 #include <sys/sysinfo.h> // for struct sysinfo 
 
-void sys_info_ex(SysInfoEx_t *info_ctx)
+void sys_info_ex(SysInfoX_t *infox_req)
 {
-	sys_kernel(&info_ctx->kernelinfo);
+	sys_kernel(&infox_req->kernelinfo);
 
 	{
 		struct sysinfo info;
 		sysinfo(&info);
-		info_ctx->uptime.bootup_t = info.uptime;
+		infox_req->uptime.bootup_t = info.uptime;
 		{
 			int day, hrs, min, sec;
-			time_sec2day(info_ctx->uptime.bootup_t, &day, &hrs, &min, &sec);
-			SAFE_SPRINTF_EX(info_ctx->uptime.bootup_fmt, "%02d:%02d:%02d:%02d", day, hrs, min, sec);
+			time_sec2day(infox_req->uptime.bootup_t, &day, &hrs, &min, &sec);
+			SAFE_SPRINTF_EX(infox_req->uptime.bootup_fmt, "%02d:%02d:%02d:%02d", day, hrs, min, sec);
 		}
-		info_ctx->meminfo.mem_unit = info.mem_unit;
-		info_ctx->meminfo.totalram = info.totalram;
-		info_ctx->meminfo.freeram = info.freeram;	
+		infox_req->meminfo.mem_unit = info.mem_unit;
+		infox_req->meminfo.totalram = info.totalram;
+		infox_req->meminfo.freeram = info.freeram;	
 
 #ifdef __UCLIBC__
 		{
-			DBG_ER_LN("(Load average: %f %f %f)", info_ctx->uptime.load[0], info_ctx->uptime.load[1], info_ctx->uptime.load[2]);
+			DBG_ER_LN("(Load average: %f %f %f)", infox_req->uptime.load[0], infox_req->uptime.load[1], infox_req->uptime.load[2]);
 		}
 #else
-		if (getloadavg(info_ctx->uptime.load, 3) != -1)
+		if (getloadavg(infox_req->uptime.load, 3) != -1)
 		{
-			DBG_TMP_Y("(Load average: %f %f %f)", info_ctx->uptime.load[0], info_ctx->uptime.load[1], info_ctx->uptime.load[2]);
+			DBG_TMP_Y("(Load average: %f %f %f)", infox_req->uptime.load[0], infox_req->uptime.load[1], infox_req->uptime.load[2]);
 		}
 #endif
 	}
 }
 
-unsigned long sys_cpu_info(CPUInfo_t *cpuinfo_ctx)
+unsigned long sys_cpu_info(CPUInfo_t *cpuinfox_req)
 {
 	char cmdline[LEN_OF_CMDLINE] = "cat /proc/stat";
 	char newline[LEN_OF_NEWLINE];
@@ -1844,7 +1844,7 @@ unsigned long sys_cpu_info(CPUInfo_t *cpuinfo_ctx)
 	{
 		if (SAFE_FGETS(newline, sizeof(newline), fp) != NULL)
 		{
-			SAFE_SSCANF(newline, "%s %ld %ld %ld %ld", cpuinfo_ctx->name, &cpuinfo_ctx->user, &cpuinfo_ctx->nice, &cpuinfo_ctx->system, &cpuinfo_ctx->idle);
+			SAFE_SSCANF(newline, "%s %ld %ld %ld %ld", cpuinfox_req->name, &cpuinfox_req->user, &cpuinfox_req->nice, &cpuinfox_req->system, &cpuinfox_req->idle);
 		}
 		else
 		{
@@ -1857,18 +1857,18 @@ unsigned long sys_cpu_info(CPUInfo_t *cpuinfo_ctx)
 		DBG_ER_LN("SAFE_POPEN error !!! (%s)", cmdline );
 	}
 
-	unsigned long lasttime = (cpuinfo_ctx->user + cpuinfo_ctx->nice + cpuinfo_ctx->system + cpuinfo_ctx->idle);
-	if (cpuinfo_ctx->lasttime == 0)
+	unsigned long lasttime = (cpuinfox_req->user + cpuinfox_req->nice + cpuinfox_req->system + cpuinfox_req->idle);
+	if (cpuinfox_req->lasttime == 0)
 	{
-		cpuinfo_ctx->lasttime = lasttime;
-		cpuinfo_ctx->duration = 0;
+		cpuinfox_req->lasttime = lasttime;
+		cpuinfox_req->duration = 0;
 	}
 	else
 	{
-		cpuinfo_ctx->duration = lasttime - cpuinfo_ctx->lasttime;
+		cpuinfox_req->duration = lasttime - cpuinfox_req->lasttime;
 	}
-	cpuinfo_ctx->lasttime = lasttime;
-	return (cpuinfo_ctx->user + cpuinfo_ctx->nice + cpuinfo_ctx->system + cpuinfo_ctx->idle);
+	cpuinfox_req->lasttime = lasttime;
+	return (cpuinfox_req->user + cpuinfox_req->nice + cpuinfox_req->system + cpuinfox_req->idle);
 }
 
 void sys_mem_purge(int freeram_min)
@@ -1915,18 +1915,18 @@ static const char* get_items(const char*buffer ,unsigned int item)
 	return p;
 }
 
-unsigned long proc_cpu_info(ProcInfo_t *procinfo_ctx)
+unsigned long proc_cpu_info(ProcInfo_t *procinfo_req)
 {
 	char filename[LEN_OF_FULLNAME]="";
 	char newline[LEN_OF_NEWLINE];
 
-	if (procinfo_ctx->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
-		DBG_ER_LN("procinfo_ctx->pid == 0 !!!");
+		DBG_ER_LN("procinfo_req->pid == 0 !!!");
 		return 0;
 	}
 
-	SAFE_SPRINTF_EX(filename,"/proc/%ld/stat", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(filename,"/proc/%ld/stat", procinfo_req->pid);
 	DBG_TR_LN("enter (%s)", filename);
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
@@ -1935,7 +1935,7 @@ unsigned long proc_cpu_info(ProcInfo_t *procinfo_ctx)
 		if ( SAFE_FGETS(newline, sizeof(newline), fp) != NULL )
 		{
 			const char *q =get_items(newline, PROCESS_ITEM);
-			SAFE_SSCANF((char *)q,"%ld %ld %ld %ld", &procinfo_ctx->utime, &procinfo_ctx->stime, &procinfo_ctx->cutime, &procinfo_ctx->cstime);
+			SAFE_SSCANF((char *)q,"%ld %ld %ld %ld", &procinfo_req->utime, &procinfo_req->stime, &procinfo_req->cutime, &procinfo_req->cstime);
 		}
 		else
 		{
@@ -1948,54 +1948,54 @@ unsigned long proc_cpu_info(ProcInfo_t *procinfo_ctx)
 		DBG_ER_LN("SAFE_FOPEN error !!! (%s, errno: %d %s)", filename, errno, strerror(errno));
 	}
 
-	unsigned long lasttime = (procinfo_ctx->utime + procinfo_ctx->stime + procinfo_ctx->cutime + procinfo_ctx->cstime);
-	if (procinfo_ctx->lasttime == 0)
+	unsigned long lasttime = (procinfo_req->utime + procinfo_req->stime + procinfo_req->cutime + procinfo_req->cstime);
+	if (procinfo_req->lasttime == 0)
 	{
-		procinfo_ctx->lasttime = lasttime;
-		procinfo_ctx->duration = 0;
+		procinfo_req->lasttime = lasttime;
+		procinfo_req->duration = 0;
 	}
 	else
 	{
-		procinfo_ctx->duration = lasttime - procinfo_ctx->lasttime;
+		procinfo_req->duration = lasttime - procinfo_req->lasttime;
 	}
-	procinfo_ctx->lasttime = lasttime;
+	procinfo_req->lasttime = lasttime;
 	return lasttime;
 }
 
-float proc_cpu_usage(ProcInfo_t *procinfo_ctx)
+float proc_cpu_usage(ProcInfo_t *procinfo_req)
 {
 	CPUInfo_t cpuinfo;
 
 	memset(&cpuinfo, 0, sizeof(CPUInfo_t));
 	sys_cpu_info(&cpuinfo);
-	proc_cpu_info(procinfo_ctx);
+	proc_cpu_info(procinfo_req);
 
 	usleep(200000);
 
 	sys_cpu_info(&cpuinfo);
-	proc_cpu_info(procinfo_ctx);
+	proc_cpu_info(procinfo_req);
 
-	procinfo_ctx->cpu_usage = 0.0;
+	procinfo_req->cpu_usage = 0.0;
 	if ( 0 != cpuinfo.duration)
 	{ 
-		procinfo_ctx->cpu_usage = 100.0 * (procinfo_ctx->duration)/(cpuinfo.duration);
+		procinfo_req->cpu_usage = 100.0 * (procinfo_req->duration)/(cpuinfo.duration);
 	}
 
-	return procinfo_ctx->cpu_usage ;
+	return procinfo_req->cpu_usage ;
 }
 
-void proc_mem_info(ProcInfo_t *procinfo_ctx)
+void proc_mem_info(ProcInfo_t *procinfo_req)
 {
 	char filename[LEN_OF_FULLNAME]="";
 	char newline[LEN_OF_NEWLINE];
 
-	if (procinfo_ctx->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
-		DBG_ER_LN("procinfo_ctx->pid == 0 !!!");
+		DBG_ER_LN("procinfo_req->pid == 0 !!!");
 		return;
 	}
 
-	SAFE_SPRINTF_EX(filename, "/proc/%ld/statm", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(filename, "/proc/%ld/statm", procinfo_req->pid);
 	DBG_TR_LN("enter (%s)", filename);
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
@@ -2003,11 +2003,11 @@ void proc_mem_info(ProcInfo_t *procinfo_ctx)
 	{
 		if (SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
 		{
-			SAFE_SSCANF(newline, "%ld %ld %ld %ld %ld %ld %ld", &procinfo_ctx->size, &procinfo_ctx->resident, &procinfo_ctx->shared, &procinfo_ctx->text, &procinfo_ctx->lib, &procinfo_ctx->data, &procinfo_ctx->dt);
-			procinfo_ctx->size *= 4;
-			procinfo_ctx->resident *= 4;
-			procinfo_ctx->text *= 4;
-			procinfo_ctx->data *= 4;
+			SAFE_SSCANF(newline, "%ld %ld %ld %ld %ld %ld %ld", &procinfo_req->size, &procinfo_req->resident, &procinfo_req->shared, &procinfo_req->text, &procinfo_req->lib, &procinfo_req->data, &procinfo_req->dt);
+			procinfo_req->size *= 4;
+			procinfo_req->resident *= 4;
+			procinfo_req->text *= 4;
+			procinfo_req->data *= 4;
 		}
 		else
 		{
@@ -2021,18 +2021,18 @@ void proc_mem_info(ProcInfo_t *procinfo_ctx)
 	}
 }
 
-void proc_fdsize_info(ProcInfo_t *procinfo_ctx)
+void proc_fdsize_info(ProcInfo_t *procinfo_req)
 {
 	char cmdline[LEN_OF_CMDLINE] = "";
 	char newline[LEN_OF_NEWLINE];
 
-	if (procinfo_ctx->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
-		DBG_ER_LN("procinfo_ctx->pid == 0 !!!");
+		DBG_ER_LN("procinfo_req->pid == 0 !!!");
 		return;
 	}
 
-	SAFE_SPRINTF_EX(cmdline,"cat /proc/%ld/status | grep 'Name\\|FDSize'", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(cmdline,"cat /proc/%ld/status | grep 'Name\\|FDSize'", procinfo_req->pid);
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
@@ -2049,11 +2049,11 @@ void proc_fdsize_info(ProcInfo_t *procinfo_ctx)
 
 			if (SAFE_STRCMP(key, "Name") ==0)
 			{
-				SAFE_SPRINTF_EX(procinfo_ctx->name, "%s", vals);
+				SAFE_SPRINTF_EX(procinfo_req->name, "%s", vals);
 			}
 			else if (SAFE_STRCMP(key, "FDSize") ==0)
 			{
-				procinfo_ctx->fdsize = atol(vals);
+				procinfo_req->fdsize = atol(vals);
 			}
 			else
 			{
@@ -2068,38 +2068,38 @@ void proc_fdsize_info(ProcInfo_t *procinfo_ctx)
 	}
 }
 
-void proc_fddetail_info(ProcInfo_t *procinfo_ctx)
+void proc_fddetail_info(ProcInfo_t *procinfo_req)
 {
 	char cmdline[LEN_OF_CMDLINE] = "";
 	char newline[LEN_OF_NEWLINE];
 
-	if (procinfo_ctx->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
-		DBG_ER_LN("procinfo_ctx->pid == 0 !!! (name: %s)", procinfo_ctx->name);
+		DBG_ER_LN("procinfo_req->pid == 0 !!! (name: %s)", procinfo_req->name);
 		return;
 	}
 
-	SAFE_SPRINTF_EX(cmdline,"ls -l /proc/%ld/fd", procinfo_ctx->pid);
+	SAFE_SPRINTF_EX(cmdline,"ls -l /proc/%ld/fd", procinfo_req->pid);
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
 	if (fp)
 	{
-		procinfo_ctx->fdcount = 0;
+		procinfo_req->fdcount = 0;
 		while((SAFE_FGETS(newline, sizeof(newline), fp)) != NULL)
 		{
 			DBG_TMP_Y("(newline: %s, %d)", newline, strlen(newline));
 			if (strlen(newline)>=56)
 			{
-				int idx = procinfo_ctx->fdcount;
-				SAFE_SSCANF(newline+56,"%d -> %s", &procinfo_ctx->fdinfo[idx].fd, procinfo_ctx->fdinfo[idx].slink);
+				int idx = procinfo_req->fdcount;
+				SAFE_SSCANF(newline+56,"%d -> %s", &procinfo_req->fdinfo[idx].fd, procinfo_req->fdinfo[idx].slink);
 
 				DBG_TMP_Y("(newline: %s)", newline+56);
-				DBG_TMP_Y("(fd: %d, slink: %s)", procinfo_ctx->fdinfo[idx].fd, procinfo_ctx->fdinfo[idx].slink);
-				procinfo_ctx->fdcount ++;
-				if (procinfo_ctx->fdcount>=MAX_OF_FDSIZE)
+				DBG_TMP_Y("(fd: %d, slink: %s)", procinfo_req->fdinfo[idx].fd, procinfo_req->fdinfo[idx].slink);
+				procinfo_req->fdcount ++;
+				if (procinfo_req->fdcount>=MAX_OF_FDSIZE)
 				{
-					DBG_ER_LN("procinfo_ctx->fdcount: %ld > MAX_OF_FDSIZE: %d !!!", procinfo_ctx->fdcount, MAX_OF_FDSIZE );
+					DBG_ER_LN("procinfo_req->fdcount: %ld > MAX_OF_FDSIZE: %d !!!", procinfo_req->fdcount, MAX_OF_FDSIZE );
 					break;
 				}
 			}
@@ -2112,17 +2112,17 @@ void proc_fddetail_info(ProcInfo_t *procinfo_ctx)
 	}
 }
 
-void proc_info_static(ProcInfo_t *procinfo_ctx)
+void proc_info_static(ProcInfo_t *procinfo_req)
 {
-	proc_mem_info(procinfo_ctx);
-	proc_fdsize_info(procinfo_ctx);
-	proc_fddetail_info(procinfo_ctx);
+	proc_mem_info(procinfo_req);
+	proc_fdsize_info(procinfo_req);
+	proc_fddetail_info(procinfo_req);
 }
 
-void proc_info(ProcInfo_t *procinfo_ctx)
+void proc_info(ProcInfo_t *procinfo_req)
 {
-	proc_info_static(procinfo_ctx);
-	proc_cpu_usage(procinfo_ctx);
+	proc_info_static(procinfo_req);
+	proc_cpu_usage(procinfo_req);
 }
 
 unsigned long pidof(char *name)

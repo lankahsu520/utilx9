@@ -24,7 +24,7 @@
 #include "utilx9.h"
 
 #ifdef UTIL_EX_TTY
-static int chainX_tty_open(ChainXCtx_t *chainX_req)
+static int chainX_tty_open(ChainX_t *chainX_req)
 {
 	//return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NONBLOCK | O_NOCTTY | O_NDELAY );
 	//return SAFE_OPEN( chainX_req->ttyinfo.ttyname, O_RDWR | O_NONBLOCK | O_NDELAY );
@@ -108,7 +108,7 @@ static int chainX_tcp_socket(void)
 	return sockfd;
 }
 
-static int chainX_fcntl_socket(ChainXCtx_t * chainX_req)
+static int chainX_fcntl_socket(ChainX_t * chainX_req)
 {
 	int ret = 0;
 #ifdef UTIL_EX_SOCKET_NOBLOCK
@@ -622,7 +622,7 @@ int chainX_if_ssid(char *iface, char *ssid, int ssid_len)
 	return ret;
 }
 
-int chainX_fd_get(ChainXCtx_t *chainX_req)
+int chainX_fd_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -643,7 +643,7 @@ int chainX_fd_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-static void chainX_fdset_set(ChainXCtx_t *chainX_req, fd_set *iset)
+static void chainX_fdset_set(ChainX_t *chainX_req, fd_set *iset)
 {
 	//SAFE_FD_ZERO(iset);
 	//SAFE_FD_SET(chainX_fd_get(chainX_req), iset);
@@ -651,7 +651,7 @@ static void chainX_fdset_set(ChainXCtx_t *chainX_req, fd_set *iset)
 	SAFE_FD_SET_EX(chainX_fd_get(chainX_req), iset);
 }
 
-static void chainX_fdset_setall(ChainXCtx_t *chainX_req)
+static void chainX_fdset_setall(ChainX_t *chainX_req)
 {
 	if ( chainX_fd_get(chainX_req) >=0 )
 	{
@@ -661,7 +661,7 @@ static void chainX_fdset_setall(ChainXCtx_t *chainX_req)
 	}
 }
 
-static void chainX_fdset_clear(ChainXCtx_t *chainX_req)
+static void chainX_fdset_clear(ChainX_t *chainX_req)
 {
 	if ( chainX_fd_get(chainX_req) >=0 )
 	{
@@ -671,7 +671,7 @@ static void chainX_fdset_clear(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainX_port_get(ChainXCtx_t *chainX_req)
+int chainX_port_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 		return chainX_req->netinfo.port;
@@ -679,7 +679,7 @@ int chainX_port_get(ChainXCtx_t *chainX_req)
 		return 0;
 }
 
-int chainX_port_set(ChainXCtx_t *chainX_req, int port)
+int chainX_port_set(ChainX_t *chainX_req, int port)
 {
 	int ret = 0;
 	if ( (chainX_req) && (port>0) )
@@ -694,7 +694,7 @@ int chainX_port_set(ChainXCtx_t *chainX_req, int port)
 	return ret;
 }
 
-int chainX_ip_len(ChainXCtx_t * chainX_req)
+int chainX_ip_len(ChainX_t * chainX_req)
 {
 	if (chainX_req)
 	{
@@ -706,7 +706,7 @@ int chainX_ip_len(ChainXCtx_t * chainX_req)
 	}
 }
 
-char * chainX_ip_get(ChainXCtx_t * chainX_req)
+char * chainX_ip_get(ChainX_t * chainX_req)
 {
 	if (chainX_req)
 	{
@@ -718,7 +718,7 @@ char * chainX_ip_get(ChainXCtx_t * chainX_req)
 	}
 }
 
-void chainX_ip_set(ChainXCtx_t *chainX_req, char *ip)
+void chainX_ip_set(ChainX_t *chainX_req, char *ip)
 {
 	if ( (chainX_req) && (ip) )
 	{
@@ -726,7 +726,7 @@ void chainX_ip_set(ChainXCtx_t *chainX_req, char *ip)
 	}
 }
 
-struct sockaddr_in * chainX_addr_to_get(ChainXCtx_t * chainX_req)
+struct sockaddr_in * chainX_addr_to_get(ChainX_t * chainX_req)
 {
 	if (chainX_req)
 	{
@@ -739,7 +739,7 @@ struct sockaddr_in * chainX_addr_to_get(ChainXCtx_t * chainX_req)
 	}
 }
 
-int chainX_addr_to_set_ex(ChainXCtx_t *chainX_req, int ai_family, char *ip_addr, int port)
+int chainX_addr_to_set_ex(ChainX_t *chainX_req, int ai_family, char *ip_addr, int port)
 {
 	int ret = 0;
 	//DBG_IF_LN("(ip_addr: %s:%d)", ip_addr, port);
@@ -790,12 +790,12 @@ int chainX_addr_to_set_ex(ChainXCtx_t *chainX_req, int ai_family, char *ip_addr,
 	return ret;
 }
 
-int chainX_addr_to_set(ChainXCtx_t *chainX_req, char *ipv4, int port)
+int chainX_addr_to_set(ChainX_t *chainX_req, char *ipv4, int port)
 {
 	return chainX_addr_to_set_ex(chainX_req, AF_INET, ipv4, port);
 }
 
-struct sockaddr_in * chainX_addr_from_get(ChainXCtx_t * chainX_req)
+struct sockaddr_in * chainX_addr_from_get(ChainX_t * chainX_req)
 {
 	if (chainX_req)
 	{
@@ -808,7 +808,7 @@ struct sockaddr_in * chainX_addr_from_get(ChainXCtx_t * chainX_req)
 }
 
 
-char *chainX_hostname_get(ChainXCtx_t *chainX_req)
+char *chainX_hostname_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -820,7 +820,7 @@ char *chainX_hostname_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-void chainX_hostname_set(ChainXCtx_t *chainX_req, char *hostname)
+void chainX_hostname_set(ChainX_t *chainX_req, char *hostname)
 {
 	if ( (chainX_req) && (hostname) )
 	{
@@ -828,7 +828,7 @@ void chainX_hostname_set(ChainXCtx_t *chainX_req, char *hostname)
 	}
 }
 
-int chainX_reversename_len(ChainXCtx_t *chainX_req)
+int chainX_reversename_len(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -840,7 +840,7 @@ int chainX_reversename_len(ChainXCtx_t *chainX_req)
 	}
 }
 
-char *chainX_reversename_get(ChainXCtx_t *chainX_req)
+char *chainX_reversename_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -852,7 +852,7 @@ char *chainX_reversename_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-void chainX_reversename_set(ChainXCtx_t *chainX_req, char *hostname)
+void chainX_reversename_set(ChainX_t *chainX_req, char *hostname)
 {
 	if ( (chainX_req) && (hostname) )
 	{
@@ -860,7 +860,7 @@ void chainX_reversename_set(ChainXCtx_t *chainX_req, char *hostname)
 	}
 }
 
-int chainX_security_get(ChainXCtx_t *chainX_req)
+int chainX_security_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -872,7 +872,7 @@ int chainX_security_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainX_security_set(ChainXCtx_t *chainX_req, int mode)
+int chainX_security_set(ChainX_t *chainX_req, int mode)
 {
 	if (chainX_req)
 	{
@@ -893,7 +893,7 @@ int chainX_security_set(ChainXCtx_t *chainX_req, int mode)
 	}
 }
 
-int chainX_recycle_get(ChainXCtx_t *chainX_req)
+int chainX_recycle_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -905,7 +905,7 @@ int chainX_recycle_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainX_recycle_dec(ChainXCtx_t *chainX_req)
+int chainX_recycle_dec(ChainX_t *chainX_req)
 {
 	if ((chainX_req) && (chainX_req->recycle))
 	{
@@ -918,7 +918,7 @@ int chainX_recycle_dec(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainX_recycle_set(ChainXCtx_t *chainX_req, int recycle)
+int chainX_recycle_set(ChainX_t *chainX_req, int recycle)
 {
 	if (chainX_req)
 	{
@@ -931,7 +931,7 @@ int chainX_recycle_set(ChainXCtx_t *chainX_req, int recycle)
 	}
 }
 
-int chainX_infinite_get(ChainXCtx_t *chainX_req)
+int chainX_infinite_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -944,7 +944,7 @@ int chainX_infinite_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainX_infinite_set(ChainXCtx_t *chainX_req, int infinite)
+int chainX_infinite_set(ChainX_t *chainX_req, int infinite)
 {
 	if (chainX_req)
 	{
@@ -1076,7 +1076,7 @@ int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len)
 	return ret;
 } 
 
-static int chainX_status_check(ChainXCtx_t *chainX_req)
+static int chainX_status_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
 	if ( chainX_req )
@@ -1091,7 +1091,7 @@ static int chainX_status_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static void chainX_status_set(ChainXCtx_t *chainX_req, int status)
+static void chainX_status_set(ChainX_t *chainX_req, int status)
 {
 	if (chainX_req)
 	{
@@ -1104,7 +1104,7 @@ static void chainX_status_set(ChainXCtx_t *chainX_req, int status)
 	}
 }
 
-int chainX_quit_check(ChainXCtx_t *chainX_req)
+int chainX_quit_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if ( chainX_req )
@@ -1115,7 +1115,7 @@ int chainX_quit_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-void chainX_quit_set(ChainXCtx_t *chainX_req, int is_quit)
+void chainX_quit_set(ChainX_t *chainX_req, int is_quit)
 {
 	if ( chainX_req )
 	{
@@ -1124,7 +1124,7 @@ void chainX_quit_set(ChainXCtx_t *chainX_req, int is_quit)
 	}
 }
 
-int chainX_linked_check(ChainXCtx_t *chainX_req)
+int chainX_linked_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if (chainX_req)
@@ -1147,7 +1147,7 @@ int chainX_linked_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-void chainX_wakeup_simple(ChainXCtx_t *chainX_req)
+void chainX_wakeup_simple(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -1156,7 +1156,7 @@ void chainX_wakeup_simple(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainX_timewait_simple(ChainXCtx_t *chainX_req, int ms)
+int chainX_timewait_simple(ChainX_t *chainX_req, int ms)
 {
 	int ret = EINVAL;
 
@@ -1169,7 +1169,7 @@ int chainX_timewait_simple(ChainXCtx_t *chainX_req, int ms)
 	return ret;
 }
 
-static void chainX_retry_wait(ChainXCtx_t *chainX_req)
+static void chainX_retry_wait(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -1184,7 +1184,7 @@ static void chainX_retry_wait(ChainXCtx_t *chainX_req)
 	}
 }
 
-static int chainX_socket_error(ChainXCtx_t *chainX_req)
+static int chainX_socket_error(ChainX_t *chainX_req)
 {
 	int so_error = -1;
 	socklen_t err_len = sizeof(so_error);
@@ -1206,7 +1206,7 @@ static int chainX_socket_error(ChainXCtx_t *chainX_req)
 // for connect
 // 0: ok, 1: timeout, -1: error
 // 0: read, 1: write
-static int chainX_socket_select(ChainXCtx_t *chainX_req, int timeout, int rw)
+static int chainX_socket_select(ChainX_t *chainX_req, int timeout, int rw)
 {
 	int ret = -1;
 	if (chainX_req)
@@ -1257,7 +1257,7 @@ static int chainX_socket_select(ChainXCtx_t *chainX_req, int timeout, int rw)
 	return ret;
 }
 
-static int chainX_RW_select(ChainXCtx_t *chainX_req)
+static int chainX_RW_select(ChainX_t *chainX_req)
 {
 	int result = 0;
 
@@ -1283,7 +1283,7 @@ static int chainX_RW_select(ChainXCtx_t *chainX_req)
 }
 
 #ifdef UTIL_EX_SOCKET_CERT_FILE
-void chainXssl_certificate_file(ChainXCtx_t *chainX_req, char *filename)
+void chainXssl_certificate_file(ChainX_t *chainX_req, char *filename)
 {
 	if (chainX_req)
 	{
@@ -1291,7 +1291,7 @@ void chainXssl_certificate_file(ChainXCtx_t *chainX_req, char *filename)
 	}
 }
 
-void chainXssl_privatekey_file(ChainXCtx_t *chainX_req, char *filename)
+void chainXssl_privatekey_file(ChainX_t *chainX_req, char *filename)
 {
 	if (chainX_req)
 	{
@@ -1299,7 +1299,7 @@ void chainXssl_privatekey_file(ChainXCtx_t *chainX_req, char *filename)
 	}
 }
 
-void chainXssl_ca_file(ChainXCtx_t *chainX_req, char *filename)
+void chainXssl_ca_file(ChainX_t *chainX_req, char *filename)
 {
 	if (chainX_req)
 	{
@@ -1311,7 +1311,7 @@ void chainXssl_ca_file(ChainXCtx_t *chainX_req, char *filename)
 #ifdef UTIL_EX_SOCKET_OPENSSL
 #define SOCKET_SSL_DEBUG(x) ERR_print_errors_fp( stderr );
 
-static void chainXssl_init(ChainXCtx_t *chainX_req)
+static void chainXssl_init(ChainX_t *chainX_req)
 {
 	DBG_TR_LN("enter");
 	SSL_library_init();
@@ -1319,7 +1319,7 @@ static void chainXssl_init(ChainXCtx_t *chainX_req)
 	OpenSSL_add_all_algorithms();
 }
 
-SSL *chainXssl_sslfd_get(ChainXCtx_t *chainX_req)
+SSL *chainXssl_sslfd_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -1331,7 +1331,7 @@ SSL *chainXssl_sslfd_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-int chainXssl_ctx_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len )
+int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len )
 {
 	int ret = 0;
 	BIO *bio = NULL;
@@ -1358,7 +1358,7 @@ int chainXssl_ctx_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_
 	return ret;
 }
 
-int chainXssl_ctx_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len )
+int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len )
 {
 #if (1)
 	int ret = 0;
@@ -1410,7 +1410,7 @@ int chainXssl_ctx_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t
 	return ret;
 }
 
-static int chainXssl_ctx_cert(ChainXCtx_t *chainX_req)
+static int chainXssl_cert(ChainX_t *chainX_req)
 {
 	int ret = -1;
 #ifdef UTIL_EX_SOCKET_CERT_TXT
@@ -1423,7 +1423,7 @@ static int chainXssl_ctx_cert(ChainXCtx_t *chainX_req)
 		/* Load the client certificate into the SSL_CTX structure */
 #ifdef UTIL_EX_SOCKET_CERT_TXT
 		DBG_TR_LN("call SSL_CTX_use_certificate ... ");
-		if ( chainXssl_ctx_cert_readbuf(chainX_req->ctxSSL, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0 )
+		if ( chainXssl_cert_readbuf(chainX_req->ctxSSL, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0 )
 #else
 		DBG_TR_LN("call SSL_CTX_use_certificate_file ... (%s)", chainX_req->certificate_file);
 		if ( SSL_CTX_use_certificate_file( chainX_req->ctxSSL, chainX_req->certificate_file,  SSL_FILETYPE_PEM) <= 0 ) 
@@ -1437,7 +1437,7 @@ static int chainXssl_ctx_cert(ChainXCtx_t *chainX_req)
 		/* Load the private-key corresponding to the client certificate */
 #ifdef UTIL_EX_SOCKET_CERT_TXT
 		DBG_TR_LN("call SSL_CTX_use_PrivateKey ...");
-		if ( chainXssl_ctx_key_readbuf(chainX_req->ctxSSL, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size) != 0 )
+		if ( chainXssl_key_readbuf(chainX_req->ctxSSL, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size) != 0 )
 #else
 		DBG_TR_LN("call SSL_CTX_use_PrivateKey_file ... (%s)", chainX_req->privatekey_file);
 		if ( SSL_CTX_use_PrivateKey_file( chainX_req->ctxSSL, chainX_req->privatekey_file, SSL_FILETYPE_PEM ) <= 0 )
@@ -1503,7 +1503,7 @@ CERT_EXIT:
 	return ret;
 }
 
-static int chainXssl_ctx_create(ChainXCtx_t *chainX_req)
+static int chainXssl_create(ChainX_t *chainX_req)
 {
 	DBG_TR_LN("enter");
 
@@ -1529,12 +1529,12 @@ static int chainXssl_ctx_create(ChainXCtx_t *chainX_req)
 
 	SSL_CTX_set_options(chainX_req->ctxSSL, SSL_OP_ALL);
 
-	ret = chainXssl_ctx_cert(chainX_req);
+	ret = chainXssl_cert(chainX_req);
 
 	return ret;
 }
 
-static int chainXssl_certs_check(ChainXCtx_t *chainX_req)
+static int chainXssl_certs_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
 
@@ -1580,7 +1580,7 @@ static int chainXssl_certs_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainXssl_check(ChainXCtx_t *chainX_req)
+static int chainXssl_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if (chainX_req)
@@ -1590,13 +1590,13 @@ static int chainXssl_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-int chainXssl_link(ChainXCtx_t *chainX_req)
+int chainXssl_link(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	int retry = RETRY_OF_SSL;
 	//DBG_TR_LN("enter");
 
-	if ( (chainX_req) && (chainXssl_ctx_create(chainX_req) != 0) )
+	if ( (chainX_req) && (chainXssl_create(chainX_req) != 0) )
 	{
 		DBG_ER_LN("SSL_setup error !!!");
 		return ret;
@@ -1696,7 +1696,7 @@ static void chainXssl_debug( void *ctx, int level, const char *file, int line, c
 	// 4-> 0 PRINT_LEVEL_TRACE
 	int lvl = 4-level;
 	DBG_PRINT(lvl, "ssl", file, line);
-	printf("%s"COLOR_NONE, str);
+	printf("%s"COLORX_NONE, str);
 }
 
 static int chainXssl_myrand( void *rng_state, unsigned char *output, size_t len )
@@ -1724,7 +1724,7 @@ static int chainXssl_myrand( void *rng_state, unsigned char *output, size_t len 
 	return( 0 );
 }
 
-static void chainXssl_init(ChainXCtx_t *chainX_req)
+static void chainXssl_init(ChainX_t *chainX_req)
 {
 	DBG_TR_LN("enter");
 
@@ -1743,7 +1743,7 @@ static void chainXssl_init(ChainXCtx_t *chainX_req)
 #endif
 }
 
-mbedtls_ssl_context *chainXssl_sslfd_get(ChainXCtx_t *chainX_req)
+mbedtls_ssl_context *chainXssl_sslfd_get(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -1755,7 +1755,7 @@ mbedtls_ssl_context *chainXssl_sslfd_get(ChainXCtx_t *chainX_req)
 	}
 }
 
-static int chainXssl_ctx_cert(ChainXCtx_t *chainX_req)
+static int chainXssl_cert(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if( mbedtls_x509_crt_parse( &chainX_req->clicert, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0 )
@@ -1780,7 +1780,7 @@ static int chainXssl_ctx_cert(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainXssl_ctx_create(ChainXCtx_t *chainX_req)
+static int chainXssl_create(ChainX_t *chainX_req)
 {
 	DBG_TR_LN("enter");
 
@@ -1804,7 +1804,7 @@ static int chainXssl_ctx_create(ChainXCtx_t *chainX_req)
 		return ret;
 	}
 
-	if ( chainXssl_ctx_cert(chainX_req) != 0 )
+	if ( chainXssl_cert(chainX_req) != 0 )
 	{
 		return ret;
 	}
@@ -1844,7 +1844,7 @@ static int chainXssl_ctx_create(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainXssl_certs_check(ChainXCtx_t *chainX_req)
+static int chainXssl_certs_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
 
@@ -1880,7 +1880,7 @@ static int chainXssl_certs_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainXssl_check(ChainXCtx_t *chainX_req)
+static int chainXssl_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if (chainX_req)
@@ -1890,13 +1890,13 @@ static int chainXssl_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-int chainXssl_link(ChainXCtx_t *chainX_req)
+int chainXssl_link(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	int retry = RETRY_OF_SSL;
 	//DBG_TR_LN("enter");
 
-	if ( (chainX_req) && (chainXssl_ctx_create(chainX_req) != 0) )
+	if ( (chainX_req) && (chainXssl_create(chainX_req) != 0) )
 	{
 		DBG_ER_LN("SSL_setup error !!!");
 		return ret;
@@ -1965,17 +1965,17 @@ do_handshake:
 		return ret;
 }
 #else
-static void chainXssl_init(ChainXCtx_t *chainX_req)
+static void chainXssl_init(ChainX_t *chainX_req)
 {
 }
 
-static int chainXssl_check(ChainXCtx_t *chainX_req)
+static int chainXssl_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	return ret;
 }
 
-int chainXssl_link(ChainXCtx_t *chainX_req)
+int chainXssl_link(ChainX_t *chainX_req)
 {
 	int ret = 0;
 
@@ -1985,7 +1985,7 @@ int chainXssl_link(ChainXCtx_t *chainX_req)
 }
 #endif
 
-static void chainXssl_close(ChainXCtx_t *chainX_req)
+static void chainXssl_close(ChainX_t *chainX_req)
 {
 	if ( (chainX_req) && (chainX_security_get(chainX_req) == 1))
 	{
@@ -2022,7 +2022,7 @@ static void chainXssl_close(ChainXCtx_t *chainX_req)
 	}
 }
 
-void chainX_close(ChainXCtx_t *chainX_req)
+void chainX_close(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -2052,7 +2052,7 @@ void chainX_close(ChainXCtx_t *chainX_req)
 	}
 }
 
-static int chainX_netlink_bind(ChainXCtx_t *chainX_req, int multi)
+static int chainX_netlink_bind(ChainX_t *chainX_req, int multi)
 {
 	int ret = -1;
 
@@ -2095,7 +2095,7 @@ static int chainX_netlink_bind(ChainXCtx_t *chainX_req, int multi)
 	return ret;
 }
 
-static int chainX_udp_bind(ChainXCtx_t *chainX_req, int multi)
+static int chainX_udp_bind(ChainX_t *chainX_req, int multi)
 {
 	int ret = -1;
 
@@ -2153,7 +2153,7 @@ static int chainX_udp_bind(ChainXCtx_t *chainX_req, int multi)
 	return ret;
 }
 
-static int chainX_tcp_connect(ChainXCtx_t *chainX_req)
+static int chainX_tcp_connect(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
@@ -2252,12 +2252,12 @@ int name_arr[] = {
 	1200,
 	300};
 
-char *chainX_tty_getname(ChainXCtx_t *chainX_req)
+char *chainX_tty_getname(ChainX_t *chainX_req)
 {
 	return chainX_req->ttyinfo.ttyname;
 }
 
-void chainX_tty_setname(ChainXCtx_t *chainX_req, char *ttyname)
+void chainX_tty_setname(ChainX_t *chainX_req, char *ttyname)
 {
 	if ( (chainX_req) && (ttyname) )
 	{
@@ -2265,7 +2265,7 @@ void chainX_tty_setname(ChainXCtx_t *chainX_req, char *ttyname)
 	}
 }
 
-void chainX_tty_setbaudrate(ChainXCtx_t *chainX_req, int baudrate)
+void chainX_tty_setbaudrate(ChainX_t *chainX_req, int baudrate)
 {
 	int idx = 0;
 
@@ -2282,7 +2282,7 @@ void chainX_tty_setbaudrate(ChainXCtx_t *chainX_req, int baudrate)
 	}
 }
 
-void chainX_tty_setparity(ChainXCtx_t *chainX_req, char parity)
+void chainX_tty_setparity(ChainX_t *chainX_req, char parity)
 {
 	if ( (chainX_req) )
 	{
@@ -2290,7 +2290,7 @@ void chainX_tty_setparity(ChainXCtx_t *chainX_req, char parity)
 	}
 }
 
-void chainX_tty_setdatabits(ChainXCtx_t *chainX_req, char databits)
+void chainX_tty_setdatabits(ChainX_t *chainX_req, char databits)
 {
 	if ( (chainX_req) )
 	{
@@ -2298,7 +2298,7 @@ void chainX_tty_setdatabits(ChainXCtx_t *chainX_req, char databits)
 	}
 }
 
-static int chainX_tty_check(ChainXCtx_t *chainX_req)
+static int chainX_tty_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
 	if ( strlen(chainX_tty_getname(chainX_req)) > 0)
@@ -2312,7 +2312,7 @@ static int chainX_tty_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainX_tty_parity(ChainXCtx_t *chainX_req)
+static int chainX_tty_parity(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
@@ -2389,7 +2389,7 @@ static int chainX_tty_parity(ChainXCtx_t *chainX_req)
 	return 0;
 }
 
-static int chainX_tty_speed(ChainXCtx_t *chainX_req)
+static int chainX_tty_speed(ChainX_t *chainX_req)
 {
 	int idx = 0;
 
@@ -2412,7 +2412,7 @@ static int chainX_tty_speed(ChainXCtx_t *chainX_req)
 }
 
 // http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html
-static int chainX_tty_option(ChainXCtx_t *chainX_req)
+static int chainX_tty_option(ChainX_t *chainX_req)
 {
 	int ret = 0;
 	if (chainX_req->ttyinfo.isset)
@@ -2479,7 +2479,7 @@ static int chainX_tty_option(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainX_tty_connect(ChainXCtx_t *chainX_req)
+static int chainX_tty_connect(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	
@@ -2520,7 +2520,7 @@ static int chainX_tty_connect(ChainXCtx_t *chainX_req)
 }
 #endif
 
-static int chainX_netinfo_scan(ChainXCtx_t *chainX_req)
+static int chainX_netinfo_scan(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if ( (chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0 ) )
@@ -2541,7 +2541,7 @@ static int chainX_netinfo_scan(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainX_netinfo_check(ChainXCtx_t *chainX_req)
+static int chainX_netinfo_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 	if ( ( chainX_req->netinfo.addr.hostname ) && (strlen(chainX_req->netinfo.addr.hostname) > 0 ) )
@@ -2557,7 +2557,7 @@ static int chainX_netinfo_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainX_check(ChainXCtx_t *chainX_req)
+static int chainX_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
@@ -2589,7 +2589,7 @@ static int chainX_check(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-static int chainX_init(ChainXCtx_t *chainX_req)
+static int chainX_init(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
@@ -2647,7 +2647,7 @@ static int chainX_init(ChainXCtx_t *chainX_req)
 	return ret;
 }
 
-void chainX_linked_register(ChainXCtx_t *chainX_req, chainX_linked_fn cb)
+void chainX_linked_register(ChainX_t *chainX_req, chainX_linked_fn cb)
 {
 	if (chainX_req)
 	{
@@ -2657,12 +2657,12 @@ void chainX_linked_register(ChainXCtx_t *chainX_req, chainX_linked_fn cb)
 
 // for tty
 #ifdef UTIL_EX_TTY
-void chainX_serial_register(ChainXCtx_t *chainX_req, chainX_serial_fn cb)
+void chainX_serial_register(ChainX_t *chainX_req, chainX_serial_fn cb)
 {
 	chainX_req->serial_cb = cb;
 }
 
-static void chainX_loop_serial(ChainXCtx_t *chainX_req)
+static void chainX_loop_serial(ChainX_t *chainX_req)
 {
 	if (chainX_req==NULL) return;
 
@@ -2751,7 +2751,7 @@ static void chainX_loop_serial(ChainXCtx_t *chainX_req)
 #endif
 
 // for udp
-void chainX_post_register(ChainXCtx_t *chainX_req, chainX_post_fn cb)
+void chainX_post_register(ChainX_t *chainX_req, chainX_post_fn cb)
 {
 	if (chainX_req)
 	{
@@ -2759,7 +2759,7 @@ void chainX_post_register(ChainXCtx_t *chainX_req, chainX_post_fn cb)
 	}
 }
 
-static void chainX_loop_post(ChainXCtx_t *chainX_req)
+static void chainX_loop_post(ChainX_t *chainX_req)
 {
 	if (chainX_req==NULL) return;
 
@@ -2845,12 +2845,12 @@ static void chainX_loop_post(ChainXCtx_t *chainX_req)
 }
 
 // for tcp client
-void chainX_pipe_register(ChainXCtx_t *chainX_req, chainX_pipe_fn cb)
+void chainX_pipe_register(ChainX_t *chainX_req, chainX_pipe_fn cb)
 {
 	chainX_req->pipe_cb = cb;
 }
 
-static void chainX_loop_pipe(ChainXCtx_t *chainX_req)
+static void chainX_loop_pipe(ChainX_t *chainX_req)
 {
 	if (chainX_req==NULL) return;
 
@@ -2977,7 +2977,7 @@ disconnected:
 
 static void *chainX_thread_handler_tcp(void *arg)
 {
-	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ChainX_t *chainX_req = (ChainX_t *)arg;
 	ThreadX_t *tidx_req = &chainX_req->tidx;
 
 	threadx_detach(tidx_req);
@@ -3012,7 +3012,7 @@ tcp_exit:
 	return NULL;
 }
 
-int chainX_multi_sender(ChainXCtx_t *chainX_req, char *buffer, int nbufs)
+int chainX_multi_sender(ChainX_t *chainX_req, char *buffer, int nbufs)
 {
 	int ret = 0;
 
@@ -3034,7 +3034,7 @@ int chainX_multi_sender(ChainXCtx_t *chainX_req, char *buffer, int nbufs)
 	return ret;
 }
 
-int chainX_multi_sender_and_post(ChainXCtx_t *chainX_req, char *buffer, int nbufs)
+int chainX_multi_sender_and_post(ChainX_t *chainX_req, char *buffer, int nbufs)
 {
 	int ret = 0;
 
@@ -3075,7 +3075,7 @@ int chainX_multi_sender_and_post(ChainXCtx_t *chainX_req, char *buffer, int nbuf
 
 static void *chainX_thread_handler_udp(void *arg)
 {
-	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ChainX_t *chainX_req = (ChainX_t *)arg;
 	ThreadX_t *tidx_req = &chainX_req->tidx;
 
 	threadx_detach(tidx_req);
@@ -3126,13 +3126,13 @@ static void chainX_netlink_parse_rtattr (struct rtattr **tb, int max, struct rta
 }
 
 // for netlink
-void chainX_netlink_register(ChainXCtx_t *chainX_req, chainX_netlink_fn cb)
+void chainX_netlink_register(ChainX_t *chainX_req, chainX_netlink_fn cb)
 {
 	chainX_req->netlink_cb = cb;
 }
 
 /* Recieving netlink message. */
-void chainX_netlink_recv(ChainXCtx_t * chainX_req)
+void chainX_netlink_recv(ChainX_t * chainX_req)
 {
 	char buf[LEN_OF_BUF4096];
 	struct iovec iov = { buf, sizeof(buf) };
@@ -3237,7 +3237,7 @@ void chainX_netlink_recv(ChainXCtx_t * chainX_req)
 	}
 }
 
-static void chainX_loop_netlink(ChainXCtx_t *chainX_req)
+static void chainX_loop_netlink(ChainX_t *chainX_req)
 {
 	if (chainX_req==NULL) return;
 
@@ -3288,7 +3288,7 @@ static void chainX_loop_netlink(ChainXCtx_t *chainX_req)
 
 static void *chainX_thread_handler_netlink(void *arg)
 {
-	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ChainX_t *chainX_req = (ChainX_t *)arg;
 	ThreadX_t *tidx_req = &chainX_req->tidx;
 
 	threadx_detach(tidx_req);
@@ -3331,7 +3331,7 @@ udp_exit:
 #ifdef UTIL_EX_TTY
 static void *chainX_thread_handler_tty(void *arg)
 {
-	ChainXCtx_t *chainX_req = (ChainXCtx_t *)arg;
+	ChainX_t *chainX_req = (ChainX_t *)arg;
 	ThreadX_t *tidx_req = &chainX_req->tidx;
 
 	threadx_detach(tidx_req);
@@ -3374,7 +3374,7 @@ tty_exit:
 }
 #endif
 
-void chainX_thread_stop(ChainXCtx_t *chainX_req)
+void chainX_thread_stop(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -3382,7 +3382,7 @@ void chainX_thread_stop(ChainXCtx_t *chainX_req)
 	}
 }
 
-void chainX_thread_close(ChainXCtx_t *chainX_req)
+void chainX_thread_close(ChainX_t *chainX_req)
 {
 	if ( (chainX_req) && (chainX_req->isfree==0) )
 	{
@@ -3393,7 +3393,7 @@ void chainX_thread_close(ChainXCtx_t *chainX_req)
 	DBG_TR_LN("exit (mode: %d)", chainX_req->mode);
 }
 
-int chainX_thread_init(ChainXCtx_t *chainX_req)
+int chainX_thread_init(ChainX_t *chainX_req)
 {
 	if (chainX_req==NULL)
 	{
@@ -3520,7 +3520,7 @@ struct icmphdr
 };
 #endif
 
-static int chainX_icmp(ChainXCtx_t *chainX_req)
+static int chainX_icmp(ChainX_t *chainX_req)
 {
 	int pingloop = chainX_req->recycle;
 	int ttl_val = 64;
@@ -3676,7 +3676,7 @@ static int chainX_icmp(ChainXCtx_t *chainX_req)
 	return msg_received_count;
 }
 
-int chainX_ping(ChainXCtx_t *chainX_req)
+int chainX_ping(ChainX_t *chainX_req)
 {
 	int ret = 0;
 

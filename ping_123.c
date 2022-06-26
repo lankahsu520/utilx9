@@ -19,7 +19,7 @@
 
 #define TAG "ping_123"
 
-ChainXCtx_t chainX_i = {
+ChainX_t chainX_i = {
 	.mode = CHAINX_MODE_ID_PING,
 	.sockfd = -1,
 

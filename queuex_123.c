@@ -17,10 +17,10 @@
 
 #include "utilx9.h"
 
-#define TAG "test"
+#define TAG "queuex_123"
 
 #define MAX_OF_QTEST 30
-QueueInfo_t *test_q;
+QueueX_t *test_q;
 
 typedef struct TestX_Struct
 {
@@ -59,7 +59,7 @@ void test_push(int idx)
 	TestX_t data_new = { .idx = 0 };
 
 	data_new.idx = idx;
-	queue_push(test_q, (void*)&data_new);
+	queuex_push(test_q, (void*)&data_new);
 }
 
 // ** app **
@@ -86,10 +86,10 @@ static void app_stop(void)
 static void app_loop(void)
 {
 
-	test_q = queue_thread_init("test", MAX_OF_QTEST, sizeof(TestX_t), test_q_exec_cb, test_q_free_cb);
+	test_q = queuex_thread_init("test", MAX_OF_QTEST, sizeof(TestX_t), test_q_exec_cb, test_q_free_cb);
 
 	test_q->dbg_more = DBG_LVL_INFO;
-	queue_isready(test_q, 5);
+	queuex_isready(test_q, 5);
 
 	while ( ( idx < 5 ) && (is_quit==0) )
 	{
@@ -108,8 +108,8 @@ static void app_loop(void)
 	}
 
 	{
-		queue_thread_stop(test_q);
-		queue_thread_close(test_q);
+		queuex_thread_stop(test_q);
+		queuex_thread_close(test_q);
 	}
 
 	exit(0);

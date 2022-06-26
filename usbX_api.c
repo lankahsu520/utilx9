@@ -161,7 +161,7 @@ void usbX_dev_print_handle(libusb_device_handle *usb_dev_handle)
 	}
 }
 
-void usbX_dev_print_ex(UsbXCtx_t *usbX_req)
+void usbX_dev_print_ex(UsbX_t *usbX_req)
 {
 	if ( usbX_req == NULL ) return;
 
@@ -170,7 +170,7 @@ void usbX_dev_print_ex(UsbXCtx_t *usbX_req)
 	DBG_DB_LN_0("\n");
 }
 
-void usbX_dev_transfer_free(UsbXCtx_t *usbX_req)
+void usbX_dev_transfer_free(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -187,7 +187,7 @@ void usbX_dev_transfer_free(UsbXCtx_t *usbX_req)
 	}
 }
 
-void usbX_dev_read_poll_free(UsbXCtx_t *usbX_req)
+void usbX_dev_read_poll_free(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -217,7 +217,7 @@ void usbX_dev_read_poll_free(UsbXCtx_t *usbX_req)
 					struct timeval tv;
 					tv.tv_sec = 0;
 					tv.tv_usec = 100 * 1000;
-					if (libusb_handle_events_timeout(usbX_req->usb_ctx, &tv) < 0)
+					if (libusb_handle_events_timeout(usbX_req->usb_req, &tv) < 0)
 					{
 						DBG_ER_LN("libusb_handle_events_timeout error !!!");
 						break;
@@ -234,7 +234,7 @@ void usbX_dev_read_poll_free(UsbXCtx_t *usbX_req)
 	}
 }
 
-int usbX_dev_read_poll(UsbXCtx_t *usbX_req, libusb_transfer_cb_fn callback)
+int usbX_dev_read_poll(UsbX_t *usbX_req, libusb_transfer_cb_fn callback)
 {
 	int ret = 0;
 	struct libusb_transfer *usb_dev_transfer = libusb_alloc_transfer(0);
@@ -269,7 +269,7 @@ int usbX_dev_read_poll(UsbXCtx_t *usbX_req, libusb_transfer_cb_fn callback)
 	return ret;
 }
 
-void usbX_dev_response_reset(UsbXCtx_t *usbX_req)
+void usbX_dev_response_reset(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -278,7 +278,7 @@ void usbX_dev_response_reset(UsbXCtx_t *usbX_req)
 	}
 }
 
-int usbX_dev_read(UsbXCtx_t *usbX_req, unsigned int usb_timeout)
+int usbX_dev_read(UsbX_t *usbX_req, unsigned int usb_timeout)
 {
 	int retry = RETRY_OF_ACCESS_USBX;
 	unsigned char *response = usbX_req->response;
@@ -327,7 +327,7 @@ do_read:
 	return ret;
 }
 
-int usbX_dev_write(UsbXCtx_t *usbX_req, int *nwrite, unsigned int usb_timeout)
+int usbX_dev_write(UsbX_t *usbX_req, int *nwrite, unsigned int usb_timeout)
 {
 	int ret = 0;
 	int retry = RETRY_OF_ACCESS_USBX;
@@ -405,7 +405,7 @@ void usbX_dev_path(struct libusb_device *usb_dev, char *usb_path, int len)
 	}
 }
 
-int usbX_dev_open(UsbXCtx_t *usbX_req, struct libusb_device *usb_dev)
+int usbX_dev_open(UsbX_t *usbX_req, struct libusb_device *usb_dev)
 {
 	int ret = -1;
 
@@ -426,14 +426,14 @@ int usbX_dev_open(UsbXCtx_t *usbX_req, struct libusb_device *usb_dev)
 	}
 	else
 	{
-		usbX_req->usb_cnt = libusb_get_device_list(usbX_req->usb_ctx, &usbX_req->usb_list);//get the list of devices
+		usbX_req->usb_cnt = libusb_get_device_list(usbX_req->usb_req, &usbX_req->usb_list);//get the list of devices
 		if ( usbX_req->usb_cnt < 0 )
 		{
 			DBG_ER_LN("libusb_get_device_list error !!! (usb_cnt: %zd)", usbX_req->usb_cnt);
 			goto exit_dev;
 		}
 		
-		usbX_req->usb_dev_handle = libusb_open_device_with_vid_pid(usbX_req->usb_ctx, usbX_req->vendor_id, usbX_req->product_id );
+		usbX_req->usb_dev_handle = libusb_open_device_with_vid_pid(usbX_req->usb_req, usbX_req->vendor_id, usbX_req->product_id );
 	}
 
 	if ( usbX_req->usb_dev_handle == NULL )
@@ -495,7 +495,7 @@ exit_dev:
 	return ret;
 }
 
-void usbX_dev_close(UsbXCtx_t *usbX_req)
+void usbX_dev_close(UsbX_t *usbX_req)
 {
 	if ( usbX_req->usb_cnt >= 0 )
 	{
@@ -528,7 +528,7 @@ void usbX_dev_close(UsbXCtx_t *usbX_req)
 // usbX_req->usb_cb_fn, 
 static int usbX_hotplug_cb(struct libusb_context *ctx, struct libusb_device * dev, libusb_hotplug_event event, void * user_data)
 {
-	UsbXCtx_t *usbX_req = (UsbXCtx_t *)user_data;
+	UsbX_t *usbX_req = (UsbX_t *)user_data;
 
 	if (usbX_req->usb_hotplug_fn)
 	{
@@ -542,13 +542,13 @@ static int usbX_hotplug_cb(struct libusb_context *ctx, struct libusb_device * de
 	return 0;
 }
 
-int usbX_hotplug_register(UsbXCtx_t *usbX_req)
+int usbX_hotplug_register(UsbX_t *usbX_req)
 {
 	int ret = LIBUSB_SUCCESS;
 	if ( (usbX_req) && (usbX_req->usb_hotplug_fn) )
 	{
 		ret = libusb_hotplug_register_callback(
-								usbX_req->usb_ctx, 
+								usbX_req->usb_req, 
 								LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
 #ifdef PJ_HAS_EUDEV
 								0,
@@ -570,7 +570,7 @@ int usbX_hotplug_register(UsbXCtx_t *usbX_req)
 	return ret;
 }
 
-void usbX_lock(UsbXCtx_t *usbX_req)
+void usbX_lock(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -579,7 +579,7 @@ void usbX_lock(UsbXCtx_t *usbX_req)
 	}
 }
 
-void usbX_unlock(UsbXCtx_t *usbX_req)
+void usbX_unlock(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -588,7 +588,7 @@ void usbX_unlock(UsbXCtx_t *usbX_req)
 	}
 }
 
-void usbX_signal(UsbXCtx_t *usbX_req)
+void usbX_signal(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -597,7 +597,7 @@ void usbX_signal(UsbXCtx_t *usbX_req)
 	}
 }
 
-int usbX_timewait(UsbXCtx_t *usbX_req, int ms)
+int usbX_timewait(UsbX_t *usbX_req, int ms)
 {
 	int ret = EINVAL;
 
@@ -610,7 +610,7 @@ int usbX_timewait(UsbXCtx_t *usbX_req, int ms)
 	return ret;
 }
 
-void usbX_wait(UsbXCtx_t *usbX_req)
+void usbX_wait(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -619,7 +619,7 @@ void usbX_wait(UsbXCtx_t *usbX_req)
 	}
 }
 
-int usbX_timewait_simple(UsbXCtx_t *usbX_req, int ms)
+int usbX_timewait_simple(UsbX_t *usbX_req, int ms)
 {
 	int ret = EINVAL;
 	if (usbX_req)
@@ -630,7 +630,7 @@ int usbX_timewait_simple(UsbXCtx_t *usbX_req, int ms)
 	return ret;
 }
 
-void usbX_wakeup_simple(UsbXCtx_t *usbX_req)
+void usbX_wakeup_simple(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -641,7 +641,7 @@ void usbX_wakeup_simple(UsbXCtx_t *usbX_req)
 
 static void *usbX_thread_handler(void *arg)
 {
-	UsbXCtx_t *usbX_req = (UsbXCtx_t *)arg;
+	UsbX_t *usbX_req = (UsbX_t *)arg;
 	ThreadX_t *tidx_req = &usbX_req->tidx;
 
 	threadx_detach(tidx_req);
@@ -659,9 +659,9 @@ static void *usbX_thread_handler(void *arg)
 		struct timeval tv;
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
-		//int ret = libusb_handle_events_timeout_completed(usbX_req->usb_ctx, &tv, NULL);
-		int ret = libusb_handle_events_timeout(usbX_req->usb_ctx, &tv);
-		//int ret = libusb_handle_events(usbX_req->usb_ctx);
+		//int ret = libusb_handle_events_timeout_completed(usbX_req->usb_req, &tv, NULL);
+		int ret = libusb_handle_events_timeout(usbX_req->usb_req, &tv);
+		//int ret = libusb_handle_events(usbX_req->usb_req);
 		if ( ret < 0 )
 		{
 			switch (ret)
@@ -693,9 +693,9 @@ exit_usbX_thread:
 	return NULL;
 }
 
-static int usbX_thread_init(UsbXCtx_t *usbX_req)
+static int usbX_thread_init(UsbX_t *usbX_req)
 {
-	if (usbX_req->usb_ctx == NULL) return -1;
+	if (usbX_req->usb_req == NULL) return -1;
 
 	{
 		usbX_req->tidx.thread_cb = usbX_thread_handler;
@@ -710,7 +710,7 @@ static int usbX_thread_init(UsbXCtx_t *usbX_req)
 	return 0;
 }
 
-int usbX_thread_isloop(UsbXCtx_t *usbX_req)
+int usbX_thread_isloop(UsbX_t *usbX_req)
 {
 	int isloop = 0;
 
@@ -722,7 +722,7 @@ int usbX_thread_isloop(UsbXCtx_t *usbX_req)
 	return isloop;
 }
 
-static void usbX_thread_stop(UsbXCtx_t *usbX_req)
+static void usbX_thread_stop(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -731,7 +731,7 @@ static void usbX_thread_stop(UsbXCtx_t *usbX_req)
 	}
 }
 
-static void usbX_thread_close(UsbXCtx_t *usbX_req)
+static void usbX_thread_close(UsbX_t *usbX_req)
 {
 	if ( (usbX_req) && (usbX_req->usb_isfree == 0) )
 	{
@@ -744,7 +744,7 @@ static void usbX_thread_close(UsbXCtx_t *usbX_req)
 	}
 }
 
-void usbX_listen_close(UsbXCtx_t *usbX_req)
+void usbX_listen_close(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
@@ -755,21 +755,21 @@ void usbX_listen_close(UsbXCtx_t *usbX_req)
 	}
 }
 
-int usbX_listen_open(UsbXCtx_t *usbX_req, void *user_data)
+int usbX_listen_open(UsbX_t *usbX_req, void *user_data)
 {
 	int ret = -1;
 
 	if (usbX_req)
 	{
-		ret = libusb_init(&usbX_req->usb_ctx); //initialize the library for the session we just declared
+		ret = libusb_init(&usbX_req->usb_req); //initialize the library for the session we just declared
 		if ( ret < 0 )
 		{
 			DBG_ER_LN("libusb_init error !!!");
 			goto exit_usbX_open;
 		}
 
-		libusb_set_debug(usbX_req->usb_ctx, usbX_req->dbg_lvl);
-		//libusb_set_option(usbX_req->usb_ctx, usbX_req->dbg_lvl);
+		libusb_set_debug(usbX_req->usb_req, usbX_req->dbg_lvl);
+		//libusb_set_option(usbX_req->usb_req, usbX_req->dbg_lvl);
 
 		usbX_thread_init(usbX_req);
 
@@ -785,26 +785,26 @@ exit_usbX_open:
 	return ret;
 }
 
-void usbX_close(UsbXCtx_t *usbX_req)
+void usbX_close(UsbX_t *usbX_req)
 {
 	if (usbX_req)
 	{
-		if (usbX_req->usb_ctx)
+		if (usbX_req->usb_req)
 		{
-			libusb_exit(usbX_req->usb_ctx);//needs to be called to end the
+			libusb_exit(usbX_req->usb_req);//needs to be called to end the
 			DBG_DB_LN("libusb_exit ok !!!");
-			usbX_req->usb_ctx = NULL;
+			usbX_req->usb_req = NULL;
 		}
 	}
 }
 
-int usbX_browse(UsbXCtx_t *usbX_req, void *user_data)
+int usbX_browse(UsbX_t *usbX_req, void *user_data)
 {
 	int ret = -1;
 
 	if (usbX_req)
 	{
-		ret = libusb_init(&usbX_req->usb_ctx); //initialize the library for the session we just declared
+		ret = libusb_init(&usbX_req->usb_req); //initialize the library for the session we just declared
 		if ( ret < 0 )
 		{
 			DBG_ER_LN("libusb_init error !!!");

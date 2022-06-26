@@ -55,7 +55,7 @@ typedef struct TaskInfo_Struct
 	SOAP_ACTION_ID id;
 	char cmd[LEN_OF_CMDLINE];
 } TaskInfo_t;
-QueueInfo_t *qtask = NULL;
+QueueX_t *qtask = NULL;
 
 void qtask_push( unsigned short gid, int32_t cid, SOAP_ACTION_ID id)
 {
@@ -66,12 +66,12 @@ void qtask_push( unsigned short gid, int32_t cid, SOAP_ACTION_ID id)
 	};
 	//SAFE_SPRINTF(task_req.cmd, "%s", cmd);
 
-	queue_push(qtask, (void*)&task_new);
+	queuex_push(qtask, (void*)&task_new);
 }
 
 void qtask_GetCapabilities(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_DEVICE_GETCAPABILITIES,
 		.act_ns = "tds",
 		.act_name = "GetCapabilities",
@@ -138,7 +138,7 @@ void qtask_GetCapabilities(TaskInfo_t *task)
 
 void qtask_GetDeviceInformation(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_DEVICE_GETDEVICEINFORMATION,
 		.act_ns = "tds",
 		.act_name = "GetDeviceInformation",
@@ -195,7 +195,7 @@ void qtask_GetDeviceInformation(TaskInfo_t *task)
 
 void qtask_GetHostname(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_DEVICE_GETHOSTNAME,
 		.act_ns = "tds",
 		.act_name = "GetHostname",
@@ -233,7 +233,7 @@ void qtask_GetHostname(TaskInfo_t *task)
 
 void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_DEVICE_GETNETWORKINTERFACES,
 		.act_ns = "tds",
 		.act_name = "GetNetworkInterfaces",
@@ -313,7 +313,7 @@ void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 
 void qtask_GetServices(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_DEVICE_GETSERVICES,
 		.act_ns = "tds",
 		.act_name = "GetServices",
@@ -355,7 +355,7 @@ void qtask_GetServices(TaskInfo_t *task)
 
 void qtask_GetScopes(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_DEVICE_GETSCOPES,
 		.act_ns = "tds",
 		.act_name = "GetScopes",
@@ -401,7 +401,7 @@ void qtask_GetScopes(TaskInfo_t *task)
 
 void qtask_GetProfiles(TaskInfo_t *task)
 {
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_MEDIA_GETPROFILES,
 		.act_ns = "trt",
 		.act_name = "GetProfiles",
@@ -445,7 +445,7 @@ void qtask_GetSnapshotUri(TaskInfo_t *task)
 	char *prefixname = "/work/snapshot";
 	char *token = profile_token;
 
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_MEDIA_GETSNAPSHOTURI,
 		.act_ns = "trt",
 		.act_name = "GetSnapshotUri",
@@ -488,7 +488,7 @@ void qtask_GetStreamUri(TaskInfo_t *task)
 	char *filename = "/work/video.h264";
 	char *token = profile_token;
 
-	OnvifCtx_t onvif_req ={
+	OnvifX_t onvif_req ={
 		.act_id = SOAP_ACTION_ID_MEDIA_GETSTREAMURI,
 		.act_ns = "trt",
 		.act_name = "GetStreamUri",
@@ -632,8 +632,8 @@ static void app_stop(void)
 		app_set_quit(1);
 		app_wakeup();
 
-		queue_thread_stop(qtask);
-		queue_thread_close(qtask);
+		queuex_thread_stop(qtask);
+		queuex_thread_close(qtask);
 	}
 }
 
@@ -761,7 +761,7 @@ int main(int argc, char* argv[])
 	if (result == 0)
 #endif
 	{
-		qtask = queue_thread_init("qtask", MAX_OF_TASK, sizeof(TaskInfo_t), qtask_exec_cb, NULL);
+		qtask = queuex_thread_init("qtask", MAX_OF_TASK, sizeof(TaskInfo_t), qtask_exec_cb, NULL);
 		usleep(500*1000);
 
 		qtask_push(769, 0, SOAP_ACTION_ID_DEVICE_GETCAPABILITIES);
@@ -783,7 +783,7 @@ int main(int argc, char* argv[])
 			app_wait();
 		}
 #else		
-		while (!queue_isempty(qtask))
+		while (!queuex_isempty(qtask))
 		{
 			sleep(1);
 		}

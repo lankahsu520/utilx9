@@ -44,6 +44,12 @@ static void app_loop(void)
 {
 	int pid = pidof("demo_000");
 	DBG_ER_LN("(pid: %d)", pid);
+
+	char payload[] = { 0xFF,0xFE,0x7B,0x22,0x75,0x73,0x65,0x72,0x22,0x3A,0x22,0x6C,0x61,0x6E,0x6B,0x61,0x22,0x7D,0xFF,0xFF};
+	unsigned short cksum = buf_cksum((unsigned short *)payload, 20);
+	DBG_ER_LN("(cksum: %d)", cksum);
+	cksum = buff_crc16((const unsigned char *)payload, 20, 0xFFFF);
+	DBG_ER_LN("(cksum: %d)", cksum);
 }
 
 static int app_init(void)

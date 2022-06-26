@@ -41,8 +41,8 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 
 # 4. Build
 ```bash
-$ . conf/github.conf
-$ . conf/customer2def.sh
+$ . confs/github.conf
+$ . confs/customer2def.sh
 # to create
 # include/customer_def.h
 # include/config_customer
@@ -103,7 +103,7 @@ $ vi utilx9.h
 - client_123 - socket client. use chainX_api.c.
 - clist_123 - link list example. use clist_api.c , use contiki\core\lib\list.*.
 - cronx_123 - parse crontab string ("minute" "hour" "day of month" "month" "day of week" "year, 2020+"), similar to crontab, to use cronx_api.c
-- dbus_456 - dbus example.
+- dbusx_456 - dbus example.
 - demo_000 - c template.
 - demo_123 - a example.
 - http_client_123 - http client example. use curl.
@@ -118,7 +118,7 @@ $ vi utilx9.h
 - onvif_client_123 - onvif client example.
 - ping_123 - ping example.
 - proc_list_123 & proc_watch - a system and proc information example.
-- queue_123 - a queue example.
+- queuex_123 - a queue example.
 - sshX_123 - ssh example.
 - statex_123 - state machine example. use statex_api.c.
 - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
@@ -134,7 +134,7 @@ $ vi utilx9.h
 - uv_123 - uv example.
 - uv_spawn_123 - uv spawn example.
 - wsdiscovery_123 - WS-Discovery example.
-- xbus_123 - a gdbus example. use xbus_api.c.
+- gbusx_123 - a gdbus example. use gbusx_api.c.
 
 
 # 6. License

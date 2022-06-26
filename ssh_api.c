@@ -14,37 +14,37 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-int sshX_open_shell(SSH_t *ssh_ctx)
+int sshX_open_shell(SSH_t *ssh_req)
 {
 	int rc;
 
-	rc = ssh_channel_open_session(ssh_ctx->channel);
+	rc = ssh_channel_open_session(ssh_req->channel);
 	if (rc != SSH_OK)
 	{
-		DBG_ER_LN("ssh_channel_open_session error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+		DBG_ER_LN("ssh_channel_open_session error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 		return rc;
 	}
 
 	return rc;
 }
 
-int sshX_request_pty(SSH_t *ssh_ctx)
+int sshX_request_pty(SSH_t *ssh_req)
 {
 	int rc;
 
-	rc = ssh_channel_request_pty(ssh_ctx->channel);
+	rc = ssh_channel_request_pty(ssh_req->channel);
 	if (rc != SSH_OK)
 	{
-		DBG_ER_LN("ssh_channel_request_pty error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+		DBG_ER_LN("ssh_channel_request_pty error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 		return rc;
 	}
 
-	if ( (ssh_ctx->cols != 0 ) && (ssh_ctx->rows != 0 ) )
+	if ( (ssh_req->cols != 0 ) && (ssh_req->rows != 0 ) )
 	{
-		rc = ssh_channel_change_pty_size(ssh_ctx->channel, ssh_ctx->cols, ssh_ctx->rows);
+		rc = ssh_channel_change_pty_size(ssh_req->channel, ssh_req->cols, ssh_req->rows);
 		if (rc != SSH_OK)
 		{
-			DBG_ER_LN("ssh_channel_change_pty_size error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+			DBG_ER_LN("ssh_channel_change_pty_size error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 			return rc;
 		}
 	}
@@ -52,14 +52,14 @@ int sshX_request_pty(SSH_t *ssh_ctx)
 	return rc;
 }
 
-int sshX_request_shell(SSH_t *ssh_ctx)
+int sshX_request_shell(SSH_t *ssh_req)
 {
 	int rc;
 
-	rc = ssh_channel_request_shell(ssh_ctx->channel);
+	rc = ssh_channel_request_shell(ssh_req->channel);
 	if (rc != SSH_OK)
 	{
-		DBG_ER_LN("ssh_channel_request_shell error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+		DBG_ER_LN("ssh_channel_request_shell error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 		return rc;
 	}
 
@@ -79,12 +79,12 @@ void sshX_stream_copy(ssh_channel channel_frm, ssh_channel channel_to)
 	}
 }
 
-void sshX_select_loop_with_tunnel(SSH_t *ssh_ctx, SSH_t *ssh_ctx_frm)
+void sshX_select_loop_with_tunnel(SSH_t *ssh_req, SSH_t *ssh_req_frm)
 {
-	ssh_session session = ssh_ctx->session;
-	ssh_channel channel = ssh_ctx->channel;
+	ssh_session session = ssh_req->session;
+	ssh_channel channel = ssh_req->channel;
 
-	ssh_channel channel_frm = ssh_ctx_frm->channel;
+	ssh_channel channel_frm = ssh_req_frm->channel;
 
 	ssh_connector connector_in, connector_out, connector_err;
 	int rc;
@@ -142,10 +142,10 @@ void sshX_select_loop_with_tunnel(SSH_t *ssh_ctx, SSH_t *ssh_ctx_frm)
 	ssh_event_free(event);
 }
 
-void sshX_select_loop_with_fd(SSH_t *ssh_ctx, socket_t in_fd, socket_t out_fd, socket_t err_fd)
+void sshX_select_loop_with_fd(SSH_t *ssh_req, socket_t in_fd, socket_t out_fd, socket_t err_fd)
 {
-	ssh_session session = ssh_ctx->session;
-	ssh_channel channel = ssh_ctx->channel;
+	ssh_session session = ssh_req->session;
+	ssh_channel channel = ssh_req->channel;
 
 	ssh_connector connector_in, connector_out, connector_err;
 	int rc;
@@ -201,17 +201,17 @@ void sshX_select_loop_with_fd(SSH_t *ssh_ctx, socket_t in_fd, socket_t out_fd, s
 	ssh_event_free(event);
 }
 
-ssh_channel sshX_open_channel(SSH_t *ssh_ctx)
+ssh_channel sshX_open_channel(SSH_t *ssh_req)
 {
-	ssh_ctx->channel = ssh_channel_new(ssh_ctx->session);
-	return ssh_ctx->channel;
+	ssh_req->channel = ssh_channel_new(ssh_req->session);
+	return ssh_req->channel;
 }
 
-int sshX_interactive(SSH_t *ssh_ctx)
+int sshX_interactive(SSH_t *ssh_req)
 {
 	int ret = 0;
 
-	if ( sshX_open_channel(ssh_ctx) )
+	if ( sshX_open_channel(ssh_req) )
 	{
 		struct termios terminal;
 		struct termios terminal_local;
@@ -223,9 +223,9 @@ int sshX_interactive(SSH_t *ssh_ctx)
 			memcpy(&terminal, &terminal_local, sizeof(struct termios));
 		}
 
-		sshX_open_shell(ssh_ctx);
-		sshX_request_pty(ssh_ctx);
-		sshX_request_shell(ssh_ctx);
+		sshX_open_shell(ssh_req);
+		sshX_request_pty(ssh_req);
+		sshX_request_shell(ssh_req);
 
 		if (interactive)
 		{
@@ -234,7 +234,7 @@ int sshX_interactive(SSH_t *ssh_ctx)
 			//setsignal();
 		}
 
-		sshX_select_loop_with_fd(ssh_ctx, 0, 1, 2);
+		sshX_select_loop_with_fd(ssh_req, 0, 1, 2);
 
 		tcsetattr(0, TCSANOW, &terminal);
 	}
@@ -242,35 +242,35 @@ int sshX_interactive(SSH_t *ssh_ctx)
 	return ret;
 }
 
-int sshX_authenticate(SSH_t *ssh_ctx)
+int sshX_authenticate(SSH_t *ssh_req)
 {
 	int rc = SSH_AUTH_SUCCESS;
 
 	DBG_TR_LN("call ssh_userauth_none ...");
-	rc = ssh_userauth_none(ssh_ctx->session, NULL);
+	rc = ssh_userauth_none(ssh_req->session, NULL);
 	if (rc == SSH_AUTH_ERROR)
 	{
 		return rc;
 	}
 
-	char *banner = ssh_get_issue_banner(ssh_ctx->session);
+	char *banner = ssh_get_issue_banner(ssh_req->session);
 	if (banner)
 	{
 		printf("%s\n",banner);
 		SSH_STRING_FREE_CHAR(banner);
 	}
 
-	int method = ssh_userauth_list(ssh_ctx->session, NULL);
+	int method = ssh_userauth_list(ssh_req->session, NULL);
 	DBG_DB_LN("(method: %d)", method);
 
 	while (rc != SSH_AUTH_SUCCESS)
 	{
 		if ( method & SSH_AUTH_METHOD_GSSAPI_MIC )
 		{
-			rc = ssh_userauth_gssapi(ssh_ctx->session);
+			rc = ssh_userauth_gssapi(ssh_req->session);
 			if(rc == SSH_AUTH_ERROR)
 			{
-				DBG_ER_LN("ssh_userauth_gssapi error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+				DBG_ER_LN("ssh_userauth_gssapi error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 				return rc;
 			}
 			else if (rc == SSH_AUTH_SUCCESS)
@@ -281,10 +281,10 @@ int sshX_authenticate(SSH_t *ssh_ctx)
 
 		if ( method & SSH_AUTH_METHOD_PUBLICKEY )
 		{
-			rc = ssh_userauth_publickey_auto(ssh_ctx->session, NULL, NULL);
+			rc = ssh_userauth_publickey_auto(ssh_req->session, NULL, NULL);
 			if (rc == SSH_AUTH_ERROR)
 			{
-				DBG_ER_LN("ssh_userauth_publickey_auto error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+				DBG_ER_LN("ssh_userauth_publickey_auto error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 				return rc;
 			}
 			else if (rc == SSH_AUTH_SUCCESS)
@@ -296,14 +296,14 @@ int sshX_authenticate(SSH_t *ssh_ctx)
 		if ( method & SSH_AUTH_METHOD_PASSWORD )
 		{
 			char *password = NULL;
-			if ( strlen(ssh_ctx->server_pass_dec) > 0 )
+			if ( strlen(ssh_req->server_pass_dec) > 0 )
 			{
-				SAFE_ASPRINTF(password, "%s",  ssh_ctx->server_pass_dec);
+				SAFE_ASPRINTF(password, "%s",  ssh_req->server_pass_dec);
 			}
-			else if ( strlen(ssh_ctx->server_pass_enc) <= 0 )
+			else if ( strlen(ssh_req->server_pass_enc) <= 0 )
 			{
 				char prompt[LEN_OF_BUF256] = "";
-				SAFE_SNPRINTF(prompt, sizeof(prompt), "%s@%s's passowrd: ", ssh_ctx->server_user, ssh_ctx->server_ip);
+				SAFE_SNPRINTF(prompt, sizeof(prompt), "%s@%s's passowrd: ", ssh_req->server_user, ssh_req->server_ip);
 
 				password = SAFE_CALLOC(1, LEN_OF_PASS);
 				memset(password, 0, LEN_OF_PASS);
@@ -315,22 +315,22 @@ int sshX_authenticate(SSH_t *ssh_ctx)
 			else
 			{
 				int server_pass_dec_len = 0;
-				password = sec_base64_dec(ssh_ctx->server_pass_enc, strlen(ssh_ctx->server_pass_enc), &server_pass_dec_len);
+				password = sec_base64_dec(ssh_req->server_pass_enc, strlen(ssh_req->server_pass_enc), &server_pass_dec_len);
 			}
 
 			if (password)
 			{
 				//DBG_ER_LN("(password: %s)", password);
-				rc = ssh_userauth_password(ssh_ctx->session, NULL, password);
+				rc = ssh_userauth_password(ssh_req->session, NULL, password);
 				switch (rc)
 				{
 					case SSH_AUTH_SUCCESS:
 						break;
 					case SSH_AUTH_DENIED:
-						printf(COLOR_RED"Permission denied"COLOR_NONE", please try again.\n");
+						DBG_WN_LN("Permission denied, please try again !!!");
 						break;
 					default:
-						DBG_ER_LN("ssh_userauth_password error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_ctx->session), ssh_get_error(ssh_ctx->session));
+						DBG_ER_LN("ssh_userauth_password error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 						break;
 				}
 				SAFE_FREE(password);
@@ -340,45 +340,45 @@ int sshX_authenticate(SSH_t *ssh_ctx)
 	return rc;
 }
 
-void sshX_close_channel(SSH_t *ssh_ctx)
+void sshX_close_channel(SSH_t *ssh_req)
 {
-	if (ssh_ctx->channel)
+	if (ssh_req->channel)
 	{
-		ssh_channel_send_eof(ssh_ctx->channel);
-		ssh_channel_close(ssh_ctx->channel);
-		ssh_channel_free(ssh_ctx->channel);
+		ssh_channel_send_eof(ssh_req->channel);
+		ssh_channel_close(ssh_req->channel);
+		ssh_channel_free(ssh_req->channel);
 
-		ssh_ctx->channel = NULL;
+		ssh_req->channel = NULL;
 	}
 }
 
-void sshX_close_session(SSH_t *ssh_ctx)
+void sshX_close_session(SSH_t *ssh_req)
 {
-	if (ssh_ctx->session )
+	if (ssh_req->session )
 	{
-		if (ssh_is_connected(ssh_ctx->session ))
+		if (ssh_is_connected(ssh_req->session ))
 		{
-			ssh_disconnect(ssh_ctx->session );
+			ssh_disconnect(ssh_req->session );
 		}
 
-		ssh_free(ssh_ctx->session );
-		ssh_ctx->session  = NULL;
+		ssh_free(ssh_req->session );
+		ssh_req->session  = NULL;
 	}
 }
 
-void sshX_stop(SSH_t *ssh_ctx)
+void sshX_stop(SSH_t *ssh_req)
 {
-	sshX_close_channel(ssh_ctx);
-	sshX_close_session(ssh_ctx);
+	sshX_close_channel(ssh_req);
+	sshX_close_session(ssh_req);
 }
 
-ssh_session sshX_client(SSH_t *ssh_ctx)
+ssh_session sshX_client(SSH_t *ssh_req)
 {
 	//int rc;
 	//ssh_init();
 
-	ssh_ctx->session = ssh_new();
-	if (ssh_ctx->session == NULL)
+	ssh_req->session = ssh_new();
+	if (ssh_req->session == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");
 		goto exit_connect;
@@ -386,49 +386,49 @@ ssh_session sshX_client(SSH_t *ssh_ctx)
 
 #if (0)
 	ssh_callbacks_init(&cb);
-	ssh_set_callbacks(ssh_ctx->session,&cb);
+	ssh_set_callbacks(ssh_req->session,&cb);
 #endif
 
 	{
 		// connect
-		ssh_options_set(ssh_ctx->session, SSH_OPTIONS_LOG_VERBOSITY, &ssh_ctx->verbosity);
-		ssh_options_set(ssh_ctx->session, SSH_OPTIONS_HOST, ssh_ctx->server_ip); 
-		if ( strlen(ssh_ctx->server_user) > 0 )
+		ssh_options_set(ssh_req->session, SSH_OPTIONS_LOG_VERBOSITY, &ssh_req->verbosity);
+		ssh_options_set(ssh_req->session, SSH_OPTIONS_HOST, ssh_req->server_ip); 
+		if ( strlen(ssh_req->server_user) > 0 )
 		{
-			DBG_TR_LN("(ssh_ctx->server_user: %s)", ssh_ctx->server_user);
-			ssh_options_set(ssh_ctx->session, SSH_OPTIONS_USER, ssh_ctx->server_user);
+			DBG_TR_LN("(ssh_req->server_user: %s)", ssh_req->server_user);
+			ssh_options_set(ssh_req->session, SSH_OPTIONS_USER, ssh_req->server_user);
 		}
-		if (ssh_ctx->server_port > 0)
-			ssh_options_set(ssh_ctx->session, SSH_OPTIONS_PORT, &ssh_ctx->server_port);
+		if (ssh_req->server_port > 0)
+			ssh_options_set(ssh_req->session, SSH_OPTIONS_PORT, &ssh_req->server_port);
 
 		int process_config = 0;
-		ssh_options_set(ssh_ctx->session , SSH_OPTIONS_PROCESS_CONFIG, &process_config);
+		ssh_options_set(ssh_req->session , SSH_OPTIONS_PROCESS_CONFIG, &process_config);
 
-		ssh_options_parse_config(ssh_ctx->session, NULL);
+		ssh_options_parse_config(ssh_req->session, NULL);
 
 		DBG_TR_LN("call ssh_connect ...");
-		if ( ssh_connect(ssh_ctx->session) )
+		if ( ssh_connect(ssh_req->session) )
 		{
-			DBG_ER_LN("ssh_new error !!! (%s)", ssh_get_error(ssh_ctx->session));
+			DBG_ER_LN("ssh_new error !!! (%s)", ssh_get_error(ssh_req->session));
 			goto exit_connect;
 		}
 
-		char *banner = ssh_get_issue_banner(ssh_ctx->session);
+		char *banner = ssh_get_issue_banner(ssh_req->session);
 		if (banner)
 		{
 			DBG_DB_LN("(banner: %s)", banner);
 			SAFE_FREE(banner);
 		}
 
-		if ( SSH_AUTH_SUCCESS != sshX_authenticate(ssh_ctx) )
+		if ( SSH_AUTH_SUCCESS != sshX_authenticate(ssh_req) )
 			goto exit_connect;
 	}
-	return ssh_ctx->session ;
+	return ssh_req->session ;
 
 exit_connect:
-	sshX_close_session(ssh_ctx);
+	sshX_close_session(ssh_req);
 	//ssh_finalize();
 
-	return ssh_ctx->session ;
+	return ssh_req->session ;
 }
 

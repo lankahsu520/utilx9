@@ -61,7 +61,7 @@ char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len,
 	return buffer;
 }
 
-void onvif_auth(OnvifCtx_t *onvif_req, SoapCtx_t *soap)
+void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 {
 	soap_node_t *request_node = soap->request_node;
 
@@ -142,12 +142,12 @@ void onvif_auth(OnvifCtx_t *onvif_req, SoapCtx_t *soap)
 	//soap_element_save(request_node, "/tmp/sdk/test.xml");
 }
 
-soap_node_t *onvif_open(OnvifCtx_t *onvif_req, onvif_resuest_fn request_cb)
+soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 {
 	soap_node_t *response_node = NULL;
 	if ( (onvif_req) && (strlen(onvif_req->netinfo.url)>0) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_SOAP,
 			.url = "",
 			.port = onvif_req->netinfo.port,
@@ -155,7 +155,7 @@ soap_node_t *onvif_open(OnvifCtx_t *onvif_req, onvif_resuest_fn request_cb)
 		};
 		SAFE_SPRINTF(http_req.url, "%s", onvif_req->netinfo.url);
 
-		SoapCtx_t *soap =	soap_create(onvif_xml(onvif_req->act_id));
+		SoapX_t *soap =	soap_create(onvif_xml(onvif_req->act_id));
 		if (soap)
 		{
 			{
@@ -190,7 +190,7 @@ soap_node_t *onvif_open(OnvifCtx_t *onvif_req, onvif_resuest_fn request_cb)
 	return response_node;
 }
 
-static void onvif_media_GetSnapshotUri_request_cb(SoapCtx_t *soap, OnvifCtx_t *onvif_req)
+static void onvif_media_GetSnapshotUri_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 {
 	char *ProfileToken = (char *)onvif_req->request;
 	soap_node_t *ptoken_node = soap_element_fetch(soap->request_node, NULL, "ProfileToken", NULL, NULL);
@@ -201,7 +201,7 @@ static void onvif_media_GetSnapshotUri_request_cb(SoapCtx_t *soap, OnvifCtx_t *o
 	}
 }
 
-static void onvif_media_GetStreamUri_request_cb(SoapCtx_t *soap, OnvifCtx_t *onvif_req)
+static void onvif_media_GetStreamUri_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 {
 	char *ProfileToken = (char *)onvif_req->request;
 	soap_node_t *ptoken_node = soap_element_fetch(soap->request_node, NULL, "ProfileToken", NULL, NULL);
@@ -212,7 +212,7 @@ static void onvif_media_GetStreamUri_request_cb(SoapCtx_t *soap, OnvifCtx_t *onv
 	}
 }
 
-static void onvif_GeCommon_request_cb(SoapCtx_t *soap, OnvifCtx_t *onvif_req)
+static void onvif_GeCommon_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 {
 	soap_node_t *body_node = soap_element_fetch(soap->request_node, NULL, "Body", NULL, NULL);
 	if ( (onvif_req) && (body_node) )
@@ -227,7 +227,7 @@ static void onvif_GeCommon_request_cb(SoapCtx_t *soap, OnvifCtx_t *onvif_req)
 	}
 }
 
-soap_node_t *onvif_GetCommon(OnvifCtx_t *onvif_req)
+soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req)
 {
 	onvif_resuest_fn request_cb = NULL;
 	switch (onvif_req->act_id)
@@ -257,12 +257,12 @@ soap_node_t *onvif_GetCommon(OnvifCtx_t *onvif_req)
 	return onvif_open(onvif_req, request_cb);
 }
 
-int onvif_GetSnapshot(OnvifCtx_t *onvif_req, char *snapshot_uri, char *prefixname)
+int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname)
 {
 	int ret = 0;
 	if (snapshot_uri)
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_MJPEG,
 			.url = "",
 			.log = "",
@@ -286,12 +286,12 @@ int onvif_GetSnapshot(OnvifCtx_t *onvif_req, char *snapshot_uri, char *prefixnam
 	return ret;
 }
 
-int onvif_GetVideoClip(OnvifCtx_t *onvif_req, char *videoclip_uri, char *filename, int duration)
+int onvif_GetVideoClip(OnvifX_t *onvif_req, char *videoclip_uri, char *filename, int duration)
 {
 	int ret = 0;
 	if (videoclip_uri)
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_RTSP,
 			.url = "",
 			.log = "",

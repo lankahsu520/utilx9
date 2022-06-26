@@ -220,7 +220,7 @@ void fs_open_cb(uv_fs_t *req)
 #endif
 
 #ifdef USE_EVENT_CREATE
-UvEventCtx_t fs_event_req = {
+UvEvent_t fs_event_req = {
 	.name = TAG,
 	.filename = TEST_TXT_FILENAME,
 	.isquit = 0,

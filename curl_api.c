@@ -31,7 +31,7 @@ static size_t dummy_fp2body_cb(char *ptr, size_t size, size_t nmemb, void *conte
 static size_t dummy_buff2body_cb(void *ptr, size_t size, size_t nmemb, void *context)
 {
 	// my side(buff) -> server
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	SimpleRequest_t *simple_req = (SimpleRequest_t *)&http_req->simple_req;
 
 	int len = simple_req->req_size - simple_req->req_pos;
@@ -75,7 +75,7 @@ static size_t simple_body_cb(char *ptr, size_t size, size_t nmemb, void *context
 {
 	// my side <- server
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	SimpleRequest_t *simple_req = (SimpleRequest_t *)&http_req->simple_req;
 
 	size_t new_len = simple_req->res_size + bytec + 1;
@@ -97,7 +97,7 @@ static size_t soap_body_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
 	// my side <- server
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	SoapRequest_t *soap_req = (SoapRequest_t *)&http_req->soap_req;
 
 	size_t new_len = soap_req->res_size + bytec + 1;
@@ -119,7 +119,7 @@ static size_t uploadfile_body_cb(char *ptr, size_t size, size_t nmemb, void *con
 {
 	// my side <- server
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	FileRequest_t *file_req = (FileRequest_t *)&http_req->file_req;
 
 	size_t new_len = file_req->res_size + bytec + 1;
@@ -137,7 +137,7 @@ static size_t uploadfile_body_cb(char *ptr, size_t size, size_t nmemb, void *con
 	return bytec;
 }
 
-static int http_request_simple(HttpCtx_t *http_req)
+static int http_request_simple(HttpX_t *http_req)
 {
 	int ret = -1;
 	SimpleRequest_t *simple_req = (SimpleRequest_t *)&http_req->simple_req;
@@ -240,7 +240,7 @@ static int http_request_simple(HttpCtx_t *http_req)
 	return ret;
 }
 
-static int http_request_soap(HttpCtx_t *http_req)
+static int http_request_soap(HttpX_t *http_req)
 {
 	int ret = -1;
 	SoapRequest_t *soap_req = (SoapRequest_t *)&http_req->soap_req;
@@ -326,7 +326,7 @@ static int http_request_soap(HttpCtx_t *http_req)
 	return ret;
 }
 
-static int http_request_uploadfile(HttpCtx_t *http_req)
+static int http_request_uploadfile(HttpX_t *http_req)
 {
 	int ret = -1;
 	FileRequest_t *file_req = (FileRequest_t *)&http_req->file_req;
@@ -443,7 +443,7 @@ static int http_request_uploadfile(HttpCtx_t *http_req)
 static size_t rtsp_options_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	if (http_req)
 	{
 		if ( SAFE_STRSTR(ptr, "Public:") )
@@ -458,7 +458,7 @@ static size_t rtsp_options_header_cb(char *ptr, size_t size, size_t nmemb, void 
 }
 
 // send RTSP OPTIONS request
-static CURLcode rtsp_options(HttpCtx_t *http_req, CURL *curl)
+static CURLcode rtsp_options(HttpX_t *http_req, CURL *curl)
 {
 	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -490,7 +490,7 @@ static CURLcode rtsp_options(HttpCtx_t *http_req, CURL *curl)
 
 static size_t rtsp_describe_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	size_t bytec = size * nmemb;
 	if (http_req)
 	{
@@ -500,7 +500,7 @@ static size_t rtsp_describe_header_cb(char *ptr, size_t size, size_t nmemb, void
 }
 
 // scan sdp file for media control attribute
-static void rtsp_describe_parse(HttpCtx_t *http_req)
+static void rtsp_describe_parse(HttpX_t *http_req)
 {
 	if (http_req)
 	{
@@ -592,7 +592,7 @@ static void rtsp_describe_parse(HttpCtx_t *http_req)
 
 static size_t rtsp_describe_body_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	size_t bytec = size * nmemb;
 	if (http_req)
 	{
@@ -603,7 +603,7 @@ static size_t rtsp_describe_body_cb(char *ptr, size_t size, size_t nmemb, void *
 	return bytec;
 }
 
-static CURLcode rtsp_describe(HttpCtx_t *http_req, CURL *curl)
+static CURLcode rtsp_describe(HttpX_t *http_req, CURL *curl)
 {
 	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -644,7 +644,7 @@ static CURLcode rtsp_describe(HttpCtx_t *http_req, CURL *curl)
 
 static size_t rtsp_setup_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	size_t bytec = size * nmemb;
 	DBG_TMP_Y("(bytec: %zd, ptr: %s)", bytec, str_trim(ptr));
 
@@ -665,7 +665,7 @@ static size_t rtsp_setup_header_cb(char *ptr, size_t size, size_t nmemb, void *c
 	return bytec;
 }
 
-static CURLcode rtsp_setup(HttpCtx_t *http_req, CURL *curl, int track_id)
+static CURLcode rtsp_setup(HttpX_t *http_req, CURL *curl, int track_id)
 {
 	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -727,7 +727,7 @@ static size_t rtsp_play_body_cb(char *ptr, size_t size, size_t nmemb, void *cont
 	size_t bytec = size * nmemb;
 	//DBG_TMP_DUMP(ptr, bytec, " ", "(bytec: %ld)", bytec);
 
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	if (http_req)
 	{
 		//unsigned char magic = ptr[0];
@@ -737,7 +737,7 @@ static size_t rtsp_play_body_cb(char *ptr, size_t size, size_t nmemb, void *cont
 		if (channel==0)
 		{
 			RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
-			RTPCtx_t *rtp_req = (RTPCtx_t*)rtsp_req->rtp_req;
+			RTPX_t *rtp_req = (RTPX_t*)rtsp_req->rtp_req;
 			
 			rtp_body_parse(rtp_req, ptr+4, length);
 		}
@@ -745,7 +745,7 @@ static size_t rtsp_play_body_cb(char *ptr, size_t size, size_t nmemb, void *cont
 	return bytec;
 }
 
-static CURLcode rtsp_play(HttpCtx_t *http_req, CURL *curl)
+static CURLcode rtsp_play(HttpX_t *http_req, CURL *curl)
 {
 	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -795,7 +795,7 @@ static CURLcode rtsp_play(HttpCtx_t *http_req, CURL *curl)
 	return curl_res;
 }
 
-static CURLcode rtsp_receive(HttpCtx_t *http_req, CURL *curl)
+static CURLcode rtsp_receive(HttpX_t *http_req, CURL *curl)
 {
 	CURLcode curl_res = CURLE_OK;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -811,7 +811,7 @@ static CURLcode rtsp_receive(HttpCtx_t *http_req, CURL *curl)
 	return curl_res;
 }
 
-static CURLcode rtsp_teardown(HttpCtx_t *http_req, CURL *curl)
+static CURLcode rtsp_teardown(HttpX_t *http_req, CURL *curl)
 {
 	CURLcode curl_res = CURLE_OK;
 	//RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -847,7 +847,7 @@ static int _getch(void)
 	return ch;
 }
 
-static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
+static int http_request_downloadfile_rtsp(HttpX_t *http_req)
 {
 	int ret = -1;
 	RTSPRequest_t *rtsp_req = (RTSPRequest_t *)&http_req->rtsp_req;
@@ -918,7 +918,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 				}
 
 				// to setup RTP
-				RTPCtx_t *rtp_req = rtp_init(rtsp_req->rtp_port, rtsp_req->interleaved);
+				RTPX_t *rtp_req = rtp_init(rtsp_req->rtp_port, rtsp_req->interleaved);
 				rtp_req->http_req = http_req;
 
 				rtsp_req->rtp_req = rtp_req;
@@ -991,7 +991,7 @@ static int http_request_downloadfile_rtsp(HttpCtx_t *http_req)
 }
 #endif
 
-static int http_request_downloadfile_normal(HttpCtx_t *http_req)
+static int http_request_downloadfile_normal(HttpX_t *http_req)
 {
 	int ret = -1;
 	FileRequest_t *file_req = (FileRequest_t *)&http_req->file_req;
@@ -1094,7 +1094,7 @@ static int http_request_downloadfile_normal(HttpCtx_t *http_req)
 static size_t mjpeg_header_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 	char *multi_ptr = NULL;
 	char *ctype = NULL;
 	char *clength = NULL;
@@ -1131,7 +1131,7 @@ static size_t mjpeg_header_cb(char *ptr, size_t size, size_t nmemb, void *contex
 static size_t mjpeg_body_cb(char *ptr, size_t size, size_t nmemb, void *context)
 {
 	size_t bytec = size * nmemb;
-	HttpCtx_t *http_req = (HttpCtx_t *)context;
+	HttpX_t *http_req = (HttpX_t *)context;
 
 	//DBG_DB_LN("(ptr: %s)", ptr);
 	if (http_req)
@@ -1303,7 +1303,7 @@ mjpeg_parse:
 	return bytec;
 }
 
-static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
+static int http_request_downloadfile_mjpeg(HttpX_t *http_req)
 {
 	int ret = -1;
 	MJPEGRequest_t *mjpeg_req = (MJPEGRequest_t *)&http_req->mjpeg_req;
@@ -1419,7 +1419,7 @@ static int http_request_downloadfile_mjpeg(HttpCtx_t *http_req)
 	return ret;
 }
 
-void http_request_free(HttpCtx_t *http_req)
+void http_request_free(HttpX_t *http_req)
 {
 	if (http_req)
 	{
@@ -1446,7 +1446,7 @@ void http_request_free(HttpCtx_t *http_req)
 	}
 }
 
-void http_connect_timeout_set(HttpCtx_t *http_req, int timeout)
+void http_connect_timeout_set(HttpX_t *http_req, int timeout)
 {
 	if ( (http_req) && (http_req->curl) )
 	{
@@ -1454,7 +1454,7 @@ void http_connect_timeout_set(HttpCtx_t *http_req, int timeout)
 	}
 }
 
-void http_timeout_set(HttpCtx_t *http_req, int timeout)
+void http_timeout_set(HttpX_t *http_req, int timeout)
 {
 	if ( (http_req) && (http_req->curl) )
 	{
@@ -1462,7 +1462,7 @@ void http_timeout_set(HttpCtx_t *http_req, int timeout)
 	}
 }
 
-void http_request_stop(HttpCtx_t *http_req)
+void http_request_stop(HttpX_t *http_req)
 {
 	if (http_req)
 	{
@@ -1471,7 +1471,7 @@ void http_request_stop(HttpCtx_t *http_req)
 	}
 }
 
-int http_request(HttpCtx_t *http_req)
+int http_request(HttpX_t *http_req)
 {
 	int ret = -1;
 	http_req->result = 0;
@@ -1514,7 +1514,7 @@ int http_upload(const char *url, const char *filename)
 	int ret = -1;
 	if ((url) && strlen(url) && (filename) && (access(filename, R_OK ) == 0) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_UPLOADFILE,
 			.url = "",
 			.log = "",
@@ -1536,7 +1536,7 @@ int http_upload_with_response(const char *url, const char *filename, void *userd
 	int ret = -1;
 	if ((url) && strlen(url) && (filename) && (access(filename, R_OK ) == 0) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_UPLOADFILE,
 			.url = "",
 			.log = "",
@@ -1564,7 +1564,7 @@ int http_simple(const char *url, HTTP_METHOD_ID method, struct curl_slist *heade
 	int ret = -1;
 	if ((url) && strlen(url) )
 	{
-		HttpCtx_t http_req ={
+		HttpX_t http_req ={
 			.mode = HTTP_MODE_ID_SIMPLE,
 			.url = "",
 			.log = "",

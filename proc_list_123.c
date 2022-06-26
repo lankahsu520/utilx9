@@ -21,9 +21,9 @@ int main(int argc, char* argv[])
 	//dbg_lvl_set(DBG_LVL_DEBUG);
 	
 #ifdef UTIL_EX_SYSTEMINFO
-	SysInfoEx_t sysinfo_ex;
+	SysInfoX_t sysinfo_ex;
 
-	memset(&sysinfo_ex, 0, sizeof(SysInfoEx_t));
+	memset(&sysinfo_ex, 0, sizeof(SysInfoX_t));
 	sys_info_ex(&sysinfo_ex);
 	DBG_LN_Y("#******************************************************************************");
 	DBG_LN_Y("#** system info **");

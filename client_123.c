@@ -15,7 +15,7 @@
 #include "utilx9.h"
 
 QBUF_t qbuf_S;
-ChainXCtx_t chainX_S = {
+ChainX_t chainX_S = {
 	.mode = CHAINX_MODE_ID_TCP_CLIENT,
 	.sockfd = -1,
 	.status = 0,
@@ -149,7 +149,7 @@ const unsigned char RSA_CLIENT_CA_CERT[]="";
 #endif
 
 
-static void chainXssl_cert_luffanet(ChainXCtx_t *chainX_req)
+static void chainXssl_cert_luffanet(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -173,12 +173,12 @@ static void chainXssl_cert_luffanet(ChainXCtx_t *chainX_req)
 	}
 }
 
-void qrequest_push(ChainXCtx_t *chainX_req, char *buff, int buff_len)
+void qrequest_push(ChainX_t *chainX_req, char *buff, int buff_len)
 {
 	DBG_IF_LN("Got !!! (buff: %s)", buff);
 }
 
-static void socket_linked(ChainXCtx_t *chainX_req)
+static void socket_linked(ChainX_t *chainX_req)
 {
 	if (chainX_linked_check(chainX_req)==0)
 	{

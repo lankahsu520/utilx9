@@ -144,10 +144,10 @@ exit_send:
 	return ret;
 }
 
-int dbusx_signal_str(DbusX_t *dbusx_ctx, const char *ifac, char *cmd, char *arg)
+int dbusx_signal_str(DbusX_t *dbusx_req, const char *ifac, char *cmd, char *arg)
 {
-	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
-	char *dbus_path = dbusx_path_get(dbusx_ctx);
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	char *dbus_path = dbusx_path_get(dbusx_req);
 	return dbusx_signal_simple(dbus_conn, dbus_path, ifac, cmd, DBUS_TYPE_STRING, (void*)arg);
 }
 
@@ -361,41 +361,41 @@ exit_send:
 	return retStr;
 }
 
-char *dbusx_method_str2str(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+char *dbusx_method_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
-	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
-	char *dbus_path = dbusx_path_get(dbusx_ctx);
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	char *dbus_path = dbusx_path_get(dbusx_req);
 	return dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_STRING, timeout);
 }
 
-char *dbusx_method_str2int(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+char *dbusx_method_str2int(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
-	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
-	char *dbus_path = dbusx_path_get(dbusx_ctx);
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	char *dbus_path = dbusx_path_get(dbusx_req);
 	char *retStr = dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INT32, timeout);
 	return retStr;
 }
 
-char *dbusx_method_xint2uint(DbusX_t *dbusx_ctx, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout)
+char *dbusx_method_xint2uint(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout)
 {
-	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_ctx);
-	char *dbus_path = dbusx_path_get(dbusx_ctx);
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	char *dbus_path = dbusx_path_get(dbusx_req);
 	return dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, itype, (void*)arg, DBUS_TYPE_UINT32, timeout);
 }
 
 static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *message, void *usr_data)
 {
 	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-	DbusX_t *dbusx_ctx = (DbusX_t *)usr_data;
-	if (dbusx_ctx)
+	DbusX_t *dbusx_req = (DbusX_t *)usr_data;
+	if (dbusx_req)
 	{
 		const char *method = dbus_message_get_member(message);
 		const char *iface = dbus_message_get_interface(message);
 		const char *path = dbus_message_get_path(message);
 
-		if (dbusx_ctx->filter_user_cb)
+		if (dbusx_req->filter_user_cb)
 		{
-			handled = dbusx_ctx->filter_user_cb(connection, message, usr_data);
+			handled = dbusx_req->filter_user_cb(connection, message, usr_data);
 		}
 
 		if ( handled != DBUS_HANDLER_RESULT_HANDLED )
@@ -408,17 +408,17 @@ static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *m
 	return handled;
 }
 
-void dbusx_conn_free(DbusX_t *dbusx_ctx)
+void dbusx_conn_free(DbusX_t *dbusx_req)
 {
-	if ( (dbusx_ctx) && ((dbusx_ctx->dbus_conn_listen) || (dbusx_ctx->dbus_conn)) )
+	if ( (dbusx_req) && ((dbusx_req->dbus_conn_listen) || (dbusx_req->dbus_conn)) )
 	{
-		SAFE_DBUS_CONN_FREE(dbusx_ctx->dbus_conn_listen);
-		SAFE_DBUS_CONN_FREE(dbusx_ctx->dbus_conn);
+		SAFE_DBUS_CONN_FREE(dbusx_req->dbus_conn_listen);
+		SAFE_DBUS_CONN_FREE(dbusx_req->dbus_conn);
 		dbus_shutdown();
 	}
 }
 
-int dbusx_client_init(DbusX_t *dbusx_ctx)
+int dbusx_client_init(DbusX_t *dbusx_req)
 {
 	int ret = -1;
 	DBusError dbus_err;
@@ -426,7 +426,7 @@ int dbusx_client_init(DbusX_t *dbusx_ctx)
 	// initialize the errors
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	if ((dbusx_ctx->dbus_conn = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_err)) == NULL)
+	if ((dbusx_req->dbus_conn = dbus_bus_get_private (DBUS_BUS_SYSTEM, &dbus_err)) == NULL)
 	{
 		DBG_ER_LN("dbus_bus_get_private error !!! (message: %s)", dbus_err.message);
 		goto exit_init;
@@ -449,13 +449,13 @@ exit_init:
 static int dbusx_add_match(DBusConnection *dbus_listen, DBusError *err, void *usr_data)
 {
 	int ret = -1;
-	DbusX_t *dbusx_ctx = (DbusX_t*)usr_data;
+	DbusX_t *dbusx_req = (DbusX_t*)usr_data;
 
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		if (dbusx_ctx->add_match_cb)
+		if (dbusx_req->add_match_cb)
 		{
-			ret = dbusx_ctx->add_match_cb(dbus_listen, err, usr_data);
+			ret = dbusx_req->add_match_cb(dbus_listen, err, usr_data);
 		}
 	}
 
@@ -464,42 +464,42 @@ static int dbusx_add_match(DBusConnection *dbus_listen, DBusError *err, void *us
 
 static void *dbusx_thread_handler(void *user)
 {
-	DbusX_t *dbusx_ctx = (DbusX_t*)user;
+	DbusX_t *dbusx_req = (DbusX_t*)user;
 
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_detach(tidx_req);
 
 		DBusError dbus_err;
 
 		// initialize the errors
-		if ( dbusx_client_init(dbusx_ctx) == -1 )
+		if ( dbusx_client_init(dbusx_req) == -1 )
 		{
 			goto exit_dbus;
 		}
 
 		SAFE_DBUS_ERR_INIT(&dbus_err);
-		dbusx_ctx->dbus_conn_listen = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_err);
+		dbusx_req->dbus_conn_listen = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_err);
 		if (dbus_error_is_set(&dbus_err))
 		{
 			DBG_ER_LN("dbus_bus_get_private error !!! (message: %s)", dbus_err.message);
 			goto exit_dbus;
 		}
 		
-		if (NULL == dbusx_ctx->dbus_conn_listen)
+		if (NULL == dbusx_req->dbus_conn_listen)
 		{
 			DBG_ER_LN("dbus_conn_listen is NULL !!!");
 			goto exit_dbus;
 		}
 
-		if (!dbus_connection_add_filter(dbusx_ctx->dbus_conn_listen, dbusx_filter, (void *)user, NULL))
+		if (!dbus_connection_add_filter(dbusx_req->dbus_conn_listen, dbusx_filter, (void *)user, NULL))
 		{
 			DBG_ER_LN("dbus_connection_add_filter error !!!");
 			goto exit_dbus;
 		}
 
-		if (dbusx_add_match(dbusx_ctx->dbus_conn_listen, &dbus_err, (void *)user) != 0 )
+		if (dbusx_add_match(dbusx_req->dbus_conn_listen, &dbus_err, (void *)user) != 0 )
 		{
 			goto exit_dbus;
 		}
@@ -507,11 +507,11 @@ static void *dbusx_thread_handler(void *user)
 		DBG_IF_LN("dbus listen ...");
 		while (threadx_isquit(tidx_req) == 0)
 		{
-			dbus_connection_read_write_dispatch(dbusx_ctx->dbus_conn_listen, 1000);
+			dbus_connection_read_write_dispatch(dbusx_req->dbus_conn_listen, 1000);
 		}
 
 exit_dbus:
-		dbusx_conn_free(dbusx_ctx);
+		dbusx_conn_free(dbusx_req);
 		SAFE_DBUS_ERR_FREE(&dbus_err);
 
 		threadx_leave(tidx_req);
@@ -521,122 +521,122 @@ exit_dbus:
 	return NULL;
 }
 
-DBusConnection *dbusx_listen_get(DbusX_t *dbusx_ctx)
+DBusConnection *dbusx_listen_get(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
-		return dbusx_ctx->dbus_conn_listen;
+	if (dbusx_req)
+		return dbusx_req->dbus_conn_listen;
 
 	return NULL;
 }
 
-DBusConnection *dbusx_conn_get(DbusX_t *dbusx_ctx)
+DBusConnection *dbusx_conn_get(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
-		return dbusx_ctx->dbus_conn;
+	if (dbusx_req)
+		return dbusx_req->dbus_conn;
 
 	return NULL;
 }
 
-char *dbusx_path_get(DbusX_t *dbusx_ctx)
+char *dbusx_path_get(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
-		return dbusx_ctx->path;
+	if (dbusx_req)
+		return dbusx_req->path;
 
 	return NULL;
 }
 
-void dbusx_lock(DbusX_t *dbusx_ctx)
+void dbusx_lock(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_lock(tidx_req);
 	}
 }
 
-void dbusx_unlock(DbusX_t *dbusx_ctx)
+void dbusx_unlock(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_unlock(tidx_req);
 	}
 }
 
-void dbusx_wakeup_simple(DbusX_t *dbusx_ctx)
+void dbusx_wakeup_simple(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wakeup_simple(tidx_req);
 	}
 }
 
-void dbusx_wakeup(DbusX_t *dbusx_ctx)
+void dbusx_wakeup(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wakeup(tidx_req);
 	}
 }
 
-int dbusx_timewait_simple(DbusX_t *dbusx_ctx, int ms)
+int dbusx_timewait_simple(DbusX_t *dbusx_req, int ms)
 {
 	int ret = EINVAL;
 
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		ret = threadx_timewait_simple(tidx_req, ms);
 	}
 
 	return ret;
 }
 
-int dbusx_timewait(DbusX_t *dbusx_ctx, int ms)
+int dbusx_timewait(DbusX_t *dbusx_req, int ms)
 {
 	int ret = EINVAL;
 
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		ret = threadx_timewait(tidx_req, ms);
 	}
 
 	return ret;
 }
 
-void dbusx_wait_simple(DbusX_t *dbusx_ctx)
+void dbusx_wait_simple(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wait_simple(tidx_req);
 	}
 }
 
-void dbusx_wait(DbusX_t *dbusx_ctx)
+void dbusx_wait(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wait(tidx_req);
 	}
 }
 
-READY_ID dbusx_ready(DbusX_t *dbusx_ctx)
+READY_ID dbusx_ready(DbusX_t *dbusx_req)
 {
-	ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+	ThreadX_t *tidx_req = &dbusx_req->tidx;
 
 	int retry = 3;
-	while ((dbusx_ctx->dbus_conn_listen==NULL) && (retry>0) && ( threadx_isquit(tidx_req) == QUIT_ID_NONE ) )
+	while ((dbusx_req->dbus_conn_listen==NULL) && (retry>0) && ( threadx_isquit(tidx_req) == QUIT_ID_NONE ) )
 	{
 		retry--;
 		sleep(1);
 	}
 
-	if (dbusx_ctx->dbus_conn_listen)
+	if (dbusx_req->dbus_conn_listen)
 	{
 		return READY_ID_OK;
 	}
@@ -647,40 +647,40 @@ READY_ID dbusx_ready(DbusX_t *dbusx_ctx)
 	}
 }
 
-int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_ctx)
+int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_req)
 {
-	dbusx_ctx->add_match_cb = match_cb;
-	dbusx_ctx->filter_user_cb = filter_cb;
+	dbusx_req->add_match_cb = match_cb;
+	dbusx_req->filter_user_cb = filter_cb;
 
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		tidx_req->thread_cb = dbusx_thread_handler;
-		tidx_req->data = dbusx_ctx;
-		threadx_init(tidx_req, dbusx_ctx->name);
+		tidx_req->data = dbusx_req;
+		threadx_init(tidx_req, dbusx_req->name);
 	}
 
 	return 0;
 }
 
-void dbusx_thread_stop(DbusX_t *dbusx_ctx)
+void dbusx_thread_stop(DbusX_t *dbusx_req)
 {
-	if (dbusx_ctx)
+	if (dbusx_req)
 	{
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_stop(tidx_req);
 	}
 }
 
-void dbusx_thread_close(DbusX_t *dbusx_ctx)
+void dbusx_thread_close(DbusX_t *dbusx_req)
 {
-	if ((dbusx_ctx) && (dbusx_ctx->isfree == 0))
+	if ((dbusx_req) && (dbusx_req->isfree == 0))
 	{
-		dbusx_ctx->isfree ++;
+		dbusx_req->isfree ++;
 	
-		ThreadX_t *tidx_req = &dbusx_ctx->tidx;
+		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_close(tidx_req);
 
-		dbusx_conn_free(dbusx_ctx);
+		dbusx_conn_free(dbusx_req);
 	}
 }
 

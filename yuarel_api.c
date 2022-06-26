@@ -14,27 +14,27 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-char *query_uri_get(QueryParam_t *q_params_ctx)
+char *query_uri_get(QueryParam_t *q_params_req)
 {
-	return q_params_ctx->query;
+	return q_params_req->query;
 }
 
-int query_count_get(QueryParam_t *q_params_ctx)
+int query_count_get(QueryParam_t *q_params_req)
 {
-	return q_params_ctx->count;
+	return q_params_req->count;
 }
 
-yuarel_param_t *query_params_get(QueryParam_t *q_params_ctx)
+yuarel_param_t *query_params_get(QueryParam_t *q_params_req)
 {
-	return q_params_ctx->params;
+	return q_params_req->params;
 }
 
-yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_ctx)
+yuarel_param_t *query_parser(char *query, QueryParam_t *q_params_req)
 {
-	SAFE_SNPRINTF(q_params_ctx->query, sizeof(q_params_ctx->query), "%s", query);
-	SAFE_SNPRINTF(q_params_ctx->query_parse, sizeof(q_params_ctx->query_parse), "%s", query);
-	q_params_ctx->count = yuarel_parse_query(q_params_ctx->query_parse, '&', q_params_ctx->params, MAX_OF_QUERY_PARAM);
+	SAFE_SNPRINTF(q_params_req->query, sizeof(q_params_req->query), "%s", query);
+	SAFE_SNPRINTF(q_params_req->query_parse, sizeof(q_params_req->query_parse), "%s", query);
+	q_params_req->count = yuarel_parse_query(q_params_req->query_parse, '&', q_params_req->params, MAX_OF_QUERY_PARAM);
 
-	return q_params_ctx->params;
+	return q_params_req->params;
 }
 

@@ -182,6 +182,7 @@ ifneq ("$(HOMEX_ROOT_DIR)", "")
 		$(PJ_SH_CP) $$sublib* $(HOMEX_LIB_DIR); \
 		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION); \
 	done
+	#$(PJ_SH_MKDIR) $(HOMEX_INC_DIR)
 	#@for subheader in $(HEADER_FILES); do \
 	#	$(PJ_SH_CP) $$subheader $(HOMEX_INC_DIR); \
 	#done

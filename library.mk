@@ -155,10 +155,10 @@ endif
 
 ifeq ("$(PJ_HAS_GLIB_SYSROOT)", "yes")
 CLEAN_BINS += \
-						gbusx_123
+						gdbusx_123
 LIBXXX_OBJS += \
-							gbusx_api.o \
-							gbusx_ifac.o
+							gdbusx_api.o \
+							gdbusx_ifac.o
 LIBS_yes += -lgobject-2.0 -lgio-2.0 -lglib-2.0
 ifeq ("$(PJ_CROSS)", "")
 CFLAGS += $(shell pkg-config --cflags gio-2.0 gio-unix-2.0 glib-2.0)

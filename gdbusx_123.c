@@ -16,8 +16,8 @@
 #include <getopt.h>
 
 #include "utilx9.h"
-#include "gbusx_ex.h"
-#include "gbusx_ifac.h"
+#include "gdbusx_ex.h"
+#include "gdbusx_ifac.h"
 
 #define TAG "gbusx_123"
 

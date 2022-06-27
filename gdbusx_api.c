@@ -13,7 +13,7 @@
  *
  ***************************************************************************/
 #include "utilx9.h"
-#include "gbusx_ex.h"
+#include "gdbusx_ex.h"
 
 void gbusx_signal_int(GbusX_t *gbusx_req, char *signal_name, void *signal_cb)
 {

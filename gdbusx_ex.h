@@ -12,8 +12,8 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#ifndef __gbusx_EX_H__
-#define __gbusx_EX_H__
+#ifndef __GDBUSX_EX_H__
+#define __GDBUSX_EX_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,12 +30,12 @@ extern "C" {
 //** UTIL_EX_XXX **
 //******************************************************************************
 //GDBUS
-#define UTIL_EX_XBUS
+#define UTIL_EX_GDBUS
 
 //******************************************************************************
-//** UTIL_EX_XBUS **
+//** UTIL_EX_GDBUS **
 //******************************************************************************
-#ifdef UTIL_EX_XBUS
+#ifdef UTIL_EX_GDBUS
 // https://developer.gimp.org/api/2.0/glib/glib-String-Utility-Functions.html
 #define SAFE_G_SPRINTF(X, FMT, args...) \
 	({ int __ret =0; do { if (pcheck(X)) __ret = g_sprintf(X, FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
@@ -102,20 +102,20 @@ extern "C" {
 #if (0)
 // please check your NAME
 #define GDBUSX_IFAC_FUNC_PREFIXNAME com_github_lankahsu520
-#define gbusx_IFAC_FUN_DEMO GDBUSX_IFAC_FUNC_CONCAT(GDBUSX_IFAC_FUNC_PREFIXNAME, _demo)
+#define GDBUSX_IFAC_FUN_DEMO GDBUSX_IFAC_FUNC_CONCAT(GDBUSX_IFAC_FUNC_PREFIXNAME, _demo)
 
-#define gbusx_METHOD_ASYNC_demo GDBUSX_METHOD_ASYNC(gbusx_IFAC_FUN_DEMO, _set_name)
-#define gbusx_METHOD_FINISH_demo GDBUSX_METHOD_FINISH(gbusx_IFAC_FUN_DEMO, _set_name)
-#define gbusx_METHOD_SYNC_demo GDBUSX_METHOD_SYNC(gbusx_IFAC_FUN_DEMO, _set_name)
-#define gbusx_METHOD_demo gbusx_METHOD(gbusx_IFAC_FUN_DEMO, _set_name)
+#define GDBUSX_METHOD_ASYNC_demo GDBUSX_METHOD_ASYNC(gbusx_IFAC_FUN_DEMO, _set_name)
+#define GDBUSX_METHOD_FINISH_demo GDBUSX_METHOD_FINISH(gbusx_IFAC_FUN_DEMO, _set_name)
+#define GDBUSX_METHOD_SYNC_demo GDBUSX_METHOD_SYNC(gbusx_IFAC_FUN_DEMO, _set_name)
+#define GDBUSX_METHOD_demo gbusx_METHOD(gbusx_IFAC_FUN_DEMO, _set_name)
 
-#define gbusx_PROXY_NEW_demo GDBUSX_PROXY_NEW(gbusx_IFAC_NAME_DEMO)
-#define gbusx_PROXY_NEW_FINISH_demo GDBUSX_PROXY_NEW_FINISH(gbusx_IFAC_NAME_DEMO)
-#define gbusx_PROXY_NEW_SYNC_demo GDBUSX_PROXY_NEW_SYNC(gbusx_IFAC_NAME_DEMO)
-#define gbusx_PROXY_NEW_FOR_BUS_demo GDBUSX_PROXY_NEW_FOR_BUS(gbusx_IFAC_NAME_DEMO)
-#define gbusx_PROXY_NEW_FOR_BUS_FINISH_demo GDBUSX_PROXY_NEW_FOR_BUS_FINISH(gbusx_IFAC_NAME_DEMO)
-#define gbusx_PROXY_NEW_FOR_BUS_SYNC_demo GDBUSX_PROXY_NEW_FOR_BUS_SYNC(gbusx_IFAC_NAME_DEMO)
-#define gbusx_SKELETON_NEW_demo GDBUSX_SKELETON_NEW(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_PROXY_NEW_demo GDBUSX_PROXY_NEW(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_PROXY_NEW_FINISH_demo GDBUSX_PROXY_NEW_FINISH(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_PROXY_NEW_SYNC_demo GDBUSX_PROXY_NEW_SYNC(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_PROXY_NEW_FOR_BUS_demo GDBUSX_PROXY_NEW_FOR_BUS(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_PROXY_NEW_FOR_BUS_FINISH_demo GDBUSX_PROXY_NEW_FOR_BUS_FINISH(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_PROXY_NEW_FOR_BUS_SYNC_demo GDBUSX_PROXY_NEW_FOR_BUS_SYNC(gbusx_IFAC_NAME_DEMO)
+#define GDBUSX_SKELETON_NEW_demo GDBUSX_SKELETON_NEW(gbusx_IFAC_NAME_DEMO)
 #endif
 
 #define GDBUSX_TYPE_SESSION G_BUS_TYPE_SESSION

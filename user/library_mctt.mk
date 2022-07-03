@@ -1,4 +1,6 @@
+ifneq ("$(wildcard $(SDK_INC_DIR)/zwave_def.h)","")
 CFLAGS += -include $(SDK_INC_DIR)/zwave_def.h
+endif
 
 ifeq ("$(PJ_HAS_ZWARE)", "yes")
 #CFLAGS += -DOS_LINUX -DZIP_V2 -DUSE_OPENSSL -DCONFIG_DEBUG

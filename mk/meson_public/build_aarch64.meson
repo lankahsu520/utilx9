@@ -1,0 +1,29 @@
+[built-in]
+#c = 'aarch64-poky-linux-gcc'
+#cpp = 'aarch64-poky-linux-g++'
+#ar = 'aarch64-poky-linux-ar'
+#strip = 'aarch64-poky-linux-strip'
+#pkgconfig = 'x86_64-pokysdk-linux-gnu-pkg-config'
+#cmake = 'cmake'
+#pcap-config = ''
+#c_args = ['--sysroot=/opt/fsl-imx-wayland/5.10-hardknott/sysroots/cortexa53-crypto-poky-linux', '-O2', '-pipe', '-g', '-feliminate-unused-debug-types']
+#c_link_args = ['--sysroot=/path/to/yocto-sdk/sysroots/aarch64-poky-linux', '-Wl,-O1', '-Wl,--hash-style=gnu', '-Wl,--as-needed', '-Wl,-z,relro,-z,now']
+#cpp_args = ['--sysroot=/path/to/yocto-sdk/sysroots/aarch64-poky-linux', '-O2', '-pipe', '-g', '-feliminate-unused-debug-types']
+#cpp_link_args = ['--sysroot=/opt/fsl-imx-wayland/5.10-hardknott/sysroots/cortexa53-crypto-poky-linux', '-Wl,-O1', '-Wl,--hash-style=gnu', '-Wl,--as-needed', '-Wl,-z,relro,-z,now']
+
+[properties]
+skip_sanity_check = true
+#sys_root = '/opt/fsl-imx-wayland/5.10-hardknott/sysroots/cortexa53-crypto-poky-linux'
+#pkg_config_libdir ='/opt/fsl-imx-wayland/5.10-hardknott/sysroots/cortexa53-crypto-poky-linux/usr/lib/pkgconfig'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[target_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'

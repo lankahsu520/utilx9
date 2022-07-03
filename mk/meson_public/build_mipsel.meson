@@ -1,0 +1,17 @@
+[built-in]
+
+
+[properties]
+
+
+[host_machine]
+system = 'linux'
+cpu_family = 'mipsel'
+cpu = 'mipsel'
+endian = 'little'
+
+[target_machine]
+system = 'linux'
+cpu_family = 'mipsel'
+cpu = 'mipsel'
+endian = 'little'

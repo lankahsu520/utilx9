@@ -219,6 +219,40 @@ typedef enum
 #define DBG_LVL_TRACE        4
 #define DBG_LVL_MAX          5
 
+//** "\0" **
+#define DBG_COLOR(color, format, args...) printf(color"[%02ld/%u] %s:%d - "format""COLORX_NONE,  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
+#define DBG_COLOR_0(color, format, args...) printf(color""format""COLORX_NONE, ## args)
+
+#define DBG_R(format,args...) DBG_COLOR(COLORX_RED, format, ## args)
+#define DBG_R_0(format,args...) DBG_COLOR_0(COLORX_RED, format, ## args)
+#define DBG_LR(format,args...) DBG_COLOR(COLORX_LIGHT_RED, format, ## args)
+#define DBG_LR_0(format,args...) DBG_COLOR_0(COLORX_LIGHT_RED, format, ## args)
+#define DBG_G(format,args...) DBG_COLOR(COLORX_GREEN, format, ## args)
+#define DBG_G_0(format,args...) DBG_COLOR_0(COLORX_GREEN, format, ## args)
+#define DBG_LG(format,args...) DBG_COLOR(COLORX_LIGHT_GREEN, format, ## args)
+#define DBG_LG_0(format,args...) DBG_COLOR_0(COLORX_LIGHT_GREEN, format, ## args)
+#define DBG_B(format,args...) DBG_COLOR(COLORX_BLUE, format, , ## args)
+#define DBG_B_0(format,args...) DBG_COLOR_0(COLORX_BLUE, format, ## args)
+#define DBG_LB(format,args...) DBG_COLOR(COLORX_LIGHT_BLUE, format, ## args)
+#define DBG_LB_0(format,args...) DBG_COLOR_0(COLORX_LIGHT_BLUE, format, ## args)
+#define DBG_DGR(format,args...) DB_COLOR(COLORX_DARY_GRAY, format, ## args)
+#define DBG_C(format,args...) DBG_COLOR(COLORX_CYAN, format, ## args)
+#define DBG_C_0(format,args...) DBG_COLOR_0(COLORX_CYAN, format, ## args)
+#define DBG_LC(format,args...) DBG_COLOR(COLORX_LIGHT_CYAN, format, ## args)
+#define DBG_LC_0(format,args...) DB_COLOR_0(COLORX_LIGHT_CYAN, format, ## args)
+#define DBG_P(format,args...) DBG_COLOR(COLORX_PURPLE, format, ## args)
+#define DBG_P_0(format,args...) DBG_COLOR_0(COLORX_PURPLE, format, ## args)
+#define DBG_LP(format,args...) DBG_COLOR(COLORX_LIGHT_PURPLE, format, ## args)
+#define DBG_LP_0(format,args...) DBG_COLOR_0(COLORX_PURPLE, format, ## args)
+#define DBG_BR(format,args...) DBG_COLOR(COLORX_BROWN, format, ## args)
+#define DBG_Y(format,args...) DBG_COLOR(COLORX_YELLOW, format, ## args)
+#define DBG_Y_0(format,args...) DBG_COLOR_0(COLORX_YELLOW, format, ## args)
+#define DBG_LGR(format,args...) DBG_COLOR(COLORX_LIGHT_GRAY, format, ## args)
+#define DBG_LGR_0(format,args...) DBG_COLOR_0(COLORX_LIGHT_GRAY, format, ## args)
+#define DBG_W(format,args...) DBG_COLOR(COLORX_WHITE, format, ## args)
+#define DBG_W_0(format,args...) DBG_COLOR_0(COLORX_WHITE, format, ## args)
+
+	//** "\n" **
 #define DBG_LN_COLOR(color, format, args...) printf(color"[%02ld/%u] %s:%d - "format""COLORX_NONE"\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
 #define DBG_LN_COLOR_0(color, format, args...) printf(color""format""COLORX_NONE"\n", ## args)
 
@@ -287,6 +321,21 @@ typedef enum
 			printf("\n}\n"COLORX_NONE); \
 	}
 
+#define ARGC_AND_ARGV_DUMP_COLOR(color,s1,s2) \
+	{ int k =0; \
+		DBG_COLOR(color,"(argc: %d", s1); \
+		for (k = 0; k < s1; k++) \
+		{ \
+			DBG_COLOR_0(color,", [%s]", s2[k]); \
+		} \
+		DBG_COLOR_0(color,")\n"); \
+	}
+
+#define ARGC_AND_ARGV_ER_DUMP(s1,s2) ARGC_AND_ARGV_DUMP_COLOR(COLORX_RED,s1,s2)
+#define ARGC_AND_ARGV_WN_DUMP(s1,s2) ARGC_AND_ARGV_DUMP_COLOR(COLORX_PURPLE,s1,s2)
+#define ARGC_AND_ARGV_IF_DUMP(s1,s2) ARGC_AND_ARGV_DUMP_COLOR(COLORX_YELLOW,s1,s2)
+#define ARGC_AND_ARGV_DB_DUMP(s1,s2) ARGC_AND_ARGV_DUMP_COLOR(COLORX_WHITE,s1,s2)
+#define ARGC_AND_ARGV_TR_DUMP(s1,s2) ARGC_AND_ARGV_DUMP_COLOR(COLORX_LIGHT_GRAY,s1,s2)
 
 #ifdef __cplusplus
 }

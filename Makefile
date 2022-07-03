@@ -116,7 +116,7 @@ clean:
 	rm -f Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
 	rm -f .configured .patched $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS) $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	rm -f util_expiration.h
-	rm -f gbusx_ifac.*
+	rm -f gdbusx_ifac.*
 ifeq ("$(PJ_NAME)", "github")
 	@[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
 endif

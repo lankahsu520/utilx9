@@ -768,8 +768,11 @@ int usbX_listen_open(UsbX_t *usbX_req, void *user_data)
 			goto exit_usbX_open;
 		}
 
+#if LIBUSB_API_VERSION >= 0x01000106
+		libusb_set_option(usbX_req->usb_req, usbX_req->dbg_lvl);
+#else
 		libusb_set_debug(usbX_req->usb_req, usbX_req->dbg_lvl);
-		//libusb_set_option(usbX_req->usb_req, usbX_req->dbg_lvl);
+#endif
 
 		usbX_thread_init(usbX_req);
 

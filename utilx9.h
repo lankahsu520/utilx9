@@ -102,6 +102,17 @@ extern int dbg_more;
 #define DBG_DB_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_DEBUG) DBG_DUMP_COLOR(COLORX_WHITE, ibuf, ilen, delim, format, ## args)
 #define DBG_TR_DUMP(ibuf,ilen,delim,format,args...) if (dbg_more>=DBG_LVL_TRACE) DBG_DUMP_COLOR(COLORX_LIGHT_GRAY, ibuf, ilen, delim, format, ## args)
 
+#define DBG_ER(format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_R(format, ## args)
+#define DBG_ER_0(format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_R_0(format, ## args)
+#define DBG_WN(format,args...) if (dbg_more>=DBG_LVL_WARN) DBG_P(format, ## args)
+#define DBG_WN_0(format,args...) if (dbg_more>=DBG_LVL_WARN) DBG_P_0(format, ## args)
+#define DBG_IF(format,args...) if (dbg_more>=DBG_LVL_INFO) DBG_Y(format, ## args)
+#define DBG_IF_0(format,args...) if (dbg_more>=DBG_LVL_INFO) DBG_Y_0(format, ## args)
+#define DBG_DB(format,args...) if (dbg_more>=DBG_LVL_DEBUG) DBG_W(format, ## args)
+#define DBG_DB_0(format,args...) if (dbg_more>=DBG_LVL_DEBUG) DBG_W_0(format, ## args)
+#define DBG_TR(format,args...) if (dbg_more>=DBG_LVL_TRACE) DBG_LGR(format, ## args)
+#define DBG_TR_0(format,args...) if (dbg_more>=DBG_LVL_TRACE) DBG_LGR_0(format, ## args)
+
 #define DBG_ER_LN(format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_LN_R(format, ## args)
 #define DBG_ER_LN_0(format,args...) if (dbg_more>=DBG_LVL_ERROR) DBG_LN_R_0(format, ## args)
 #define DBG_WN_LN(format,args...) if (dbg_more>=DBG_LVL_WARN) DBG_LN_P(format, ## args)

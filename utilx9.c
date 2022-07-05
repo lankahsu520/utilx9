@@ -1436,9 +1436,15 @@ static char *qbuf_jumpjump(QBUF_t *qbuf, char *jumpptr, size_t *jumplen)
 	char *startptr = qbuf_buff(qbuf);
 	if ( ( jumpptr ) && ( jumpptr > startptr ) )
 	{
-		skiplen = jumpptr - startptr;
-		if ( (skiplen + 1) < qbuf_total(qbuf) )
+		char *endptr = qbuf_endptr(qbuf);
+
+		if (jumpptr>=endptr)
 		{
+			startptr = NULL;
+		}
+		else
+		{
+			skiplen = jumpptr - startptr;
 			startptr = jumpptr;
 		}
 	}
@@ -1516,8 +1522,11 @@ char *qbuf_memchr(QBUF_t *qbuf, char c, char *jumpptr)
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
 		int n = qbuf_total(qbuf) - jumplen;
-		
-		return SAFE_MEMCHR(startptr, c, n);
+
+		if (startptr)
+		{
+			return SAFE_MEMCHR(startptr, c, n);
+		}
 	}
 	return NULL;
 }
@@ -1528,9 +1537,13 @@ char *qbuf_memmem(QBUF_t *qbuf, char *needle, size_t needlelen, char *jumpptr)
 	{
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
-		char *endptr = qbuf_endptr(qbuf);
-		size_t leftlen = endptr - startptr;
-		return SAFE_MEMMEM(startptr, leftlen, needle, needlelen);
+
+		if (startptr)
+		{
+			char *endptr = qbuf_endptr(qbuf);
+			size_t leftlen = endptr - startptr;
+			return SAFE_MEMMEM(startptr, leftlen, needle, needlelen);
+		}
 	}
 	return NULL;
 }
@@ -1542,7 +1555,10 @@ char *qbuf_strstr(QBUF_t *qbuf, char *substr, char *jumpptr)
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
-		return SAFE_STRSTR(startptr, substr);
+		if (startptr)
+		{
+			return SAFE_STRSTR(startptr, substr);
+		}
 	}
 	return NULL;
 }

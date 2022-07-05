@@ -236,7 +236,7 @@ void* pcheck( void* a );
 #define SAFE_MEMCMP(s1,s2,n) \
 	({ int __ret = -1; do { if ( (pcheck(s1)) && (pcheck(s2)) && (n)) { __ret = memcmp(s1, s2, n); } } while(0); __ret; })
 #define SAFE_MEMMEM(s1,n1,s2,n2) \
-	({ void *__ret = NULL; do { if ( (pcheck(s1)) && (n1) && (pcheck(s2)) && (n2)) { __ret = memmem(s1, n1, s2, n2); } } while(0); __ret; })
+	({ void *__ret = NULL; do { if ( (pcheck(s1)) && (n1) && (pcheck(s2)) && (n2) && (n1>=n2)) { __ret = memmem(s1, n1, s2, n2); } } while(0); __ret; })
 
 /** string **/
 #define SAFE_STRLEN(X) \

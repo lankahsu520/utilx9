@@ -52,7 +52,6 @@ CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/json_def.h' ]
 CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/query_def.h' ]
 endif
 #CFLAGS_CUSTOMER += ['-D_GNU_SOURCE' ]
-CFLAGS_CUSTOMER += ['-DUSE_YK_P2P_LED' ]
 
 
 #** dependency **
@@ -60,6 +59,8 @@ cc = meson.get_compiler('c')
 LIB_ARY = []
 LIB_ARY += cc.find_library('utilx9', required : true)
 LIB_ARY += cc.find_library('dbus_handler', dirs: [ SDK_LIB_DIR ], required : false)
+#dependency('uci')
+LIB_ARY += cc.find_library('uci', required : false)
 #dependency('usb-1.0')
 LIB_ARY += cc.find_library('usb-1.0', required : true)
 #dependency('bluetooth')
@@ -74,6 +75,8 @@ LIB_ARY += cc.find_library('aprutil-1', required : true)
 LIB_ARY += cc.find_library('mosquitto', required : true)
 #dependency('xml2')
 LIB_ARY += cc.find_library('xml2', required : false)
+#dependency('mxml')
+LIB_ARY += cc.find_library('mxml', required : false)
 #dependency('websockets')
 LIB_ARY += cc.find_library('websockets', required : true)
 LIB_ARY += cc.find_library('websockets-evlib_uv', required : true)
@@ -89,6 +92,20 @@ LIB_ARY += cc.find_library('yuarel', required : true)
 LIB_ARY += cc.find_library('expat', required : true)
 #dependency('dbus-1')
 LIB_ARY += cc.find_library('dbus-1', required : true)
+#dependency('ubus')
+LIB_ARY += cc.find_library('ubus', required : false)
+#dependency('blobmsg_json')
+LIB_ARY += cc.find_library('blobmsg_json', required : false)
+#dependency('gobject-2.0')
+LIB_ARY += cc.find_library('gobject-2.0', required : false)
+#dependency('gio-2.0')
+LIB_ARY += cc.find_library('gio-2.0', required : false)
+#dependency('glib-2.0')
+LIB_ARY += cc.find_library('glib-2.0', required : false)
+#dependency('readline')
+LIB_ARY += cc.find_library('readline', required : false)
+#dependency('ncurses')
+LIB_ARY += cc.find_library('ncurses', required : false)
 #dependency('ssl')
 LIB_ARY += cc.find_library('ssl', required : true)
 LIB_ARY += cc.find_library('crypto', required : true)

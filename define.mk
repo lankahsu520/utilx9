@@ -24,6 +24,8 @@ $(GDBUSX_C_FILENAME).c: $(GDBUSX_XML_FILENAME)
 	#	--interface-prefix $(GDBUSX_IFAC_NAME)
 
 .patched:
+	sed -i "s|#define LIBUTILX_API_VERSION.*|#define LIBUTILX_API_VERSION $(LIBUTILX_API_VERSION)|g" utilx9.h
+
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 	sed -i "s|#undef UTIL_EX_SSL.*|#define UTIL_EX_SSL|g" utilx9.h
 else

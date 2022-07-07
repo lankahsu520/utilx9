@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 	DBG_ER_LN("(Version: %s)", version_show());
 	time_t run_t = time(NULL);
 	time_t expired_t = expiration_date();
-	DBG_ER_LN("(Debug LVL: %d, Expiration: %ld=%s, Time Diff: %.2f)", dbg_lvl_get(), expired_t, time_now_short(expired_t), time_diff_days(run_t, expired_t));
+	DBG_ER_LN("(Debug LVL: %d, Expiration: %ld=%s, Time Diff: %.2f)", dbg_lvl_get(), expired_t, time_now_short(expired_t), time_diff_days(expired_t, run_t));
 	DBG_ER_LN("(Toolchain: %s, Path: %s, Build Path: %s)", PJ_TOOLCHAIN_NAME, PJ_TOOLCHAIN_PATH, PJ_ROOT);
 	DBG_ER_LN("(Name: %s, Platform: %s, Save: %s, Work: %s)", PJ_NAME, PJ_PLATFORM, PJ_SAVE_PATH, PJ_WORK_PATH);
 	DBG_ER_LN("(ICLOUD: %s:%s-%s, IFACE: %s)", PJ_ICLOUD_HOST, PJ_ICLOUD_PORT, PJ_ICLOUD_SECURITY, PJ_IFACE);

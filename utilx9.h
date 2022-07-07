@@ -23,6 +23,8 @@ extern "C" {
 #define _GNU_SOURCE
 #endif
 
+#define LIBUTILX_API_VERSION 0x01002000
+
 
 //******************************************************************************
 //** include **

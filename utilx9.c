@@ -135,7 +135,7 @@ char *version_show(void)
 	if ( SAFE_STRLEN(buff) == 0 )
 	{
 		time_t bootup_t = time(NULL);
-		SAFE_SPRINTF_EX(buff, "%s, %s, %s, %s, %ld", PJ_VERSION, PJ_REVISION, PJ_BUILDNO, PJ_BUILDER, bootup_t);
+		SAFE_SPRINTF_EX(buff, "0x%08X, %s, %s, %s, %ld", LIBUTILX_API_VERSION, PJ_REVISION, PJ_BUILDNO, PJ_BUILDER, bootup_t);
 	}
 
 	return buff;

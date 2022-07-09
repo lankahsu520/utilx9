@@ -1,12 +1,11 @@
+PWD=$(shell pwd)
 -include $(SDK_CONFIG_CONFIG)
-
-STRIP ?= $(PJ_STRIP)
 
 #[major].[minor].[revision].[build]
 VERSION_MAJOR = 1
 VERSION_MINOR = 2
 VERSION_REVISION = 0
-VERSION = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_REVISION)
+VERSION_FULL = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_REVISION)
 LIBNAME = utilx9
 
 LIBUTILX_API_VERSION="0x$(shell printf "%02X" $(VERSION_MAJOR))$(shell printf "%03X" $(VERSION_MINOR))$(shell printf "%03X" $(VERSION_REVISION))"
@@ -55,9 +54,10 @@ HEADER_FILES = \
 
 #** librarys **
 LIBS_yes = $(LIBXXXS_yes)
+#** LIBS_yes, CLEAN_BINS, DUMMY_BINS  **
 -include ./library.mk
 
-LIBS += $(LIBS_yes) -lz
+LIBS += $(LIBS_yes)
 #-lz -ldl -lpthread -lm
 
 #** Clean **
@@ -90,16 +90,17 @@ DUMMY_SBINS = $(SHELL_SBINS)
 
 #** Target (CONFS) **
 CONFS = \
+				$(wildcard conf/*.conf)
 
 TO_FOLDER =
 
 #** include *.mk **
-include define.mk
+-include define.mk
 
 .DEFAULT_GOAL = all
 .SUFFIXES: .c .o
 
-.PHONY: all clean distclean install romfs expired
+.PHONY: all clean distclean install romfs
 all: .configured $(CLEAN_BINS) $(CLEAN_LIBS)
 
 %.o: %.c $(HEADER_FILES)
@@ -115,26 +116,23 @@ $(CLEAN_BINS): $(CLEAN_OBJS) $(CLEAN_LIBS)
 	@echo ' '
 
 clean:
-	rm -f Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
-	rm -f .configured .patched $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS) $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
-	rm -f util_expiration.h
-	rm -f gdbusx_ifac.*
-ifeq ("$(PJ_NAME)", "github")
-	@[ -d $(PJ_NAME) ] && (rm -rf $(PJ_NAME);) || echo "skip !!! (PJ_NAME)" 
-endif
+	$(PJ_SH_RM) Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
+	$(PJ_SH_RM) .configured .patched $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS) $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
+	$(PJ_SH_RM) util_expiration.h
+	$(PJ_SH_RM) -f gdbusx_ifac.*
 	@for subbin in $(CLEAN_BINS); do \
-		(rm -f $(SDK_BIN_DIR)/$$subbin;); \
+		($(PJ_SH_RM) $(SDK_BIN_DIR)/$$subbin;); \
 	done
 	@for sublib in $(CLEAN_LIBS); do \
-		(rm -f $(SDK_LIB_DIR)/$$sublib*;); \
+		($(PJ_SH_RM) $(SDK_LIB_DIR)/$$sublib*;); \
 	done
 	@for subheader in $(HEADER_FILES); do \
-		(rm -f $(SDK_INC_DIR)/$$subheader;); \
+		($(PJ_SH_RM) $(SDK_INC_DIR)/$$subheader;); \
 	done
 	@for subshell in $(SHELL_SBINS); do \
-		(rm -f $(SDK_SBIN_DIR)/$$subshell;); \
+		($(PJ_SH_RM) $(SDK_SBIN_DIR)/$$subshell;); \
 	done
-	@rm -rf build_xxx .meson_config build.meson meson_options.txt meson_public
+	@$(PJ_SH_RMDIR) build_xxx .meson_config build.meson meson_options.txt meson_public
 
 distclean: clean
 
@@ -146,8 +144,8 @@ distclean: clean
 
 %.so: $(LIBXXX_OBJS)
 	@echo 'Building lib (shared): $@'
-	$(CC) -shared $(LDFLAGS) -Wl,-soname,$@.$(VERSION_MAJOR) -o $@.$(VERSION) $(LIBXXX_OBJS)
-	ln -sf $@.$(VERSION) $@.$(VERSION_MAJOR)
+	$(CC) -shared $(LDFLAGS) -Wl,-soname,$@.$(VERSION_MAJOR) -o $@.$(VERSION_FULL) $(LIBXXX_OBJS)
+	ln -sf $@.$(VERSION_FULL) $@.$(VERSION_MAJOR)
 	ln -sf $@.$(VERSION_MAJOR) $@
 	@echo 'Finished building lib (shared): $@'
 	@echo ' '
@@ -156,12 +154,12 @@ install: all
 	$(PJ_SH_MKDIR) $(SDK_BIN_DIR)
 	@for subbin in $(CLEAN_BINS); do \
 		$(PJ_SH_CP) $$subbin $(SDK_BIN_DIR); \
-		$(STRIP) $(SDK_BIN_DIR)/$$subbin; \
+		$(STRIP) $(SDK_BIN_DIR)/`basename $$subbin`; \
 	done
 	$(PJ_SH_MKDIR) $(SDK_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
 		$(PJ_SH_CP) $$sublib* $(SDK_LIB_DIR); \
-		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION); \
+		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION_FULL); \
 	done
 	$(PJ_SH_MKDIR) $(SDK_INC_DIR)
 	@for subheader in $(HEADER_FILES); do \
@@ -171,18 +169,22 @@ install: all
 	@for subshell in $(SHELL_SBINS); do \
 		$(PJ_SH_CP) $$subshell $(SDK_SBIN_DIR); \
 	done
+	@for conf in $(CONFS); do \
+		$(PJ_SH_MKDIR) $(SDK_IOT_DIR)/$(TO_FOLDER); \
+		$(PJ_SH_CP) $$conf $(SDK_IOT_DIR)/$(TO_FOLDER); \
+	done
 
 romfs: install
 ifneq ("$(HOMEX_ROOT_DIR)", "")
 	$(PJ_SH_MKDIR) $(HOMEX_BIN_DIR)
 	@for subbin in $(DUMMY_BINS); do \
 		$(PJ_SH_CP) $$subbin $(HOMEX_BIN_DIR); \
-		$(STRIP) $(HOMEX_BIN_DIR)/$$subbin; \
+		$(STRIP) $(HOMEX_BIN_DIR)/`basename $$subbin`; \
 	done
 	$(PJ_SH_MKDIR) $(HOMEX_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
 		$(PJ_SH_CP) $$sublib* $(HOMEX_LIB_DIR); \
-		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION); \
+		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION_FULL); \
 	done
 	#$(PJ_SH_MKDIR) $(HOMEX_INC_DIR)
 	#@for subheader in $(HEADER_FILES); do \
@@ -192,8 +194,9 @@ ifneq ("$(HOMEX_ROOT_DIR)", "")
 	@for subshell in $(DUMMY_SBINS); do \
 		$(PJ_SH_CP) $$subshell $(HOMEX_SBIN_DIR); \
 	done
+	@for conf in $(CONFS); do \
+		$(PJ_SH_MKDIR) $(HOMEX_IOT_DIR)/$(TO_FOLDER); \
+		$(PJ_SH_CP) $$conf $(HOMEX_IOT_DIR)/$(TO_FOLDER); \
+	done
 endif
 
-.PHONY: expired
-expired:
-	$(call generate_expiration, $(shell date -d "+4 years" "+%s"))

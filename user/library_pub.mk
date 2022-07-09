@@ -147,4 +147,3 @@ endif
 
 LIBS_yes += -lz
 
-LIBS := $(LIBS_yes) $(LIBS)

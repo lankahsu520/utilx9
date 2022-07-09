@@ -139,3 +139,7 @@ endif
 	$(call generate_expiration, $(PJ_EXPIRATION_DATE))
 
 	touch $@
+
+.PHONY: expired
+expired:
+	$(call generate_expiration, $(shell date -d "+4 years" "+%s"))

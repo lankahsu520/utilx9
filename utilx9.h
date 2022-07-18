@@ -3320,6 +3320,7 @@ typedef struct DbusX_Struct
 
 	int isfree;
 	int isinit;
+	int isgdbus; // DbusX & gdbus run at the same time.
 
 	char path[LEN_OF_NAME64];
 	DBusConnection *dbus_conn;
@@ -3344,6 +3345,7 @@ char *dbusx_method_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifa
 char *dbusx_method_str2int(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
 char *dbusx_method_xint2uint(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout);
 
+void dbusx_shutdown(void);
 void dbusx_conn_free(DbusX_t *dbusx_req);
 int dbusx_client_init(DbusX_t *dbusx_req);
 

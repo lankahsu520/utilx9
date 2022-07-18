@@ -119,7 +119,6 @@ clean:
 	$(PJ_SH_RM) Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
 	$(PJ_SH_RM) .configured .patched $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS) $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
 	$(PJ_SH_RM) util_expiration.h
-	$(PJ_SH_RM) -f gdbusx_ifac.*
 	@for subbin in $(CLEAN_BINS); do \
 		($(PJ_SH_RM) $(SDK_BIN_DIR)/$$subbin;); \
 	done

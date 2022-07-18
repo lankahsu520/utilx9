@@ -10,19 +10,6 @@ define generate_expiration
 	@echo "#endif" >> util_expiration.h
 endef
 
-export GDBUSX_C_FILENAME=gdbusx_ifac
-#export GDBUSX_PREFIXNAME=lankahsu520
-#export GDBUSX_IFAC_NAME=com.lankahsu520.www.
-export GDBUSX_XML_FILENAME=Interface-com.github.lankahsu520.xml
-
-$(GDBUSX_C_FILENAME).c: $(GDBUSX_XML_FILENAME)
-	#https://www.freedesktop.org/software/gstreamer-sdk/data/docs/latest/gio/gdbus-codegen.html
-	gdbus-codegen \
-		--generate-c-code $(GDBUSX_C_FILENAME) \
-		$(GDBUSX_XML_FILENAME)
-	#	--c-namespace $(GDBUSX_PREFIXNAME)
-	#	--interface-prefix $(GDBUSX_IFAC_NAME)
-
 .patched:
 	sed -i "s|#define LIBUTILX_API_VERSION.*|#define LIBUTILX_API_VERSION $(LIBUTILX_API_VERSION)|g" utilx9.h
 
@@ -121,21 +108,9 @@ ifeq ("$(PJ_HAS_MOSQUITTO)", "yes")
 else
 	sed -i "s|#define UTIL_EX_MQTT.*|#undef UTIL_EX_MQTT|g" utilx9.h
 endif
-
-ifeq ("$(PJ_HAS_GLIB)", "yes")
-	sed -i "s|#undef UTIL_EX_GDBUS.*|#define UTIL_EX_GDBUS|g" gdbusx_ex.h
-else
-	sed -i "s|#define UTIL_EX_GDBUS.*|#undef UTIL_EX_GDBUS|g" gdbusx_ex.h
-endif
-
-ifeq ("$(PJ_HAS_GLIB_SYSROOT)", "yes")
-	sed -i "s|#undef UTIL_EX_GDBUS.*|#define UTIL_EX_GDBUS|g" gdbusx_ex.h
-else
-	sed -i "s|#define UTIL_EX_GDBUS.*|#undef UTIL_EX_GDBUS|g" gdbusx_ex.h
-endif
 	touch $@
 
-.configured: .patched $(GDBUSX_C_FILENAME).c
+.configured: .patched
 	$(call generate_expiration, $(PJ_EXPIRATION_DATE))
 
 	touch $@

@@ -95,6 +95,11 @@ static void app_stop(void)
 	if (app_quit()==0)
 	{
 		app_set_quit(1);
+
+		if (is_service)
+		{
+			dbusx_thread_close(&dbusx_456);
+		}
 	}
 }
 

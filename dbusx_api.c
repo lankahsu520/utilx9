@@ -408,13 +408,22 @@ static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *m
 	return handled;
 }
 
+void dbusx_shutdown(void)
+{
+	dbus_shutdown();
+}
+
 void dbusx_conn_free(DbusX_t *dbusx_req)
 {
 	if ( (dbusx_req) && ((dbusx_req->dbus_conn_listen) || (dbusx_req->dbus_conn)) )
 	{
 		SAFE_DBUS_CONN_FREE(dbusx_req->dbus_conn_listen);
 		SAFE_DBUS_CONN_FREE(dbusx_req->dbus_conn);
-		dbus_shutdown();
+
+		if (dbusx_req->isgdbus==0)
+		{
+			dbus_shutdown();
+		}
 	}
 }
 

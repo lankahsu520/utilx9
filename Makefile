@@ -14,14 +14,7 @@ LIBUTILX_API_VERSION="0x$(shell printf "%02X" $(VERSION_MAJOR))$(shell printf "%
 CFLAGS += $(CFLAGS_OTHERS) $(CFLAGS_CUSTOMER)
 
 CFLAGS += \
-					-Wall -O2 \
 					-I./
-ifeq ("$(PJ_ARCH)", "x86")
-CFLAGS += \
-					-Wno-unused-value \
-					-Wno-unused-result \
-					-Wno-format-truncation
-endif
 LDFLAGS += \
 					-L./
 ARFLAGS = rcs
@@ -66,25 +59,25 @@ CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
 
 #** Target (CLEAN_BINS) **
 CLEAN_BINS += \
-						nlink_123 \
-						nlink_456 \
-						nlink_789 \
-						proc_list_123 \
-						proc_watch \
-						queuex_123 \
-						demo_123 \
-						demo_000
+							nlink_123 \
+							nlink_456 \
+							nlink_789 \
+							proc_list_123 \
+							proc_watch \
+							queuex_123 \
+							demo_123 \
+							demo_000
 
 #** Target (DUMMY_BINS) **
 DUMMY_BINS += \
-						util_123
+							util_123
 
 CLEAN_BINS += $(DUMMY_BINS)
 CLEAN_OBJS += $(addsuffix .o, $(CLEAN_BINS))
 
 #** Target (SHELL_SBINS) **
 SHELL_SBINS = \
-						proc_watch.sh
+							proc_watch.sh
 
 DUMMY_SBINS = $(SHELL_SBINS)
 

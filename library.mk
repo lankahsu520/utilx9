@@ -3,30 +3,30 @@ DUMMY_BINS =
 
 #** chainX_api **
 CLEAN_BINS += \
-						chainX_123 \
-						client_123 \
-						tty_123 \
-						ping_123
+							chainX_123 \
+							client_123 \
+							tty_123 \
+							ping_123
 
 #** clist_api **
 CLEAN_BINS += \
-						clist_123
+							clist_123
 
 #** thread_api, led_api **
 CLEAN_BINS += \
-						led_123
+							led_123
 
 #** statex_api **
 CLEAN_BINS += \
-						statex_123
+							statex_123
 
 #** thread_api **
 CLEAN_BINS += \
-						thread_123
+							thread_123
 
 ifeq ("$(PJ_HAS_LIBUSB)", "yes")
 CLEAN_BINS += \
-						usb_123
+							usb_123
 LIBXXX_OBJS += \
 							usbX_api.o
 LIBS_yes += -lusb-1.0
@@ -34,9 +34,9 @@ endif
 
 ifeq ("$(PJ_HAS_JANSSON)", "yes")
 DUMMY_BINS += \
-						jqx
+							jqx
 CLEAN_BINS += \
-						json_123
+							json_123
 LIBXXX_OBJS += \
 							json_api.o
 LIBS_yes += -ljansson
@@ -48,8 +48,8 @@ endif
 
 ifeq ("$(PJ_HAS_MXML)", "yes")
 CLEAN_BINS += \
-						onvif_client_123 \
-						wsdiscovery_123
+							onvif_client_123 \
+							wsdiscovery_123
 LIBXXX_OBJS += \
 							onvif_api.o \
 							soap_api.o \
@@ -59,7 +59,7 @@ endif
 
 ifeq ("$(PJ_HAS_MOSQUITTO)", "yes")
 CLEAN_BINS += \
-						mqtt_123
+							mqtt_123
 LIBXXX_OBJS += \
 							mqtt_api.o
 LIBS_yes += -lmosquitto
@@ -67,7 +67,7 @@ endif
 
 ifeq ("$(PJ_HAS_LIBWEBSOCKETS)", "yes")
 CLEAN_BINS += \
-						lws_123
+							lws_123
 LIBXXX_OBJS += \
 							lws_api.o
 LIBS_yes += -lwebsockets #-lwebsockets-evlib_uv
@@ -75,7 +75,7 @@ endif
 
 ifeq ("$(PJ_HAS_CURL)", "yes")
 CLEAN_BINS += \
-						http_client_123
+							http_client_123
 LIBXXX_OBJS += \
 							curl_api.o \
 							rtp_api.o
@@ -84,8 +84,8 @@ endif
 
 ifeq ("$(PJ_HAS_LIBSSH)", "yes")
 CLEAN_BINS += \
-						sshX_123 \
-						tunnel_123
+							sshX_123 \
+							tunnel_123
 LIBXXX_OBJS += \
 							ssh_api.o \
 #LIBS_yes += -lssh
@@ -94,10 +94,10 @@ endif
 
 ifeq ("$(PJ_HAS_LIBUV)", "yes")
 CLEAN_BINS += \
-						uv_000 \
-						uv_spawn_123 \
-						cronx_123 \
-						uv_123
+							uv_000 \
+							uv_spawn_123 \
+							cronx_123 \
+							uv_123
 LIBXXX_OBJS += \
 							uv_api.o
 LIBS_yes += -luv
@@ -115,7 +115,7 @@ endif
 
 ifeq ("$(PJ_HAS_DBUS)", "yes")
 CLEAN_BINS += \
-						dbusx_456
+							dbusx_456
 LIBXXX_OBJS += \
 							dbusx_api.o
 LIBS_yes += -lexpat -ldbus-1
@@ -124,7 +124,7 @@ endif
 
 ifeq ("$(PJ_HAS_UBUS)", "yes")
 CLEAN_BINS += \
-						ubus_123
+							ubus_123
 LIBXXX_OBJS += \
 							ubus_api.o
 LIBS_yes += -lubus -lblobmsg_json
@@ -132,13 +132,13 @@ endif
 
 ifeq ("$(PJ_HAS_SWCONFIG)", "yes")
 CLEAN_BINS += 	\
-						swlink_123
+							swlink_123
 LIBS_yes += -lswconfig
 endif
 
 ifeq ("$(PJ_HAS_UCI)", "yes")
 CLEAN_BINS += \
-						uci_123
+							uci_123
 LIBXXX_OBJS += \
 							uci_api.o
 LIBS_yes += -luci

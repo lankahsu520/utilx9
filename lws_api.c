@@ -598,7 +598,7 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 		{
 			lws_req->cinfo.options |= options;
 			lws_req->cinfo.foreign_loops = (void*[]){loop};
-			DBG_DB_LN("(loop: %p, options: %ld)", loop, lws_req->cinfo.options);
+			DBG_DB_LN("(loop: %p, options: %d)", loop, lws_req->cinfo.options);
 		}
 
 		struct lws_context *context = lws_create_context( &lws_req->cinfo );
@@ -714,7 +714,7 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 		{
 			lws_req->cinfo.options |= options;
 			lws_req->cinfo.foreign_loops = (void*[]){loop};
-			DBG_DB_LN("(loop: %p, options: %ld)", loop, lws_req->cinfo.options);
+			DBG_DB_LN("(loop: %p, options: %d)", loop, lws_req->cinfo.options);
 		}
 
 		struct lws_context *context = lws_create_context( &lws_req->cinfo );

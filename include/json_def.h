@@ -51,11 +51,13 @@
 #define JKEY_COMM_CDT                             "cdt"
 #define JKEY_COMM_CFGS                            "cfgs"
 #define JKEY_COMM_CHANNEL                         "channel"
+#define JKEY_COMM_CHANNEL_ID                      "channel_id"
 #define JKEY_COMM_CHECKSUM                        "checksum"
 #define JKEY_COMM_CHID                            "chid"
 #define JKEY_COMM_CLASS                           "class"
 #define JKEY_COMM_CLOUD_BACKUP                    "cloud_backup"
 #define JKEY_COMM_CMD                             "cmd"
+#define JKEY_COMM_CMDID                           "cmdId"
 #define JKEY_COMM_CODE                            "code"
 #define JKEY_COMM_CODE1                           "code1"
 #define JKEY_COMM_CODE10                          "code10"
@@ -70,6 +72,7 @@
 #define JKEY_COMM_CODE_NUM                        "codenum"
 #define JKEY_COMM_COMPARISON                      "comparison"
 #define JKEY_COMM_CPU_USAGE                       "cpu_usage"
+#define JKEY_COMM_CREDENTIALS                     "credentials"
 #define JKEY_COMM_CRONTAB                         "crontab"
 #define JKEY_COMM_CURR_VAL                        "curr_val"
 #define JKEY_COMM_DAYM                            "daym"
@@ -88,11 +91,14 @@
 #define JKEY_COMM_DATAS                           "datas"
 #define JKEY_COMM_DELAY                           "delay"
 #define JKEY_COMM_DELTA_TIME                      "delta_time"
+#define JKEY_COMM_DEVICE_UID                      "device_uid"
+#define JKEY_COMM_DEVICE_UUID                     "deviceUuid"
 #define JKEY_COMM_DEV_EUI64                       "dev_eui64"
 #define JKEY_COMM_DIM_ON_VALUE                    "Dim_ON_Value"
 #define JKEY_COMM_DUR                             "dur"
 #define JKEY_COMM_DURATION                        "duration"
 #define JKEY_COMM_ENABLE                          "enable"
+#define JKEY_COMM_ERROR                           "error"
 #define JKEY_COMM_ERRORCODE                       "ErrorCode"
 #define JKEY_COMM_ERROR_CODE                      "error_code"
 #define JKEY_COMM_EVENT                           "event"
@@ -104,14 +110,17 @@
 #define JKEY_COMM_FCM_TOKEN                       "fcm_token"
 #define JKEY_COMM_FDCOUNT                         "fdcount"
 #define JKEY_COMM_FDSIZE                          "fdsize"
+#define JKEY_COMM_FIFO_ID                         "fifo_id"
 #define JKEY_COMM_FIRMWARE                        "firmware"
 #define JKEY_COMM_FIRMWARE_DATE                   "firmware_date"
 #define JKEY_COMM_FILENAME                        "filename"
 #define JKEY_COMM_FLAGS                           "flags"
 #define JKEY_COMM_FREERAM                         "freeram"
+#define JKEY_COMM_FRIENDLYNAME                    "friendlyName"
 #define JKEY_COMM_FULL                            "full"
 #define JKEY_COMM_FUNCTION                        "function"
 #define JKEY_COMM_GROUP                           "group"
+#define JKEY_COMM_GROUPS                          "groups"
 #define JKEY_COMM_HOMEID                          "homeid"
 #define JKEY_COMM_HOSTNAME                        "hostname"
 #define JKEY_COMM_HR                              "hr"
@@ -141,6 +150,7 @@
 #define JKEY_COMM_LOAD2                           "load2"
 #define JKEY_COMM_LOGICAL                         "logical"
 #define JKEY_COMM_MAC                             "mac"
+#define JKEY_COMM_MAC_ADDRESS                     "Mac_Address"
 #define JKEY_COMM_MAP                             "map"
 #define JKEY_COMM_MAXNUMBER                       "maxnumber"
 #define JKEY_COMM_MAX_ADDR                        "maxaddr"
@@ -150,6 +160,7 @@
 #define JKEY_COMM_MIXTURE_NAME                    "mixture_name"
 #define JKEY_COMM_MODEL                           "model"
 #define JKEY_COMM_MODULE                          "module"
+#define JKEY_COMM_MODULES                         "modules"
 #define JKEY_COMM_MODULES_UIDS                    "modulesUids"
 #define JKEY_COMM_MSG                             "msg"
 #define JKEY_COMM_MTH                             "mth"
@@ -163,6 +174,7 @@
 #define JKEY_COMM_OFFSET                          "offset"
 #define JKEY_COMM_ORDER                           "order"
 #define JKEY_COMM_ORBWEB_UUID                     "Orbweb_UUID"
+#define JKEY_COMM_OUT_CREDENTIALS_USERNAME        "out_credentials_username"
 #define JKEY_COMM_PANID                           "panid"
 #define JKEY_COMM_PASS                            "pass"
 #define JKEY_COMM_PORT                            "port"
@@ -175,32 +187,37 @@
 #define JKEY_COMM_RATE_TYPE                       "rate_type"
 #define JKEY_COMM_RELEASE                         "release"
 #define JKEY_COMM_REMOTE                          "remote"
+#define JKEY_COMM_REMOTES                         "remotes"
 #define JKEY_COMM_RES                             "res"
 #define JKEY_COMM_RESIDENT                        "resident"
+#define JKEY_COMM_RESPONSE                        "response"
 #define JKEY_COMM_RESP_TIME                       "response_time"
 #define JKEY_COMM_REVISION                        "revision"
 #define JKEY_COMM_ROOM                            "room"
 #define JKEY_COMM_SAN                             "san"
 #define JKEY_COMM_SAVETO                          "saveto"
 #define JKEY_COMM_SCENARIO                        "scenario"
+#define JKEY_COMM_SCENARS                         "scenars"
 #define JKEY_COMM_SCENE_NUMBER                    "scene_number"
 #define JKEY_COMM_SECOND                          "sec"
 #define JKEY_COMM_SECONDE                         "seconde"
 #define JKEY_COMM_SECURITY                        "security"
+#define JKEY_COMM_SERIAL                          "serial"
 #define JKEY_COMM_SEQ                             "seq"
 #define JKEY_COMM_SETASTCLOCK_LAT                 "setastclock_lat"
 #define JKEY_COMM_SETASTCLOCK_LON                 "setastclock_lon"
-#define JKEY_COMM_SIGN                            "sign"
-#define JKEY_COMM_SLOW_REFRESH                    "slow_refresh"
 #define JKEY_COMM_SET_CHECKBOX                    "jsonsetcheckbox"
 #define JKEY_COMM_SET_ENABLELOCK                  "enablelock"
 #define JKEY_COMM_SET_SUpwd                       "SU_PASSWORD"
+#define JKEY_COMM_SIGN                            "sign"
 #define JKEY_COMM_SIZE                            "size"
+#define JKEY_COMM_SLOW_REFRESH                    "slow_refresh"
 #define JKEY_COMM_STATE                           "state"
 #define JKEY_COMM_STATUS                          "status"
 #define JKEY_COMM_STATUSFLAG                      "status_flag"
 #define JKEY_COMM_STA_SSID                        "STA_SSID"
 #define JKEY_COMM_STEAL                           "steal"
+#define JKEY_COMM_SUBSYSTEM_UUID                  "subsystemUuid"
 #define JKEY_COMM_SUNRISE                         "sunrise"
 #define JKEY_COMM_SUNSET                          "sunset"
 #define JKEY_COMM_SWVERSION                       "swversion"
@@ -210,12 +227,14 @@
 #define JKEY_COMM_TEHN                            "then"
 #define JKEY_COMM_TIME                            "time"
 #define JKEY_COMM_TIME_UTC                        "time_utc"
+#define JKEY_COMM_TIMESTAMP                       "timestamp"
 #define JKEY_COMM_TOGGLE                          "toggle"
 #define JKEY_COMM_TONE_ID                         "tone_id"
 #define JKEY_COMM_TONE_VOL                        "tone_vol"
 #define JKEY_COMM_TOPIC                           "topic"
 #define JKEY_COMM_TOTALRAM                        "totalram"
 #define JKEY_COMM_TRIGGER                         "trigger"
+#define JKEY_COMM_TRIGGERS                        "triggers"
 #define JKEY_COMM_TUTK_UUID                       "TUTK_UUID"
 #define JKEY_COMM_TYPE                            "type"
 #define JKEY_COMM_TYPE_E                          "type_e"
@@ -412,6 +431,7 @@
 //******************************************************************************
 //** JVAL_ **
 //******************************************************************************
+// https://www.w3schools.com/tags/ref_httpmethods.asp
 #define JVAL_ACTION_GET                           "GET"
 #define JVAL_ACTION_PUT                           "PUT"
 #define JVAL_ACTION_DELETE                        "DELETE"
@@ -424,15 +444,18 @@
 #define JVAL_BRANCH_V3                            "v3"
 
 #define JVAL_COMM_CLOSED                          "closed"
-#define JVAL_COMM_SUCCESS                         "success"
 #define JVAL_COMM_FAIL                            "fail"
+#define JVAL_COMM_FAIL_V2                         "FAIL"
 #define JVAL_COMM_IDLE                            "idle"
+#define JVAL_COMM_OK                              "ok"
+#define JVAL_COMM_LOCK                            "lock"
 #define JVAL_COMM_OFF                             "off"
 #define JVAL_COMM_ON                              "on"
 #define JVAL_COMM_OPEN                            "open"
-#define JVAL_COMM_LOCK                            "lock"
-#define JVAL_COMM_UNLOCK                          "unlock"
+#define JVAL_COMM_SUCCESS                         "success"
+#define JVAL_COMM_SUCCESS_V2                      "SUCCESS"
 #define JVAL_COMM_UNKNOWN                         "unknown"
+#define JVAL_COMM_UNLOCK                          "unlock"
 
 #define JVAL_WATER_LEAK                           "water_leak"
 #define JVAL_WATER_LEVEL_DROPPED                  "water_level_dropped"
@@ -447,6 +470,34 @@
 #define JVAL_METER_VOLTAGE                        "voltage"
 #define JVAL_METER_WATT                           "watt"
 
+#define JVAL_NODE_ALIVE                           "alive"
+#define JVAL_NODE_SLEEPING                        "sleeping"
+
+#define JVAL_REPORT_START                         "start"
+#define JVAL_REPORT_DONE                          "done"
+
+#define JVAL_SECURITY_CSA                         "csa"
+#define JVAL_SECURITY_LOWER                       "sec_lower"
+#define JVAL_SECURITY_NORMAL                      "sec_normal"
+#define JVAL_SECURITY_SSA                         "ssa"
+#define JVAL_SECURITY_SET                         "ssa_set"
+
+#define JVAL_UNKNOWN                              "???"
+
+
+//******************************************************************************
+//** JVAL_FRIENDLY_NAME_ **
+//******************************************************************************
+#define JVAL_FRIENDLY_NAME_SMART_LIGHT            "smart light"
+#define JVAL_FRIENDLY_NAME_PHONE                  "Phone"
+#define JVAL_FRIENDLY_NAME_GATE_1                 "gate 1"
+#define JVAL_FRIENDLY_NAME_GATE_2                 "gate 2"
+#define JVAL_FRIENDLY_NAME_SYSTEM                 "system"
+
+
+//******************************************************************************
+//** JVAL_CLASS_ **
+//******************************************************************************
 #define JVAL_CLASS_MAC_ADDRESS                    "MAC Address"
 #define JVAL_CLASS_GROUPID                        "Group ID"
 #define JVAL_CLASS_UUID                           "UUID"
@@ -460,6 +511,7 @@
 #define JVAL_CLASS_CONTROLLER                     "Controller"
 #define JVAL_CLASS_CENTRAL_SCENE                  "Central Scene"
 #define JVAL_CLASS_CRON                           "Cron"
+#define JVAL_CLASS_DEVICE                         "Device"
 #define JVAL_CLASS_DIMMER                         "Dimmer"
 #define JVAL_CLASS_DOOR                           "Door/Window Sensor"
 #define JVAL_CLASS_DOOR_LOCK                      "Door Lock"
@@ -481,19 +533,14 @@
 #define JVAL_CLASS_WAKE_UP_INTERVAL               "Wakeup Interval"
 #define JVAL_CLASS_WAKE_UP_SENSOR                 "Wakeup Sensor"
 
-#define JVAL_NODE_ALIVE                           "alive"
-#define JVAL_NODE_SLEEPING                        "sleeping"
 
-#define JVAL_REPORT_START                         "start"
-#define JVAL_REPORT_DONE                          "done"
+//******************************************************************************
+//** JVAL_represent_ **
+//******************************************************************************
+#define JVAL_REPRESENT_DOOR_LOCK                  "Door Lock"
+#define JVAL_REPRESENT_LIGHT                      "Light"
+#define JVAL_REPRESENT_SOUND_SWITCH               "Sound Switch"
 
-#define JVAL_SECURITY_CSA                         "csa"
-#define JVAL_SECURITY_LOWER                       "sec_lower"
-#define JVAL_SECURITY_NORMAL                      "sec_normal"
-#define JVAL_SECURITY_SSA                         "ssa"
-#define JVAL_SECURITY_SET                         "ssa_set"
-
-#define JVAL_UNKNOWN                              "???"
 
 //******************************************************************************
 // Report Payload (MQTT & MCTT)
@@ -513,6 +560,8 @@
 #define JVAL_C_NODEID_BROADCAST                  "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 #define JVAL_NODEID_CONTROLLER                   1
 #define JVAL_EPID_BASE                           0
+#define JVAL_C_EPID_0                            "0"
+#define JVAL_C_EPID_1                            "1"
 
 #define JVAL_METHODID_EVENT                      0
 #define JVAL_METHODID_PUT                        1
@@ -574,6 +623,9 @@
 #define JKEY_ISSUEID_RMFAILED                    0x0000000B
 #define JKEY_ISSUEID_NODE                        0x00000010
 #define JKEY_ISSUEID_NOP                         0x00000011
+
+#define JKEY_ISSUEID_INTERCOM_DEVICE             0x00001001
+#define JKEY_ISSUEID_INTERCOM_DEVICE_STR         "00001001"
 
 #define JKEY_ISSUEID_GATEWAY_MASK                0x000FFFFF
 
@@ -677,6 +729,7 @@
 #define JKEY_ISSUEID_CC_BASIC_SET                0x00092002 // basic_set
 
 #define JKEY_ISSUEID_CC_SWITCH                   0x00092501 // switch
+#define JKEY_ISSUEID_CC_SWITCH_STR               "00092501" // switch
 #define JKEY_ISSUEID_CC_SWITCH_SIREN             0x00092502 // siren
 #define JKEY_ISSUEID_CC_SWITCH_PLUG              0x00092503 // plug
 
@@ -711,6 +764,7 @@
 #define JKEY_ISSUEID_CC_CENTRAL_SCENE_CFG        0x00095b03 // csc_cfg
 
 #define JKEY_ISSUEID_CC_DOOR_LOCK                0x00096201 // lock
+#define JKEY_ISSUEID_CC_DOOR_LOCK_STR            "00096201" // lock
 #define JKEY_ISSUEID_CC_DOOR_LOCK_CFG            0x00096202 // lock_cfg
 #define JKEY_ISSUEID_CC_DOOR_LOCK_POSTSET        0x000962FF // lock_postset
 
@@ -725,8 +779,10 @@
 #define JKEY_ISSUEID_CC_PROTECTION               0x00097501 // protection
 
 #define JKEY_ISSUEID_CC_SOUND_SWITCH             0x00097901 // COMMAND_CLASS_SOUND_SWITCH
+#define JKEY_ISSUEID_CC_SOUND_SWITCH_STR         "00097901" // COMMAND_CLASS_SOUND_SWITCH
 
 #define JKEY_ISSUEID_CC_BATTERY                  0x00098001 // COMMAND_CLASS_BATTERY
+#define JKEY_ISSUEID_CC_BATTERY_STR              "00098001" // COMMAND_CLASS_BATTERY
 
 #define JKEY_ISSUEID_CC_WAKE_UP_INTERVAL         0x00098401 // wakeup_interval
 #define JKEY_ISSUEID_CC_WAKE_UP_NOTIFICATION     0x00098402 // wakeup_notification
@@ -750,6 +806,7 @@
 #define JKEY_ISSUEID_CC_CRON                     0x000A9601 //
 
 #define JKEY_ISSUEID_CC_PHONE                    0x000A9701 //
+#define JKEY_ISSUEID_CC_PHONE_STR                "000A9701" //
 
 // JKEY_ISSUEID_GW, 
 #define ZWAVE_EVT_GW_CFG                        95
@@ -903,6 +960,7 @@
 #define COLOR_COMPONENT_INDEXED_COLOR           8 // 0x0100
 #define COLOR_COMPONENT_MAX                     9
 
+
 //******************************************************************************
 //** JVAL_ **
 //******************************************************************************
@@ -928,161 +986,6 @@
 #define JVAL_FAIL                                 -2147483648
 
 //#define JVAL_UNKNOWN_NUM                          4294967295
-
-
-//******************************************************************************
-//** EVENT (CONTROL_CMD) **
-//******************************************************************************
-#define JVAL_EC_0100_OPERATE_OK                   100
-#define JVAL_EC_0101_OPERATE_CMD_UNKNOWN          101
-#define JVAL_EC_0102_OPERATE_UID_INVALID          102
-#define JVAL_EC_0103_OPERATE_TIMEOUT              103
-#define JVAL_EC_0104_OPERATE_RF_BUSY              104
-#define JVAL_EC_0105_OPERATE_INTERNAL_ERR         105
-
-#define JVAL_EC_1000_DEVICE_INCLUDEorEXCLUDE      1000
-#define JVAL_EC_1001_FOUND_DEVICE                 1001
-#define JVAL_EC_1002_DEVICE_ADDED                 1002
-#define JVAL_EC_1040_DEVICE_ADDED                 1040
-#define JVAL_EC_1003_DEVICE_REMOVED               1003
-#define JVAL_EC_1009_SYSTEM_DISARM                1009
-#define JVAL_EC_1010_SYSTEM_ARM                   1010
-#define JVAL_EC_1011_SYSTEM_PART_ARM1             1011
-#define JVAL_EC_1012_SYSTEM_PART_ARM2             1012
-#define JVAL_EC_1013_SYSTEM_PART_ARM3             1013
-#define JVAL_EC_1014_SYSTEM_PART_ARM4             1014
-#define JVAL_EC_1015_SYSTEM_PART_ARM5             1015
-#define JVAL_EC_1020_SYSTEM_RESET                 1020
-#define JVAL_EC_1021_SYSTEM_RESET_SW              1021
-#define JVAL_EC_1030_OTA_START                    1030
-#define JVAL_EC_1031_OTA_STOP                     1031
-#define JVAL_EC_1032_OTA_SUCCESS                  1032
-#define JVAL_EC_1033_OTA_FAIL                     1033
-#define JVAL_EC_1034_READ_EXTNVM_SUCCESS          1034
-#define JVAL_EC_1035_READ_EXTNVM_FAIL             1035
-#define JVAL_EC_1036_WRITE_EXTNVM_SUCCESS         1036
-#define JVAL_EC_1037_WRITE_EXTNVM_FAIL            1037
-
-#define JVAL_EC_1380_ADDING_START                 1380
-#define JVAL_EC_1381_ADDING_CSA                   1381
-#define JVAL_EC_1382_ADDING_SSA                   1382
-#define JVAL_EC_1383_ADDING_SEC                   1383
-#define JVAL_EC_1384_ADDING_SEC_LOWER             1384
-#define JVAL_EC_1385_ADDING_SSA_SET               1385
-#define JVAL_EC_1387_ADDING_DONE                  1387
-#define JVAL_EC_1389_ADDING_FAIL                  1389
-
-#define JVAL_EC_1390_REMOVING_START               1390
-#define JVAL_EC_1397_REMOVING_DONE                1397
-#define JVAL_EC_1399_REMOVING_FAIL                1399
-
-#define JVAL_EC_1400_RESETING_START               1400
-#define JVAL_EC_1407_RESETING_DONE                1407
-//#define JVAL_EC_1408_RESETING_REMOVED             1408 // JVAL_EC_1020_SYSTEM_RESET
-#define JVAL_EC_1409_RESETING_FAIL                1409
-
-#define JVAL_EC_1410_RMFAILED_START               1410
-#define JVAL_EC_1417_RMFAILED_DONE                1417
-#define JVAL_EC_1418_RMFAILED_REMOVED             1418
-#define JVAL_EC_1419_RMFAILED_FAIL                1419
-
-#define JVAL_EC_1420_REPLACING_START              1420
-#define JVAL_EC_1422_REPLACING_SSA                1422
-#define JVAL_EC_1427_REPLACING_DONE               1427
-#define JVAL_EC_1428_REPLACING_REPLACED           1428
-#define JVAL_EC_1429_REPLACING_FAIL               1429
-
-#define JVAL_EC_1430_ABORTING_START               1430
-#define JVAL_EC_1437_ABORTING_DONE                1437
-#define JVAL_EC_1438_ABORTING_ABORTED             1438
-#define JVAL_EC_1439_ABORTING_FAIL                1439
-
-#define JVAL_EC_1440_LEARNING_START               1440
-#define JVAL_EC_1442_LEARNING_SSA                 1442
-#define JVAL_EC_1447_LEARNING_DONE                1447
-#define JVAL_EC_1448_LEARNING_LEARNED             1448
-#define JVAL_EC_1449_LEARNING_FAIL                1449
-
-#define JVAL_EC_1990_NOP_OK                       1990
-#define JVAL_EC_1991_NOP_FAIL                     1991
-
-#define JVAL_EC_4001_TAMPER_TRIGGER               4001
-#define JVAL_EC_4002_BATTERY_LOW                  4002
-#define JVAL_EC_4003_BATTERY_NORMAL               4003
-#define JVAL_EC_4005_DOORLOCK_KEYPAD_LOCKED       4005
-#define JVAL_EC_4006_DOORLOCK_KEYPAD_UNLOCKED     4006
-#define JVAL_EC_4007_WAKE_UP_INTERVAL             4007
-#define JVAL_EC_4008_WAKE_UP_NOTIFICATION         4008
-
-#define JVAL_EC_4101_PIR_TRIGGER                  4101
-#define JVAL_EC_4102_DOOR_WINDOW_OPEN             4102
-#define JVAL_EC_4103_DOOR_WINDOW_CLOSE            4103
-#define JVAL_EC_4104_SMOKE_TRIGGER                4104
-#define JVAL_EC_4105_CO_TRIGGER                   4105
-#define JVAL_EC_4106_CO2_TRIGGER                  4106
-#define JVAL_EC_4107_FLOOD_TRIGGER                4107
-#define JVAL_EC_4108_GLASS_BREAK                  4108
-#define JVAL_EC_4109_GPIO_ON                      4109
-#define JVAL_EC_4110_GPIO_OFF                     4110
-#define JVAL_EC_4111_TEMP_OVER                    4111 //data:Temperature
-#define JVAL_EC_4112_TEMP_BELOW                   4112 //data:Temperature
-#define JVAL_EC_4113_LUX_OVER                     4113 //data:Luminance
-#define JVAL_EC_4114_LUX_BELOW                    4114 //data:Luminance
-#define JVAL_EC_4115_HUMIDITY_OVER                4115 //data:Humidity
-#define JVAL_EC_4116_HUMIDITY_BELOW               4116 //data:Humidity
-#define JVAL_EC_4119_TRIGGER_OFF                  4119
-#define JVAL_EC_4120_POWER_OVERLOAD               4120
-#define JVAL_EC_4121_METER_CHANGED                4121 //data:Meter
-#define JVAL_EC_4122_PANIC_TRIGGER                4122
-#define JVAL_EC_4123_SONIC_TRIGGER                4123
-#define JVAL_EC_4127_GAS_TRIGGER                  4127
-
-#define JVAL_EC_4201_SNAPSHOT                     4201
-#define JVAL_EC_4202_VIDEOCLIP                    4202
-
-#define JVAL_EC_4401_BUTTON_1_DOWN                4401
-#define JVAL_EC_4402_BUTTON_2_DOWN                4402
-#define JVAL_EC_4403_BUTTON_3_DOWN                4403
-#define JVAL_EC_4404_BUTTON_4_DOWN                4404
-#define JVAL_EC_4405_BUTTON_5_DOWN                4405
-#define JVAL_EC_4406_BUTTON_6_DOWN                4406
-#define JVAL_EC_4407_BUTTON_7_DOWN                4407
-#define JVAL_EC_4408_BUTTON_8_DOWN                4408
-
-#define JVAL_EC_4700_DOORLOCK_CHANGED             4700
-#define JVAL_EC_4701_USERCODE_UPDATE              4701
-#define JVAL_EC_4702_USERCODE_OPEN                4702
-#define JVAL_EC_4703_USERCODE_CLOSE               4703
-
-#define JVAL_EC_4801_TEMP_REPORT                  4801 //data:Temperature
-#define JVAL_EC_4802_LUX_REPORT                   4802 //data:Luminance
-#define JVAL_EC_4803_HUMIDITY_REPORT              4803 //data:Humidity
-#define JVAL_EC_4804_METER_REPORT                 4804 //data:Meter
-#define JVAL_EC_4805_CO2_REPORT                   4805 //data:Meter
-#define JVAL_EC_4806_VOC_REPORT                   4806 //data:Meter
-#define JVAL_EC_4807_UV_REPORT                    4807 //data:Meter
-
-#define JVAL_EC_4901_THERMO_FAN_REPORT            4901
-#define JVAL_EC_4902_THERMO_MODE_REPORT           4902
-#define JVAL_EC_4903_THERMO_TEMP_REPORT           4903
-
-#define JVAL_EC_5001_GOT_CONTROL                  5001
-#define JVAL_EC_5002_STATUS_UPDATE                5002
-#define JVAL_EC_5102_STATUS_UPDATE                5102
-#define JVAL_EC_5003_CONFIG_CHANGE                5003
-#define JVAL_EC_5004_USERDATA_CHANGE              5004
-#define JVAL_EC_5005_BUILD_IN_SIREN_ON            5005
-#define JVAL_EC_5006_BUILD_IN_SIREN_OFF           5006
-#define JVAL_EC_5007_ZWAVE_INFO_UPDATE            5007
-#define JVAL_EC_5008_timer_v1_INFO_UPDATE         5008
-#define JVAL_EC_5009_timer_v2_INFO_UPDATE         5009
-#define JVAL_EC_5031_SET_MAP                      5031
-#define JVAL_EC_5032_PUSH_MSG                     5032
-
-#define JVAL_EC_5096_NODE_ALIVE                   5096
-#define JVAL_EC_5097_NODE_SLEEPING                5097
-
-#define JVAL_EC_9999_ZWAVE_RUN_SWITCH             9999
 
 
 #endif

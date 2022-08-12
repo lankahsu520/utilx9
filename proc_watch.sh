@@ -82,7 +82,7 @@ init_fn()
 
 clean_fn()
 {
-	echo "$RUN_SH ($PID) clean_fn ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ... "
 
 	return 0
 }
@@ -148,7 +148,7 @@ start_fn()
 {
 	runpid_fn
 
-	echo "$RUN_SH ($PID) start_fn ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ... "
 	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
 
 	init_fn
@@ -165,7 +165,7 @@ start_fn()
 
 	wait_fn 1 1
 
-	echo "$RUN_SH ($PID) start_fn ok."
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ok."
 
 	return 0
 }
@@ -174,7 +174,7 @@ stop_fn()
 {
 	runpid_fn
 
-	echo "$RUN_SH ($PID) stop_fn ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ... "
 
 	IS_QUIT=1
 
@@ -182,7 +182,7 @@ stop_fn()
 
 	clean_fn
 
-	echo "$RUN_SH ($PID) stop_fn ok."
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ok."
 
 	return 0
 }
@@ -191,7 +191,7 @@ status_fn()
 {
 	runpid_fn
 
-	echo "$RUN_SH ($PID) status_fn ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ... "
 
 	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "$RUN_SH ($PID) is already running.";}
 	[ ! -z "$DAEMON" ] && [ -z "$PID" ] && { die_fn "$RUN_SH () isn't running.";}
@@ -201,7 +201,7 @@ status_fn()
 
 debug_fn()
 {
-	echo "$RUN_SH ($PID) debug_fn ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ... "
 
 	$KILLALL_EX -USR2 $DAEMON
 
@@ -210,7 +210,7 @@ debug_fn()
 
 trigger_fn()
 {
-	echo "$RUN_SH ($PID) trigger_fn ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ... "
 
 	$KILLALL_EX -USR1 $DAEMON
 
@@ -219,7 +219,7 @@ trigger_fn()
 
 logger_fn()
 {
-	echo "$RUN_SH ($PID) logger_fn [$LOGGER_TAG] ... "
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} [$LOGGER_TAG] ... "
 
 	LOGREAD=`which logread`
 	LOGREAD_ARG=" [ ! -z '$LOGREAD' ] "
@@ -240,7 +240,7 @@ showusage_fn()
 
 trap_ctrlc()
 {
-	echo "$RUN_SH ($PID) trap_ctrlc ..."
+	echo "$RUN_SH ($PID) ${FUNCNAME[0]} ..."
 
 	[ -z $IS_INTERACTIVE ] || stop_fn
 }

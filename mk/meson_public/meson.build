@@ -96,7 +96,7 @@ endif
 #** LIB_DIR_ARY **
 #********************************************************************************
 LIB_DIR_ARY = [ ]
-if ( SDK_INC_DIR != '' ) and ( run_command('[', '-d', SDK_LIB_DIR , ']', check : false).returncode() == 0 )
+if ( SDK_LIB_DIR != '' ) and ( run_command('[', '-d', SDK_LIB_DIR , ']', check : false).returncode() == 0 )
 	LIB_DIR_ARY += [ SDK_LIB_DIR ]
 endif
 

@@ -41,11 +41,11 @@ rm -f env.tmp
 echo "#define PJ_NAME_${PJ_NAME}" >> ${CONFIG_CUSTOMER_DEF_H}
 	echo "export PJ_NAME_${PJ_NAME}=\"yes\"" >> ${CONFIG_CUSTOMER}.export
 	echo "PJ_NAME_${PJ_NAME}=yes" >> ${CONFIG_CUSTOMER}
-	echo "option('PJ_NAME_${PJ_NAME}', type: 'string', value: 'yes')" >> ${CONFIG_MESON}
+	echo "option('PJ_NAME_${PJ_NAME}', type: 'boolean', value: true)" >> ${CONFIG_MESON}
 echo "#define PJ_MODE_${PJ_MODE}" >> ${CONFIG_CUSTOMER_DEF_H}
 	echo "export PJ_MODE_${PJ_MODE}=\"yes\"" >> ${CONFIG_CUSTOMER}.export
 	echo "PJ_MODE_${PJ_MODE}=yes" >> ${CONFIG_CUSTOMER}
-	echo "option('PJ_MODE_${PJ_MODE}', type: 'string', value: 'yes')" >> ${CONFIG_MESON}
+	echo "option('PJ_MODE_${PJ_MODE}', type: 'boolean', value: true)" >> ${CONFIG_MESON}
 
 #** CONFIG_XXX **
 env | grep ^CONFIG_ | sort > env.tmp
@@ -58,12 +58,12 @@ while read line; do
 		echo "#define ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"yes\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=yes" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'yes')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: true)" >> ${CONFIG_MESON}
 	elif [ "$VAL" = "no" ]; then
 		echo "#undef ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"no\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=no" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'no')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: false)" >> ${CONFIG_MESON}
 	else
 		echo "#define ${KEY} \"${VAL}\"" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"${VAL}\"" >> ${CONFIG_CUSTOMER}.export
@@ -109,12 +109,12 @@ do
 		echo "#define ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"yes\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=yes" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'yes')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: true)" >> ${CONFIG_MESON}
 	elif [ "$VAL" = "no" ]; then
 		echo "#undef ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"no\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=no" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'no')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: false)" >> ${CONFIG_MESON}
 	else
 		echo "#define ${KEY} \"${VAL}\"" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"${VAL}\"" >> ${CONFIG_CUSTOMER}.export
@@ -159,12 +159,12 @@ do
 		echo "#define ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"yes\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=yes" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'yes')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: true)" >> ${CONFIG_MESON}
 	elif [ "$VAL" = "no" ]; then
 		echo "#undef ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"no\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=no" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'no')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: false)" >> ${CONFIG_MESON}
 	else
 		echo "#define ${KEY} \"${VAL}\"" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"${VAL}\"" >> ${CONFIG_CUSTOMER}.export

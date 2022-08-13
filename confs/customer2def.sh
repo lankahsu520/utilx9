@@ -134,12 +134,12 @@ do
 		echo "#define ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"yes\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=yes" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'yes')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: true)" >> ${CONFIG_MESON}
 	elif [ "$VAL" = "no" ]; then
 		echo "#undef ${KEY}" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"no\"" >> ${CONFIG_CUSTOMER}.export
 		echo "${KEY}=no" >> ${CONFIG_CUSTOMER}
-		echo "option('${KEY}', type: 'string', value: 'no')" >> ${CONFIG_MESON}
+		echo "option('${KEY}', type: 'boolean', value: false)" >> ${CONFIG_MESON}
 	else
 		echo "#define ${KEY} \"${VAL}\"" >> ${CONFIG_CUSTOMER_DEF_H}
 		echo "export ${KEY}=\"${VAL}\"" >> ${CONFIG_CUSTOMER}.export

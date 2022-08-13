@@ -127,6 +127,9 @@ clean:
 	@$(PJ_SH_RMDIR) build_xxx .meson_config build.meson meson_options.txt meson_public
 
 distclean: clean
+ifeq ("$(CONFIG_CUSTOMER_DEF_H)", "${SDK_CONFIG_CUSTOMER_DEF_H}")
+	$(PJ_SH_RM) $(CONFIG_CUSTOMER) $(CONFIG_CUSTOMER).export $(CONFIG_CUSTOMER_DEF_H) $(CONFIG_MESON)
+endif
 
 %.a: $(LIBXXX_OBJS)
 	@echo 'Building lib (static): $@'

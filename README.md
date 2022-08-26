@@ -14,8 +14,8 @@ utilx9 is the utility api.
 Here giving small api packages and easily to use. We can also get  the ideals from the demo programs
 
 # 2. Depend on
-- ubuntu_ - https://github.com/lankahsu520/ubuntu_
 - curl (PJ_HAS_CURL) - https://curl.haxx.se
+- list (UTIL_EX_CLIST) & Crc16 - http://www.contiki-os.org
 - dbus (PJ_HAS_DBUS) - https://www.freedesktop.org/wiki/Software/dbus/
 - fcgi2 (PJ_HAS_FASTCGI) - http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm
 - jansson (PJ_HAS_JANSSON) - https://digip.org/jansson/

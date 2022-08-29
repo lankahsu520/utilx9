@@ -2,9 +2,10 @@
 
 .PHONY: meson meson_install
 .meson_config:
-	rm -f meson_public \
-	&& ln -s $(PJ_MESON_BUILD_ROOT) meson_public \
-	&& cp -av $(PJ_MESON_CROSS) ./build.meson \
+ifeq ("$(wildcard meson_public)","")
+	ln -s $(PJ_MESON_BUILD_ROOT) meson_public
+endif
+	cp -av $(PJ_MESON_CROSS) ./build.meson \
 	&& cp -av $(CONFIG_MESON) ./meson_options.txt \
 	&& meson \
 		--prefix $(SDK_ROOT_DIR) \

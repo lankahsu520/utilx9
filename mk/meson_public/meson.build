@@ -89,6 +89,11 @@ elif ( SDK_INC_DIR != '' ) and ( run_command('[', '-f', PJ_ROOT + '/include/cust
 	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/dbus_def.h' ]
 	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/json_def.h' ]
 	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/query_def.h' ]
+elif ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-f', PKG_CONFIG_SYSROOT_DIR + '/usr/include/customer_def.h', ']', check : false).returncode() == 0 )
+	CFLAGS_CUSTOMER += ['-include', PKG_CONFIG_SYSROOT_DIR + '/usr/include/customer_def.h' ]
+	CFLAGS_CUSTOMER += ['-include', PKG_CONFIG_SYSROOT_DIR + '/usr/include/dbus_def.h' ]
+	CFLAGS_CUSTOMER += ['-include', PKG_CONFIG_SYSROOT_DIR + '/usr/include/json_def.h' ]
+	CFLAGS_CUSTOMER += ['-include', PKG_CONFIG_SYSROOT_DIR + '/usr/include/query_def.h' ]
 endif
 #CFLAGS_CUSTOMER += ['-D_GNU_SOURCE' ]
 

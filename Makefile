@@ -32,6 +32,11 @@ LIBXXX_OBJS += \
 							cronx_api.o \
 							utilx9.o
 
+LIBXXX_OBJS += \
+							crc16.o \
+							crc32alg.o \
+							internet-collect.o
+
 #** LIBXXX_yes **
 #LIBXXX_A = lib$(LIBNAME).a
 LIBXXX_SO = lib$(LIBNAME).so
@@ -128,7 +133,7 @@ distclean: clean
 ifeq ("$(CONFIG_CUSTOMER_DEF_H)", "${SDK_CONFIG_CUSTOMER_DEF_H}")
 	$(PJ_SH_RM) $(CONFIG_CUSTOMER) $(CONFIG_CUSTOMER).export $(CONFIG_CUSTOMER_DEF_H) $(CONFIG_MESON)
 endif
-	[ -d "install" ] && $(PJ_SH_RMDIR) install
+	if [ -d "install" ]; then $(PJ_SH_RMDIR) install; fi
 
 %.a: $(LIBXXX_OBJS)
 	@echo 'Building lib (static): $@'

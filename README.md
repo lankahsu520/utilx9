@@ -14,26 +14,57 @@ utilx9 is the utility api.
 Here giving small api packages and easily to use. We can also get  the ideals from the demo programs
 
 # 2. Depend on
+
+## 2.1. Open-source
+
 - curl (PJ_HAS_CURL) - https://curl.haxx.se
+
 - list (UTIL_EX_CLIST) & Crc16 - http://www.contiki-os.org
+
 - dbus (PJ_HAS_DBUS) - https://www.freedesktop.org/wiki/Software/dbus/
+
 - fcgi2 (PJ_HAS_FASTCGI) - http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm
+
 - jansson (PJ_HAS_JANSSON) - https://digip.org/jansson/
+
 - json-c (PJ_HAS_JSONC) - https://github.com/json-c/json-c
+
 - libnl-tiny (PJ_HAS_LIBNL_TINY) - https://git.openwrt.org/project/libnl-tiny.git
+
 - libssh (PJ_HAS_LIBSSH) - http://www.libssh.org
+
 - libubox (PJ_HAS_LIBUBOX) - https://openwrt.org/docs/techref/libubox
+
 - libusb (PJ_HAS_LIBUSB) - https://github.com/libusb/libusb
+
 - libuv (PJ_HAS_LIBUV) - https://github.com/libuv/libuv
+
 - libwebsockets (PJ_HAS_LIBWEBSOCKETS) - https://libwebsockets.org
+
 - libyuarel (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL) - https://github.com/jacketizer/libyuarel
+
 - mosquitto (PJ_HAS_MOSQUITTO) - https://mosquitto.org
+
 - mxml (PJ_HAS_MXML / UTIL_EX_MXML) - https://www.msweet.org/mxml/ (need to patch, please check patches/mxml-2.11)
+
 - openssl (PJ_HAS_OPENSSL) - https://www.openssl.org
+
 - ~~swconfig (PJ_HAS_SWCONFIG) - openwrt/package/network/config/swconfig~~
+
 - ubus (PJ_HAS_UBUS) - https://openwrt.org/docs/techref/ubus
+
 - uci (PJ_HAS_UCI) - https://openwrt.org/docs/techref/uci
 
+## 2.2. Internet Notes
+
+- internet-collect.c - [Hex Encode and Decode in C](https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/)
+- internet-collect.c - [Linux C语言实现urlencode和urldecode](https://ivanzz1001.github.io/records/post/cplusplus/2018/03/13/cpluscplus_urlencode)
+- chainX_api.c - [Linux RS-232 程式設計](http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html)
+- lws_123.c - [simple-libwebsockets-example](https://github.com/iamscottmoyers/simple-libwebsockets-example)
+- lws_api.c - [multithread call lws_callback_on_writable to send data ASAP](https://codesti.com/issue/warmcat/libwebsockets/2358)
+- utilx9.h - [解读 /proc/$PID/status 中各种参数](https://my.oschina.net/aiguozhe/blog/125477)
+- utilx9.h - [RTP Library in C](https://sourceforge.net/projects/rtp-lib/)
+- utilx9.c - [Howto base64 encode and decode with C and OpenSSL](https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/)
 
 # 3. Current Status
 因為這是多年工作下的成果，一定還有發展空間.如果有 bug 請多多包函.

@@ -13,6 +13,7 @@
  *
  ***************************************************************************/
 #include "utilx9.h"
+#include <ctype.h>
 
 #ifdef UTIL_EX_BASIC 
 // https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/

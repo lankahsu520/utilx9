@@ -886,54 +886,6 @@ char *os_urandom(int byte_count)
 
 
 #ifdef UTIL_EX_SSL
-// https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/
-char *sec_base64_enc(char *input, int length, int *enc_len)
-{
-	//int ret = 0;
-	BIO *bmem, *b64;
-	BUF_MEM *bptr;
-
-	b64 = BIO_new(BIO_f_base64());
-	bmem = BIO_new(BIO_s_mem());
-	bmem = BIO_push(b64, bmem);
-
-	BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
-	BIO_set_close(bmem, BIO_CLOSE);
-	BIO_write(bmem, (const void *)input, length);
-	BIO_flush(bmem);
-	BIO_get_mem_ptr(bmem, &bptr);
-
-	*enc_len = bptr->length;
-
-	char *buff = SAFE_CALLOC(1, bptr->length+1);
-	SAFE_MEMCPY(buff, bptr->data, bptr->length, bptr->length);
-	//buff[bptr->length-1] = 0;
-
-	BIO_free_all(bmem);
-
-	return buff;
-}
-
-char *sec_base64_dec(char *input, int length, int *dec_len)
-{
-	BIO *b64, *bmem;
-
-	char *buffer = SAFE_CALLOC(1, length+1);
-	SAFE_MEMSET(buffer, 0, length);
-
-	b64 = BIO_new(BIO_f_base64());
-	bmem = BIO_new_mem_buf(input, length);
-	bmem = BIO_push(b64, bmem);
-
-	BIO_set_flags(bmem, BIO_FLAGS_BASE64_NO_NL);
-	BIO_set_close(bmem, BIO_CLOSE);
-	*dec_len = BIO_read(bmem, buffer, length);
-	//buffer[*dec_len] = '\0';
-
-	BIO_free_all(bmem);
-
-	return buffer;
-}
 
 int sec_aes_cbc_enc(char *in, char *out, char *aes_key)
 {

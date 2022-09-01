@@ -19,8 +19,6 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 
 - curl (PJ_HAS_CURL) - https://curl.haxx.se
 
-- list (UTIL_EX_CLIST) & Crc16 - http://www.contiki-os.org
-
 - dbus (PJ_HAS_DBUS) - https://www.freedesktop.org/wiki/Software/dbus/
 
 - fcgi2 (PJ_HAS_FASTCGI) - http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm
@@ -60,13 +58,16 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 - internet-collect.c - [Hex Encode and Decode in C](https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/)
 - internet-collect.c - [Linux C语言实现urlencode和urldecode](https://ivanzz1001.github.io/records/post/cplusplus/2018/03/13/cpluscplus_urlencode)
 - internet-collect.c - [Howto base64 encode and decode with C and OpenSSL](https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/)
+- clist_api.c - http://www.contiki-os.org
+- crc16.c - http://www.contiki-os.org
+- crc32alg.c - http://www.contiki-os.org
 - chainX_api.c - [Linux RS-232 程式設計](http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html)
 - lws_123.c - [simple-libwebsockets-example](https://github.com/iamscottmoyers/simple-libwebsockets-example)
 - lws_api.c - [multithread call lws_callback_on_writable to send data ASAP](https://codesti.com/issue/warmcat/libwebsockets/2358)
-- utilx9.h - [解读 /proc/$PID/status 中各种参数](https://my.oschina.net/aiguozhe/blog/125477)
-- utilx9.h - [RTP Library in C](https://sourceforge.net/projects/rtp-lib/)
 - nlink_123.c - [Monitoring Linux networking state using netlink](https://olegkutkov.me/2018/02/14/monitoring-linux-networking-state-using-netlink/)
 - nlink_456.c - [Port status polling via swconfig kernel module](http://centaur.sch.bme.hu/~leait/projects/openwrt/)
+- utilx9.h - [解读 /proc/$PID/status 中各种参数](https://my.oschina.net/aiguozhe/blog/125477)
+- utilx9.h - [RTP Library in C](https://sourceforge.net/projects/rtp-lib/)
 
 # 3. Current Status
 因為這是多年工作下的成果，一定還有發展空間.如果有 bug 請多多包函.

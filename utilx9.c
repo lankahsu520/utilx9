@@ -886,7 +886,6 @@ char *os_urandom(int byte_count)
 
 
 #ifdef UTIL_EX_SSL
-
 int sec_aes_cbc_enc(char *in, char *out, char *aes_key)
 {
 	int ret = 0;

@@ -60,7 +60,7 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 - internet-collect.c - [Howto base64 encode and decode with C and OpenSSL](https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/)
 - clist_api.c - http://www.contiki-os.org
 - crc16.c - http://www.contiki-os.org
-- crc32alg.c - http://www.contiki-os.org
+- crc32alg.c - CRC32 code derived from work by Gary S. Brown.
 - chainX_api.c - [Linux RS-232 程式設計](http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html)
 - lws_123.c - [simple-libwebsockets-example](https://github.com/iamscottmoyers/simple-libwebsockets-example)
 - lws_api.c - [multithread call lws_callback_on_writable to send data ASAP](https://codesti.com/issue/warmcat/libwebsockets/2358)

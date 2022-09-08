@@ -76,7 +76,7 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 # 4. Build
 ```bash
 $ . confs/github.conf
-$ . confs/customer2def.sh
+#$ . confs/customer2def.sh
 # to create
 # include/customer_def.h
 # include/config_customer

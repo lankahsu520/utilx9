@@ -3,12 +3,12 @@ PWD=$(shell pwd)
 
 #[major].[minor].[revision].[build]
 VERSION_MAJOR = 1
-VERSION_MINOR = 3
+VERSION_MINOR = 4
 VERSION_REVISION = 0
 VERSION_FULL = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_REVISION)
 LIBNAME = utilx9
 
-LIBUTILX_API_VERSION="0x$(shell printf "%02X" $(VERSION_MAJOR))$(shell printf "%03X" $(VERSION_MINOR))$(shell printf "%03X" $(VERSION_REVISION))"
+LIBUTILX9_VERSION="0x$(shell printf "%02X" $(VERSION_MAJOR))$(shell printf "%03X" $(VERSION_MINOR))$(shell printf "%03X" $(VERSION_REVISION))"
 
 #** CFLAGS & LDFLAGS **
 CFLAGS += $(CFLAGS_OTHERS) $(CFLAGS_CUSTOMER)
@@ -88,6 +88,10 @@ DUMMY_SBINS = $(SHELL_SBINS)
 CONFS = \
 				$(wildcard conf/*.conf)
 
+#** Target (AUTO_GENERATEDS) **
+AUTO_GENERATEDS = \
+								util_expiration.h
+
 TO_FOLDER =
 
 #** include *.mk **
@@ -112,9 +116,8 @@ $(CLEAN_BINS): $(CLEAN_OBJS) $(CLEAN_LIBS)
 	@echo ' '
 
 clean:
-	$(PJ_SH_RM) Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb)
+	$(PJ_SH_RM) Makefile.bak $(CLEAN_BINS) $(CLEAN_BINS:=.elf) $(CLEAN_BINS:=.gdb) $(AUTO_GENERATEDS)
 	$(PJ_SH_RM) .configured .patched $(addsuffix *, $(CLEAN_LIBS)) $(CLEAN_OBJS) $(CLEAN_OBJS:%.o=%.c.bak) $(CLEAN_OBJS:%.o=%.h.bak)
-	$(PJ_SH_RM) util_expiration.h
 	@for subbin in $(CLEAN_BINS); do \
 		($(PJ_SH_RM) $(SDK_BIN_DIR)/$$subbin;); \
 	done
@@ -127,13 +130,13 @@ clean:
 	@for subshell in $(SHELL_SBINS); do \
 		($(PJ_SH_RM) $(SDK_SBIN_DIR)/$$subshell;); \
 	done
-	@$(PJ_SH_RMDIR) build_xxx .meson_config build.meson meson_options.txt meson_public
 
 distclean: clean
-ifeq ("$(CONFIG_CUSTOMER_DEF_H)", "${SDK_CONFIG_CUSTOMER_DEF_H}")
-	$(PJ_SH_RM) $(CONFIG_CUSTOMER) $(CONFIG_CUSTOMER).export $(CONFIG_CUSTOMER_DEF_H) $(CONFIG_MESON)
-endif
-	if [ -d "install" ]; then $(PJ_SH_RMDIR) install; fi
+	[ -L meson_public ] && ($(PJ_SH_RMDIR) meson_public; ) || true
+	[ -d ./subprojects ] && [ -f meson.build ] && (meson subprojects purge --confirm;) || true
+	$(PJ_SH_RMDIR) build_xxx .meson_config build.meson meson_options.txt
+	[ -f ".customer" ] && ($(PJ_SH_RM) .customer $(CONFIG_CUSTOMER) $(CONFIG_CUSTOMER).export $(CONFIG_CUSTOMER_DEF_H) $(CONFIG_MESON); ) || true
+	[ -d "install" ] && ($(PJ_SH_RMDIR) install; ) || true
 
 %.a: $(LIBXXX_OBJS)
 	@echo 'Building lib (static): $@'
@@ -150,52 +153,51 @@ endif
 	@echo ' '
 
 install: all
-	$(PJ_SH_MKDIR) $(SDK_BIN_DIR)
+	[ "$(CLEAN_BINS)" = "" ] || $(PJ_SH_MKDIR) $(SDK_BIN_DIR)
 	@for subbin in $(CLEAN_BINS); do \
 		$(PJ_SH_CP) $$subbin $(SDK_BIN_DIR); \
 		$(STRIP) $(SDK_BIN_DIR)/`basename $$subbin`; \
 	done
-	$(PJ_SH_MKDIR) $(SDK_LIB_DIR)
+	[ "$(CLEAN_LIBS)" = "" ] || $(PJ_SH_MKDIR) $(SDK_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
 		$(PJ_SH_CP) $$sublib* $(SDK_LIB_DIR); \
 		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION_FULL); \
 	done
-	$(PJ_SH_MKDIR) $(SDK_INC_DIR)
+	[ "$(HEADER_FILES)" = "" ] || $(PJ_SH_MKDIR) $(SDK_INC_DIR)
 	@for subheader in $(HEADER_FILES); do \
 		$(PJ_SH_CP) $$subheader $(SDK_INC_DIR); \
 	done
-	$(PJ_SH_MKDIR) $(SDK_SBIN_DIR)
+	[ "$(SHELL_SBINS)" = "" ] || $(PJ_SH_MKDIR) $(SDK_SBIN_DIR)
 	@for subshell in $(SHELL_SBINS); do \
 		$(PJ_SH_CP) $$subshell $(SDK_SBIN_DIR); \
 	done
+	[ "$(CONFS)" = "" ] || $(PJ_SH_MKDIR) $(SDK_IOT_DIR)/$(TO_FOLDER)
 	@for conf in $(CONFS); do \
-		$(PJ_SH_MKDIR) $(SDK_IOT_DIR)/$(TO_FOLDER); \
 		$(PJ_SH_CP) $$conf $(SDK_IOT_DIR)/$(TO_FOLDER); \
 	done
 
 romfs: install
 ifneq ("$(HOMEX_ROOT_DIR)", "")
-	$(PJ_SH_MKDIR) $(HOMEX_BIN_DIR)
+	[ "$(DUMMY_BINS)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_BIN_DIR)
 	@for subbin in $(DUMMY_BINS); do \
 		$(PJ_SH_CP) $$subbin $(HOMEX_BIN_DIR); \
 		$(STRIP) $(HOMEX_BIN_DIR)/`basename $$subbin`; \
 	done
-	$(PJ_SH_MKDIR) $(HOMEX_LIB_DIR)
+	[ "$(CLEAN_LIBS)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_LIB_DIR)
 	@for sublib in $(CLEAN_LIBS); do \
 		$(PJ_SH_CP) $$sublib* $(HOMEX_LIB_DIR); \
 		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION_FULL); \
 	done
-	#$(PJ_SH_MKDIR) $(HOMEX_INC_DIR)
+	#[ "$(HEADER_FILES)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_INC_DIR)
 	#@for subheader in $(HEADER_FILES); do \
 	#	$(PJ_SH_CP) $$subheader $(HOMEX_INC_DIR); \
 	#done
-	$(PJ_SH_MKDIR) $(HOMEX_SBIN_DIR)
+	[ "$(DUMMY_SBINS)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_SBIN_DIR)
 	@for subshell in $(DUMMY_SBINS); do \
 		$(PJ_SH_CP) $$subshell $(HOMEX_SBIN_DIR); \
 	done
+	[ "$(CONFS)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_IOT_DIR)/$(TO_FOLDER)
 	@for conf in $(CONFS); do \
-		$(PJ_SH_MKDIR) $(HOMEX_IOT_DIR)/$(TO_FOLDER); \
 		$(PJ_SH_CP) $$conf $(HOMEX_IOT_DIR)/$(TO_FOLDER); \
 	done
 endif
-

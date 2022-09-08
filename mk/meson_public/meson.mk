@@ -1,6 +1,6 @@
 .DEFAULT_GOAL = all
 
-.PHONY: meson meson_install
+.PHONY: meson meson_install meson_clean meson_distclean
 .meson_config:
 ifeq ("$(wildcard meson_public)","")
 	ln -s $(PJ_MESON_BUILD_ROOT) meson_public
@@ -22,3 +22,12 @@ meson: .meson_config
 meson_install: meson
 	cd build_xxx \
 	&& ninja install
+
+meson_clean:
+	cd build_xxx \
+	&& ninja clean
+
+meson_distclean:
+	[ -L meson_public ] && ($(PJ_SH_RMDIR) meson_public; ) || true
+	[ -d ./subprojects ] && [ -f meson.build ] && (meson subprojects purge --confirm;) || true
+	rm -rf build_xxx

@@ -125,8 +125,12 @@ void timer_1sec_loop(uv_timer_t *handle)
 	int count = 0;
 	count ++;
 
-	//DBG_TR_LN(DBG_TXT_ENTER);
+	//DBG_TR_LN("(count: %d)", count);
 	//SAFE_UV_ASYNC(&uv_async_fd);
+
+	time_t now_t = time((time_t *)NULL);
+	struct tm *now_tm = localtime(&now_t);
+	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
 	if (app_quit()==1)
 	{
@@ -134,7 +138,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
 		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
 	}
-	else
+	else if (mqtt123_session.isconnect)
 	{
 		char topic[LEN_OF_TOPIC] = "";
 

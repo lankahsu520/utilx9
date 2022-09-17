@@ -14,6 +14,17 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+int mqtt_session_isconnect(MQTTX_t *mqtt_req)
+{
+	MQTTSession_t *session = NULL;
+
+	if ( (mqtt_req) && ( session = mqtt_req->session) )
+	{
+		return session->isconnect;
+	}
+	return 0;
+}
+
 MQTTSession_t *mqtt_session_get(MQTTX_t *mqtt_req)
 {
 	if (mqtt_req)

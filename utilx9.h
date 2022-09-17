@@ -3937,6 +3937,7 @@ typedef struct MQTTX_Struct
 	MQTTSession_t *session;
 } MQTTX_t;
 
+int mqtt_session_isconnect(MQTTX_t *mqtt_req);
 MQTTSession_t *mqtt_session_get(MQTTX_t *mqtt_req);
 
 int mqtt_publish(MQTTSession_t *session, char *topic, char *msg);

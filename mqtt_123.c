@@ -138,7 +138,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
 		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
 	}
-	else if (mqtt123_session.isconnect)
+	else if ( mqtt_session_isconnect(&mqtt123_data) )
 	{
 		char topic[LEN_OF_TOPIC] = "";
 

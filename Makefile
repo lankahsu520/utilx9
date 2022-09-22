@@ -158,8 +158,8 @@ install: all
 		$(PJ_SH_CP) $$subbin $(SDK_BIN_DIR); \
 		$(STRIP) $(SDK_BIN_DIR)/`basename $$subbin`; \
 	done
-	[ "$(CLEAN_LIBS)" = "" ] || $(PJ_SH_MKDIR) $(SDK_LIB_DIR)
-	@for sublib in $(CLEAN_LIBS); do \
+	[ "$(LIBXXX_SO)" = "" ] || $(PJ_SH_MKDIR) $(SDK_LIB_DIR)
+	@for sublib in $(LIBXXX_SO); do \
 		$(PJ_SH_CP) $$sublib* $(SDK_LIB_DIR); \
 		$(STRIP) $(SDK_LIB_DIR)/$$sublib.$(VERSION_FULL); \
 	done
@@ -183,8 +183,8 @@ ifneq ("$(HOMEX_ROOT_DIR)", "")
 		$(PJ_SH_CP) $$subbin $(HOMEX_BIN_DIR); \
 		$(STRIP) $(HOMEX_BIN_DIR)/`basename $$subbin`; \
 	done
-	[ "$(CLEAN_LIBS)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_LIB_DIR)
-	@for sublib in $(CLEAN_LIBS); do \
+	[ "$(LIBXXX_SO)" = "" ] || $(PJ_SH_MKDIR) $(HOMEX_LIB_DIR)
+	@for sublib in $(LIBXXX_SO); do \
 		$(PJ_SH_CP) $$sublib* $(HOMEX_LIB_DIR); \
 		$(STRIP) $(HOMEX_LIB_DIR)/$$sublib.$(VERSION_FULL); \
 	done

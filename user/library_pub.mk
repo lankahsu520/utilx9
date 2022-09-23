@@ -1,6 +1,5 @@
 ifeq ("$(PJ_HAS_UTILX9)", "yes")
-LIBS_$(PJ_HAS_STATIC_LIB) += $(SDK_LIB_DIR)/libutilx9.a
-LIBS_$(PJ_HAS_SHARE_LIB) += -lutilx9
+LIBS_yes += -lutilx9
 endif
 
 ifeq ("$(PJ_HAS_DBUS_HANDLER)", "yes")
@@ -145,5 +144,5 @@ ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 LIBS_yes += -lssl -lcrypto
 endif
 
-LIBS_yes += -lz
+LIBS_yes += $(LIBS_CUSTOMER) -lz
 

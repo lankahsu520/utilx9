@@ -6,7 +6,9 @@ VERSION_MAJOR = 1
 VERSION_MINOR = 4
 VERSION_REVISION = 0
 VERSION_FULL = $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_REVISION)
-LIBNAME = utilx9
+LIBNAME_A =
+LIBNAME_SO = utilx9
+LIBNAME_MOD =
 
 LIBUTILX9_VERSION="0x$(shell printf "%02X" $(VERSION_MAJOR))$(shell printf "%03X" $(VERSION_MINOR))$(shell printf "%03X" $(VERSION_REVISION))"
 
@@ -38,11 +40,17 @@ LIBXXX_OBJS += \
 							internet-collect.o
 
 #** LIBXXX_yes **
-#LIBXXX_A = lib$(LIBNAME).a
-LIBXXX_SO = lib$(LIBNAME).so
-#LIBXXXS_$(PJ_HAS_STATIC_LIB) += $(LIBXXX_A)
-#LIBXXXS_$(PJ_HAS_SHARE_LIB) += -l$(LIBNAME)
-LIBXXXS_yes += -l$(LIBNAME)
+ifneq ("$(LIBNAME_A)", "")
+LIBXXX_A = lib$(LIBNAME_A).a
+LIBXXXS_yes += $(LIBXXX_A)
+endif
+ifneq ("$(LIBNAME_SO)", "")
+LIBXXX_SO = lib$(LIBNAME_SO).so
+LIBXXXS_yes += -l$(LIBNAME_SO)
+endif
+ifneq ("$(LIBNAME_MOD)", "")
+LIBXXX_MOD = $(LIBNAME_MOD).so
+endif
 
 #** HEADER_FILES **
 HEADER_FILES = \
@@ -56,11 +64,10 @@ LIBS_yes = $(LIBXXXS_yes)
 -include ./library.mk
 
 LIBS += $(LIBS_yes)
-#-lz -ldl -lpthread -lm
 
 #** Clean **
 CLEAN_OBJS = $(LIBXXX_OBJS)
-CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO)
+CLEAN_LIBS = $(LIBXXX_A) $(LIBXXX_SO) $(LIBXXX_MOD)
 
 #** Target (CLEAN_BINS) **
 CLEAN_BINS += \

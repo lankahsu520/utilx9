@@ -3,24 +3,14 @@ LIBS_yes += -lsdk -lapp
 endif
 
 ifeq ("$(PJ_HAS_LOGCAT)", "yes")
-ifneq ("$(wildcard $(SDK_LIB_DIR)/liblogcat.a)","")
-LIBS_$(PJ_HAS_STATIC_LIB) += $(SDK_LIB_DIR)/liblogcat.a
-endif
-ifneq ("$(wildcard $(SDK_LIB_DIR)/liblogcat.so)","")
-LIBS_$(PJ_HAS_SHARE_LIB) += -llogcat
-endif
+LIBS_yes += -llogcat
 ifneq (,$(wildcard $(SDK_INC_DIR)/logcat_api.h))
 CFLAGS += -include $(SDK_INC_DIR)/logcat_api.h
 endif
 endif
 
 ifeq ("$(PJ_HAS_TIMEZONE)", "yes")
-ifneq ("$(wildcard $(SDK_LIB_DIR)/libtimezone.a)","")
-LIBS_$(PJ_HAS_STATIC_LIB) += $(SDK_LIB_DIR)/libtimezone.a
-endif
-ifneq ("$(wildcard $(SDK_LIB_DIR)/libtimezone.so)","")
-LIBS_$(PJ_HAS_SHARE_LIB) += -ltimezone
-endif
+LIBS_yes += -ltimezone
 ifneq ("$(wildcard $(SDK_INC_DIR)/timezone_api.h)","")
 CFLAGS += -include $(SDK_INC_DIR)/timezone_api.h
 endif

@@ -1,6 +1,9 @@
 PWD=$(shell pwd)
 -include $(SDK_CONFIG_CONFIG)
 
+#** include *.mk **
+-include define.mk
+
 #[major].[minor].[revision].[build]
 VERSION_MAJOR = 1
 VERSION_MINOR = 4
@@ -97,12 +100,9 @@ CONFS = \
 
 #** Target (AUTO_GENERATEDS) **
 AUTO_GENERATEDS = \
-								util_expiration.h
+									util_expiration.h
 
 TO_FOLDER =
-
-#** include *.mk **
--include define.mk
 
 .DEFAULT_GOAL = all
 .SUFFIXES: .c .o

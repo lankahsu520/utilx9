@@ -53,26 +53,11 @@ if ( SDK_INC_DIR != '' ) and ( run_command('[', '-d', SDK_INC_DIR , ']', check :
 	INC_DIR_ARY += [ SDK_INC_DIR ]
 endif
 
-#dependency('dbus-1')
-if ( SDK_INC_DIR != '' ) and ( run_command('[', '-d', SDK_INC_DIR + '/dbus-1.0', ']', check : false).returncode() == 0 )
-	INC_DIR_ARY += [ SDK_INC_DIR + '/dbus-1.0' ]
-	INC_DIR_ARY += [ SDK_INC_DIR + '/dbus-1.0/dbus' ]
-	INC_DIR_ARY += [ SDK_LIB_DIR + '/dbus-1.0/include' ]
-	INC_DIR_ARY += [ SDK_INC_DIR + '/apr-1' ]
-elif ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/dbus-1.0', ']', check : false).returncode() == 0 )
-	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/dbus-1.0' ]
-	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/lib' + '/dbus-1.0/include' ]
-endif
-
-#dependency('glib-2.0')
-if ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/glib-2.0', ']', check : false).returncode() == 0 )
-	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/glib-2.0' ]
-	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/lib' + '/glib-2.0/include' ]
-	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/readline' ]
-endif
-
 if ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/apache2', ']', check : false).returncode() == 0 )
+	found_apache2 = 1
 	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/apache2' ]
+else
+	found_apache2 = 0
 endif
 
 #********************************************************************************
@@ -105,78 +90,171 @@ if ( SDK_LIB_DIR != '' ) and ( run_command('[', '-d', SDK_LIB_DIR , ']', check :
 	LIB_DIR_ARY += [ SDK_LIB_DIR ]
 endif
 
+if ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/lib', ']', check : false).returncode() == 0 )
+	LIB_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/lib' ]
+endif
+
 #********************************************************************************
 #** dependency **
 #********************************************************************************
 if is_variable('LIB_REQUIRE_FULL')
 else
-	LIB_REQUIRE_FULL=true
+	LIB_REQUIRE_FULL=false
 endif
 
 # I prefer to use find_library.
 # Some libs don't follow pkgconfig.
 cc = meson.get_compiler('c')
 LIB_ARY = []
-LIB_ARY += cc.find_library('utilx9', required : LIB_REQUIRE_FULL)
-LIB_ARY += cc.find_library('dbus_handler', dirs: LIB_DIR_ARY, required : false)
-#dependency('uci')
-LIB_ARY += cc.find_library('uci', required : false)
-#dependency('usb-1.0')
-LIB_ARY += cc.find_library('usb-1.0', required : LIB_REQUIRE_FULL)
-#dependency('bluetooth')
-LIB_ARY += cc.find_library('bluetooth', required : false)
-#dependency('jansson')
-LIB_ARY += cc.find_library('jansson', required : LIB_REQUIRE_FULL)
-#dependency('apr-1')
-LIB_ARY += cc.find_library('rt', required : LIB_REQUIRE_FULL)
-LIB_ARY += cc.find_library('apr-1', required : LIB_REQUIRE_FULL)
-LIB_ARY += cc.find_library('aprutil-1', required : LIB_REQUIRE_FULL)
-#dependency('mosquitto')
-LIB_ARY += cc.find_library('mosquitto', required : LIB_REQUIRE_FULL)
-#dependency('xml2')
-LIB_ARY += cc.find_library('xml2', required : false)
-#dependency('mxml')
-LIB_ARY += cc.find_library('mxml', required : false)
-#dependency('websockets')
-LIB_ARY += cc.find_library('websockets', required : LIB_REQUIRE_FULL)
-LIB_ARY += cc.find_library('websockets-evlib_uv', required : LIB_REQUIRE_FULL)
-#dependency('curl')
-LIB_ARY += cc.find_library('curl', required : LIB_REQUIRE_FULL)
-#dependency('ical')
-LIB_ARY += cc.find_library('ical', required : false)
-#dependency('uv')
-LIB_ARY += cc.find_library('uv', required : LIB_REQUIRE_FULL)
+
 #dependency('yuarel')
-LIB_ARY += cc.find_library('yuarel', required : LIB_REQUIRE_FULL)
+dep_yuarel = cc.find_library('yuarel', required : true)
+LIB_ARY += dep_yuarel
+
+dep_utilx9 = cc.find_library('utilx9', required : true)
+LIB_ARY += dep_utilx9
+
+dep_dbus_handler = cc.find_library('dbus_handler', dirs: LIB_DIR_ARY, required : false)
+LIB_ARY += dep_dbus_handler
+
+#dependency('uci')
+dep_uci = cc.find_library('uci', required : false)
+LIB_ARY += dep_uci
+
+#dependency('usb-1.0')
+dep_usb = cc.find_library('usb-1.0', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_usb
+
+#dependency('bluetooth')
+dep_bluetooth = cc.find_library('bluetooth', required : false)
+LIB_ARY += dep_bluetooth
+
+#dependency('jansson')
+dep_jansson = cc.find_library('jansson', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_jansson
+
+#dependency('apr-1')
+dep_rt = cc.find_library('rt', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_rt
+
+dep_apr = cc.find_library('apr-1', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_apr
+
+if ( SDK_INC_DIR != '' ) and ( run_command('[', '-d', SDK_INC_DIR + '/apr-1', ']', check : false).returncode() == 0 )
+	INC_DIR_ARY += [ SDK_INC_DIR + '/apr-1' ]
+elif ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/apr-1', ']', check : false).returncode() == 0 )
+	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/apr-1' ]
+endif
+
+dep_aprutil = cc.find_library('aprutil-1', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_aprutil
+
+#dependency('mosquitto')
+dep_mosquitto = cc.find_library('mosquitto', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_mosquitto
+
+#dependency('xml2')
+dep_xml2 = cc.find_library('xml2', required : false)
+LIB_ARY += dep_xml2
+
+#dependency('mxml')
+dep_mxml = cc.find_library('mxml', required : false)
+LIB_ARY += dep_mxml
+
+#dependency('websockets')
+dep_websockets = cc.find_library('websockets', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_websockets
+dep_websockets_uv = cc.find_library('websockets-evlib_uv', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_websockets_uv
+
+#dependency('curl')
+dep_curl = cc.find_library('curl', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_curl
+
+#dependency('ical')
+dep_ical = cc.find_library('ical', required : false)
+LIB_ARY += dep_ical
+
+#dependency('uv')
+dep_uv = cc.find_library('uv', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_uv
+
 #dependency('expat')
-LIB_ARY += cc.find_library('expat', required : LIB_REQUIRE_FULL)
+dep_expat = cc.find_library('expat', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_expat
+
 #dependency('dbus-1')
-LIB_ARY += cc.find_library('dbus-1', required : LIB_REQUIRE_FULL)
+dep_dbus = cc.find_library('dbus-1', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_dbus
+
+if ( SDK_INC_DIR != '' ) and ( run_command('[', '-d', SDK_INC_DIR + '/dbus-1.0', ']', check : false).returncode() == 0 )
+	INC_DIR_ARY += [ SDK_INC_DIR + '/dbus-1.0' ]
+	INC_DIR_ARY += [ SDK_INC_DIR + '/dbus-1.0/dbus' ]
+	INC_DIR_ARY += [ SDK_LIB_DIR + '/dbus-1.0/include' ]
+elif ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/dbus-1.0', ']', check : false).returncode() == 0 )
+	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/dbus-1.0' ]
+	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/lib' + '/dbus-1.0/include' ]
+endif
+
 #dependency('ubus')
-LIB_ARY += cc.find_library('ubus', required : false)
+dep_ubus = cc.find_library('ubus', required : false)
+LIB_ARY += dep_ubus
+
 #dependency('blobmsg_json')
-LIB_ARY += cc.find_library('blobmsg_json', required : false)
+dep_blobmsg_json = cc.find_library('blobmsg_json', required : false)
+LIB_ARY += dep_blobmsg_json
+
 #dependency('gobject-2.0')
-LIB_ARY += cc.find_library('gobject-2.0', required : false)
+dep_gobject = cc.find_library('gobject-2.0', required : false)
+LIB_ARY += dep_gobject
+
 #dependency('gio-2.0')
-LIB_ARY += cc.find_library('gio-2.0', required : false)
+dep_gio = cc.find_library('gio-2.0', required : false)
+LIB_ARY += dep_gio
+
 #dependency('glib-2.0')
-LIB_ARY += cc.find_library('glib-2.0', required : false)
+dep_glib = cc.find_library('glib-2.0', required : false)
+LIB_ARY += dep_glib
+
+if ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/glib-2.0', ']', check : false).returncode() == 0 )
+	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/glib-2.0' ]
+	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/lib' + '/glib-2.0/include' ]
+endif
+
 #dependency('readline')
-LIB_ARY += cc.find_library('readline', required : false)
+dep_readline = cc.find_library('readline', required : false)
+LIB_ARY += dep_readline
+
+if ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-d', PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/readline', ']', check : false).returncode() == 0 )
+	INC_DIR_ARY += [ PKG_CONFIG_SYSROOT_DIR + '/usr/include' + '/readline' ]
+endif
+
 #dependency('ncurses')
-LIB_ARY += cc.find_library('ncurses', required : false)
+dep_ncurses = cc.find_library('ncurses', required : false)
+LIB_ARY += dep_ncurses
+
 #dependency('openssl')
-LIB_ARY += cc.find_library('ssl', required : true)
-LIB_ARY += cc.find_library('crypto', required : true)
+dep_openssl = cc.find_library('ssl', required : true)
+LIB_ARY += dep_openssl
+
+dep_crypto = cc.find_library('crypto', required : true)
+LIB_ARY += dep_crypto
+
 #dependency('z')
-LIB_ARY += cc.find_library('z', required : true)
+dep_z = cc.find_library('z', required : true)
+LIB_ARY += dep_z
+
 #dependency('dl')
-LIB_ARY += cc.find_library('dl', required : true)
+dep_dl = cc.find_library('dl', required : true)
+LIB_ARY += dep_dl
+
 #dependency('pthread')
-LIB_ARY += cc.find_library('pthread', required : true)
+dep_pthread = cc.find_library('pthread', required : true)
+LIB_ARY += dep_pthread
+
 #dependency('m')
-LIB_ARY += cc.find_library('m', required : true)
+dep_m = cc.find_library('m', required : true)
+LIB_ARY += dep_m
 
 #********************************************************************************
 #** LIB_GLOBLE (Please put local libs) **

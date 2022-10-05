@@ -289,8 +289,12 @@ char* translate_lws_cb(enum lws_callback_reasons reason)
 			return "LWS_CALLBACK_CLOSED_HTTP";
 		case LWS_CALLBACK_RECEIVE: // 6
 			return "LWS_CALLBACK_RECEIVE";
+		case LWS_CALLBACK_RECEIVE_PONG: // 7
+			return "LWS_CALLBACK_RECEIVE_PONG";
 		case LWS_CALLBACK_CLIENT_RECEIVE: // 8
 			return "LWS_CALLBACK_CLIENT_RECEIVE";
+		case LWS_CALLBACK_CLIENT_RECEIVE_PONG: // 9
+			return "LWS_CALLBACK_CLIENT_RECEIVE_PONG";
 		case LWS_CALLBACK_CLIENT_WRITEABLE: // 10
 			return "LWS_CALLBACK_CLIENT_WRITEABLE";
 		case LWS_CALLBACK_SERVER_WRITEABLE: // 11
@@ -323,10 +327,20 @@ char* translate_lws_cb(enum lws_callback_reasons reason)
 			return "LWS_CALLBACK_WS_PEER_INITIATED_CLOSE";
 		case LWS_CALLBACK_ESTABLISHED_CLIENT_HTTP: // 44
 			return "LWS_CALLBACK_ESTABLISHED_CLIENT_HTTP";
+		case LWS_CALLBACK_CLOSED_CLIENT_HTTP: // 45
+			return "LWS_CALLBACK_CLOSED_CLIENT_HTTP";
+		case LWS_CALLBACK_RECEIVE_CLIENT_HTTP: // 46
+			return "LWS_CALLBACK_RECEIVE_CLIENT_HTTP";
+		case LWS_CALLBACK_COMPLETED_CLIENT_HTTP: // 47
+			return "LWS_CALLBACK_COMPLETED_CLIENT_HTTP";
+		case LWS_CALLBACK_RECEIVE_CLIENT_HTTP_READ: // 48
+			return "LWS_CALLBACK_RECEIVE_CLIENT_HTTP_READ";
 		case LWS_CALLBACK_HTTP_BIND_PROTOCOL: // 49
 			return "LWS_CALLBACK_HTTP_BIND_PROTOCOL";
 		case LWS_CALLBACK_ADD_HEADERS: // 53
 			return "LWS_CALLBACK_ADD_HEADERS";
+		case LWS_CALLBACK_CLIENT_HTTP_WRITEABLE: // 57
+			return "LWS_CALLBACK_CLIENT_HTTP_WRITEABLE";
 		case LWS_CALLBACK_EVENT_WAIT_CANCELLED: // 71
 			return "LWS_CALLBACK_EVENT_WAIT_CANCELLED";
 		case LWS_CALLBACK_CLIENT_CLOSED: // 75
@@ -615,7 +629,7 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 
 void lws2_cli_open(LWSX_t *lws_req, char *address, int port, char *filename)
 {
-	if ( lws_req )
+	if ( ( lws_req ) && (lws_req->context) )
 	{
 		CLIST_STRUCT_INIT(lws_req, session_list);
 
@@ -798,7 +812,10 @@ void lws2_thread_stop(LWSX_t *lws_req)
 		ThreadX_t *tidx_req = &lws_req->tidx;
 		threadx_stop(tidx_req);
 
-		lws_cancel_service(lws_req->context );
+		if (lws_req->context)
+		{
+			lws_cancel_service(lws_req->context );
+		}
 	}
 }
 

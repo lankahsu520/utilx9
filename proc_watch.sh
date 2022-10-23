@@ -5,10 +5,10 @@ HINT="$0 {start|stop|restart|status|debug|trigger|logger|clean} iface"
 ROOTFS_PATH="/work/rootfs"
 ROOTFS_PATH_ARG=""
 PWD=`pwd`
-SBIN_PATH="$ROOTFS_PATH/sbin"
-[ -d "$SBIN_PATH" ] || SBIN_PATH="/sbin"
-[ -x "/usr/bin/sudo" ] && SUDO_B="sudo -E -b" && SUDO="sudo -E"
-[ -x "/usr/bin/whoami" ] && WHO=`whoami`
+SBIN_PATH=`realpath $0`
+[ -d "$SBIN_PATH" ] || SBIN_PATH="/work/rootfs/sbin"
+SUDO_EX=$(which sudo 2>&1) && SUDO_B="sudo -E -b" && SUDO="sudo -E"
+WHOAMI_EX=$(which whoami 2>&1) && WHO=`whoami`
 [ ! -z "$WHO" ] || WHO="admin"
 export DBUS_SYSTEM_BUS_ADDRESS=""
 [ ! -z "$DBUS_SYSTEM_BUS_ADDRESS" ] || unset DBUS_SYSTEM_BUS_ADDRESS
@@ -17,11 +17,10 @@ ACTION=$1
 
 DAEMON="proc_watch"
 [ -z "$DAEMON" ] || BIN_FILE="./$DAEMON"
-[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || [ "$PWD" = "/" ] || BIN_FILE="$PWD/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/usr/bin/$DAEMON"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/bin/$DAEMON"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/usr/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/usr/bin/$DAEMON"
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
 [ -z "$DAEMON" ] || PID=$(pidof $DAEMON)

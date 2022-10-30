@@ -162,7 +162,7 @@ $ vi utilx9.h
 - ubox_123 - ubox example.
 - ubus_123 - ubus example.
 - uci_123 - uci example.
-- usb_12 - usb example.
+- usb_123 - usb example.
 - util_123 - example.
 - uv_000 - uv template.
 - uv_123 - uv example.

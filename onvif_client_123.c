@@ -22,18 +22,24 @@
 //#define USE_DAEMON
 #define MAX_OF_TASK 20
 
+char *snapshot_prefixname = "snapshot";;
+char *video_filename = "video.h264";
 
 #if (1)
 //static int srv_port = 1018;
 //static char srv_ip[LEN_OF_IP] = "192.168.50.170";
 
 static int srv_port = 80;
-static char srv_ip[LEN_OF_IP] = "192.168.50.237";
+static char srv_ip[LEN_OF_IP] = "192.168.50.21";
 static char srv_user[LEN_OF_USER]="admin";
 static char srv_pass[LEN_OF_PASS]="888888";
 
-char device_url[LEN_OF_URL_ONVIF]="http://192.168.50.237/onvif/device_service";
-char media_url[LEN_OF_URL_ONVIF]="http://192.168.50.237/onvif/media_service";
+char device_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/device_service";
+char media_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/media_service";
+
+char device_url_path[LEN_OF_URL_ONVIF]="/onvif/device_service";
+char media_url_path[LEN_OF_URL_ONVIF]="/onvif/media_service";
+
 #else
 static int srv_port = 80;
 static char srv_ip[LEN_OF_IP] = "192.168.50.182";
@@ -442,7 +448,6 @@ void qtask_GetProfiles(TaskInfo_t *task)
 
 void qtask_GetSnapshotUri(TaskInfo_t *task)
 {
-	char *prefixname = "/work/snapshot";
 	char *token = profile_token;
 
 	OnvifX_t onvif_req ={
@@ -465,13 +470,13 @@ void qtask_GetSnapshotUri(TaskInfo_t *task)
 			char *snapshot_uri = (char*	)soap_element_text(Uri_node, NULL);
 			DBG_DB_LN("GetSnapshotUri (snapshot_uri: %s)",  snapshot_uri);
 	
-			if (onvif_GetSnapshot(&onvif_req, snapshot_uri, prefixname) == 0)
+			if (onvif_GetSnapshot(&onvif_req, snapshot_uri, snapshot_prefixname) == 0)
 			{
-				DBG_IF_LN("GetSnapshot ok !!! (gid:%d.%d, %s.jpg)", task->gid, task->cid, prefixname);
+				DBG_IF_LN("GetSnapshot ok !!! (gid:%d.%d, %s.jpg)", task->gid, task->cid, snapshot_prefixname);
 			}
 			else
 			{
-				DBG_IF_LN("GetSnapshot fail !!! (gid:%d.%d, %s.jpg)", task->gid, task->cid, prefixname);
+				DBG_IF_LN("GetSnapshot fail !!! (gid:%d.%d, %s.jpg)", task->gid, task->cid, snapshot_prefixname);
 			}
 		}
 		soap_element_delete(response_node);
@@ -485,7 +490,6 @@ void qtask_GetSnapshotUri(TaskInfo_t *task)
 
 void qtask_GetStreamUri(TaskInfo_t *task)
 {
-	char *filename = "/work/video.h264";
 	char *token = profile_token;
 
 	OnvifX_t onvif_req ={
@@ -508,13 +512,13 @@ void qtask_GetStreamUri(TaskInfo_t *task)
 			char *media_uri = (char*	)soap_element_text(Uri_node, NULL);
 			DBG_DB_LN("GetStreamUri (media_uri: %s)",  media_uri);
 
-			if (onvif_GetVideoClip(&onvif_req, media_uri, filename, 15) == 0)
+			if (onvif_GetVideoClip(&onvif_req, media_uri, video_filename, 15) == 0)
 			{
-				DBG_IF_LN("qtask_GetStreamUri ok !!! (gid:%d.%d, %s)", task->gid, task->cid, filename);
+				DBG_IF_LN("qtask_GetStreamUri ok !!! (gid:%d.%d, %s)", task->gid, task->cid, video_filename);
 			}
 			else
 			{
-				DBG_IF_LN("qtask_GetStreamUri fail !!! (gid:%d.%d, %s)", task->gid, task->cid, filename);
+				DBG_IF_LN("qtask_GetStreamUri fail !!! (gid:%d.%d, %s)", task->gid, task->cid, video_filename);
 			}
 		}
 		soap_element_delete(response_node);
@@ -667,21 +671,23 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-  signal(SIGINT, app_signal_handler );
-  signal(SIGTERM, app_signal_handler );
-  signal(SIGHUP, app_signal_handler );
-  signal(SIGUSR1, app_signal_handler );
-  signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler );
+	signal(SIGTERM, app_signal_handler );
+	signal(SIGHUP, app_signal_handler );
+	signal(SIGUSR1, app_signal_handler );
+	signal(SIGUSR2, app_signal_handler );
 }
 
 int option_index = 0;
-const char* short_options = "i:p:u:s:h"; 
+const char* short_options = "i:p:u:s:e:m:d:h"; 
 static struct option long_options[] =
 {
 	{ "ip",          required_argument,   NULL,    'i'  },  
 	{ "port",        required_argument,   NULL,    'p'  },  
 	{ "user",        required_argument,   NULL,    'u'  },  
 	{ "pass",        required_argument,   NULL,    's'  },  
+	{ "dpath",       required_argument,   NULL,    'e'  },  
+	{ "mpath",       required_argument,   NULL,    'm'  },
 	{ "help",        no_argument,         NULL,    'h'  },  
 	{ 0,             0,                      0,    0    }
 };  
@@ -689,10 +695,13 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf( "Usage: %s\n"
+					"  -d, --debug       debug level\n"
 					"  -i, --ip          ip\n"
 					"  -p, --port        port\n"
 					"  -u, --user        user\n"
 					"  -s, --pass        pass\n"
+					"  -e, --dpath       device url path\n"
+					"  -m, --mpath       media url path\n"
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
@@ -709,6 +718,12 @@ static void app_ParseArguments(int argc, char **argv)
 	{
 		switch (opt)
 		{
+			case 'd':
+				if (optarg)
+				{
+					dbg_lvl_set(atoi(optarg));
+				}
+				break;
 			case 'i':
 				if (optarg)
 				{
@@ -733,6 +748,18 @@ static void app_ParseArguments(int argc, char **argv)
 					SAFE_SPRINTF(srv_pass, "%s", optarg);
 				}
 				break;
+			case 'e':
+				if (optarg)
+				{
+					SAFE_SPRINTF(device_url_path, "%s", optarg);
+				}
+				break;
+			case 'm':
+				if (optarg)
+				{
+					SAFE_SPRINTF(media_url_path, "%s", optarg);
+				}
+				break;
 			default:
 				app_showusage(-1); break;
 		}
@@ -751,10 +778,10 @@ int main(int argc, char* argv[])
 	if (strlen(srv_ip)>0)
 	{
 		if (srv_port==0) srv_port=80;
-		SAFE_SPRINTF(device_url, "http://%s:%d/onvif/device_service", srv_ip, srv_port);
-		SAFE_SPRINTF(media_url, "http://%s:%d/onvif/media_service", srv_ip, srv_port);
+		SAFE_SPRINTF(device_url, "http://%s:%d%s", srv_ip, srv_port, device_url_path);
+		SAFE_SPRINTF(media_url, "http://%s:%d%s", srv_ip, srv_port, media_url_path);
 	}
-	DBG_IF_LN("Please check (%s:%d, %s:%s)", srv_ip, srv_port, srv_user, srv_pass);
+	DBG_IF_LN("%s (%s:%d, %s:%s, device_url_path: %s, media_url_path: %s)", DBG_TXT_START, srv_ip, srv_port, srv_user, srv_pass, device_url_path, media_url_path);
 
 #ifdef USE_DAEMON
 	int result = daemon(0,1);

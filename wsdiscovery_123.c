@@ -12,7 +12,12 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
+#include <signal.h>
+#include <getopt.h>
+
 #include "utilx9.h"
+
+#define TAG "wsdiscovery_123"
 
 static int is_quit = 0;
 
@@ -187,13 +192,54 @@ static void app_signal_register(void)
 	signal(SIGHUP, app_signal_handler );
 	signal(SIGUSR1, app_signal_handler );
 	signal(SIGUSR2, app_signal_handler );
+
+	signal(SIGPIPE, SIG_IGN );
+}
+
+int option_index = 0;
+const char* short_options = "d:h";
+static struct option long_options[] =
+{
+	{ "debug",       required_argument,   NULL,    'd'  },
+	{ "help",        no_argument,         NULL,    'h'  },
+	{ 0,             0,                      0,    0    }
+};
+
+static void app_showusage(int exit_code)
+{
+	printf( "Usage: %s\n"
+					"  -d, --debug       debug level\n"
+					"  -h, --help\n", TAG);
+	printf( "Version: %s\n", version_show());
+	printf( "Example:\n"
+					"  %s -d 4\n", TAG);
+	exit(exit_code);
+}
+
+static void app_ParseArguments(int argc, char **argv)
+{
+	int opt;
+
+	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
+	{
+		switch (opt)
+		{
+			case 'd':
+				if (optarg)
+				{
+					dbg_lvl_set(atoi(optarg));
+				}
+				break;
+			default:
+				app_showusage(-1);
+				break;
+		}
+	}
 }
 
 int main(int argc, char* argv[])
 {
-	DBG_TR_LN("enter");
-
-	dbg_lvl_set(DBG_LVL_TRACE);
+	app_ParseArguments(argc, argv);
 	app_signal_register();
 	atexit(app_exit);
 
@@ -213,14 +259,8 @@ int main(int argc, char* argv[])
 
 	while (app_quit() == 0)
 	{
-#if (0)
-		if ( (wsd_info) && (wsd_info->chainX_req) )
-		{
-			wsdiscovery_sender(wsd_info, SOAP_ACTION_ID_PROBE_DEVICE);
-			wsdiscovery_sender(wsd_info, SOAP_ACTION_ID_PROBE_NETWORKVIDEOTRANSMITTER);
-		}
-#endif
-		sleep(2);
+		ws_devices_refresh();
+		sleep(10);
 	}
 
 	app_stop();

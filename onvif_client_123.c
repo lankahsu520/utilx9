@@ -31,8 +31,8 @@ char *video_filename = "video.h264";
 
 static int srv_port = 80;
 static char srv_ip[LEN_OF_IP] = "192.168.50.21";
-static char srv_user[LEN_OF_USER]="admin";
-static char srv_pass[LEN_OF_PASS]="888888";
+static char srv_user[LEN_OF_USER]="";
+static char srv_pass[LEN_OF_PASS]="";
 
 char device_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/device_service";
 char media_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/media_service";

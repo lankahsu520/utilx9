@@ -34,6 +34,8 @@ static char srv_ip[LEN_OF_IP] = "192.168.50.21";
 static char srv_user[LEN_OF_USER]="";
 static char srv_pass[LEN_OF_PASS]="";
 
+static int http_auth = 0;
+
 char device_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/device_service";
 char media_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/media_service";
 
@@ -82,6 +84,7 @@ void qtask_GetCapabilities(TaskInfo_t *task)
 		.act_ns = "tds",
 		.act_name = "GetCapabilities",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
@@ -149,6 +152,7 @@ void qtask_GetDeviceInformation(TaskInfo_t *task)
 		.act_ns = "tds",
 		.act_name = "GetDeviceInformation",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
@@ -206,6 +210,7 @@ void qtask_GetHostname(TaskInfo_t *task)
 		.act_ns = "tds",
 		.act_name = "GetHostname",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
@@ -244,6 +249,7 @@ void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 		.act_ns = "tds",
 		.act_name = "GetNetworkInterfaces",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
@@ -324,6 +330,7 @@ void qtask_GetServices(TaskInfo_t *task)
 		.act_ns = "tds",
 		.act_name = "GetServices",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
@@ -366,6 +373,7 @@ void qtask_GetScopes(TaskInfo_t *task)
 		.act_ns = "tds",
 		.act_name = "GetScopes",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
@@ -412,6 +420,7 @@ void qtask_GetProfiles(TaskInfo_t *task)
 		.act_ns = "trt",
 		.act_name = "GetProfiles",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = NULL
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", media_url);
@@ -455,6 +464,7 @@ void qtask_GetSnapshotUri(TaskInfo_t *task)
 		.act_ns = "trt",
 		.act_name = "GetSnapshotUri",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)token
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", media_url);
@@ -497,6 +507,7 @@ void qtask_GetStreamUri(TaskInfo_t *task)
 		.act_ns = "trt",
 		.act_name = "GetStreamUri",
 		.netinfo.port = 0,
+		.http_auth = http_auth,
 		.request = (void *)token
 	};
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", media_url);
@@ -679,7 +690,7 @@ static void app_signal_register(void)
 }
 
 int option_index = 0;
-const char* short_options = "i:p:u:s:e:m:d:h"; 
+const char* short_options = "i:p:u:s:e:m:ad:h"; 
 static struct option long_options[] =
 {
 	{ "ip",          required_argument,   NULL,    'i'  },  
@@ -688,6 +699,8 @@ static struct option long_options[] =
 	{ "pass",        required_argument,   NULL,    's'  },  
 	{ "dpath",       required_argument,   NULL,    'e'  },  
 	{ "mpath",       required_argument,   NULL,    'm'  },
+	{ "auth",        no_argument,         NULL,    'a'  },
+	{ "debug",       required_argument,   NULL,    'd'  },  
 	{ "help",        no_argument,         NULL,    'h'  },  
 	{ 0,             0,                      0,    0    }
 };  
@@ -702,6 +715,7 @@ static void app_showusage(int exit_code)
 					"  -s, --pass        pass\n"
 					"  -e, --dpath       device url path\n"
 					"  -m, --mpath       media url path\n"
+					"  -a, --auth        http auth\n"
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
@@ -759,6 +773,9 @@ static void app_ParseArguments(int argc, char **argv)
 				{
 					SAFE_SPRINTF(media_url_path, "%s", optarg);
 				}
+				break;
+			case 'a':
+				http_auth = 1;
 				break;
 			default:
 				app_showusage(-1); break;

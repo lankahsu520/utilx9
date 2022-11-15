@@ -155,6 +155,12 @@ soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 		};
 		SAFE_SPRINTF(http_req.url, "%s", onvif_req->netinfo.url);
 
+		if (onvif_req->http_auth > 0)
+		{
+			http_req.user = onvif_req->netinfo.user;
+			http_req.password = onvif_req->netinfo.pass;
+		}
+
 		SoapX_t *soap =	soap_create(onvif_xml(onvif_req->act_id));
 		if (soap)
 		{

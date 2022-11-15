@@ -834,7 +834,7 @@ static CURLcode rtsp_teardown(HttpX_t *http_req, CURL *curl)
 	return curl_res;
 }
 
-static int _getch(void)
+static int rtsp_getch(void)
 {
 	struct termios oldt, newt;
 	int ch;
@@ -954,7 +954,7 @@ static int http_request_downloadfile_rtsp(HttpX_t *http_req)
 				}
 				else
 				{
-					_getch();
+					rtsp_getch();
 				}
 
 				// teardown session

@@ -2208,6 +2208,8 @@ typedef struct OnvifX_STRUCT
 
 	NetworkInfo_t netinfo;
 
+	int http_auth;
+
 	void *request;
 } OnvifX_t;
 

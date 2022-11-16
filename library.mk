@@ -48,6 +48,7 @@ endif
 
 ifeq ("$(PJ_HAS_MXML)", "yes")
 CLEAN_BINS += \
+							onvif_pass_123 \
 							onvif_client_123 \
 							wsdiscovery_123
 LIBXXX_OBJS += \

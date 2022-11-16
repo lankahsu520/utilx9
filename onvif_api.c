@@ -92,47 +92,50 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 							soap_element_text_new(Created_node, 0, create_s);
 						}
 
-						char *nonce_b64 = NULL;
 						char *nonce_rand = os_urandom(20);
 						if (nonce_rand)
 						{
 							int enc_len = 0;
-							nonce_b64 = sec_base64_enc(nonce_rand, 20, &enc_len);
-							DBG_TMP_Y("nonce_b64 (enc_len: %d, [%s])", enc_len, nonce_b64);						
+							char *nonce_b64 = sec_base64_enc(nonce_rand, 20, &enc_len);
+							if (nonce_b64)
+							{
+								DBG_TMP_Y("nonce_b64 (enc_len: %d, [%s])", enc_len, nonce_b64);
+								soap_node_t *Nonce_node = soap_element_add(UsernameToken_node, "Nonce");
+								{
+									soap_element_attr_set(Nonce_node, "EncodingType", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary");
+								
+									soap_element_text_new(Nonce_node, 0, nonce_b64);
+								}
+								SAFE_FREE(nonce_b64);
+							}
+
+							soap_node_t *Username_node = soap_element_add(UsernameToken_node, "Username");
+							{
+								soap_element_text_new(Username_node, 0, (const char *)onvif_req->netinfo.user);
+							}
+
+							char *password = onvif_pass_sha1(nonce_rand, 20, create_s, strlen(create_s), onvif_req->netinfo.pass, strlen(onvif_req->netinfo.pass));
+							if (password)
+							{
+								int enc_len = 0;
+								char *password_b64 = sec_base64_enc(password, 20, &enc_len);
+								if (password_b64)
+								{
+									DBG_TMP_Y("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, onvif_req->netinfo.pass, password_b64);						
+
+									soap_node_t *Password_node = soap_element_add(UsernameToken_node, "Password");
+									{
+										soap_element_attr_set(Password_node, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest");
+									
+										soap_element_text_new(Password_node, 0, password_b64);
+									}
+									SAFE_FREE(password_b64);
+								}
+								SAFE_FREE(password);
+							}
+
+							SAFE_FREE(nonce_rand);
 						}
-
-						soap_node_t *Nonce_node = soap_element_add(UsernameToken_node, "Nonce");
-						{
-							soap_element_attr_set(Nonce_node, "EncodingType", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary");
-
-							soap_element_text_new(Nonce_node, 0, nonce_b64);
-						}
-						SAFE_FREE(nonce_b64);
-						
-						soap_node_t *Username_node = soap_element_add(UsernameToken_node, "Username");
-						{
-							soap_element_text_new(Username_node, 0, (const char *)onvif_req->netinfo.user);
-						}
-
-						char *password_b64 = NULL;
-						char *password = onvif_pass_sha1(nonce_rand, 20, create_s, strlen(create_s), onvif_req->netinfo.pass, strlen(onvif_req->netinfo.pass));
-						if (password)
-						{
-							int enc_len = 0;
-							password_b64 = sec_base64_enc(password, 20, &enc_len);
-							DBG_TMP_Y("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, onvif_req->netinfo.pass, password_b64);						
-						}
-
-						soap_node_t *Password_node = soap_element_add(UsernameToken_node, "Password");
-						{
-							soap_element_attr_set(Password_node, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest");
-
-							soap_element_text_new(Password_node, 0, password_b64);
-						}
-						SAFE_FREE(password_b64);
-
-
-						SAFE_FREE(nonce_rand);
 					}
 				}
 			}
@@ -161,7 +164,7 @@ soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 			http_req.password = onvif_req->netinfo.pass;
 		}
 
-		SoapX_t *soap =	soap_create(onvif_xml(onvif_req->act_id));
+		SoapX_t *soap = soap_create(onvif_xml(onvif_req->act_id));
 		if (soap)
 		{
 			{
@@ -285,7 +288,7 @@ int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname)
 
 		http_req.user = onvif_req->netinfo.user;
 		http_req.password = onvif_req->netinfo.pass;
-		
+
 		ret = http_request(&http_req);
 		DBG_DB_LN("(http_req.log: %s)", http_req.log);
 	}

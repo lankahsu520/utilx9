@@ -16,7 +16,9 @@
 
 char filename[LEN_OF_FULLNAME] = "onvif_pass.sh";
 
-// ./onvif_pass_sha1 admin
+//#define USE_FIXD_DATA
+char nonce_rand_default[20] = {0x0E, 0x96, 0xFE, 0xB8, 0x5B, 0x60, 0x4C, 0x01, 0xC5, 0xD9, 0xEB, 0xF1, 0xF3, 0x21, 0xB0, 0x37, 0x62, 0xB3, 0x29, 0x38};
+// ./onvif_pass_123 admin
 int main(int argc, char* argv[])
 {
 	char tmpbuf[LEN_OF_BUF256] = "";
@@ -38,14 +40,24 @@ int main(int argc, char* argv[])
 			char create_s[LEN_OF_VAL32] = "";
 
 			time (&create_t);
-			//strftime(create_s, sizeof(create_s), "%Y-%m-%dT%T.000Z", time(NULL));
+#ifdef USE_FIXD_DATA
+			SAFE_SPRINTF(create_s, "2022-11-22T10:44:48.000Z");
+#else
 			strftime(create_s, sizeof(create_s), "%Y-%m-%dT%H:%M:%S.000Z", localtime(&create_t));
+#endif
 			DBG_IF_LN(">> (create_s: %s)", create_s);
 
 			SAFE_SPRINTF(tmpbuf, "export ONVIF_XML_CREATED=%s\n", create_s);
 			file_append(filename, tmpbuf, strlen(tmpbuf));
 
-			char *nonce_rand = os_urandom(20);
+			char *nonce_rand = NULL;
+#ifdef USE_FIXD_DATA
+			nonce_rand = SAFE_CALLOC(1, 20);
+			SAFE_MEMCPY(nonce_rand, nonce_rand_default, 20, 20);
+#else
+			nonce_rand = os_urandom(20);
+			DBG_ER_DUMP(nonce_rand, 20, " ", "nonce_rand:");
+#endif
 			if (nonce_rand)
 			{
 				int enc_len = 0;

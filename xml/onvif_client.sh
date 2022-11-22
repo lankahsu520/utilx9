@@ -21,7 +21,8 @@ ONVIF_AUTH="-auth"
 
 ONVIF_XML_USERNAME=${USER}
 
-valgrind --tool=memcheck --leak-check=full --show-reachable=yes -s ../onvif_pass_123 admin
+#valgrind --tool=memcheck --leak-check=full --show-reachable=yes -s ../onvif_pass_123 admin
+../onvif_pass_123 admin
 chmod 777 ./onvif_pass.sh
 . ./onvif_pass.sh
 

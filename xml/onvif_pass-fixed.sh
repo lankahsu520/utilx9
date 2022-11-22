@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export ONVIF_XML_CREATED=2022-11-22T10:44:48.000Z
+export ONVIF_XML_NONCE=Dpb+uFtgTAHF2evx8yGwN2KzKTg=
+export ONVIF_XML_PASSWORD=kggNJ56lqFXMUBwmdedmHurvDO8=

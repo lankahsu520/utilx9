@@ -2215,6 +2215,8 @@ typedef struct OnvifX_STRUCT
 
 typedef void (*onvif_resuest_fn)(SoapX_t *soap, OnvifX_t *onvif_req);
 
+char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len, char *password, int password_len);
+void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap);
 soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb);
 
 soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req);

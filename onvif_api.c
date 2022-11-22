@@ -45,11 +45,50 @@ static char *onvif_xml(SOAP_ACTION_ID act_id)
 	}
 }
 
-
+//#define USE_EVP_MD
 #include <openssl/sha.h>
 char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len, char *password, int password_len)
 {
+	unsigned int buffer_len = LEN_OF_VAL32;
 	char *buffer = SAFE_CALLOC(1, LEN_OF_VAL32);
+
+#ifdef USE_EVP_MD
+	EVP_MD_CTX *ctx = NULL;
+
+	if((ctx = EVP_MD_CTX_create()) == NULL)
+	{
+		DBG_ER_LN("EVP_MD_CTX_create error !!!");
+		goto exit_sha1;
+	}
+
+	if(1 != EVP_DigestInit_ex(ctx, EVP_sha1(), NULL))
+	{
+		DBG_ER_LN("EVP_DigestInit_ex error !!!");
+		goto exit_sha1;
+	}
+
+	if(1 != EVP_DigestUpdate(ctx, nonce, nonce_len))
+	{
+		DBG_ER_LN("EVP_DigestUpdate error - nonce !!!");
+		goto exit_sha1;
+	}
+	if(1 != EVP_DigestUpdate(ctx, created, create_len))
+	{
+		DBG_ER_LN("EVP_DigestUpdate error - created !!!");
+		goto exit_sha1;
+	}
+	if(1 != EVP_DigestUpdate(ctx, password, password_len))
+	{
+		DBG_ER_LN("EVP_DigestUpdate error - created !!!");
+		goto exit_sha1;
+	}
+
+	if(1 != EVP_DigestFinal_ex(ctx, (unsigned char*)buffer, &buffer_len))
+	{
+		DBG_ER_LN("EVP_DigestFinal_ex error !!!");
+		goto exit_sha1;
+	}
+#else
 	SHA_CTX sha1;
 
 	SHA1_Init(&sha1);
@@ -57,6 +96,15 @@ char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len,
 	SHA1_Update(&sha1, created, create_len);
 	SHA1_Update(&sha1, password, password_len);
 	SHA1_Final((unsigned char *)buffer, &sha1);
+#endif
+
+exit_sha1:
+#ifdef USE_EVP_MD
+	if (ctx)
+	{
+		EVP_MD_CTX_destroy(ctx);
+	}
+#endif
 
 	return buffer;
 }

@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 			SAFE_MEMCPY(nonce_rand, nonce_rand_default, 20, 20);
 #else
 			nonce_rand = os_urandom(20);
-			DBG_ER_DUMP(nonce_rand, 20, " ", "nonce_rand:");
+			//DBG_ER_DUMP(nonce_rand, 20, " ", "nonce_rand:");
 #endif
 			if (nonce_rand)
 			{

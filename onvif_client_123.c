@@ -726,7 +726,7 @@ static void app_showusage(int exit_code)
 
 static void app_ParseArguments(int argc, char **argv)
 {
-	int opt;               
+	int opt;
 
 	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)  
 	{

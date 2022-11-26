@@ -149,7 +149,7 @@ const unsigned char RSA_CLIENT_CA_CERT[]="";
 #endif
 
 
-static void chainXssl_cert_luffanet(ChainX_t *chainX_req)
+static void chainXssl_cert_lankahsu520(ChainX_t *chainX_req)
 {
 	if (chainX_req)
 	{
@@ -194,7 +194,7 @@ static int socket_init(void)
 {
 	chainX_pipe_register(&chainX_S, qrequest_push);
 	chainX_linked_register(&chainX_S, socket_linked);
-	chainXssl_cert_luffanet(&chainX_S);
+	chainXssl_cert_lankahsu520(&chainX_S);
 
 	qbuf_init(&qbuf_S, MAX_OF_QBUF_1MB);
 	return chainX_thread_init(&chainX_S); 

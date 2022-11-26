@@ -135,10 +135,7 @@ int main(int argc, char* argv[])
 #endif
 
 #if (0)
-	//http_upload_with_response("http://192.168.50.206:8089/test.jpg", "./snapshot_770.jpg", NULL, http_response_cb);
-	//http_upload_with_response("https://philio-reko.luffanet.com.tw/face/detectFace", "./snapshot_770.jpg", NULL, http_response_cb);
-
-	http_upload_with_response("https://philio-reko.luffanet.com.tw/face/indexFace?uuid=AECDLTRYJKL79HTSMUE1", "./snapshot_770.jpg", NULL, http_response_cb);
+	http_upload_with_response("http://192.168.50.206:8089/test.jpg", "./snapshot_770.jpg", NULL, http_response_cb);
 #endif
 
 #if (0)

@@ -16,7 +16,7 @@
 #include <getopt.h>
 #include "utilx9.h"
 
-#define TAG "CRONX_123"
+#define TAG "cronx_123"
 
 #define USE_CRONX_123_UV
 #define USE_ASYNC_CREATE
@@ -260,7 +260,7 @@ static void app_showusage(int exit_code)
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
-					"  %s -s /tmp -d 2\n", TAG);
+					"  %s -a \"*/1 * * * * 2022 \" -d 2\n", TAG);
 	exit(exit_code);
 }
 

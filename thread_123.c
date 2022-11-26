@@ -32,6 +32,7 @@ static void *thread_handler(void *user)
 			DBG_IF_LN("(count: %d)", count++);
 			if (( count % 10) == 0)
 			{
+				DBG_IF_LN("wait 3 seconds ...");
 				threadx_timewait_simple(tidx_req, 3*1000);
 				//break;
 			}

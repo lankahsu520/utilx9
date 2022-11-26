@@ -3688,7 +3688,7 @@ int chainX_ping(ChainX_t *chainX_req)
 
 	if ((chainX_req->sockfd=chainX_icmp_open()) < 0)
 	{
-		DBG_ER_LN("sockfd error !!!");
+		DBG_ER_LN("sockfd error !!! (errno: %d %s)", errno, strerror(errno));
 		return ret;
 	}
 

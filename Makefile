@@ -107,7 +107,7 @@ TO_FOLDER =
 .DEFAULT_GOAL = all
 .SUFFIXES: .c .o
 
-.PHONY: all clean distclean install romfs
+.PHONY: all clean distclean install romfs target_install
 all: .configured $(CLEAN_BINS) $(CLEAN_LIBS)
 
 %.o: %.c $(HEADER_FILES)
@@ -207,4 +207,13 @@ ifneq ("$(HOMEX_ROOT_DIR)", "")
 	@for conf in $(CONFS); do \
 		$(PJ_SH_CP) $$conf $(HOMEX_IOT_DIR)/$(TO_FOLDER); \
 	done
+endif
+
+target_install:
+ifneq "$(wildcard $(HOMEX_ROOT_DIR) )" ""
+ifneq ("$(PJ_INSTALL_TARGET)", "")
+	$(PJ_SH_MKDIR) $(PJ_INSTALL_TARGET)
+	(cd $(PJ_INSTALL_TARGET); $(PJ_SH_RMDIR) *)
+	$(PJ_SH_CP) $(HOMEX_ROOT_DIR)/* $(PJ_INSTALL_TARGET)
+endif
 endif

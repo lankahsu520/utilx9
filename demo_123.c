@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
 	{
 		char topic_pub[LEN_OF_TOPIC]	= "";
-		char user[LEN_OF_TOPIC]= "luffanet";
+		char user[LEN_OF_TOPIC]= "lankahsu520";
 		char macid[LEN_OF_TOPIC] = "1234";
 		SAFE_STRCAT_EX(topic_pub, user, "/", macid);
 

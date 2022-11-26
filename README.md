@@ -83,6 +83,13 @@ $ . confs/github.conf
 # include/config_customer.export
 # include/meson_options.txt
 $ make
+$ make install
+# will be installed ${SDK_ROOT_DIR} - .install/github_
+$ make romfs
+# will be installed ${HOMEX_ROOT_DIR} - ./install/github_rootfs
+$ make target_install 
+# will be installed ${PJ_INSTALL_TARGET} - /work/rootfs
+
 ```
 ## 4.1. environment (without libmxml and libyuarel)
 ```bash
@@ -132,17 +139,112 @@ $ vi utilx9.h
 ```
 
 # 5. Example or Usage
-
 - chainX_123 - socket example. use chainX_api.c.
 - client_123 - socket client. use chainX_api.c.
 - clist_123 - link list example. use clist_api.c , use contiki\core\lib\list.*.
+
+```bash
+$ ./clist_123
+[30864/30864] main:53 - (num: 8)
+[30864/30864] main:53 - (num: 4)
+[30864/30864] main:53 - (num: 0)
+[30864/30864] main:53 - (num: 1)
+[30864/30864] main:53 - (num: 2)
+[30864/30864] main:53 - (num: 3)
+[30864/30864] main:53 - (num: 5)
+[30864/30864] main:53 - (num: 6)
+[30864/30864] main:53 - (num: 7)
+[30864/30864] main:53 - (num: 9)
+```
+
 - cronx_123 - parse crontab string ("minute" "hour" "day of month" "month" "day of week" "year, 2020+"), similar to crontab, to use cronx_api.c
+
+```bash
+$ cronx_123 -a "*/1 * * * * 2022 " -d 2
+[30859/30859] app_loop:164 - Run loop ... (clock_alarm: [*/1 * * * * 2022 ])
+[30859/30859] timer_1sec_loop:51 - (21:31:58)
+[30859/30859] timer_1sec_loop:51 - (21:31:59)
+[30859/30859] timer_1sec_loop:51 - (21:32:00)
+[30859/30859] cronx_validate:98 - (cron_txt: [*/1 * * * * 2022 ], [32 21 26 10 6 2022])
+[30859/30859] cronx_validate:218 - Got !!! (cron_txt: [*/1 * * * * 2022 ], [32 21 26 10 6 2], fit: 6)
+[30859/30859] timer_1sec_loop:65 - Alarm !!! (*/1 * * * * 2022 )
+[30859/30859] timer_1sec_loop:51 - (21:32:01)
+```
+
 - dbusx_456 - dbus example.
+
+```bash
+$ ./dbusx_456 -s &
+[30642/30643] dbusx_thread_handler:516 - dbus listen ...
+$ ./dbusx_456 -e 123
+[30644/30644] app_loop:124 - (retStr: 123)
+[30644/30644] main:244 - Bye-Bye !!!
+```
+
 - demo_000 - c template.
+
+```bash
+$ ./demo_000
+[30636/30636] app_loop:46 - (pid: 30636)
+[30636/30636] app_loop:50 - (cksum: 1398)
+[30636/30636] app_loop:52 - (cksum: 22044)
+[30636/30636] main:156 - Bye-Bye !!!
+```
 - demo_123 - a example.
+```bash
+$ ./demo_123
+[30635/30635] main:41 - (1<<3: 0x00000008, 1<<14: 0x00004000, 1<<15: 0x00008000, 1<<16: 0x00010000, 1<<17: 0x00020000)
+[30635/30635] main:44 - (hello_trim: Hello World !!!    )
+[30635/30635] main:47 - (hello_trim: Hello World !!!)
+[30635/30635] main:55 - SAFE_STRCAT_EX - lankahsu520/1234
+
+[30635/30635] main:152 - (mode: 4)
+[30635/30635] main:153 - (curl: 8)
+[30635/30635] main:154 - (url: 2048)
+[30635/30635] main:155 - (port: 4)
+[30635/30635] main:156 - (user: 8)
+[30635/30635] main:157 - (log: 3072)
+[30635/30635] main:159 - ------------
+[30635/30635] main:160 - (res_size: 8)
+[30635/30635] main:161 - (response: 8)
+[30635/30635] main:162 - (method: 4)
+[30635/30635] main:163 - (curl_slist: 8)
+[30635/30635] main:165 - ------------
+[30635/30635] main:166 - (max_size: 8)
+[30635/30635] main:167 - (filename: 1024)
+[30635/30635] main:168 - (fp: 8)
+[30635/30635] main:169 - (qbuf: 24)
+[30635/30635] main:170 - (boundary: 32)
+[30635/30635] main:171 - (state: 4)
+[30635/30635] main:173 - ------------
+[30635/30635] main:175 - (track: 64)
+[30635/30635] main:176 - (track[0]: 32)
+```
 - http_client_123 - http client example. use curl.
 - jqx - it is similar to jq. jqx only support reads from pipe. 
 - json_123 - json example.
+
+```bash
+./json_123
+[30867/30867] main:26 - enter
+[30867/30867] uuid_test:21 - (guid: 72594E89-CFC6-4B86-b25F-AAE48DDCF1BD)
+[30867/30867] main:59 - (jdemo1: 0x55d4cd20c7a0, refcount: 1)
+[30867/30867] main:61 - (jdemo2: 0x55d4cd20c810, refcount: 1)
+[30867/30867] main:62 - (jdemo1: 0x55d4cd20c7a0, refcount: 94372462784528)
+[30867/30867] json_dump_simple:22 - (jroot: {"demo":"HelloWorld 1 !!!","j1":{"j2":{"j3":{"logo":"helloworld!!!"}}},"jA":[{"name":"A1","val":1},{"name":"A2","val":2},{"name":"A3","val":3}]})
+[30867/30867] main:69 - (idx: 2)
+[30867/30867] main:79 - (logo: helloworld!!!)
+[30867/30867] json_dump_simple:26 - (Not Found - j1/j2/j4: (nil))
+[30867/30867] json_dump_simple:22 - (APPEND - j1/j2/j4: {})
+[30867/30867] json_dump_simple:26 - (DEL - j1/j2/j3: (nil))
+[30867/30867] json_dump_simple:22 - (j1/j2: {"j4":{}})
+[30867/30867] main:140 - (sunrise: 3:22:56 AM)
+[30867/30867] main:141 - (sunset: 5:10:20 PM)
+[30867/30867] main:142 - (utc: 1652853043)
+[30867/30867] main:160 - (cJson: {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043})
+
+```
+
 - led_123 - led controller example.
 - lws_123 - a websocket example.
 - mqtt_123 - a mqtt example.
@@ -151,12 +253,67 @@ $ vi utilx9.h
 - nlink_789 netlink example. use chainX_api.c (CHAINX_MODE_ID_NETLINK).
 - onvif_client_123 - onvif client example.
 - ping_123 - ping example.
+
+```bash
+$ ./ping_123 -i 1 -c 3 google.com
+[35736/35736] chainX_ping:3691 - sockfd error !!! (errno: 1 Operation not permitted)
+[35736/35736] main:109 - (count: 0/3)
+
+$ sudo ./ping_123 -i 1 -c 3 google.com
+[sudo] password for lanka:
+[35735/35735] chainX_icmp:3560 - PING google.com (): 64 bytes of data
+[35735/35735] chainX_icmp:3633 - 64 bytes from tsa01s11-in-f14.1e100.net (): icmp_seq=1 ttl=64 time=13.98 ms
+[35735/35735] chainX_icmp:3633 - 64 bytes from tsa01s11-in-f14.1e100.net (): icmp_seq=2 ttl=64 time=9.32 ms
+[35735/35735] chainX_icmp:3633 - 64 bytes from tsa01s11-in-f14.1e100.net (): icmp_seq=3 ttl=64 time=9.45 ms
+[35735/35735] chainX_icmp:3668 - --- google.com ping statistics ---
+[35735/35735] chainX_icmp:3669 - 3 packets transmitted, 3 received, 0% packet loss, time: 33 ms.
+[35735/35735] main:109 - (count: 3/3)
+```
+
 - proc_list_123 & proc_watch - a system and proc information example.
 - queuex_123 - a queue example.
+
+```bash
+$ ./queuex_123
+[34576/34577] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[34576/34576] queuex_push:287 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[34576/34576] queuex_push:287 - (name: test, length: 1/30, ishold: 0, isloop: 1)
+[34576/34576] queuex_push:287 - (name: test, length: 2/30, ishold: 0, isloop: 1)
+[34576/34576] queuex_push:287 - (name: test, length: 3/30, ishold: 0, isloop: 1)
+[34576/34576] queuex_push:287 - (name: test, length: 4/30, ishold: 0, isloop: 1)
+[34576/34577] queue_pop:325 - (name: test, length: 5/30, ishold: 0, isloop: 1)
+[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 0)
+[34576/34577] queue_pop:325 - (name: test, length: 4/30, ishold: 0, isloop: 1)
+[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 1)
+[34576/34577] queue_pop:325 - (name: test, length: 3/30, ishold: 0, isloop: 1)
+[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 2)
+[34576/34577] queue_pop:325 - (name: test, length: 2/30, ishold: 0, isloop: 1)
+[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 3)
+[34576/34577] queue_pop:325 - (name: test, length: 1/30, ishold: 0, isloop: 1)
+[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 4)
+[34576/34577] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+```
+
 - sshX_123 - ssh example.
 - statex_123 - state machine example. use statex_api.c.
 - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
 - thread_123 - thread example.
+
+```bash
+$ ./thread_123 -d3
+[34574/34575] thread_handler:26 - (count: 0)
+[34574/34575] thread_handler:32 - (count: 1)
+[34574/34575] thread_handler:32 - (count: 2)
+[34574/34575] thread_handler:32 - (count: 3)
+[34574/34575] thread_handler:32 - (count: 4)
+[34574/34575] thread_handler:32 - (count: 5)
+[34574/34575] thread_handler:32 - (count: 6)
+[34574/34575] thread_handler:32 - (count: 7)
+[34574/34575] thread_handler:32 - (count: 8)
+[34574/34575] thread_handler:32 - (count: 9)
+[34574/34575] thread_handler:35 - wait 3 seconds ...
+```
+
 - tty_123 - a tty example. use chainX_api.c.
 - tunnel_123 - ssh tunnel example.
 - ubox_123 - ubox example.
@@ -165,7 +322,43 @@ $ vi utilx9.h
 - usb_123 - usb example.
 - util_123 - example.
 - uv_000 - uv template.
+
+```bash
+$ ./uv_000
+[30882/30882] async_loop:77 - __________ Enter __________
+[30882/30882] async_loop:77 - __________ Enter __________
+```
+
 - uv_123 - uv example.
+
+```bash
+$ ./uv_123
+[30884/30885] queue_work_handler:114 - (id: 2, count: 1)
+[30884/30888] queue_work_handler:114 - (id: 1, count: 1)
+[30884/30887] queue_work_handler:114 - (id: 3, count: 1)
+[30884/30886] queue_work_handler:114 - (id: 4, count: 1)
+[30884/30884] timer_1_loop:44 - (count: 1)
+[30884/30884] timer_1_loop:50 - Bye-Bye !!! (uv_123)
+[30884/30884] timer_2_loop:58 - (count: 1)
+[30884/30884] timer_2_loop:63 - Bye-Bye !!! (uv_123)
+[30884/30886] queue_work_handler:114 - (id: 5, count: 1)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 4, status: 0)
+[30884/30887] queue_work_handler:114 - (id: 6, count: 1)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 3, status: 0)
+[30884/30885] queue_work_handler:114 - (id: 7, count: 1)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 2, status: 0)
+[30884/30888] queue_work_handler:114 - (id: 8, count: 1)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 1, status: 0)
+[30884/30887] queue_work_handler:114 - (id: 9, count: 1)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 6, status: 0)
+[30884/30886] queue_work_handler:114 - (id: 10, count: 1)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 5, status: 0)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 8, status: 0)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 7, status: 0)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 10, status: 0)
+[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 9, status: 0)
+```
+
 - uv_spawn_123 - uv spawn example.
 - wsdiscovery_123 - WS-Discovery example.
 - ~~gbusx_123 - a  example. use gbusx_api.c.~~

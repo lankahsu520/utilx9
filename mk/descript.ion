@@ -7,3 +7,4 @@ libs.mk LIBDIRS_yes
 customer.mk CUSTOMERDIRS_yes
 libx.mk LIBX_yes
 romfs_LSC002.mk ROMFSDIRS_yes, ROMFSDIRS_USER_yes
+romfs_Omega.mk ROMFSDIRS_yes, ROMFSDIRS_USER_yes

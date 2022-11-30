@@ -1,4 +1,6 @@
 
+CONFIGURED = .configured
+
 define generate_expiration
 	@echo "#ifndef __UTIL_EXPIRATION_H__" > util_expiration.h
 	@echo "#define __UTIL_EXPIRATION_H__" >> util_expiration.h
@@ -121,3 +123,13 @@ endif
 .PHONY: expired
 expired:
 	$(call generate_expiration, $(shell date -d "+4 years" "+%s"))
+
+.PHONY: target_install
+target_install:
+ifneq "$(wildcard $(HOMEX_ROOT_DIR) )" ""
+ifneq ("$(PJ_INSTALL_TARGET)", "")
+	$(PJ_SH_MKDIR) $(PJ_INSTALL_TARGET)
+	(cd $(PJ_INSTALL_TARGET); $(PJ_SH_RMDIR) *)
+	$(PJ_SH_CP) $(HOMEX_ROOT_DIR)/* $(PJ_INSTALL_TARGET)
+endif
+endif

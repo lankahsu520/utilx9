@@ -220,8 +220,8 @@ typedef enum
 #define DBG_LVL_MAX          5
 
 //** "\0" **
-#define DBG_COLOR(color, format, args...) printf(color"[%02ld/%u] %s:%d - "format""COLORX_NONE,  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
-#define DBG_COLOR_0(color, format, args...) printf(color""format""COLORX_NONE, ## args)
+#define DBG_COLOR(color, format, args...) printf(color "[%02ld/%u] %s:%d - " format "" COLORX_NONE,  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
+#define DBG_COLOR_0(color, format, args...) printf(color "" format "" COLORX_NONE, ## args)
 
 #define DBG_R(format,args...) DBG_COLOR(COLORX_RED, format, ## args)
 #define DBG_R_0(format,args...) DBG_COLOR_0(COLORX_RED, format, ## args)
@@ -253,8 +253,8 @@ typedef enum
 #define DBG_W_0(format,args...) DBG_COLOR_0(COLORX_WHITE, format, ## args)
 
 	//** "\n" **
-#define DBG_LN_COLOR(color, format, args...) printf(color"[%02ld/%u] %s:%d - "format""COLORX_NONE"\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
-#define DBG_LN_COLOR_0(color, format, args...) printf(color""format""COLORX_NONE"\n", ## args)
+#define DBG_LN_COLOR(color, format, args...) printf(color "[%02ld/%u] %s:%d - " format "" COLORX_NONE"\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
+#define DBG_LN_COLOR_0(color, format, args...) printf(color "" format "" COLORX_NONE "\n", ## args)
 
 #define DBG_LN_R(format,args...) DBG_LN_COLOR(COLORX_RED, format, ## args)
 #define DBG_LN_R_0(format,args...) DBG_LN_COLOR_0(COLORX_RED, format, ## args)
@@ -318,7 +318,7 @@ typedef enum
 			if ((k%16) ==0) printf("\n    %02X", (0xff & (char)dbuf[k]) ); \
 			else printf(delim"%02X", (0xff & (char)dbuf[k]) ); \
 		} \
-			printf("\n}\n"COLORX_NONE); \
+			printf("\n}\n" COLORX_NONE); \
 	}
 
 #define ARGC_AND_ARGV_DUMP_COLOR(color,s1,s2) \

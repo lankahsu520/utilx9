@@ -1759,6 +1759,7 @@ unsigned long pidof(char *name)
 		}
 	}
 
+	closedir(dir);
 	return ret;
 }
 

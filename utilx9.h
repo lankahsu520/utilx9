@@ -639,7 +639,10 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		do { \
 			if (pcheck(ptr)) \
 			{ \
-				__ret = SAFE_THREAD_BROADCAST(&ptr->in_cond); \
+				if ( ptr->tid != 0 ) \
+				{ \
+					__ret = SAFE_THREAD_BROADCAST(&ptr->in_cond); \
+				} \
 			} \
 		} while(0); \
 		__ret; \
@@ -653,6 +656,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 				if ( 0 == SAFE_THREAD_LOCK_EX(ptr) ) \
 				{ \
 					ptr->isexit = 1; \
+					ptr->isquit = 1; \
 					ptr->isloop = 0; \
 					SAFE_THREAD_UNLOCK_EX(ptr); \
 				} \

@@ -409,6 +409,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 
 //** thread & lock **
 #include <pthread.h>
+#include <semaphore.h>
 
 #define SAFE_THREAD_LOCK(in_mtx_p) \
 	({ int __ret = EINVAL; \
@@ -468,6 +469,12 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 	})
 
 #define SAFE_THREAD_WAIT(in_cond_p, in_mtx_p) pthread_cond_wait(in_cond_p, in_mtx_p)
+
+#define SAFE_SEMAPHORE_INIT(ptr) sem_init(&ptr->semaphore, 0, 0)
+#define SAFE_SEMAPHORE_WAIT(ptr) sem_wait(&ptr->semaphore)
+#define SAFE_SEMAPHORE_POST(ptr) sem_post(&ptr->semaphore)
+#define SAFE_SEMAPHORE_DESTROY(ptr) sem_destroy(&ptr->semaphore)
+#define SAFE_SEMAPHORE_GETVALUE(ptr, val) sem_getvalue(&ptr->semaphore, val)
 
 #define SAFE_MUTEX_DESTROY(in_mtx_p) \
 		({ int __ret = EINVAL; \
@@ -750,6 +757,8 @@ typedef struct ThreadX_Struct
 	pthread_t tid;
 	pthread_mutex_t in_mtx;
 	pthread_cond_t in_cond;
+
+	sem_t semaphore;
 	int in_detach;
 
 	int isexit;

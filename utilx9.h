@@ -580,8 +580,11 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		do { \
 			if (pcheck(ptr)) \
 			{ \
-				__ret = SAFE_THREAD_LOCK(&ptr->in_mtx); \
-				if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
+				if ( ptr->tid != 0 ) \
+				{ \
+					__ret = SAFE_THREAD_LOCK(&ptr->in_mtx); \
+					if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
+				} \
 			} \
 		} while(0); \
 		__ret; \
@@ -592,8 +595,11 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		do { \
 			if (pcheck(ptr)) \
 			{ \
-				__ret = SAFE_THREAD_TRYLOCK(&ptr->in_mtx); \
-				if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
+				if ( ptr->tid != 0 ) \
+				{ \
+					__ret = SAFE_THREAD_TRYLOCK(&ptr->in_mtx); \
+					if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
+				} \
 			} \
 		} while(0); \
 		__ret; \
@@ -604,8 +610,11 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		do { \
 			if (pcheck(ptr)) \
 			{ \
-				__ret = SAFE_THREAD_UNLOCK(&ptr->in_mtx); \
-				if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
+				if ( ptr->tid != 0 ) \
+				{ \
+					__ret = SAFE_THREAD_UNLOCK(&ptr->in_mtx); \
+					if (__ret!=0) DBG_ER_LN("(name: %s)", ptr->name); \
+				} \
 			} \
 		} while(0); \
 		__ret; \
@@ -616,7 +625,10 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		do { \
 			if (pcheck(ptr)) \
 			{ \
-				__ret = SAFE_THREAD_SIGNAL(&ptr->in_cond); \
+				if ( ptr->tid != 0 ) \
+				{ \
+					__ret = SAFE_THREAD_SIGNAL(&ptr->in_cond); \
+				} \
 			} \
 		} while(0); \
 		__ret; \

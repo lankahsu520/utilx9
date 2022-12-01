@@ -84,7 +84,7 @@ $ . confs/github.conf
 # include/meson_options.txt
 $ make
 $ make install
-# will be installed ${SDK_ROOT_DIR} - .install/github_
+# will be installed ${SDK_ROOT_DIR} - ./install/github_
 $ make romfs
 # will be installed ${HOMEX_ROOT_DIR} - ./install/github_rootfs
 $ make target_install 
@@ -275,23 +275,23 @@ $ sudo ./ping_123 -i 1 -c 3 google.com
 
 ```bash
 $ ./queuex_123
-[34576/34577] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
-[34576/34576] queuex_push:287 - (name: test, length: 0/30, ishold: 0, isloop: 1)
-[34576/34576] queuex_push:287 - (name: test, length: 1/30, ishold: 0, isloop: 1)
-[34576/34576] queuex_push:287 - (name: test, length: 2/30, ishold: 0, isloop: 1)
-[34576/34576] queuex_push:287 - (name: test, length: 3/30, ishold: 0, isloop: 1)
-[34576/34576] queuex_push:287 - (name: test, length: 4/30, ishold: 0, isloop: 1)
-[34576/34577] queue_pop:325 - (name: test, length: 5/30, ishold: 0, isloop: 1)
-[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 0)
-[34576/34577] queue_pop:325 - (name: test, length: 4/30, ishold: 0, isloop: 1)
-[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 1)
-[34576/34577] queue_pop:325 - (name: test, length: 3/30, ishold: 0, isloop: 1)
-[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 2)
-[34576/34577] queue_pop:325 - (name: test, length: 2/30, ishold: 0, isloop: 1)
-[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 3)
-[34576/34577] queue_pop:325 - (name: test, length: 1/30, ishold: 0, isloop: 1)
-[34576/34577] test_q_exec_cb:38 - (data_pop->idx: 4)
-[34576/34577] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[12746/12747] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[12746/12746] queuex_push:287 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[12746/12746] queuex_push:287 - (name: test, length: 1/30, ishold: 0, isloop: 1)
+[12746/12746] queuex_push:287 - (name: test, length: 2/30, ishold: 0, isloop: 1)
+[12746/12746] queuex_push:287 - (name: test, length: 3/30, ishold: 0, isloop: 1)
+[12746/12746] queuex_push:287 - (name: test, length: 4/30, ishold: 0, isloop: 1)
+[12746/12747] queue_pop:325 - (name: test, length: 5/30, ishold: 0, isloop: 1)
+[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 0)
+[12746/12747] queue_pop:325 - (name: test, length: 4/30, ishold: 0, isloop: 1)
+[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 1)
+[12746/12747] queue_pop:325 - (name: test, length: 3/30, ishold: 0, isloop: 1)
+[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 2)
+[12746/12747] queue_pop:325 - (name: test, length: 2/30, ishold: 0, isloop: 1)
+[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 3)
+[12746/12747] queue_pop:325 - (name: test, length: 1/30, ishold: 0, isloop: 1)
+[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 4)
+[12746/12747] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
 ```
 
 - sshX_123 - ssh example.
@@ -300,18 +300,23 @@ $ ./queuex_123
 - thread_123 - thread example.
 
 ```bash
-$ ./thread_123 -d3
-[34574/34575] thread_handler:26 - (count: 0)
-[34574/34575] thread_handler:32 - (count: 1)
-[34574/34575] thread_handler:32 - (count: 2)
-[34574/34575] thread_handler:32 - (count: 3)
-[34574/34575] thread_handler:32 - (count: 4)
-[34574/34575] thread_handler:32 - (count: 5)
-[34574/34575] thread_handler:32 - (count: 6)
-[34574/34575] thread_handler:32 - (count: 7)
-[34574/34575] thread_handler:32 - (count: 8)
-[34574/34575] thread_handler:32 - (count: 9)
-[34574/34575] thread_handler:35 - wait 3 seconds ...
+$ ./thread_123
+[16594/16595] thread_handler:27 - (count: 0)
+[16594/16595] thread_handler:33 - (name: thread_A, count: 1)
+[16594/16595] thread_handler:33 - (name: thread_A, count: 2)
+[16594/16595] thread_handler:36 - wait 3 seconds ...
+[16594/16596] thread_handler:27 - (count: 0)
+[16594/16596] thread_handler:33 - (name: thread_B, count: 1)
+[16594/16596] thread_handler:33 - (name: thread_B, count: 2)
+[16594/16596] thread_handler:36 - wait 3 seconds ...
+[16594/16595] thread_handler:33 - (name: thread_A, count: 3)
+[16594/16595] thread_handler:33 - (name: thread_A, count: 4)
+[16594/16595] thread_handler:33 - (name: thread_A, count: 5)
+[16594/16595] thread_handler:36 - wait 3 seconds ...
+[16594/16596] thread_handler:33 - (name: thread_B, count: 3)
+[16594/16596] thread_handler:33 - (name: thread_B, count: 4)
+[16594/16596] thread_handler:33 - (name: thread_B, count: 5)
+[16594/16596] thread_handler:36 - wait 3 seconds ...
 ```
 
 - tty_123 - a tty example. use chainX_api.c.
@@ -325,8 +330,14 @@ $ ./thread_123 -d3
 
 ```bash
 $ ./uv_000
-[30882/30882] async_loop:77 - __________ Enter __________
-[30882/30882] async_loop:77 - __________ Enter __________
+[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
+[20044/20044] async_loop:79 - __________ Enter __________
+[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
+[20044/20044] async_loop:79 - __________ Enter __________
+[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
+[20044/20044] async_loop:79 - __________ Enter __________
+[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
+[20044/20044] async_loop:79 - __________ Enter __________
 ```
 
 - uv_123 - uv example.

@@ -14,7 +14,8 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-ThreadX_t tidx_data;
+ThreadX_t tidx_data_A;
+ThreadX_t tidx_data_B;
 
 static void *thread_handler(void *user)
 {
@@ -29,8 +30,8 @@ static void *thread_handler(void *user)
 	{
 		if (threadx_ispause(tidx_req)==0)
 		{
-			DBG_IF_LN("(count: %d)", count++);
-			if (( count % 10) == 0)
+			DBG_IF_LN("(name: %s, count: %d)", tidx_req->name, count++);
+			if (( count % 3) == 0)
 			{
 				DBG_IF_LN("wait 3 seconds ...");
 				threadx_timewait_simple(tidx_req, 3*1000);
@@ -53,12 +54,17 @@ int main(int argc, char* argv[])
 {
 	DBG_TR_LN("enter");
 
-	tidx_data.thread_cb = thread_handler;
-	tidx_data.data = (void *)&tidx_data;
+	tidx_data_A.thread_cb = thread_handler;
+	tidx_data_A.data = (void *)&tidx_data_A;
 
-	threadx_init(&tidx_data, "thread_123");
+	threadx_init(&tidx_data_A, "thread_A");
 
-	while ( (threadx_isquit(&tidx_data)==0) )
+	tidx_data_B.thread_cb = thread_handler;
+	tidx_data_B.data = (void *)&tidx_data_B;
+
+	threadx_init(&tidx_data_B, "thread_B");
+
+	while ( (threadx_isquit(&tidx_data_A)==0) && (threadx_isquit(&tidx_data_B)==0) )
 	{
 		// busy loop
 		sleep(1);

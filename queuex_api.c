@@ -322,7 +322,7 @@ static void queue_pop(QueueX_t *queuex_req)
 	queuex_lock(queuex_req);
 	if ( queuex_req->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queue_isloop(queuex_req));
+		DBG_DB_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queue_isloop(queuex_req));
 	}
 
 	if ( ( queue_isquit(queuex_req) == 0 ) && ( queuex_req->ishold == 0 ) && (queuex_isempty(queuex_req) != 1) )

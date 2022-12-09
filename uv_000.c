@@ -35,7 +35,7 @@ uv_timer_t uv_timer_1sec_fd;
 void timer_1sec_loop(uv_timer_t *handle)
 {
 	DBG_IF_LN("kick async every 1 second.");
-	
+
 	SAFE_UV_ASYNC(&uv_async_fd);
 }
 #endif

@@ -596,7 +596,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		} while(0); \
 		__ret; \
 	})
-	
+
 #define SAFE_THREAD_TRYLOCK_EX(ptr) \
 	({ int __ret = EINVAL; \
 		do { \
@@ -3661,13 +3661,13 @@ int uci_open(UCIX_t *uci_req);
 
 #define ULOG_LVL_SET(x) ulog_threshold(x)
 
-#define ULOG_ER_LN(fmt, ...) ULOG_ERR(COLORX_RED"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_ER_LN(fmt, ...) ULOG_ERR(COLORX_RED "[%02ld/%u] %s:%d - " fmt "" COLORX_NONE "\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_ER(fmt, ...) ULOG_ERR(fmt, ## __VA_ARGS__)
-#define ULOG_WN_LN(fmt, ...) ULOG_WARN(COLORX_PURPLE"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_WN_LN(fmt, ...) ULOG_WARN(COLORX_PURPLE "[%02ld/%u] %s:%d - " fmt "" COLORX_NONE "\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_WN(fmt, ...) ULOG_WARN(fmt, ## __VA_ARGS__)
-#define ULOG_IF_LN(fmt, ...) ULOG_NOTE(COLORX_YELLOW"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_IF_LN(fmt, ...) ULOG_NOTE(COLORX_YELLOW "[%02ld/%u] %s:%d - " fmt "" COLORX_NONE "\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_IF(fmt, ...) ULOG_NOTE(fmt, ## __VA_ARGS__)
-#define ULOG_DB_LN(fmt, ...) ULOG_INFO(COLORX_WHITE"[%02ld/%u] %s:%d - "fmt""COLORX_NONE"\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#define ULOG_DB_LN(fmt, ...) ULOG_INFO(COLORX_WHITE "[%02ld/%u] %s:%d - " fmt "" COLORX_NONE "\n", (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define ULOG_DB(fmt, ...) ULOG_INFO(fmt, ## __VA_ARGS__)
 
 #define ULOG_CLOSE() ulog_close()

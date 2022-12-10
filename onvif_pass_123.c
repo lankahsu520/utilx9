@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 		unlink(filename);
 
 		SAFE_SPRINTF(tmpbuf, "%s", "#!/bin/sh\n\n");
-		file_append(filename, tmpbuf, strlen(tmpbuf));
+		file_append(filename, tmpbuf, SAFE_STRLEN(tmpbuf));
 
 		SAFE_SPRINTF(pass, "%s", argv[1]);
 
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 			DBG_IF_LN(">> (create_s: %s)", create_s);
 
 			SAFE_SPRINTF(tmpbuf, "export ONVIF_XML_CREATED=%s\n", create_s);
-			file_append(filename, tmpbuf, strlen(tmpbuf));
+			file_append(filename, tmpbuf, SAFE_STRLEN(tmpbuf));
 
 			char *nonce_rand = NULL;
 #ifdef USE_FIXD_DATA
@@ -66,13 +66,14 @@ int main(int argc, char* argv[])
 				{
 					DBG_IF_LN("nonce_b64 (enc_len: %d, [%s])", enc_len, nonce_b64);
 					SAFE_SPRINTF(tmpbuf, "export ONVIF_XML_NONCE=%s\n", nonce_b64);
-					file_append(filename, tmpbuf, strlen(tmpbuf));
+					file_append(filename, tmpbuf, SAFE_STRLEN(tmpbuf));
 
 					SAFE_FREE(nonce_b64);
 				}
 
-				DBG_IF_LN(">> (pass: %s %d)", pass, strlen(pass));
-				char *password = onvif_pass_sha1(nonce_rand, 20, create_s, strlen(create_s), pass, strlen(pass));
+				size_t pass_len = SAFE_STRLEN(pass);
+				DBG_IF_LN(">> (pass: %s %zd)", pass, pass_len);
+				char *password = onvif_pass_sha1(nonce_rand, 20, create_s, SAFE_STRLEN(create_s), pass, SAFE_STRLEN(pass));
 				if (password)
 				{
 					int enc_len = 0;
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
 					{
 						DBG_IF_LN("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, pass, password_b64);
 						SAFE_SPRINTF(tmpbuf, "export ONVIF_XML_PASSWORD=%s\n", password_b64);
-						file_append(filename, tmpbuf, strlen(tmpbuf));
+						file_append(filename, tmpbuf, SAFE_STRLEN(tmpbuf));
 
 						SAFE_FREE(password_b64);
 					}

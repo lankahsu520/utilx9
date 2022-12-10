@@ -253,7 +253,7 @@ typedef enum
 #define DBG_W_0(format,args...) DBG_COLOR_0(COLORX_WHITE, format, ## args)
 
 	//** "\n" **
-#define DBG_LN_COLOR(color, format, args...) printf(color "[%02ld/%u] %s:%d - " format "" COLORX_NONE"\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
+#define DBG_LN_COLOR(color, format, args...) printf(color "[%02ld/%u] %s:%d - " format "" COLORX_NONE "\n",  (long) getpid(), (unsigned int)gettidv1_ex(), __FUNCTION__, __LINE__, ## args)
 #define DBG_LN_COLOR_0(color, format, args...) printf(color "" format "" COLORX_NONE "\n", ## args)
 
 #define DBG_LN_R(format,args...) DBG_LN_COLOR(COLORX_RED, format, ## args)

@@ -248,7 +248,7 @@ void* pcheck( void* a );
 
 /** string **/
 #define SAFE_STRLEN(X) \
-	({ int __ret =0; do { if (pcheck(X)) __ret = strlen(X); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
+	({ size_t __ret =0; do { if (pcheck(X)) __ret = strlen(X); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SPRINTF(X, FMT, args...) \
 	({ int __ret =0; do { if (pcheck(X)) __ret = sprintf(X, FMT, ## args); else DBG_ER_LN("%s is NULL !!!", #X); } while(0); __ret; })
 #define SAFE_SPRINTF_EX(X, FMT, args...) \

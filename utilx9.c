@@ -204,7 +204,7 @@ char *str_rtrim(char *str)
 		return str;
 	}
 
-	int len = strlen(str);
+	int len = SAFE_STRLEN(str);
 	char *p = str + len - 1;
 	while ( (p >= str) && (isspace(*p)) )
 	{
@@ -232,7 +232,7 @@ char *str_ltrim(char *str)
 
 	if (len>0)
 	{
-		SAFE_MEMMOVE(str, p, strlen(str) - len + 1);
+		SAFE_MEMMOVE(str, p, SAFE_STRLEN(str) - len + 1);
 	}
 	return str;
 }
@@ -259,8 +259,8 @@ char *str_trim_char(char *str, const char *delim, int delim_len)
 		if ( SAFE_MEMCHR((char*)delim, *p, delim_len) )
 		{
 			char *endp = NULL;
-			endp = p+strlen(p+1);
-			SAFE_MEMMOVE(p, p+1, strlen(p+1));
+			endp = p+SAFE_STRLEN(p+1);
+			SAFE_MEMMOVE(p, p+1, SAFE_STRLEN(p+1));
 			*endp = '\0';
 		}
 		else
@@ -784,7 +784,7 @@ void file_lookup(char *filename, newline_lookup_fn lookup_cb, void *arg)
 
 void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg)
 {
-	if ( (lookup_cb) && (cmdline) && (strlen(cmdline) > 0) )
+	if ( (lookup_cb) && (cmdline) && (SAFE_STRLEN(cmdline) > 0) )
 	{
 		char newline[LEN_OF_NEWLINE];
 
@@ -830,7 +830,7 @@ char *os_random_uuid(char *buf, int buf_len)
 					SAFE_SPRINTF(p, "4%X", b%15 );
 					break;
 				case 8:
-					SAFE_SPRINTF(p, "%c%X", c[rand()%strlen(c)], b%15 );
+					SAFE_SPRINTF(p, "%c%X", c[rand()%SAFE_STRLEN((char*)c)], b%15 );
 					break;
 				default:
 					SAFE_SPRINTF(p, "%02X", b);
@@ -900,7 +900,7 @@ int sec_aes_cbc_enc(char *in, char *out, char *aes_key)
 	if ( AES_set_encrypt_key((unsigned char*)iv, 128, &aes) < 0 ) {
 		return -1;
 	}
-	out_len = ((strlen(in)/AES_BLOCK_SIZE) + 1) * AES_BLOCK_SIZE; //strlen(in);
+	out_len = ((SAFE_STRLEN(in)/AES_BLOCK_SIZE) + 1) * AES_BLOCK_SIZE; //strlen(in);
 
 	AES_cbc_encrypt((unsigned char*)in, (unsigned char*)out, out_len, &aes, iv, AES_ENCRYPT);
 	return ret;
@@ -955,7 +955,7 @@ int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key)
 {
 	int ret = 0;
 	int in_base_len = 0;
-	char *in_base = sec_base64_dec(in, strlen(in), &in_base_len);
+	char *in_base = sec_base64_dec(in, SAFE_STRLEN(in), &in_base_len);
 
 	if (sec_aes_cbc_dec((char*)in_base, out, out_len, aes_key) < 0 )
 	{
@@ -1247,7 +1247,7 @@ int qbuf_shiftstr(QBUF_t *qbuf, char *substr)
 
 	if ( (qbuf) && (substr) && ( (breakptr = qbuf_memmem(qbuf, substr, SAFE_STRLEN(substr), NULL)) > 0 ))
 	{
-		int slen = strlen(substr);
+		int slen = SAFE_STRLEN(substr);
 		int mlen = breakptr - qbuf_buff(qbuf) + slen;
 		if ( qbuf_read(qbuf, NULL, breakptr - qbuf_buff(qbuf) + slen) == mlen)
 		{
@@ -1484,7 +1484,7 @@ static const char* get_items(const char*buffer ,unsigned int item)
 	int i = 0;
 	const char *p =buffer;
 
-	int len = strlen(buffer);
+	int len = SAFE_STRLEN((char*)buffer);
 	int count = 0;
 	
 	for (i=0; i<len;i++)
@@ -1633,7 +1633,7 @@ void proc_fdsize_info(ProcInfo_t *procinfo_req)
 			char vals[32]="";
 
 			SAFE_SSCANF(newline,"%s %s", key, vals);
-			if (key[strlen(key)-1]==':') key[strlen(key)-1] ='\0';
+			if (key[SAFE_STRLEN(key)-1]==':') key[SAFE_STRLEN(key)-1] ='\0';
 			DBG_TR_LN("(key: %s, vals: %s)", key, vals);
 
 			if (SAFE_STRCMP(key, "Name") ==0)
@@ -1677,8 +1677,8 @@ void proc_fddetail_info(ProcInfo_t *procinfo_req)
 		procinfo_req->fdcount = 0;
 		while((SAFE_FGETS(newline, sizeof(newline), fp)) != NULL)
 		{
-			DBG_TMP_Y("(newline: %s, %d)", newline, strlen(newline));
-			if (strlen(newline)>=56)
+			DBG_TMP_Y("(newline: %s, %zd)", newline, SAFE_STRLEN(newline));
+			if (SAFE_STRLEN(newline)>=56)
 			{
 				int idx = procinfo_req->fdcount;
 				SAFE_SSCANF(newline+56,"%d -> %s", &procinfo_req->fdinfo[idx].fd, procinfo_req->fdinfo[idx].slink);

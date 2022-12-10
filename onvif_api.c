@@ -49,10 +49,10 @@ static char *onvif_xml(SOAP_ACTION_ID act_id)
 #include <openssl/sha.h>
 char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len, char *password, int password_len)
 {
-	unsigned int buffer_len = LEN_OF_VAL32;
 	char *buffer = SAFE_CALLOC(1, LEN_OF_VAL32);
 
 #ifdef USE_EVP_MD
+	unsigned int buffer_len = LEN_OF_VAL32;
 	EVP_MD_CTX *ctx = NULL;
 
 	if((ctx = EVP_MD_CTX_create()) == NULL)
@@ -98,8 +98,8 @@ char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len,
 	SHA1_Final((unsigned char *)buffer, &sha1);
 #endif
 
-exit_sha1:
 #ifdef USE_EVP_MD
+exit_sha1:
 	if (ctx)
 	{
 		EVP_MD_CTX_destroy(ctx);

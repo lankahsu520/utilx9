@@ -209,24 +209,24 @@ void* pcheck( void* a );
 	do { if ( (X) != NULL ) {free(X); X=NULL;} } while(0)
 
 #define SAFE_CALLOC(nitems, size) \
-	({ char *__ret = NULL; \
+	({ void *__ret = NULL; \
 		do { \
-			__ret = calloc(nitems, size); \
+			__ret = (void *)calloc(nitems, size); \
 		} while(0); \
 		__ret; \
 	})
 #define SAFE_MALLOC(size) \
-	({ char *__ret = NULL; \
+	({ void *__ret = NULL; \
 		do { \
-			__ret = malloc(size); \
+			__ret = (void*)malloc(size); \
 			if (__ret) memset(__ret, 0, size); \
 		} while(0); \
 		__ret; \
 	})
 #define SAFE_REALLOC(ptr, size) \
-	({ char *__ret = NULL; \
+	({ void *__ret = NULL; \
 		do { \
-			__ret = realloc(ptr, size); \
+			__ret = (void*)realloc(ptr, size); \
 		} while(0); \
 		__ret; \
 	})

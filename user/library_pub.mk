@@ -100,6 +100,35 @@ ifeq ("$(PJ_HAS_LIBWEBSOCKETS)", "yes")
 LIBS_yes += -lwebsockets #-lwebsockets-evlib_uv
 endif
 
+ifeq ("$(PJ_HAS_AWSX9)", "yes")
+ifneq (,$(wildcard $(SDK_LIB_DIR)/libawsx9.so))
+LIBS_yes += \
+					-lawsx9
+endif
+endif
+
+ifeq ("$(PJ_HAS_AWS_SDK_CPP)", "yes")
+ifneq (,$(wildcard $(SDK_LIB_DIR)/libaws-cpp-sdk-core.so))
+LIBS_yes += \
+					-laws-cpp-sdk-dynamodb \
+					-laws-cpp-sdk-s3 \
+					-laws-cpp-sdk-core \
+					-laws-crt-cpp \
+					-laws-c-mqtt \
+					-laws-c-event-stream \
+					-laws-c-s3 \
+					-laws-c-auth \
+					-laws-c-http \
+					-laws-c-io \
+					-ls2n \
+					-laws-c-compression \
+					-laws-c-cal \
+					-laws-c-sdkutils \
+					-laws-checksums \
+					-laws-c-common
+endif
+endif
+
 ifeq ("$(PJ_HAS_CURL)", "yes")
 LIBS_yes += -lcurl
 endif

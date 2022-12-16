@@ -482,6 +482,11 @@ static void *dbusx_thread_handler(void *user)
 
 		DBusError dbus_err;
 
+		if ( dbusx_req_check(dbusx_req) == -1 )
+		{
+			goto exit_dbus;
+		}
+
 		// initialize the errors
 		if ( dbusx_client_init(dbusx_req) == -1 )
 		{
@@ -654,6 +659,27 @@ READY_ID dbusx_ready(DbusX_t *dbusx_req)
 		DBG_ER_LN("(retry: %d)", retry);
 		return READY_ID_NONE;
 	}
+}
+
+void dbusx_req_init(DbusX_t *dbusx_req, char *name, char *path, void *data)
+{
+	SAFE_MEMSET(dbusx_req, 0, sizeof(DbusX_t));
+	SAFE_SPRINTF(dbusx_req->name, "dbusx_%s", name);
+	SAFE_SPRINTF(dbusx_req->path, "%s", path);
+	dbusx_req->data = data;
+}
+
+int dbusx_req_check(DbusX_t *dbusx_req)
+{
+	int ret = 0;
+
+	if ( SAFE_STRLEN(dbusx_req->path) <= 0 )
+	{
+		DBG_ER_LN("(path: %s)", dbusx_req->path);
+		ret = -1;
+	}
+
+	return ret;
 }
 
 int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_req)

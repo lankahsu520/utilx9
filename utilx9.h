@@ -3398,6 +3398,8 @@ void dbusx_wait_simple(DbusX_t *dbusx_req);
 void dbusx_wait(DbusX_t *dbusx_req);
 
 READY_ID dbusx_ready(DbusX_t *dbusx_req);
+void dbusx_req_init(DbusX_t *dbusx_req, char *name, char *path, void *data);
+int dbusx_req_check(DbusX_t *dbusx_req);
 
 int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, DbusX_t *dbusx_req);
 void dbusx_thread_stop(DbusX_t *dbusx_req);

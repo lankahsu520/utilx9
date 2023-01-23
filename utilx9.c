@@ -63,6 +63,12 @@ time_t expiration_date(void)
 #endif
 }
 
+#if (1)
+void* pcheck( void* a )
+{
+	return a;
+}
+#else
 void* pcheck( void* a )
 {
 	static double diff_t = 1;
@@ -82,6 +88,7 @@ void* pcheck( void* a )
 	}
 	return a ;
 }
+#endif
 
 int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr, int msec)
 {

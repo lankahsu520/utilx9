@@ -287,63 +287,74 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 			break;
 	}
 
-	dbus_msg_res = dbus_connection_send_with_reply_and_block(dbus_conn, dbus_msg_req, timeout, &dbus_err);
-	if (dbus_msg_res == NULL)
+	if (otype == DBUS_TYPE_INVALID)
 	{
-		DBG_ER_LN("dbus_connection_send_with_reply_and_block error !!! (message: %s, timeout: %d)", dbus_err.message, timeout);
+		if (!dbus_connection_send(dbus_conn, dbus_msg_req, NULL))
+		{
+			DBG_ER_LN("dbus_connection_send error !!!");
+			goto exit_send;
+		}
 	}
 	else
 	{
-		if (!dbus_message_iter_init(dbus_msg_res, &dbus_iter))
+		dbus_msg_res = dbus_connection_send_with_reply_and_block(dbus_conn, dbus_msg_req, timeout, &dbus_err);
+		if (dbus_msg_res == NULL)
 		{
-			DBG_ER_LN("dbus_message_iter_init error !!! (message: %s)", dbus_err.message);
+			DBG_ER_LN("dbus_connection_send_with_reply_and_block error !!! (message: %s, timeout: %d)", dbus_err.message, timeout);
 		}
 		else
 		{
-			switch (otype)
+			if (!dbus_message_iter_init(dbus_msg_res, &dbus_iter))
 			{
-				case DBUS_TYPE_STRING:
-					{
-						char *response = NULL;
-						dbus_message_iter_get_basic(&dbus_iter, &response);
-						if ( response )
-						{
-							SAFE_ASPRINTF(retStr, "%s", response);
-						}
-					}
-					break;
-				case DBUS_TYPE_INT32:
-				case DBUS_TYPE_UINT32:
-					{
-						int response = 0;
-						dbus_message_iter_get_basic(&dbus_iter, &response);
-						SAFE_ASPRINTF(retStr, "%d", response);
-					}
-					break;
-#ifdef UTIL_EX_JSON
-				case DBUS_TYPE_ARRAY:
-					{
-						json_t *jresponse = JSON_ARY_NEW();
-						DBusMessageIter dSubIter;
-						dbus_message_iter_recurse(&dbus_iter, &dSubIter);
-						do
+				DBG_ER_LN("dbus_message_iter_init error !!! (message: %s)", dbus_err.message);
+			}
+			else
+			{
+				switch (otype)
+				{
+					case DBUS_TYPE_STRING:
 						{
 							char *response = NULL;
-							dbus_message_iter_get_basic(&dSubIter, &response);
-
-							if (response)
+							dbus_message_iter_get_basic(&dbus_iter, &response);
+							if ( response )
 							{
-								JSON_ARY_APPEND_STR(jresponse, response);
-								DBG_DB_LN("(response: %s)", response);
+								SAFE_ASPRINTF(retStr, "%s", response);
 							}
 						}
-						while( dbus_message_iter_next(&dSubIter) == TRUE );
+						break;
+					case DBUS_TYPE_INT32:
+					case DBUS_TYPE_UINT32:
+						{
+							int response = 0;
+							dbus_message_iter_get_basic(&dbus_iter, &response);
+							SAFE_ASPRINTF(retStr, "%d", response);
+						}
+						break;
+#ifdef UTIL_EX_JSON
+					case DBUS_TYPE_ARRAY:
+						{
+							json_t *jresponse = JSON_ARY_NEW();
+							DBusMessageIter dSubIter;
+							dbus_message_iter_recurse(&dbus_iter, &dSubIter);
+							do
+							{
+								char *response = NULL;
+								dbus_message_iter_get_basic(&dSubIter, &response);
 
-						retStr = JSON_DUMPS_EASY( jresponse );
-						JSON_FREE(jresponse);
-					}
+								if (response)
+								{
+									JSON_ARY_APPEND_STR(jresponse, response);
+									DBG_DB_LN("(response: %s)", response);
+								}
+							}
+							while( dbus_message_iter_next(&dSubIter) == TRUE );
+
+							retStr = JSON_DUMPS_EASY( jresponse );
+							JSON_FREE(jresponse);
+						}
 #endif
-					break;
+						break;
+				}
 			}
 		}
 	}
@@ -381,6 +392,14 @@ char *dbusx_method_xint2uint(DbusX_t *dbusx_req, const char *dest, const char *i
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
 	char *dbus_path = dbusx_path_get(dbusx_req);
 	return dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, itype, (void*)arg, DBUS_TYPE_UINT32, timeout);
+}
+
+void dbusx_method_str2null(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+{
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	char *dbus_path = dbusx_path_get(dbusx_req);
+	char *retStr = dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INVALID, timeout);
+	SAFE_FREE(retStr);
 }
 
 static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *message, void *usr_data)

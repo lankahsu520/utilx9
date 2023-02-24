@@ -3379,6 +3379,7 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 char *dbusx_method_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
 char *dbusx_method_str2int(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
 char *dbusx_method_xint2uint(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout);
+void dbusx_method_str2null(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);
 
 void dbusx_shutdown(void);
 void dbusx_conn_free(DbusX_t *dbusx_req);

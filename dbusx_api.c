@@ -161,9 +161,14 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 				goto exit_send;
 			}
 			break;
+		case DBUS_TYPE_BYTE:
 		case DBUS_TYPE_INT16:
+		case DBUS_TYPE_UINT16:
 		case DBUS_TYPE_INT32:
 		case DBUS_TYPE_UINT32:
+		case DBUS_TYPE_INT64:
+		case DBUS_TYPE_UINT64:
+		case DBUS_TYPE_DOUBLE:
 		default:
 			if (!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
 			{
@@ -362,9 +367,14 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 				goto exit_send;
 			}
 			break;
+		case DBUS_TYPE_BYTE:
 		case DBUS_TYPE_INT16:
+		case DBUS_TYPE_UINT16:
 		case DBUS_TYPE_INT32:
 		case DBUS_TYPE_UINT32:
+		case DBUS_TYPE_INT64:
+		case DBUS_TYPE_UINT64:
+		case DBUS_TYPE_DOUBLE:
 		default:
 			if (!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
 			{

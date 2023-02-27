@@ -39,8 +39,8 @@ static int http_auth = 0;
 char device_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/device_service";
 char media_url[LEN_OF_URL_ONVIF]="http://192.168.50.21/onvif/media_service";
 
-char device_url_path[LEN_OF_URL_ONVIF]="/onvif/device_service";
-char media_url_path[LEN_OF_URL_ONVIF]="/onvif/media_service";
+char device_url_path[LEN_OF_URL_PATH]="/onvif/device_service";
+char media_url_path[LEN_OF_URL_PATH]="/onvif/media_service";
 
 #else
 static int srv_port = 80;

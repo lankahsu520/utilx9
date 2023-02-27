@@ -3368,12 +3368,13 @@ typedef struct DbusX_Struct
 } DbusX_t;
 
 DBusHandlerResult demo_signal_cb(DBusConnection *connection, DBusMessage *message, void *usr_data);
-DBusHandlerResult echo_method_cb(DBusConnection *connection, DBusMessage *message, void *usr_data);
+DBusHandlerResult demo_signal_name_cb(DBusConnection *connection, DBusMessage *message, const char *signal_name, void *usr_data);
 
 int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *ifac,char *cmd, int itype, void *arg);
 int dbusx_signal_str(DbusX_t *dbusx_req, const char *ifac, char *cmd, char *arg);
-int dbusx_signal_xint2uint(DBusConnection *dbus_conn, char *dbus_path, const char *ifac, char *cmd, int itype, unsigned int *arg);
+int dbusx_signal_helper(DbusX_t *dbusx_req, const char *ifac, char *cmd, int itype, void *arg);
 
+DBusHandlerResult dbusx_method_echo_cb(DBusConnection *connection, DBusMessage *message, void *usr_data);
 char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *key, const char *val, int timeout);
 char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, int itype, void *arg, int otype, int timeout);
 char *dbusx_method_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout);

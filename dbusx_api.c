@@ -14,6 +14,7 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+// DBUS_S_NAME_COMMAND -> DBUS_TYPE_STRING
 DBusHandlerResult demo_signal_cb(DBusConnection *connection, DBusMessage *message, void *usr_data)
 {
 	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -40,40 +41,82 @@ done:
 	return handled;
 }
 
-DBusHandlerResult echo_method_cb(DBusConnection *connection, DBusMessage *message, void *usr_data)
+// DBUS_S_NAME_COMMAND -> DBUS_TYPE_STRING
+// DBUS_TYPE_INT16 -> DBUS_TYPE_INT16
+// DBUS_TYPE_INT32 -> DBUS_TYPE_INT32
+// DBUS_TYPE_INT64 -> DBUS_TYPE_INT64
+// DBUS_TYPE_STRING -> DBUS_TYPE_STRING
+DBusHandlerResult demo_signal_name_cb(DBusConnection *connection, DBusMessage *message, const char *signal_name, void *usr_data)
 {
 	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 	DBusError dbus_err;
-	DBusMessage *dbus_msg_res; //response
-	char *val = NULL;
-	char *retStr = NULL;
-
-	dbus_msg_res = dbus_message_new_method_return(message);
-	if (!dbus_msg_res)
-	{
-		return DBUS_HANDLER_RESULT_NEED_MEMORY;
-	}
+	DBusMessageIter dbus_iter;
+	char *reqStr = NULL;
 
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	if (!dbus_message_get_args(message, &dbus_err, DBUS_TYPE_STRING, &val, DBUS_TYPE_INVALID))
+	if (!dbus_message_iter_init(message, &dbus_iter))
 	{
-		DBG_ER_LN("dbus_message_get_args error !!! (message: %s)", dbus_err.message);
-		handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+		DBG_ER_LN("dbus_message_iter_init error !!! (message: %s)", dbus_err.message);
 		goto done;
 	}
+	else
+	{
+		int ctype = DBUS_TYPE_INVALID;
+		while ((ctype = dbus_message_iter_get_arg_type(&dbus_iter)) != DBUS_TYPE_INVALID)
+		{
+			switch (ctype)
+			{
+				case DBUS_TYPE_STRING:
+					{
+						char *request = NULL;
+						dbus_message_iter_get_basic(&dbus_iter, &request);
+						SAFE_ASPRINTF(reqStr, "%s", request);
+					}
+					break;
+#ifdef UTIL_EX_JSON
+				case DBUS_TYPE_ARRAY:
+					{
+						json_t *jitem_ary = JSON_ARY_NEW();
+						DBusMessageIter dSubIter;
+						dbus_message_iter_recurse(&dbus_iter, &dSubIter);
+						do
+						{
+							char *item = NULL;
+							dbus_message_iter_get_basic(&dSubIter, &item);
 
-	DBG_DB_LN("%s (val: %s)", DBG_TXT_GOT, val);
-	SAFE_ASPRINTF(retStr, "%s", val);
+							if (item)
+							{
+								JSON_ARY_APPEND_STR(jitem_ary, item);
+								DBG_DB_LN("(item: %s)", item);
+							}
+						}
+						while( dbus_message_iter_next(&dSubIter) == TRUE );
 
-	dbus_message_append_args(dbus_msg_res, DBUS_TYPE_STRING, &retStr, DBUS_TYPE_INVALID);
-	dbus_connection_send(connection, dbus_msg_res, NULL);
+						reqStr = JSON_DUMPS_EASY( jitem_ary );
+						JSON_FREE(jitem_ary);
+					}
+#endif
+				case DBUS_TYPE_VARIANT:
+					break;
+				default:
+					{
+						int request = 0;
+						dbus_message_iter_get_basic(&dbus_iter, &request);
+						SAFE_ASPRINTF(reqStr, "%d", request);
+					}
+					break;
+			}
+			dbus_message_iter_next (&dbus_iter);
+		}
+	}
+
+	DBG_IF_LN("%s (signal_name: %s, reqStr: %s)", DBG_TXT_GOT, signal_name, reqStr);
 
 	handled = DBUS_HANDLER_RESULT_HANDLED;
 
 done:
-	SAFE_FREE(retStr);
-	SAFE_DBUS_MSG_FREE(dbus_msg_res);
+	SAFE_FREE(reqStr);
 	SAFE_DBUS_ERR_FREE(&dbus_err);
 
 	return handled;
@@ -96,7 +139,7 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 	}
 	else if (arg == NULL)
 	{
-		DBG_ER_LN("arg is NULL !!! (arg: %p)", arg);
+		DBG_ER_LN("arg is NULL !!!");
 		goto exit_send;
 	}
 
@@ -110,20 +153,19 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 
 	switch (itype)
 	{
+		case DBUS_TYPE_INVALID:
+			break;
 		case DBUS_TYPE_STRING:
 			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
 			break;
+		case DBUS_TYPE_INT16:
 		case DBUS_TYPE_INT32:
-			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_INT32, (int*)arg, DBUS_TYPE_INVALID))
-			{
-				goto exit_send;
-			}
-			break;
 		case DBUS_TYPE_UINT32:
-			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_UINT32, (unsigned int*)arg, DBUS_TYPE_INVALID))
+		default:
+			if (!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
@@ -151,9 +193,55 @@ int dbusx_signal_str(DbusX_t *dbusx_req, const char *ifac, char *cmd, char *arg)
 	return dbusx_signal_simple(dbus_conn, dbus_path, ifac, cmd, DBUS_TYPE_STRING, (void*)arg);
 }
 
-int dbusx_signal_xint2uint(DBusConnection *dbus_conn, char *dbus_path, const char *ifac, char *cmd, int itype, unsigned int *arg)
+int dbusx_signal_helper(DbusX_t *dbusx_req, const char *ifac, char *cmd, int itype, void *arg)
 {
-	return dbusx_signal_simple(dbus_conn, dbus_path, ifac, cmd, itype, (void*)arg);
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	char *dbus_path = dbusx_path_get(dbusx_req);
+	return dbusx_signal_simple(dbus_conn, dbus_path, ifac, cmd, itype, arg);
+}
+
+DBusHandlerResult dbusx_method_echo_cb(DBusConnection *connection, DBusMessage *message, void *usr_data)
+{
+	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+	DBusError dbus_err;
+	DBusMessage *dbus_msg_res = NULL;
+	char *retStr = NULL;
+
+	dbus_msg_res = dbus_message_new_method_return(message);
+	if (!dbus_msg_res)
+	{
+		return DBUS_HANDLER_RESULT_NEED_MEMORY;
+	}
+
+	SAFE_DBUS_ERR_INIT(&dbus_err);
+
+	{
+		char *response = NULL;
+		if (!dbus_message_get_args(message, &dbus_err, DBUS_TYPE_STRING, &response, DBUS_TYPE_INVALID))
+		{
+			DBG_ER_LN("dbus_message_get_args error !!! (message: %s)", dbus_err.message);
+			handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+			goto done;
+		}
+
+		if ( response )
+		{
+			SAFE_ASPRINTF(retStr, "%s", response);
+		}
+	}
+	DBG_DB_LN("%s (retStr: %s)", DBG_TXT_GOT, retStr);
+
+	dbus_message_append_args(dbus_msg_res, DBUS_TYPE_STRING, &retStr, DBUS_TYPE_INVALID);
+	dbus_connection_send(connection, dbus_msg_res, NULL);
+
+	handled = DBUS_HANDLER_RESULT_HANDLED;
+
+done:
+	SAFE_FREE(retStr);
+	SAFE_DBUS_MSG_FREE(dbus_msg_res);
+	SAFE_DBUS_ERR_FREE(&dbus_err);
+
+	return handled;
 }
 
 char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *key, const char *val, int timeout)
@@ -258,29 +346,27 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 	}
 
 	dbus_msg_req = dbus_message_new_method_call(dest, dbus_path, ifac, cmd);
-
-	if (dbus_msg_req == NULL)
+	if (NULL == dbus_msg_req)
 	{
-		DBG_ER_LN("dbus_msg_req is NULL !!!");
+		DBG_ER_LN("dbus_message_new_method_call error !!!");
 		goto exit_send;
 	}
 
 	switch (itype)
 	{
+		case DBUS_TYPE_INVALID:
+			break;
 		case DBUS_TYPE_STRING:
 			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
 			break;
+		case DBUS_TYPE_INT16:
 		case DBUS_TYPE_INT32:
-			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_INT32, (int*)arg, DBUS_TYPE_INVALID))
-			{
-				goto exit_send;
-			}
-			break;
 		case DBUS_TYPE_UINT32:
-			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_UINT32, (unsigned int*)arg, DBUS_TYPE_INVALID))
+		default:
+			if (!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
@@ -310,50 +396,55 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 			}
 			else
 			{
-				switch (otype)
+				int ctype = DBUS_TYPE_INVALID;
+				while ((ctype = dbus_message_iter_get_arg_type(&dbus_iter)) != DBUS_TYPE_INVALID)
 				{
-					case DBUS_TYPE_STRING:
-						{
-							char *response = NULL;
-							dbus_message_iter_get_basic(&dbus_iter, &response);
-							if ( response )
-							{
-								SAFE_ASPRINTF(retStr, "%s", response);
-							}
-						}
-						break;
-					case DBUS_TYPE_INT32:
-					case DBUS_TYPE_UINT32:
-						{
-							int response = 0;
-							dbus_message_iter_get_basic(&dbus_iter, &response);
-							SAFE_ASPRINTF(retStr, "%d", response);
-						}
-						break;
-#ifdef UTIL_EX_JSON
-					case DBUS_TYPE_ARRAY:
-						{
-							json_t *jresponse = JSON_ARY_NEW();
-							DBusMessageIter dSubIter;
-							dbus_message_iter_recurse(&dbus_iter, &dSubIter);
-							do
+					switch (ctype)
+					{
+						case DBUS_TYPE_STRING:
 							{
 								char *response = NULL;
-								dbus_message_iter_get_basic(&dSubIter, &response);
-
-								if (response)
+								dbus_message_iter_get_basic(&dbus_iter, &response);
+								if ( response )
 								{
-									JSON_ARY_APPEND_STR(jresponse, response);
-									DBG_DB_LN("(response: %s)", response);
+									SAFE_ASPRINTF(retStr, "%s", response);
 								}
 							}
-							while( dbus_message_iter_next(&dSubIter) == TRUE );
-
-							retStr = JSON_DUMPS_EASY( jresponse );
-							JSON_FREE(jresponse);
-						}
+							break;
+#ifdef UTIL_EX_JSON
+						case DBUS_TYPE_ARRAY:
+							{
+								json_t *jitem_ary = JSON_ARY_NEW();
+								DBusMessageIter dSubIter;
+								dbus_message_iter_recurse(&dbus_iter, &dSubIter);
+								do
+								{
+									char *item = NULL;
+									dbus_message_iter_get_basic(&dSubIter, &item);
+	
+									if (item)
+									{
+										JSON_ARY_APPEND_STR(jitem_ary, item);
+										DBG_DB_LN("(item: %s)", item);
+									}
+								}
+								while( dbus_message_iter_next(&dSubIter) == TRUE );
+	
+								retStr = JSON_DUMPS_EASY( jitem_ary );
+								JSON_FREE(jitem_ary);
+							}
 #endif
-						break;
+						case DBUS_TYPE_VARIANT:
+							break;
+						default:
+							{
+								int response = 0;
+								dbus_message_iter_get_basic(&dbus_iter, &response);
+								SAFE_ASPRINTF(retStr, "%d", response);
+							}
+							break;
+					}
+					dbus_message_iter_next (&dbus_iter);
 				}
 			}
 		}

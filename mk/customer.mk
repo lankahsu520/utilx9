@@ -49,9 +49,3 @@ BINS_CHECK_$(PJ_HAS_WWW_COMMON) += $(SDK_WWW_DIR)/common/mqtt-web/index.html
 CUSTOMERDIRS_$(PJ_HAS_ICLOUD) += $(PJ_ROOT)/user/customer/common/icloud
 BINS_CHECK_$(PJ_HAS_ICLOUD) += $(SDK_BIN_DIR)/icloud
 
-CUSTOMERDIRS_$(PJ_HAS_AWS_BOWSER) += $(PJ_ROOT)/user/customer/Urmet/awsBowser
-LIBS_CHECK_$(PJ_HAS_AWS_BOWSER) +=
-BINS_CHECK_$(PJ_HAS_AWS_BOWSER) += $(SDK_BIN_DIR)/s3sample $(SDK_BIN_DIR)/awsBowser
-
-CUSTOMERDIRS_$(PJ_HAS_AWS_KVSMARIO) += $(PJ_ROOT)/user/customer/Urmet/kvsMario
-BINS_CHECK_$(PJ_HAS_AWS_KVSMARIO) += $(SDK_BIN_DIR)/kvsWebrtcUrmet $(SDK_BIN_DIR)/kvsWebrtcRTSP $(SDK_BIN_DIR)/kvsWebrtcUDP

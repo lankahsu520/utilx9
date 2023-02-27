@@ -106,13 +106,17 @@ extern "C" {
 #define LEN_OF_URL256 256
 #define LEN_OF_URL512 512
 #define LEN_OF_URL1024 1024
+#define LEN_OF_URL1536 1536
 #define LEN_OF_URL2048 2048
 
 #define LEN_OF_TOPIC LEN_OF_BUF1024
 #define LEN_OF_TOPIC_TOKEN (LEN_OF_UUID+8)
 
+#define LEN_OF_URL_PATH LEN_OF_URL1536
+#define LEN_OF_URL_ADDR LEN_OF_URL512
+
 // HttpX_t, NetworkInfo_t, WSList_t
-#define LEN_OF_URL LEN_OF_URL2048
+#define LEN_OF_URL (LEN_OF_URL_ADDR+LEN_OF_URL_PATH)
 // BackupInfo_t
 #define LEN_OF_URL_BACKUP LEN_OF_URL
 // for onvif

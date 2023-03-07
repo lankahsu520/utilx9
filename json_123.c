@@ -18,12 +18,12 @@ static void uuid_test(void)
 {
 	char guid[LEN_OF_UUID]="";
 	os_random_uuid(guid, sizeof(guid));
-	DBG_LN_Y("(guid: %s)", guid);
+	DBG_IF_LN("(guid: %s)", guid);
 }
 
 int main(int argc, char* argv[])
 {
-	DBG_LN_Y("enter");
+	DBG_IF_LN("enter");
 
 	//dbg_lvl_set(DBG_LVL_DEBUG);
 	uuid_test();
@@ -40,6 +40,20 @@ int main(int argc, char* argv[])
 	JSON_OBJ_SET_OBJ(j2, "j3", j3);
 	JSON_OBJ_SET_STR(j3, "logo", "helloworld!!!");
 
+#if (1)
+	json_dump_simple(jroot, "jroot");
+
+	DBG_WN_LN(">> update j4->j1");
+	// update j4->j1
+	json_t *j4 = JSON_OBJ_NEW();
+	JSON_OBJ_SET_STR(j4, "j4", "child !!!");
+	JSON_OBJ_CLEAR(j1);
+	JSON_UPDATE(j1, j4);
+	JSON_FREE(j4);
+
+	json_dump_simple(jroot, "jroot");
+#endif
+
 	json_t *jA = JSON_ARY_NEW();
 	JSON_OBJ_SET_OBJ(jroot, "jA", jA);
 	json_t *jA1 = JSON_OBJ_NEW();
@@ -55,19 +69,46 @@ int main(int argc, char* argv[])
 	JSON_OBJ_SET_STR(jA3, "name", "A3");
 	JSON_OBJ_SET_INT(jA3, "val", 3);
 
-	json_t *jdemo1 = JSON_OBJ_SET_STR(jroot, "demo", "HelloWorld !!!");
-	DBG_LN_Y("(jdemo1: %p, refcount: %zd)", jdemo1, jdemo1->refcount);
-	json_t *jdemo2 = JSON_OBJ_SET_STR(jroot, "demo", "HelloWorld 1 !!!");
-	DBG_LN_Y("(jdemo2: %p, refcount: %zd)", jdemo2, jdemo2->refcount);
-	DBG_LN_Y("(jdemo1: %p, refcount: %zd)", jdemo1, jdemo1->refcount);
-
+#if (1)
 	json_dump_simple(jroot, "jroot");
 
 	{
+		DBG_WN_LN(">> update jB1->jA1");
+		// update jB1->jA1
+		json_t *jB1 = JSON_OBJ_NEW();
+		JSON_OBJ_SET_STR(jB1, "nameB", "B4");
+		JSON_OBJ_SET_INT(jB1, "valB", 4);
+		JSON_UPDATE(jA1, jB1);
+		json_t *jA1_cpy = JSON_COPY(jA1);
+		JSON_ARY_SET_NEW(jA, 0, jA1_cpy);
+		JSON_FREE(jB1);
+	}
+
+	json_dump_simple(jroot, "jroot");
+#endif
+
+	{
+		// set "demo" as jdemo1
+		json_t *jdemo1 = JSON_OBJ_SET_STR(jroot, "demo", "HelloWorld 1 !!!");
+		json_dump_simple(jroot, "jroot");
+		DBG_WN_LN(">> set demo as jdemo1 (jdemo1: %p, refcount: %zd)", jdemo1, JSON_REFCOUNT(jdemo1));
+
+		// set "demo" as jdemo2
+		json_t *jdemo2 = JSON_OBJ_SET_STR(jroot, "demo", "HelloWorld 2 !!!");
+		json_dump_simple(jroot, "jroot");
+		DBG_WN_LN(">> set demo as jdemo2; jdemo1 will be free and we can't access jdemo1 !!! !!! (jdemo2: %p, refcount: %zd)", jdemo2, JSON_REFCOUNT(jdemo2));
+
+		//DBG_IF_LN("(jdemo1: %p, refcount: %zd)", jdemo1, JSON_REFCOUNT(jdemo1));
+		json_dump_simple(jroot, "jroot");
+	}
+
+#if (1)
+	{
 		int idx = -1;
 		json_ary_find_key_val(jA, "val", JSON_JINT(3), &idx);
-		DBG_LN_Y("(idx: %d)", idx);
+		DBG_IF_LN("(idx: %d)", idx);
 	}
+#endif
 
 	json_t *jfound = NULL;
 	jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "logo", NULL, JSON_OBJ_FIND_ID_INFINITE, "", NULL);
@@ -76,7 +117,7 @@ int main(int argc, char* argv[])
 		const char *found = JSON_STR(jfound);
 		if (found)
 		{
-			DBG_LN_Y("(logo: %s)", (char*)found);
+			DBG_IF_LN("(logo: %s)", (char*)found);
 		}
 	}
 
@@ -137,9 +178,9 @@ int main(int argc, char* argv[])
 			const char *sunset = JSON_OBJ_GET_STR(jsunrise_sunset, jobj, JKEY_COMM_SUNSET);
 			int utc = JSON_OBJ_GET_INT_DEF(jsunrise_sunset, jobj, JKEY_COMM_TIME_UTC, 0);
 
-			DBG_LN_Y("(sunrise: %s)", sunrise);
-			DBG_LN_Y("(sunset: %s)", sunset);
-			DBG_LN_Y("(utc: %d)", utc);
+			DBG_IF_LN("(sunrise: %s)", sunrise);
+			DBG_IF_LN("(sunset: %s)", sunset);
+			DBG_IF_LN("(utc: %d)", utc);
 
 			JSON_FREE(jsunrise_sunset);
 		}
@@ -157,7 +198,7 @@ int main(int argc, char* argv[])
 			char *cJson = JSON_DUMPS_EASY( jsunrise_sunset );
 			if (cJson)
 			{
-				DBG_LN_Y("(cJson: %s)", cJson);
+				DBG_IF_LN("(cJson: %s)", cJson);
 				SAFE_FREE(cJson);
 			}
 

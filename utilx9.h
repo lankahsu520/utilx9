@@ -2474,6 +2474,14 @@ typedef struct JSON_TopicX_STRUCT
 		__jobj; \
 	})
 
+#define JSON_REFCOUNT(X) \
+		({ long int ret = -1; \
+			if (X) { \
+				ret = X->refcount;  \
+			} \
+			ret; \
+		})
+
 #define JSON_FREE(X) \
 	do { \
 		if ( (X) != NULL ) { \
@@ -2570,6 +2578,8 @@ typedef struct JSON_TopicX_STRUCT
 			__ret = json_object_del(jroot, key); \
 		__ret; \
 	})
+
+#define JSON_OBJ_CLEAR(jroot) json_object_clear(jroot)
 
 #define JSON_JSTR(val) json_string(val)
 #define JSON_JINT(val) json_integer(val)
@@ -2668,6 +2678,8 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_ARY_APPEND_STR(jary, val) JSON_ARY_APPEND_OBJ(jary, JSON_JSTR(val))
 #define JSON_ARY_APPEND_INT(jary, val) JSON_ARY_APPEND_OBJ(jary, JSON_JINT(val))
 #define JSON_ARY_APPEND_REAL(jary, val) JSON_ARY_APPEND_OBJ(jary, JSON_JREAL(val))
+
+#define JSON_ARY_SET_NEW(jary, idx, jval) json_array_set_new(jary, idx, jval)
 
 #define JSON_FLAGS_VIEW JSON_INDENT(2)|JSON_ENSURE_ASCII|JSON_PRESERVE_ORDER
 #define JSON_FLAGS_WITHOUT_SORT_KEY JSON_COMPACT|JSON_ENSURE_ASCII|JSON_PRESERVE_ORDER

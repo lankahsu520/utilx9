@@ -70,8 +70,7 @@ datetime_fn()
 		echo
 	else
 		now_fn
-		DO_COMMAND="echo \"$NOW_t ${RUN_SH}|${PROMPT}\" $TEE_ARG"
-		sh -c "$DO_COMMAND"
+		DO_COMMAND_NOW="echo \"$NOW_t ${RUN_SH}|${PROMPT}\" $TEE_ARG"; sh -c "$DO_COMMAND_NOW"
 	fi
 
 	return 0

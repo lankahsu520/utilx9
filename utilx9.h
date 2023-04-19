@@ -2451,6 +2451,13 @@ typedef enum
 	JSON_ACTID_DEL,
 } JSON_ACTID;
 
+typedef enum
+{
+	JSON_REVERSEID_NO = 0,
+	JSON_REVERSEID_YES,
+	JSON_REVERSEID_MAX,
+} JSON_REVERSEID;
+
 typedef struct JSON_TokenX_STRUCT
 {
 	char token[LEN_OF_TOPIC_TOKEN];
@@ -2507,6 +2514,7 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_CHECK_STR(jroot) json_is_string(jroot)
 #define JSON_CHECK_INT(jroot) json_is_integer(jroot)
 #define JSON_CHECK_REAL(jroot) json_is_real(jroot)
+#define JSON_CHECK_BOOLEAN(jroot) json_is_boolean(jroot)
 
 #define JSON_OBJ_NEW() json_object()
 
@@ -2585,6 +2593,8 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_JSTR(val) json_string(val)
 #define JSON_JINT(val) json_integer(val)
 #define JSON_JREAL(val) json_real(val)
+#define JSON_TRUE() json_true()
+#define JSON_FALSE() json_false()
 
 //#define JSON_OBJ_SET_STR(jroot, key, val) JSON_OBJ_SET_OBJ(jroot, key, JSON_JSTR(val))
 //#define JSON_OBJ_SET_INT(jroot, key, val) JSON_OBJ_SET_OBJ(jroot, key, JSON_JINT(val))
@@ -2592,6 +2602,27 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_OBJ_SET_STR(jroot, key, val) ({json_t *__jval = JSON_JSTR(val); JSON_OBJ_SET_OBJ(jroot, key, __jval); __jval;})
 #define JSON_OBJ_SET_INT(jroot, key, val) ({json_t *__jval = JSON_JINT(val); JSON_OBJ_SET_OBJ(jroot, key, __jval); __jval;})
 #define JSON_OBJ_SET_REAL(jroot, key, val) ({json_t *__jval = JSON_JREAL(val); JSON_OBJ_SET_OBJ(jroot, key, __jval); __jval;})
+// reverse=0, 1 for JSON_TRUE and 0 otherwise
+// reverse is otherwise, 0 for JSON_TRUE and 1 otherwise
+#define JSON_OBJ_SET_BOOLEAN(jroot, key, val, reverse) \
+	({json_t *__jval = NULL; \
+		if (reverse==0) \
+		{ \
+			if ( key == 0 ) \
+				__jval = JSON_FALSE(); \
+			else \
+				__jval = JSON_TRUE(); \
+		} \
+		else \
+		{ \
+			if ( key == 0 ) \
+				__jval = JSON_TRUE(); \
+			else \
+				__jval = JSON_FALSE(); \
+		} \
+		JSON_OBJ_SET_OBJ(jroot, key, __jval); \
+		__jval; \
+	})
 
 #define JSON_OBJ_FILL_STR(jroot, key, val) \
 	({json_t *__jval = JSON_OBJ_GET_OBJ(jroot, key); \
@@ -2651,6 +2682,23 @@ typedef struct JSON_TopicX_STRUCT
 	({ double __ret = val; \
 		if ( ( jobj = JSON_OBJ_GET_OBJ(jroot, key) ) ) \
 			__ret = JSON_REAL(jobj, val); \
+		__ret; \
+	})
+
+// reverse=0, 1 for JSON_TRUE and 0 otherwise
+// reverse is otherwise, 0 for JSON_TRUE and 1 otherwise
+#define JSON_OBJ_GET_BOOLEAN_DEF(jroot, jobj, key, val, reverse) \
+	({ int __ret = val; \
+		if ( ( jobj = JSON_OBJ_GET_OBJ(jroot, key) ) ) \
+		{ \
+			if (JSON_CHECK_BOOLEAN(jobj)) \
+			{ \
+				if (reverse==JSON_REVERSEID_NO) \
+					__ret = json_boolean_value(jobj); \
+				else \
+					__ret = ! json_boolean_value(jobj); \
+			} \
+		} \
 		__ret; \
 	})
 

@@ -83,7 +83,7 @@ void queuex_debug(QueueX_t *queuex_req, int dbg_more)
 	}
 }
 
-static void queue_create(QueueX_t *queuex_req)
+static void queuex_create(QueueX_t *queuex_req)
 {
 #ifdef UTIL_EX_CLIST
 	CLIST_STRUCT_INIT(queuex_req, qlist);
@@ -189,7 +189,7 @@ int queuex_isempty(QueueX_t *queuex_req)
 	return ret;
 }
 
-int queue_isloop(QueueX_t *queuex_req)
+int queuex_isloop(QueueX_t *queuex_req)
 {
 	int isloop = 0;
 	if (queuex_req)
@@ -200,7 +200,7 @@ int queue_isloop(QueueX_t *queuex_req)
 	return isloop;
 }
 
-int queue_isquit(QueueX_t *queuex_req)
+int queuex_isquit(QueueX_t *queuex_req)
 {
 	int isquit = 0;
 	if (queuex_req)
@@ -227,7 +227,7 @@ int queuex_isready(QueueX_t *queuex_req, int retry)
 void queuex_gosleep(QueueX_t *queuex_req)
 {
 	if (queuex_req==NULL) return;
-	if (queue_isloop(queuex_req)==0) return;
+	if (queuex_isloop(queuex_req)==0) return;
 
 	queuex_lock(queuex_req);
 	queuex_req->ishold = 1;
@@ -237,7 +237,7 @@ void queuex_gosleep(QueueX_t *queuex_req)
 void queuex_wakeup(QueueX_t *queuex_req)
 {
 	if (queuex_req==NULL) return;
-	if (queue_isloop(queuex_req)==0) return;
+	if (queuex_isloop(queuex_req)==0) return;
 
 	queuex_lock(queuex_req);
 	queuex_req->ishold = 0;
@@ -248,15 +248,15 @@ void queuex_wakeup(QueueX_t *queuex_req)
 void queuex_add(QueueX_t *queuex_req, void *data_new)
 {
 	if (queuex_req==NULL) return;
-	if (queue_isloop(queuex_req)==0) return;
+	if (queuex_isloop(queuex_req)==0) return;
 
 	queuex_lock(queuex_req);
 	if ( queuex_req->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queue_isloop(queuex_req));
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queuex_isloop(queuex_req));
 	}
 
-	if ( (queue_isquit(queuex_req)== 0) && ( !queuex_isfull(queuex_req) ) )
+	if ( (queuex_isquit(queuex_req)== 0) && ( !queuex_isfull(queuex_req) ) )
 	{
 #ifdef UTIL_EX_CLIST
 		QItem_t *qitem = (QItem_t*)SAFE_CALLOC(1, sizeof(QItem_t));
@@ -279,15 +279,15 @@ void queuex_add(QueueX_t *queuex_req, void *data_new)
 void queuex_push(QueueX_t *queuex_req, void *data_new)
 {
 	if (queuex_req==NULL) return;
-	if (queue_isloop(queuex_req)==0) return;
+	if (queuex_isloop(queuex_req)==0) return;
 
 	queuex_lock(queuex_req);
 	if ( queuex_req->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queue_isloop(queuex_req));
+		DBG_IF_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queuex_isloop(queuex_req));
 	}
 
-	if ( (queue_isquit(queuex_req)== 0) && ( !queuex_isfull(queuex_req) ) )
+	if ( (queuex_isquit(queuex_req)== 0) && ( !queuex_isfull(queuex_req) ) )
 	{
 #ifdef UTIL_EX_CLIST
 		QItem_t *qitem = (QItem_t*)SAFE_CALLOC(1, sizeof(QItem_t));
@@ -311,7 +311,7 @@ void queuex_push(QueueX_t *queuex_req, void *data_new)
 	queuex_unlock(queuex_req);
 }
 
-static void queue_pop(QueueX_t *queuex_req)
+static void queuex_pop(QueueX_t *queuex_req)
 {
 	int exec = 0;
 	if (queuex_req==NULL) return;
@@ -322,10 +322,10 @@ static void queue_pop(QueueX_t *queuex_req)
 	queuex_lock(queuex_req);
 	if ( queuex_req->dbg_more < DBG_LVL_MAX )
 	{
-		DBG_DB_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queue_isloop(queuex_req));
+		DBG_DB_LN("(name: %s, length: %d/%d, ishold: %d, isloop: %d)", queuex_req->name, clist_length(queuex_req->qlist), queuex_req->max_data, queuex_req->ishold, queuex_isloop(queuex_req));
 	}
 
-	if ( ( queue_isquit(queuex_req) == 0 ) && ( queuex_req->ishold == 0 ) && (queuex_isempty(queuex_req) != 1) )
+	if ( ( queuex_isquit(queuex_req) == 0 ) && ( queuex_req->ishold == 0 ) && (queuex_isempty(queuex_req) != 1) )
 	{
 		SAFE_MEMSET(data_pop, 0, queuex_req->data_size);
 
@@ -346,7 +346,7 @@ static void queue_pop(QueueX_t *queuex_req)
 
 		exec = 1;
 	}
-	else if ( queue_isquit(queuex_req) == 0 )
+	else if ( queuex_isquit(queuex_req) == 0 )
 	{
 		queuex_wait(queuex_req);
 	}
@@ -366,7 +366,7 @@ static void queue_pop(QueueX_t *queuex_req)
 	//int new = clist_length(queuex_req->qlist);
 }
 
-static void *queue_thread_handler( void *user )
+static void *queuex_thread_handler( void *user )
 {
 	QueueX_t *queuex_req = (QueueX_t*)user;
 
@@ -375,11 +375,11 @@ static void *queue_thread_handler( void *user )
 		ThreadX_t *tidx_req = &queuex_req->tidx;
 		threadx_detach(tidx_req);
 
-		queue_create(queuex_req);
+		queuex_create(queuex_req);
 
 		while (threadx_isquit(tidx_req) == 0)
 		{
-			queue_pop(queuex_req);
+			queuex_pop(queuex_req);
 		}
 
 		queuex_free(queuex_req);
@@ -430,7 +430,7 @@ QueueX_t *queuex_thread_init(char *name, int queue_size, int data_size, queuex_f
 
 		{
 			ThreadX_t *tidx_req = &queuex_req->tidx;
-			tidx_req->thread_cb = queue_thread_handler;
+			tidx_req->thread_cb = queuex_thread_handler;
 			tidx_req->data = queuex_req;
 			threadx_init(tidx_req, queuex_req->name);
 		}

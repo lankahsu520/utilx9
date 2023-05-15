@@ -138,7 +138,7 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 				{
 					idx_full = 0;
 				}
-				DBG_DB_LN("(idx_b: %d, idx_e: %d)", idx_b, idx_e);
+				DBG_DB_LN("(idx_full: %d, idx_b: %d, idx_e: %d)", idx_full, idx_b, idx_e);
 
 				ary_b[0] = '\0';
 				is_array = 1;
@@ -152,7 +152,7 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 				if (is_array)
 				{
 					jresult = NULL;
-					if (JSON_CHECK_ARY(jparent))
+					if (JSON_CHECK_ARY(jtoken))
 					{
 						if (idx_full==0)
 						{
@@ -162,7 +162,7 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 						json_t *jobj_found = NULL;
 						int idx = 0;
 
-						JSON_ARY_FOREACH(jparent, idx, jobj_found) {
+						JSON_ARY_FOREACH(jtoken, idx, jobj_found) {
 							//DBG_DB_LN("(idx: %d)", idx);
 							if ( (idx_full)
 								|| ( (idx_b <= idx) && (idx < idx_e) ) )

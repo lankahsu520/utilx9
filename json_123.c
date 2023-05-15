@@ -19,6 +19,12 @@ static void uuid_test(void)
 	char guid[LEN_OF_UUID]="";
 	os_random_uuid(guid, sizeof(guid));
 	DBG_IF_LN("(guid: %s)", guid);
+
+	os_random_uuid(guid, sizeof(guid));
+	DBG_IF_LN("(guid: %s)", guid);
+
+	os_random_uuid(guid, sizeof(guid));
+	DBG_IF_LN("(guid: %s)", guid);
 }
 
 int main(int argc, char* argv[])

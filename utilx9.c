@@ -820,13 +820,18 @@ void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg)
 
 char *os_random_uuid(char *buf, int buf_len)
 {
+	static int srand_1st = 0;
 	if ( (buf) && (buf_len>=LEN_OF_UUID) )
 	{
 		const char *c = "89ab";
 		char *p = buf;
 		int n;
 
-		srand(time(NULL));
+		if (srand_1st == 0 )
+		{
+			srand_1st ++;
+			srand(time(NULL) + getpid());
+		}
 
 		for( n = 0; n < 16; ++n )
 		{

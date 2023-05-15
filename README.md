@@ -223,6 +223,18 @@ $ ./demo_123
 ```
 - http_client_123 - http client example. use curl.
 - jqx - it is similar to jq. jqx only support reads from pipe. 
+
+```bash
+# please download Music.json (https://github.com/lankahsu520/HelperX/blob/master/AWS/Music.json)
+$ cat Music.json | ./jqx .Items[3].Sponsor.L[].S
+"dog"
+"cat"
+"mouse"
+"stoat"
+"snake"
+
+```
+
 - json_123 - json example.
 
 ```bash

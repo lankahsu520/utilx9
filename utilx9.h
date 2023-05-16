@@ -281,6 +281,8 @@ void* pcheck( void* a );
 //#define SAFE_STRCASESTR(str1, str2) strcasestr(str1, str2)
 #define SAFE_STRCMP(str1, str2) \
 	({ int __ret = -1; do { if ((pcheck(str1)) && pcheck(str2)) { __ret = strcmp(str1, str2); } } while(0); __ret; })
+#define SAFE_STRCASECMP(str1, str2) \
+	({ int __ret = -1; do { if ((pcheck(str1)) && pcheck(str2)) { __ret = strcasecmp(str1, str2); } } while(0); __ret; })
 #define SAFE_STRNCMP(str1, str2, n) \
 	({ int __ret = -1; do { if ((pcheck(str1)) && pcheck(str2) && (n)) { __ret = strncmp(str1, str2, n); } } while(0); __ret; })
 #define SAFE_STRRCMP(str1, str2) \

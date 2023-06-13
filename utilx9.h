@@ -2610,14 +2610,14 @@ typedef struct JSON_TopicX_STRUCT
 	({json_t *__jval = NULL; \
 		if (reverse==0) \
 		{ \
-			if ( key == 0 ) \
+			if ( val == 0 ) \
 				__jval = JSON_FALSE(); \
 			else \
 				__jval = JSON_TRUE(); \
 		} \
 		else \
 		{ \
-			if ( key == 0 ) \
+			if ( val == 0 ) \
 				__jval = JSON_TRUE(); \
 			else \
 				__jval = JSON_FALSE(); \

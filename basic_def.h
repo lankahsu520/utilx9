@@ -149,6 +149,14 @@ extern "C" {
 
 // Check if a bit is 1 or 0
 #define CHECK_BIT(var, pos) !!((var) & (1 << (pos)))
+#define BIT_SET(x,y) \
+	x |= (0x01 << y)
+#define BIT_CLR(x,y) \
+	x &= ~(0x01 << y)
+#define BIT_INVERSE(x,y) \
+	x ^= (0x01 << y)
+#define BIT_GET(x,y) \
+	((x) >> (y) & 0x01)
 
 #define X_JOIN_E(X,Y) X YSTR(Y)
 #define X_JOIN(X,Y) X_JOIN_E(X,Y)

@@ -107,10 +107,10 @@ cc = meson.get_compiler('c')
 LIB_ARY = []
 
 #dependency('yuarel')
-dep_yuarel = cc.find_library('yuarel', required : true)
+dep_yuarel = cc.find_library('yuarel', required : false)
 LIB_ARY += dep_yuarel
 
-dep_utilx9 = cc.find_library('utilx9', required : true)
+dep_utilx9 = cc.find_library('utilx9', required : false)
 LIB_ARY += dep_utilx9
 
 dep_dbus_handler = cc.find_library('dbus_handler', dirs: LIB_DIR_ARY, required : false)

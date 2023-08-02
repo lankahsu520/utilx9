@@ -25,7 +25,6 @@ DAEMON="proc_watch"
 [ -z "$BIN_FILE" ] || BIN_PATH=`dirname $BIN_FILE`
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
-[ -z "$DAEMON" ] || PID=$(pidof $DAEMON)
 
 IS_INTERACTIVE=""
 IS_ECHO="0"
@@ -52,8 +51,11 @@ LOGGER_TAG="$DAEMON"
 LOGGER="logger"
 LOGGER_ARG=""
 
-IFACE=$2
-[ ! -z "$IFACE" ] || IFACE="enp0s8"
+DAEMON_ARG="&"
+DO_COMMAND_ARG=""
+
+#IFACE=$2
+#[ ! -z "$IFACE" ] || IFACE="enp0s8"
 IFACE_ARG=""
 
 now_fn()
@@ -82,16 +84,23 @@ die_fn()
 	exit 1
 }
 
-bin_check_fn()
+tools_chk_fn()
 {
-	[ -z "$DAEMON" ] || [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || { die_fn "${FUNCNAME[0]}:${LINENO}- $BIN_FILE isn't found !!!";}
-
 	return 0
 }
 
 runpid_fn()
 {
 	[ -z "$DAEMON" ] || PID=$(pidof $DAEMON)
+
+	return 0
+}
+
+bin_check_fn()
+{
+	[ -z "$DAEMON" ] || [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || { die_fn "${FUNCNAME[0]}:${LINENO}- $BIN_FILE isn't found !!!";}
+
+	runpid_fn
 
 	return 0
 }
@@ -137,6 +146,8 @@ arguments_fn()
 
 	[ "$CFG_FILE" != "" ] && CFG_FILE_ARG="-s $CFG_FILE"
 
+	DO_COMMAND_ARG="$IFACE_ARG $SAVE_PATH_ARG $CFG_PATH_ARG $WORK_PATH_ARG $DEBUG_ARG $LOG_ARG $LOGGER_ARG $DAEMON_ARG"
+
 	return 0
 }
 
@@ -167,8 +178,6 @@ wait_fn()
 
 start_fn()
 {
-	runpid_fn
-
 	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- ($PID) is already running.";}
 
@@ -177,9 +186,9 @@ start_fn()
 	arguments_fn
 
 	if [ "$SUDO" = "" ]; then
-		DO_COMMAND="$BIN_FILE $DEBUG_ARG $LOG_ARG $LOGGER_ARG &"
+		DO_COMMAND="$BIN_FILE $DO_COMMAND_ARG"
 	else
-		DO_COMMAND="$SUDO $BIN_FILE $DEBUG_ARG $LOG_ARG $LOGGER_ARG &"
+		DO_COMMAND="$SUDO $BIN_FILE $DO_COMMAND_ARG"
 	fi
 	datetime_fn "${FUNCNAME[0]}:${LINENO}- [$DO_COMMAND]"
 	sh -c "$DO_COMMAND"
@@ -193,8 +202,6 @@ start_fn()
 
 stop_fn()
 {
-	runpid_fn
-
 	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	IS_QUIT=1
@@ -210,8 +217,6 @@ stop_fn()
 
 status_fn()
 {
-	runpid_fn
-
 	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	[ -z "$DAEMON" ] || [ -z "$PID" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- ($PID) is already running.";}
@@ -267,6 +272,7 @@ trap_ctrlc()
 }
 
 [ "$ACTION" != "" ] || showusage_fn
+tools_chk_fn
 
 main_fn()
 {

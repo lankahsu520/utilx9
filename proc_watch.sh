@@ -6,7 +6,7 @@ ROOTFS_PATH="/work/rootfs"
 ROOTFS_PATH_ARG=""
 NOW_t=`date +"%Y%m%d%H%M%S"`
 PWD=`pwd`
-SBIN_PATH=`realpath $0`
+SBIN_PATH=`dirname $0`
 [ -d "$SBIN_PATH" ] || SBIN_PATH="/work/rootfs/sbin"
 SUDO_EX=$(which sudo 2>&1) && SUDO_B="sudo -E -b" && SUDO="sudo -E"
 WHOAMI_EX=$(which whoami 2>&1) && WHO=`whoami`
@@ -22,7 +22,7 @@ DAEMON="proc_watch"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/usr/bin/$DAEMON"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/bin/$DAEMON"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/usr/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || BIN_PATH=`dirname $BIN_FILE`
+[ -z "$BIN_FILE" ] || BIN_FILE=`realpath $BIN_FILE` && BIN_PATH=`dirname $BIN_FILE`
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
 

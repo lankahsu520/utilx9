@@ -502,8 +502,8 @@ char *time_now_full(time_t now_t) // output: 2020-03-06 15:01:47
 	//time_t now_t = time(NULL);
 	struct tm *timeinfo  = localtime(&now_t);
 	SAFE_SPRINTF_EX(buff, "%04d-%02d-%02d %02d:%02d:%02d",
-					timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday,
-					timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+		timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday,
+		timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
 	return buff;
 }
@@ -514,8 +514,8 @@ char *time_now_short(time_t now_t) // output: 20200306 150147
 	//time_t now_t = time(NULL);
 	struct tm *timeinfo  = localtime(&now_t);
 	SAFE_SPRINTF_EX(buff, "%04d%02d%02d %02d%02d%02d",
-					timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday,
-					timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+		timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday,
+		timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
 	return buff;
 }
@@ -762,8 +762,7 @@ int file_copy(const char *file_from, const char *file_to)
 				ret = -1;
 				goto cp_exit;
 			}
-		}
-		while (nread > 0);
+		} while (nread > 0);
 	}
 
 cp_exit:
@@ -1236,8 +1235,8 @@ int qbuf_trimrchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr)
 {
 	int ret = qbuf_total(qbuf);
 	char *breakptr = NULL;
-	if ((ret) &&
-			(breakptr = qbuf_jumprchr(qbuf, delim, delim_len, jumpptr)))
+	if ((ret)
+		&& (breakptr = qbuf_jumprchr(qbuf, delim, delim_len, jumpptr)))
 	{
 		char *endptr = qbuf_endptr(qbuf);
 
@@ -1256,8 +1255,8 @@ int qbuf_trimchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr)
 {
 	int ret = qbuf_total(qbuf);
 	char *breakptr = NULL;
-	if ((ret) &&
-			(breakptr = qbuf_jumpchr(qbuf, delim, delim_len, jumpptr)))
+	if ((ret)
+		&& (breakptr = qbuf_jumpchr(qbuf, delim, delim_len, jumpptr)))
 	{
 		char *pbuff = qbuf_buff(qbuf);
 		qbuf_read(qbuf, NULL, (breakptr - pbuff));

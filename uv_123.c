@@ -449,14 +449,14 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -d, --debug       debug level\n"
+		"  -d, --debug       debug level\n"
 #ifdef USE_FS_CREATE
-		   "  -f, --file        filename_r\n"
+		"  -f, --file        filename_r\n"
 #endif
-		   "  -h, --help\n", TAG);
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -d 4\n", TAG);
+		"  %s -d 4\n", TAG);
 	exit(exit_code);
 }
 

@@ -61,8 +61,7 @@ void netlink_recv(int nsock)
 		return;
 	}
 
-	for (h = (struct nlmsghdr *) buf; NLMSG_OK(h, status);
-			h = NLMSG_NEXT(h, status))
+	for (h = (struct nlmsghdr *) buf; NLMSG_OK(h, status); h = NLMSG_NEXT(h, status))
 	{
 
 		switch (h->nlmsg_type)
@@ -103,18 +102,15 @@ void netlink_recv(int nsock)
 					case RTM_NEWLINK:
 						if (ifi->ifi_flags & IFF_RUNNING)
 						{
-							printf("interface %s(%d): UP\n",
-								   ifname, ifi->ifi_index);
+							printf("interface %s(%d): UP\n", ifname, ifi->ifi_index);
 						}
 						else
 						{
-							printf("interface %s(%d): DOWN\n",
-								   ifname, ifi->ifi_index);
+							printf("interface %s(%d): DOWN\n", ifname, ifi->ifi_index);
 						}
 						break;
 					case RTM_DELLINK:
-						printf("interface %s(%d): REMOVED\n",
-							   ifname, ifi->ifi_index);
+						printf("interface %s(%d): REMOVED\n", ifname, ifi->ifi_index);
 						break;
 				}
 				break;
@@ -129,8 +125,7 @@ void netlink_getlink(int nsock)
 {
 	struct nlmsghdr* n;
 	struct ifinfomsg *ifi;
-	u_int8_t req[sizeof(struct nlmsghdr) + sizeof(struct ifinfomsg) +
-							   sizeof(struct ifaddrmsg) + 4096];
+	u_int8_t req[sizeof(struct nlmsghdr) + sizeof(struct ifinfomsg) + sizeof(struct ifaddrmsg) + 4096];
 
 	memset(&req, 0, sizeof(req));
 	n = (struct nlmsghdr*) req;

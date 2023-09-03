@@ -109,8 +109,11 @@ void sshX_select_loop_with_tunnel(SSH_t *ssh_req, SSH_t *ssh_req_frm)
 	ssh_connector_set_in_channel(connector_err, channel, SSH_CONNECTOR_STDERR);
 	ssh_event_add_connector(event, connector_err);
 
-	while (ssh_channel_is_open(channel) && (ssh_channel_is_eof(channel) == 0) &&
-			ssh_channel_is_open(channel_frm) && (ssh_channel_is_eof(channel_frm) == 0))
+	while ((ssh_channel_is_open(channel))
+		&& (ssh_channel_is_eof(channel) == 0)
+		&& (ssh_channel_is_open(channel_frm))
+		&& (ssh_channel_is_eof(channel_frm) == 0)
+	)
 	{
 		//if (signal_delayed) {
 		//	sizechanged();

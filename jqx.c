@@ -166,7 +166,7 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 						{
 							//DBG_DB_LN("(idx: %d)", idx);
 							if ((idx_full)
-									|| ((idx_b <= idx) && (idx < idx_e)))
+								|| ((idx_b <= idx) && (idx < idx_e)))
 							{
 								char *saveptr_cpy = NULL;
 								//DBG_DB_LN("saveptr: [%s]", saveptr);
@@ -224,7 +224,7 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 					{
 						//DBG_DB_LN("(idx: %d)", idx);
 						if ((idx_full)
-								|| ((idx_b <= idx) && (idx < idx_e)))
+							|| ((idx_b <= idx) && (idx < idx_e)))
 						{
 							char *saveptr_cpy = NULL;
 							//DBG_DB_LN("saveptr: [%s]", saveptr);
@@ -419,11 +419,11 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -d, --debug       debug level\n"
-		   "  -h, --help\n", TAG);
+		"  -d, --debug       debug level\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -d 4\n", TAG);
+		"  %s -d 4\n", TAG);
 	exit(exit_code);
 }
 

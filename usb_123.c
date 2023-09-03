@@ -159,8 +159,9 @@ void usb_hotplug_loop(void)
 					int read_len = recv(sockfd, &buff, sizeof(buff), 0);
 					if (read_len > 0)
 					{
-						if (((SAFE_STRNCMP(buff, "remove@", SAFE_STRLEN("remove@")) == 0) || (SAFE_STRNCMP(buff, "add@", SAFE_STRLEN("add@")) == 0)) &&
-								(SAFE_STRSTR(buff, "usb")))
+						if (((SAFE_STRNCMP(buff, "remove@", SAFE_STRLEN("remove@")) == 0) || (SAFE_STRNCMP(buff, "add@", SAFE_STRLEN("add@")) == 0))
+							&& (SAFE_STRSTR(buff, "usb"))
+						)
 						{
 							DBG_IF_LN("%s", buff);
 						}

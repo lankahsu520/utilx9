@@ -28,24 +28,6 @@
 int newline_lookupokup_cb(char *newline, void *arg)
 {
 	int ret = 0;
-	if (ret==0)
-	{
-		ret++;
-	}
-	switch (ret)
-	{
-		case 1:
-		{
-		}
-		break;
-		case 2:
-			a=b;
-			b=c;
-			c=d;
-			break;
-		default:
-			break;
-	}
 	DBG_IF_LN("(newline: %s)", newline);
 
 	return ret;
@@ -90,7 +72,6 @@ int main(int argc, char* argv[])
 		DBG_IF_LN("(hello_dec: %s)", hello_dec);
 	}
 #endif
-
 
 #ifdef USE_TEST_SEC_ENC_AND_DEC
 #ifdef UTIL_EX_SSL

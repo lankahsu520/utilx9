@@ -933,9 +933,9 @@ static int http_request_downloadfile_rtsp(HttpX_t *http_req)
 
 				if (rtsp_req->max_size)
 				{
-					while ((rtsp_req->stop==0) &&
-							(rtp_req->total <= rtsp_req->max_size)
-						  )
+					while ((rtsp_req->stop==0)
+						&& (rtp_req->total <= rtsp_req->max_size)
+					)
 					{
 						rtsp_receive(http_req, curl);
 					}
@@ -944,9 +944,9 @@ static int http_request_downloadfile_rtsp(HttpX_t *http_req)
 				{
 					time_t start_t = time(NULL);
 					int duration = 0;
-					while ((rtsp_req->stop==0) &&
-							(duration <= rtsp_req->duration)
-						  )
+					while ((rtsp_req->stop==0)
+						&& (duration <= rtsp_req->duration)
+					)
 					{
 						rtsp_receive(http_req, curl);
 						duration = (int)difftime(time(NULL), start_t);
@@ -1111,9 +1111,9 @@ static size_t mjpeg_header_cb(char *ptr, size_t size, size_t nmemb, void *contex
 		{
 			SAFE_MEMSET(mjpeg_req->boundary, 0, sizeof(mjpeg_req->boundary));
 			SAFE_SNPRINTF(mjpeg_req->ctype, (int)sizeof(mjpeg_req->ctype), "%s", ctype);
-			if ((multi_ptr = SAFE_STRSTR(ctype, "multipart/x-mixed-replace")) &&
-					(boundary = SAFE_STRSTR(ctype, "boundary="))
-			   )
+			if ((multi_ptr = SAFE_STRSTR(ctype, "multipart/x-mixed-replace"))
+				&& (boundary = SAFE_STRSTR(ctype, "boundary="))
+			)
 			{
 				// No support
 				char *boundary = SAFE_STRSTR(ctype, "boundary=");

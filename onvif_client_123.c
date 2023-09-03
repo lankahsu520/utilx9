@@ -752,19 +752,19 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -d, --debug       debug level\n"
-		   "  -i, --ip          ip\n"
-		   "  -p, --port        port\n"
-		   "  -u, --user        user\n"
-		   "  -s, --pass        pass\n"
-		   "  -e, --dpath       device url path\n"
-		   "  -m, --mpath       media url path\n"
-		   "  -a, --auth        http auth\n"
-		   "  -h, --help\n", TAG);
+		"  -d, --debug       debug level\n"
+		"  -i, --ip          ip\n"
+		"  -p, --port        port\n"
+		"  -u, --user        user\n"
+		"  -s, --pass        pass\n"
+		"  -e, --dpath       device url path\n"
+		"  -m, --mpath       media url path\n"
+		"  -a, --auth        http auth\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -i 192.168.50.239 -p 80 -u admin -s hahahaha\n", TAG
-		  );
+		"  %s -i 192.168.50.239 -p 80 -u admin -s hahahaha\n", TAG
+	);
 	exit(exit_code);
 }
 

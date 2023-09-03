@@ -77,8 +77,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 
 		case LWS_CALLBACK_CLOSED:
 			/* remove our closing pss from the list of live pss */
-			lws_ll_fwd_remove(struct per_session_data__minimal, pss_list,
-							  pss, vhd->pss_list);
+			lws_ll_fwd_remove(struct per_session_data__minimal, pss_list, pss, vhd->pss_list);
 			break;
 
 		case LWS_CALLBACK_SERVER_WRITEABLE:
@@ -93,8 +92,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 			}
 
 			/* notice we allowed for LWS_PRE in the payload already */
-			m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) +
-						  LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
+			m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) + LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
 			if (m < (int)vhd->amsg.len)
 			{
 				lwsl_err("ERROR %d writing to ws\n", m);
@@ -126,8 +124,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 			 * let everybody know we want to write something on them
 			 * as soon as they are ready
 			 */
-			lws_start_foreach_llp(struct per_session_data__minimal **,
-								  ppss, vhd->pss_list)
+			lws_start_foreach_llp(struct per_session_data__minimal **, ppss, vhd->pss_list)
 			{
 				lws_callback_on_writable((*ppss)->wsi);
 			}
@@ -608,8 +605,8 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 
 		if (lws_req->security)
 		{
-			if ((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1) ||
-					(SAFE_ACCESS(lws_req->privatekey_file, F_OK) == -1))
+			if ((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1)
+				|| (SAFE_ACCESS(lws_req->privatekey_file, F_OK) == -1))
 			{
 				DBG_ER_LN("SAFE_ACCESS error !!! (certificate_file: %s, privatekey_file: %s)", lws_req->certificate_file, lws_req->privatekey_file);
 			}
@@ -727,8 +724,8 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 
 		if (lws_req->security)
 		{
-			if ((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1) ||
-					(SAFE_ACCESS(lws_req->privatekey_file, F_OK) == -1))
+			if ((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1)
+				|| (SAFE_ACCESS(lws_req->privatekey_file, F_OK) == -1))
 			{
 				DBG_ER_LN("SAFE_ACCESS error !!! (certificate_file: %s, privatekey_file: %s)", lws_req->certificate_file, lws_req->privatekey_file);
 			}

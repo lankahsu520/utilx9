@@ -228,13 +228,13 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -d, --debug       debug level\n"
-		   "  -e, --echo        message\n"
-		   "  -s, --service\n"
-		   "  -h, --help\n", TAG);
+		"  -d, --debug       debug level\n"
+		"  -e, --echo        message\n"
+		"  -s, --service\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -d 4 -s\n", TAG);
+		"  %s -d 4 -s\n", TAG);
 	exit(exit_code);
 }
 

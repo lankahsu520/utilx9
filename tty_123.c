@@ -64,10 +64,10 @@ static void tty_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 			qbuf_write(qbuf, buff, buff_len);
 			//DBG_IF_LN(">>>>>>>>>>>>%s, %d, %02x", buff, buff_len, buff[buff_len-1]);
-			if ((breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NEWLINE, NULL)) ||
-					(breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_RETURN, NULL)) ||
-					(breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NULL, NULL))
-			   )
+			if ((breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NEWLINE, NULL))
+				||(breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_RETURN, NULL))
+				|| (breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NULL, NULL))
+			)
 			{
 				char *startptr = qbuf_buff(qbuf);
 				int cmdline_len = (int)(breakptr - startptr) + 1;
@@ -227,13 +227,13 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -d, --debug       debug level\n"
-		   "  -t, --tty         tty name\n"
-		   "  -b, --baudrate    baud rate\n"
-		   "  -h, --help\n", TAG);
+		"  -d, --debug       debug level\n"
+		"  -t, --tty         tty name\n"
+		"  -b, --baudrate    baud rate\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -t /dev/ttyS0 -b 57600n8\n", TAG);
+		"  %s -t /dev/ttyS0 -b 57600n8\n", TAG);
 	exit(exit_code);
 }
 

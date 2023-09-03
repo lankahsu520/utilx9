@@ -140,16 +140,16 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -i, --ip          ip\n"
-		   "  -p, --port        port\n"
-		   "  -u, --user        user\n"
-		   "  -s, --pass        pass\n"
-		   "  -v, --verbose\n"
-		   "  -h, --help\n", TAG);
+		"  -i, --ip          ip\n"
+		"  -p, --port        port\n"
+		"  -u, --user        user\n"
+		"  -s, --pass        pass\n"
+		"  -v, --verbose\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -i localhost -p 22 -u admin -s hahahaha\n", TAG
-		  );
+		"  %s -i localhost -p 22 -u admin -s hahahaha\n", TAG
+	);
 	exit(exit_code);
 }
 

@@ -138,9 +138,9 @@ int URLEncode(const char *str, const int strsz, char *result, const int resultsz
 	{
 		ch = * (str + i);
 		if ((ch >= 'A' && ch <= 'Z')
-				|| (ch >= 'a' && ch <= 'z')
-				|| (ch >= '0' && ch <= '9')
-				|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?')
+			|| (ch >= 'a' && ch <= 'z')
+			|| (ch >= '0' && ch <= '9')
+			|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?')
 		{
 			result[j++] = ch;
 		}
@@ -154,9 +154,9 @@ int URLEncode(const char *str, const int strsz, char *result, const int resultsz
 			{
 				result[j++] = '%';
 				result[j++] = hexchars[(unsigned char)
-									   ch >> 4];
+						ch >> 4];
 				result[j++] = hexchars[(unsigned char)
-									   ch & 0xF];
+						ch & 0xF];
 			}
 			else
 			{
@@ -285,9 +285,9 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 		else if (isascii(ch))
 #else
 		else if ((ch >= 'A' && ch <= 'Z')
-				 || (ch >= 'a' && ch <= 'z')
-				 || (ch >= '0' && ch <= '9')
-				 || ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?' || ch == '=' || ch == '&' || ch == '[' || ch == ']')
+			|| (ch >= 'a' && ch <= 'z')
+			|| (ch >= '0' && ch <= '9')
+			|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?' || ch == '=' || ch == '&' || ch == '[' || ch == ']')
 #endif
 		{
 			result[j] = ch;

@@ -362,11 +362,11 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 				else
 				{
 					DBG_ER_LN("(name: %s, flags: 0x%02x, family: %d, host: %s, netmask: %s)",
-							  ifa->ifa_name,
-							  ifa->ifa_flags,
-							  family,
-							  host,
-							  netmask);
+						ifa->ifa_name,
+						ifa->ifa_flags,
+						family,
+						host,
+						netmask);
 				}
 			}
 		}
@@ -524,7 +524,8 @@ int chainX_if_gateway(char *iface, char *gateway, int gateway_len)
 		{
 			char iface_name[LEN_OF_VAL32] = "";
 			if ((SAFE_SSCANF(newline, "%s\t%lX\t%lX\t%X", iface_name, &dest_addr, &gate_addr, &iflags) == 4)
-					&& (SAFE_STRCMP(iface_name, iface) == 0))
+				&& (SAFE_STRCMP(iface_name, iface) == 0)
+			)
 			{
 				//if (dest_addr == 0)
 				if ((iflags & (RTF_UP | RTF_GATEWAY)) == (RTF_UP | RTF_GATEWAY))
@@ -1050,8 +1051,7 @@ int chainX_nslookup(char *hostname, char *ip, int ip_len)
 		return - 1;
 	}
 
-	addr_list = (struct in_addr * *)
-				he->h_addr_list;
+	addr_list = (struct in_addr **)he->h_addr_list;
 
 	for (i = 0; addr_list[i] != NULL; i++)
 	{
@@ -1356,9 +1356,10 @@ int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t le
 	BIO *bio = NULL;
 	X509 *cert = NULL;
 
-	if ((bio = BIO_new_mem_buf((char *)buff, -1)) &&
-			(cert = PEM_read_bio_X509(bio, NULL, 0, NULL)) &&
-			(SSL_CTX_use_certificate(ctxSSL, cert) != 1))
+	if ((bio = BIO_new_mem_buf((char *)buff, -1))
+		&& (cert = PEM_read_bio_X509(bio, NULL, 0, NULL))
+		&& (SSL_CTX_use_certificate(ctxSSL, cert) != 1)
+	)
 	{
 		SOCKET_SSL_DEBUG(stderr);
 		DBG_ER_LN("SSL_CTX_use_certificate error !!!");
@@ -1384,9 +1385,10 @@ int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len
 	BIO *kbio = NULL;
 	EVP_PKEY *pkey = NULL;
 
-	if ((kbio = BIO_new_mem_buf((char *)buff, -1)) &&
-			(pkey = PEM_read_bio_PrivateKey(kbio, NULL, 0, NULL)) &&
-			(SSL_CTX_use_PrivateKey(ctxSSL, pkey) != 1))
+	if ((kbio = BIO_new_mem_buf((char *)buff, -1))
+		&& (pkey = PEM_read_bio_PrivateKey(kbio, NULL, 0, NULL))
+		&& (SSL_CTX_use_PrivateKey(ctxSSL, pkey) != 1)
+	)
 	{
 		SOCKET_SSL_DEBUG(stderr);
 		DBG_ER_LN("SSL_CTX_use_PrivateKey error !!!");
@@ -1407,9 +1409,10 @@ int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len
 	BIO *kbio = NULL;
 	RSA *rsa = NULL;
 
-	if ((kbio = BIO_new_mem_buf((char *)buff, -1)) &&
-			(rsa = PEM_read_bio_RSAPrivateKey(kbio, NULL, 0, NULL)) &&
-			(SSL_CTX_use_RSAPrivateKey(ctxSSL, rsa) != 1))
+	if ((kbio = BIO_new_mem_buf((char *)buff, -1))
+		&& (rsa = PEM_read_bio_RSAPrivateKey(kbio, NULL, 0, NULL))
+		&& (SSL_CTX_use_RSAPrivateKey(ctxSSL, rsa) != 1)
+	)
 	{
 		SOCKET_SSL_DEBUG(stderr);
 		DBG_ER_LN("SSL_CTX_use_RSAPrivateKey error !!!");
@@ -1482,9 +1485,10 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 		{
 #ifdef UTIL_EX_SOCKET_CERT_TXT
 			X509_STORE *store = SSL_CTX_get_cert_store(chainX_req->ctxSSL);
-			if ((ca_bio = BIO_new_mem_buf((char *)chainX_req->ca_txt, -1)) &&
-					(ca_cert = PEM_read_bio_X509(ca_bio, NULL, 0, NULL)) &&
-					(X509_STORE_add_cert(store, ca_cert) != 1))
+			if ((ca_bio = BIO_new_mem_buf((char *)chainX_req->ca_txt, -1))
+				&& (ca_cert = PEM_read_bio_X509(ca_bio, NULL, 0, NULL))
+				&& (X509_STORE_add_cert(store, ca_cert) != 1)
+			)
 #else
 			DBG_TR_LN("call SSL_CTX_load_verify_locations ... (%s)", chainX_req->ca_file);
 			if (!SSL_CTX_load_verify_locations(chainX_req->ctxSSL, chainX_req->ca_file, NULL))
@@ -1812,9 +1816,9 @@ static int chainXssl_create(ChainX_t *chainX_req)
 		return ret;
 	}
 
-	if ((chainX_req->seed) &&
-			((mbedtls_ctr_drbg_seed(&chainX_req->ctr_drbg, mbedtls_entropy_func, &chainX_req->entropy, (const unsigned char *) chainX_req->seed, strlen(chainX_req->seed))) != 0)
-	   )
+	if ((chainX_req->seed)
+		&& ((mbedtls_ctr_drbg_seed(&chainX_req->ctr_drbg, mbedtls_entropy_func, &chainX_req->entropy, (const unsigned char *) chainX_req->seed, strlen(chainX_req->seed))) != 0)
+	)
 	{
 		DBG_ER_LN("mbedtls_ctr_drbg_seed error !!!");
 		return ret;
@@ -2705,8 +2709,10 @@ static void chainX_loop_serial(ChainX_t *chainX_req)
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
-			((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)))
+	while ((chainX_quit_check(chainX_req)== 0)
+		&& (chainX_linked_check(chainX_req) == 0)
+		&& ((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0))
+	)
 	{
 		int result = 0;
 		int nread = 0;
@@ -2814,8 +2820,10 @@ static void chainX_loop_post(ChainX_t *chainX_req)
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
-			((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)))
+	while ((chainX_quit_check(chainX_req)== 0)
+		&& (chainX_linked_check(chainX_req) == 0)
+		&& ((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0))
+	)
 	{
 		int result = 0;
 		int nread = 0;
@@ -3328,8 +3336,10 @@ static void chainX_loop_netlink(ChainX_t *chainX_req)
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
-			((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)))
+	while ((chainX_quit_check(chainX_req)== 0)
+		&& (chainX_linked_check(chainX_req) == 0)
+		&& ((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0))
+	)
 	{
 		int result = 0;
 		//int nread = 0;
@@ -3728,12 +3738,12 @@ static int chainX_icmp(ChainX_t *chainX_req)
 								if (chainX_req->verbose)
 								{
 									DBG_IF_LN("%d bytes from %s (%s): icmp_seq=%d ttl=%d time=%.02Lf ms",
-											  rlen - hlen,
-											  chainX_reversename_get(chainX_req),
-											  chainX_ip_get(chainX_req),
-											  pkt->icmp_seq,
-											  ttl_val,
-											  rtt_msec);
+										rlen - hlen,
+										chainX_reversename_get(chainX_req),
+										chainX_ip_get(chainX_req),
+										pkt->icmp_seq,
+										ttl_val,
+										rtt_msec);
 								}
 							}
 							break;
@@ -3767,10 +3777,10 @@ static int chainX_icmp(ChainX_t *chainX_req)
 	{
 		DBG_IF_LN("--- %s ping statistics ---", chainX_hostname_get(chainX_req));
 		DBG_IF_LN("%d packets transmitted, %d received, %.0f%% packet loss, time: %.0Lf ms.",
-				  msg_seq,
-				  msg_received_count,
-				  ((msg_seq - msg_received_count)/msg_seq) * 100.0,
-				  total_msec);
+			msg_seq,
+			msg_received_count,
+			((msg_seq - msg_received_count)/msg_seq) * 100.0,
+			total_msec);
 	}
 
 	return msg_received_count;

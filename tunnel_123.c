@@ -529,19 +529,19 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -i, --ip          ip\n"
-		   "  -p, --port        port\n"
-		   "  -u, --user        user\n"
-		   "  -s, --pass        pass\n"
-		   "  -o, --open        open port\n"
-		   "  -m, --mode        mode\n"
-		   "  -f, --foreground\n"
-		   "  -v, --verbose\n"
-		   "  -h, --help\n", TAG);
+		"  -i, --ip          ip\n"
+		"  -p, --port        port\n"
+		"  -u, --user        user\n"
+		"  -s, --pass        pass\n"
+		"  -o, --open        open port\n"
+		"  -m, --mode        mode\n"
+		"  -f, --foreground\n"
+		"  -v, --verbose\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -i 192.168.50.100 -p 19999 -u admin -s hahahaha\n", TAG
-		  );
+		"  %s -i 192.168.50.100 -p 19999 -u admin -s hahahaha\n", TAG
+	);
 	exit(exit_code);
 }
 

@@ -90,8 +90,7 @@ DBusHandlerResult demo_signal_name_cb(DBusConnection *connection, DBusMessage *m
 							JSON_ARY_APPEND_STR(jitem_ary, item);
 							DBG_DB_LN("(item: %s)", item);
 						}
-					}
-					while (dbus_message_iter_next(&dSubIter) == TRUE);
+					} while (dbus_message_iter_next(&dSubIter) == TRUE);
 
 					reqStr = JSON_DUMPS_EASY(jitem_ary);
 					JSON_FREE(jitem_ary);
@@ -437,8 +436,7 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 									JSON_ARY_APPEND_STR(jitem_ary, item);
 									DBG_DB_LN("(item: %s)", item);
 								}
-							}
-							while (dbus_message_iter_next(&dSubIter) == TRUE);
+							} while (dbus_message_iter_next(&dSubIter) == TRUE);
 
 							retStr = JSON_DUMPS_EASY(jitem_ary);
 							JSON_FREE(jitem_ary);

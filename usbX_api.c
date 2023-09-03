@@ -567,18 +567,18 @@ int usbX_hotplug_register(UsbX_t *usbX_req)
 	if ((usbX_req) && (usbX_req->usb_hotplug_fn))
 	{
 		ret = libusb_hotplug_register_callback(
-				  usbX_req->usb_req,
-				  LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+				usbX_req->usb_req,
+				LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
 #ifdef PJ_HAS_EUDEV
-				  0,
+				0,
 #else
-				  LIBUSB_HOTPLUG_ENUMERATE, // libusb_hotplug_flag
+				LIBUSB_HOTPLUG_ENUMERATE, // libusb_hotplug_flag
 #endif
-				  usbX_req->vendor_id, usbX_req->product_id,
-				  LIBUSB_HOTPLUG_MATCH_ANY,
-				  usbX_hotplug_cb,
-				  usbX_req,
-				  &usbX_req->usb_hotplug_handle);
+				usbX_req->vendor_id, usbX_req->product_id,
+				LIBUSB_HOTPLUG_MATCH_ANY,
+				usbX_hotplug_cb,
+				usbX_req,
+				&usbX_req->usb_hotplug_handle);
 		if (LIBUSB_SUCCESS != ret)
 		{
 			DBG_ER_LN("libusb_hotplug_register_callback error !!!");

@@ -49,14 +49,14 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -i, --interval    interval\n"
-		   "  -c, --count       count\n"
-		   "  -v, --verbose     verbose\n"
-		   "  -h, --help\n", TAG);
+		"  -i, --interval    interval\n"
+		"  -c, --count       count\n"
+		"  -v, --verbose     verbose\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  ping_123 -i 1 -c 3 google.com\n"
-		  );
+		"  ping_123 -i 1 -c 3 google.com\n"
+	);
 	exit(exit_code);
 }
 
@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
 {
 	app_ParseArguments(argc, argv);
 
-	if ((strlen(chainX_ip_get(&chainX_i)) > 0) ||
-			(strlen(chainX_hostname_get(&chainX_i)) > 0))
+	if ((strlen(chainX_ip_get(&chainX_i)) > 0)
+		|| (strlen(chainX_hostname_get(&chainX_i)) > 0))
 	{
 		int count = chainX_ping(&chainX_i);
 		DBG_IF_LN("(count: %d/%d)", count, chainX_i.recycle);

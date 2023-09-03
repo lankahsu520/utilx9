@@ -339,17 +339,17 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf("Usage: %s\n"
-		   "  -d, --debug       debug level\n"
-		   "  -f, --host        hostname\n"
-		   "  -p, --port        port\n"
-		   "  -i, --iface       iface\n"
-		   "  -u, --user        user\n"
-		   "  -w, --pass        pass\n"
-		   "  -c, --certpath    certpath\n"
-		   "  -h, --help\n", TAG);
+		"  -d, --debug       debug level\n"
+		"  -f, --host        hostname\n"
+		"  -p, --port        port\n"
+		"  -i, --iface       iface\n"
+		"  -u, --user        user\n"
+		"  -w, --pass        pass\n"
+		"  -c, --certpath    certpath\n"
+		"  -h, --help\n", TAG);
 	printf("Version: %s\n", version_show());
 	printf("Example:\n"
-		   "  %s -d 2 -f 192.168.50.9 -p 1883\n", TAG);
+		"  %s -d 2 -f 192.168.50.9 -p 1883\n", TAG);
 	exit(exit_code);
 }
 

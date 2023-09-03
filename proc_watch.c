@@ -24,7 +24,7 @@ CLIST(CurrListHead);
 
 static int is_quit = 0;
 
-static pthread_mutex_t app_mutex = PTHREAD_MUTEX_INITIALIZER; 
+static pthread_mutex_t app_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t app_cond = PTHREAD_COND_INITIALIZER;
 
 void sys_info_show(void)
@@ -43,7 +43,7 @@ void sys_info_show(void)
 
 #if (1)
 	int freeram_percent = ((double)sysinfo_ex.meminfo.freeram/sysinfo_ex.meminfo.totalram) *100;
-	if (freeram_percent > 25)
+	if(freeram_percent > 25)
 	{
 		// nothing
 		DBG_LN_Y("safe !!! (freeram_percent: %d > 25, %ld, %ld)", freeram_percent, sysinfo_ex.meminfo.freeram, sysinfo_ex.meminfo.totalram);
@@ -62,13 +62,13 @@ void proc_info_show(void)
 	DBG_LN_Y("#******************************************************************************");
 	DBG_LN_Y("#** proc info (refresh: %d secs) **", TIMEOUT_OF_APP);
 	DBG_LN_Y("#******************************************************************************");
-	proc_entry_print_ex( OrgListHead, 0);
-	
+	proc_entry_print_ex(OrgListHead, 0);
+
 	DBG_LN_Y("#** proc info (new)**");
 	proc_entry_reset(CurrListHead);
 	proc_entry_scan(CurrListHead);
 	//proc_entry_cpuusage(CurrListHead);
-	proc_entry_print_ex( CurrListHead, 0);
+	proc_entry_print_ex(CurrListHead, 0);
 }
 
 void proc_table_add_yokis(clist_t head)
@@ -143,7 +143,7 @@ void proc_table_add_philio(clist_t head)
 
 	// 1.x
 	proc_entry_push(head, "philio-sdk");
-	
+
 	// 2.x
 	proc_entry_push(head, "pan27");
 	proc_entry_push(head, "sdk");
@@ -179,7 +179,7 @@ void proc_watch_CurrList(clist_t head)
 void app_wakeup(void)
 {
 	SAFE_THREAD_LOCK(&app_mutex);
-	SAFE_THREAD_SIGNAL(&app_cond); 
+	SAFE_THREAD_SIGNAL(&app_cond);
 	SAFE_THREAD_UNLOCK(&app_mutex);
 }
 
@@ -209,7 +209,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if (app_quit()==0)
+	if(app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -222,7 +222,7 @@ static void app_stop(void)
 
 static void app_loop(void)
 {
-	while (app_quit() == 0)
+	while(app_quit() == 0)
 	{
 		sys_info_show();
 		proc_info_show();
@@ -250,7 +250,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch (signum)
+	switch(signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -274,13 +274,13 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-	signal(SIGINT, app_signal_handler );
-	signal(SIGTERM, app_signal_handler );
-	signal(SIGHUP, app_signal_handler );
-	signal(SIGUSR1, app_signal_handler );
-	signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler);
+	signal(SIGTERM, app_signal_handler);
+	signal(SIGHUP, app_signal_handler);
+	signal(SIGUSR1, app_signal_handler);
+	signal(SIGUSR2, app_signal_handler);
 
-	signal(SIGPIPE, SIG_IGN );
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int main(int argc, char *argv[])
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 
 	SAFE_STDOUT_NONE();
-	if ( app_init() == -1 )
+	if(app_init() == -1)
 	{
 		return -1;
 	}

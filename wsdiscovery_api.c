@@ -33,21 +33,27 @@ static WSList_t *ws_entry_push(clist_t head, int mask, const char *XAddrs, const
 	ws_entry->mask = mask;
 	SAFE_SNPRINTF(ws_entry->url, sizeof(ws_entry->url), "%s", XAddrs);
 
-	if (Types)
+	if(Types)
 	{
 #if (0)
 		char *cTypes = SAFE_STRCHR(Types, ':');
-		if (cTypes) cTypes=cTypes+1;
-		else cTypes = Types;
+		if(cTypes)
+		{
+			cTypes=cTypes+1;
+		}
+		else
+		{
+			cTypes = Types;
+		}
 #endif
 
 		SAFE_SNPRINTF(ws_entry->types, sizeof(ws_entry->types), "%s", Types);
 	}
-	if (MetadataVersion)
+	if(MetadataVersion)
 	{
 		SAFE_SNPRINTF(ws_entry->version, sizeof(ws_entry->version), "%s", MetadataVersion);
 	}
-	
+
 	clist_push(head, ws_entry);
 
 	return ws_entry;
@@ -56,21 +62,22 @@ static WSList_t *ws_entry_push(clist_t head, int mask, const char *XAddrs, const
 static WSList_t *ws_entry_search(clist_t head, const char *XAddrs)
 {
 	WSList_t *cur;
-	
-	for (cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
+
+	for(cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
 	{
-		if (!SAFE_STRCMP((char *)XAddrs, cur->url)) {
+		if(!SAFE_STRCMP((char *)XAddrs, cur->url))
+		{
 			return cur;
 		}
 	}
-	
+
 	return NULL;
 }
 
 static void ws_entry_print_ex(clist_t head)
 {
 	WSList_t *cur = NULL;
-	for (cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
+	for(cur = clist_head(head); cur != NULL; cur = clist_item_next(cur))
 	{
 		DBG_IF_LN("(types: %s, version: %s, url: %s)", cur->types, cur->version, cur->url);
 	}
@@ -83,23 +90,23 @@ static void ws_entry_item_free(void *item)
 
 void ws_entry_print(void)
 {
-	ws_entry_print_ex( ws_list_head() );
+	ws_entry_print_ex(ws_list_head());
 }
 
 void ws_entry_init(void)
 {
-	clist_init( ws_list_head() );
+	clist_init(ws_list_head());
 }
 
 void ws_entry_free(void)
 {
-	clist_free_ex( ws_list_head(), ws_entry_item_free );
+	clist_free_ex(ws_list_head(), ws_entry_item_free);
 }
 
 void ws_devices_refresh(void)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if (wsd_req)
+	if(wsd_req)
 	{
 		ws_entry_free();
 		ws_entry_init();
@@ -112,54 +119,54 @@ void ws_device_add(ChainX_t *chainX_req, soap_node_t *node)
 {
 	const char *Types = NULL;
 	soap_node_t *Types_node = soap_element_fetch(node, NULL, "Types", NULL, NULL);
-	if (Types_node)
+	if(Types_node)
 	{
 		Types = soap_element_text(Types_node, 0);
 	}
 
 	const char *Scopes = NULL;
 	soap_node_t *Scopes_node = soap_element_fetch(node, NULL, "Scopes", NULL, NULL);
-	if (Scopes_node)
+	if(Scopes_node)
 	{
 		Scopes = soap_element_text(Scopes_node, 0);
 	}
 
 	const char *XAddrs = NULL;
 	soap_node_t *XAddrs_node = soap_element_fetch(node, NULL, "XAddrs", NULL, NULL);
-	if (XAddrs_node)
+	if(XAddrs_node)
 	{
 		XAddrs = soap_element_text(XAddrs_node, 0);
 	}
 
 	const char *MetadataVersion = NULL;
 	soap_node_t *MetadataVersion_node = soap_element_fetch(node, NULL, "MetadataVersion", NULL, NULL);
-	if (MetadataVersion_node)
+	if(MetadataVersion_node)
 	{
 		MetadataVersion = soap_element_text(MetadataVersion_node, 0);
 	}
 
 	char *XAddrs_new = NULL;
 	SAFE_ASPRINTF(XAddrs_new, "%s", XAddrs);
-	if (XAddrs_new)
+	if(XAddrs_new)
 	{
 		char *first = NULL;
 		char *saveptr = NULL;
-		if ( (first = SAFE_STRTOK_R(XAddrs_new, " ", &saveptr)) )
+		if((first = SAFE_STRTOK_R(XAddrs_new, " ", &saveptr)))
 		{
 			DBG_TR_LN("(XAddrs: %s)", first);
-			WSList_t *ws_entry = ws_entry_search( ws_list_head(), first);
-			if (ws_entry)
+			WSList_t *ws_entry = ws_entry_search(ws_list_head(), first);
+			if(ws_entry)
 			{
 				// found the same
 			}
 			else
 			{
 				int mask = WSDISCOVERY_FILTER_MASK_OTHERS;
-				if ( (Scopes) && (SAFE_STRSTR((char*)Scopes, "onvif")) )
+				if((Scopes) && (SAFE_STRSTR((char*)Scopes, "onvif")))
 				{
 					mask = WSDISCOVERY_FILTER_MASK_ONVIF;
 				}
-				ws_entry_push( ws_list_head(), mask, first, Types, MetadataVersion);
+				ws_entry_push(ws_list_head(), mask, first, Types, MetadataVersion);
 				ws_entry_print();
 			}
 		}
@@ -174,7 +181,7 @@ void ws_device_add(ChainX_t *chainX_req, soap_node_t *node)
 void wsdiscovery_probematches_register(wsdiscovery_response_fn cb)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if (wsd_req)
+	if(wsd_req)
 	{
 		wsd_req->probematches_cb = cb;
 	}
@@ -183,7 +190,7 @@ void wsdiscovery_probematches_register(wsdiscovery_response_fn cb)
 void wsdiscovery_probe_register(wsdiscovery_response_fn cb)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if (wsd_req)
+	if(wsd_req)
 	{
 		wsd_req->probe_cb = cb;
 	}
@@ -192,7 +199,7 @@ void wsdiscovery_probe_register(wsdiscovery_response_fn cb)
 void wsdiscovery_hello_register(wsdiscovery_response_fn cb)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if (wsd_req)
+	if(wsd_req)
 	{
 		wsd_req->hello_cb = cb;
 	}
@@ -201,7 +208,7 @@ void wsdiscovery_hello_register(wsdiscovery_response_fn cb)
 void wsdiscovery_others_register(wsdiscovery_response_fn cb)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if (wsd_req)
+	if(wsd_req)
 	{
 		wsd_req->others_cb = cb;
 	}
@@ -210,7 +217,7 @@ void wsdiscovery_others_register(wsdiscovery_response_fn cb)
 void wsdiscovery_linked_register(chainX_linked_fn cb)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if ( (wsd_req) && (wsd_req->chainX_req) )
+	if((wsd_req) && (wsd_req->chainX_req))
 	{
 		chainX_linked_register(wsd_req->chainX_req, cb);
 	}
@@ -218,34 +225,46 @@ void wsdiscovery_linked_register(chainX_linked_fn cb)
 
 static void wsdiscovery_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
-	if ((chainX_req) && (buff) &&(buff_len))
+	if((chainX_req) && (buff) &&(buff_len))
 	{
 		//DBG_TMP_Y("%s:%d - [%s] \n", inet_ntoa(chainX_req->addr_frm.sin_addr), ntohs(chainX_req->addr_frm.sin_port), buff);
 		WSDiscoveryX_t *wsd_req = (WSDiscoveryX_t *)chainX_req->c_data;
-		if (wsd_req)
+		if(wsd_req)
 		{
 			soap_node_t *response_node = soap_load_string(buff);
-			if ( response_node ) 
+			if(response_node)
 			{
 				soap_node_t *Hello_node = soap_element_fetch(response_node, NULL, "Hello", NULL, NULL);
 				soap_node_t *Probe_node = soap_element_fetch(response_node, NULL, "Probe", NULL, NULL);
 				soap_node_t *ProbeMatch_node = soap_element_fetch(response_node, NULL, "ProbeMatch", NULL, NULL);
 
-				if (Hello_node)
+				if(Hello_node)
 				{
-					if (wsd_req->hello_cb) wsd_req->hello_cb(chainX_req, Hello_node);
+					if(wsd_req->hello_cb)
+					{
+						wsd_req->hello_cb(chainX_req, Hello_node);
+					}
 				}
-				else if (ProbeMatch_node)
+				else if(ProbeMatch_node)
 				{
-					if (wsd_req->probematches_cb) wsd_req->probematches_cb(chainX_req, ProbeMatch_node);
+					if(wsd_req->probematches_cb)
+					{
+						wsd_req->probematches_cb(chainX_req, ProbeMatch_node);
+					}
 				}
-				else if (Probe_node)
+				else if(Probe_node)
 				{
-					if (wsd_req->probe_cb) wsd_req->probe_cb(chainX_req, Probe_node);
+					if(wsd_req->probe_cb)
+					{
+						wsd_req->probe_cb(chainX_req, Probe_node);
+					}
 				}
 				else
 				{
-					if (wsd_req->others_cb) wsd_req->others_cb(chainX_req, response_node);
+					if(wsd_req->others_cb)
+					{
+						wsd_req->others_cb(chainX_req, response_node);
+					}
 				}
 
 				soap_element_delete(response_node);
@@ -256,7 +275,7 @@ static void wsdiscovery_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 static char *wsdiscovery_xml(SOAP_ACTION_ID act_id)
 {
-	switch (act_id)
+	switch(act_id)
 	{
 		case SOAP_ACTION_ID_PROBE_DEVICE:
 			return WSD_XML_PROBE_DEVICE;
@@ -280,15 +299,15 @@ static void wsdiscovery_uuid_gen(ChainX_t *chainX_req, soap_node_t *request_node
 	//ChainX_t *chainX_req = wsd_req->chainX_req;
 	//SoapX_t *soap = wsd_req->soap;
 
-	if ( (chainX_req) && (request_node) )
+	if((chainX_req) && (request_node))
 	{
 		soap_node_t *MessageID_node = soap_element_fetch(request_node, NULL, "MessageID", NULL, NULL);
-		if (MessageID_node)
+		if(MessageID_node)
 		{
 			os_random_uuid(chainX_req->session, sizeof(chainX_req->session));
 			char *messageid = NULL;
 			SAFE_ASPRINTF(messageid, "uuid:%s", chainX_req->session);
-			if (messageid)
+			if(messageid)
 			{
 				DBG_TR_LN("(messageid: %s)", messageid);
 				soap_element_text_set(MessageID_node, 0, messageid);
@@ -300,16 +319,16 @@ static void wsdiscovery_uuid_gen(ChainX_t *chainX_req, soap_node_t *request_node
 
 void wsdiscovery_sender(WSDiscoveryX_t *wsd_req, SOAP_ACTION_ID act_id)
 {
-	if (wsd_req)
+	if(wsd_req)
 	{
 		soap_node_t *request_node = soap_load_string(wsdiscovery_xml(act_id));
-		if (request_node)
+		if(request_node)
 		{
 			wsdiscovery_uuid_gen(wsd_req->chainX_req, request_node);
-			
+
 			int buffer_len = 0;
 			char *buffer = soap_element_2string(request_node);
-			if ( (buffer) && (buffer_len = strlen(buffer)) )
+			if((buffer) && (buffer_len = strlen(buffer)))
 			{
 				chainX_multi_sender(wsd_req->chainX_req, buffer, buffer_len);
 				SAFE_FREE(buffer);
@@ -322,9 +341,10 @@ void wsdiscovery_sender(WSDiscoveryX_t *wsd_req, SOAP_ACTION_ID act_id)
 
 void wsdiscovery_probe(chainX_post_fn cb)
 {
-	if (cb)
+	if(cb)
 	{
-		ChainX_t chainXms = {
+		ChainX_t chainXms =
+		{
 			.mode = CHAINX_MODE_ID_MULTI_SENDER,
 			.sockfd = -1,
 
@@ -344,14 +364,14 @@ void wsdiscovery_probe(chainX_post_fn cb)
 		chainX_post_register(&chainXms, cb);
 
 		soap_node_t *request_node = soap_load_string(wsdiscovery_xml(SOAP_ACTION_ID_PROBE_DEVICE));
-		if (request_node)
+		if(request_node)
 		{
 			{
 				wsdiscovery_uuid_gen(&chainXms, request_node);
 			}
 			int buffer_len = 0;
 			char *buffer = soap_element_2string(request_node);
-			if ( (buffer) && (buffer_len = strlen(buffer)) )
+			if((buffer) && (buffer_len = strlen(buffer)))
 			{
 				DBG_TMP_Y("%s", buffer);
 				chainX_multi_sender_and_post(&chainXms, buffer, buffer_len);
@@ -369,7 +389,7 @@ WSDiscoveryX_t *wsdiscovery_get(void)
 
 static void wsdiscovery_free(WSDiscoveryX_t *wsd_req)
 {
-	if (wsd_req)
+	if(wsd_req)
 	{
 		SAFE_FREE(wsd_req->chainX_req);
 		SAFE_FREE(wsd_req);
@@ -379,7 +399,7 @@ static void wsdiscovery_free(WSDiscoveryX_t *wsd_req)
 void wsdiscovery_stop(void)
 {
 	WSDiscoveryX_t *wsd_req = wsdiscovery_get();
-	if (wsd_req)
+	if(wsd_req)
 	{
 		chainX_thread_stop(wsd_req->chainX_req);
 	}
@@ -388,7 +408,7 @@ void wsdiscovery_stop(void)
 void wsdiscovery_close(void)
 {
 	WSDiscoveryX_t *wsd_req = wsd_info;
-	if (wsd_req)
+	if(wsd_req)
 	{
 		chainX_thread_close(wsd_req->chainX_req);
 		wsdiscovery_free(wsd_req);
@@ -399,20 +419,20 @@ void wsdiscovery_close(void)
 static WSDiscoveryX_t *wsdiscovery_init(void)
 {
 	WSDiscoveryX_t *wsd_req = (WSDiscoveryX_t*)SAFE_CALLOC(1, sizeof(WSDiscoveryX_t));
-	if (wsd_req)
+	if(wsd_req)
 	{
 		ChainX_t *chainX_req = (ChainX_t*)SAFE_CALLOC(1, sizeof(ChainX_t));
-		if (chainX_req)
+		if(chainX_req)
 		{
 			wsd_req->chainX_req = chainX_req;
-			
+
 			chainX_req->mode = CHAINX_MODE_ID_MULTI_RECEIVER;
 			chainX_req->sockfd = -1;
 			chainX_req->c_data = (void*)wsd_req;
 			chainX_req->select_wait = TIMEOUT_OF_SELECT_1;
 			chainX_req->retry_hold = TIMEOUT_OF_RETRY_HOLD,
-			chainX_req->noblock =  1;
-			
+						chainX_req->noblock =  1;
+
 			chainX_ip_set(chainX_req, WS_DISCOVERY_IPV4);
 			chainX_port_set(chainX_req, WS_DISCOVERY_PORT);
 			chainX_post_register(chainX_req, wsdiscovery_response);
@@ -429,7 +449,7 @@ static WSDiscoveryX_t *wsdiscovery_init(void)
 
 WSDiscoveryX_t *wsdiscovery_open(void)
 {
-	if (wsd_info==NULL)
+	if(wsd_info==NULL)
 	{
 		wsd_info = wsdiscovery_init();
 	}

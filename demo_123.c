@@ -28,6 +28,24 @@
 int newline_lookupokup_cb(char *newline, void *arg)
 {
 	int ret = 0;
+	if(ret==0)
+	{
+		ret++;
+	}
+	switch(ret)
+	{
+		case 1:
+		{
+		}
+		break;
+		case 2:
+			a=b;
+			b=c;
+			c=d;
+			break;
+		default:
+			break;
+	}
 	DBG_IF_LN("(newline: %s)", newline);
 
 	return ret;
@@ -42,7 +60,7 @@ int main(int argc, char* argv[])
 
 	char hello[]="Hello World !!!    ";
 	DBG_IF_LN("(hello_trim: %s)", hello);
-	
+
 	char *hello_trim = str_trim(hello);
 	DBG_IF_LN("(hello_trim: %s)", hello_trim);
 
@@ -72,6 +90,7 @@ int main(int argc, char* argv[])
 		DBG_IF_LN("(hello_dec: %s)", hello_dec);
 	}
 #endif
+
 
 #ifdef USE_TEST_SEC_ENC_AND_DEC
 #ifdef UTIL_EX_SSL
@@ -122,7 +141,7 @@ int main(int argc, char* argv[])
 	{
 		char path[] = "/etc/passwd";
 		char actualpath [PATH_MAX+1] = "";
-		if( file_path(path, actualpath) )
+		if(file_path(path, actualpath))
 		{
 			DBG_IF_LN("(actualpath: %s)", actualpath);
 		}
@@ -136,7 +155,7 @@ int main(int argc, char* argv[])
 #ifdef USE_TEST_COPY_FILE
 	char filename[LEN_OF_FULLNAME] ="";
 	int i = 0;
-	for (i=0; i< 256; i++)
+	for(i=0; i< 256; i++)
 	{
 		SAFE_SPRINTF_EX(filename, "./snapshot_%03d.jpg", i);
 		file_copy("./snapshot.jpg", filename);
@@ -149,31 +168,31 @@ int main(int argc, char* argv[])
 
 #ifdef UTIL_EX_CURL
 	HttpX_t http_req;
-	DBG_IF_LN("(mode: %zd)", sizeof(http_req.mode) );
-	DBG_IF_LN("(curl: %zd)", sizeof(http_req.curl) );
-	DBG_IF_LN("(url: %zd)", sizeof(http_req.url) );
-	DBG_IF_LN("(port: %zd)", sizeof(http_req.port) );
-	DBG_IF_LN("(user: %zd)", sizeof(http_req.user) );
-	DBG_IF_LN("(log: %zd)", sizeof(http_req.log) );
+	DBG_IF_LN("(mode: %zd)", sizeof(http_req.mode));
+	DBG_IF_LN("(curl: %zd)", sizeof(http_req.curl));
+	DBG_IF_LN("(url: %zd)", sizeof(http_req.url));
+	DBG_IF_LN("(port: %zd)", sizeof(http_req.port));
+	DBG_IF_LN("(user: %zd)", sizeof(http_req.user));
+	DBG_IF_LN("(log: %zd)", sizeof(http_req.log));
 
 	DBG_IF_LN("------------");
-	DBG_IF_LN("(res_size: %zd)", sizeof(http_req.simple_req.res_size) );
-	DBG_IF_LN("(response: %zd)", sizeof(http_req.simple_req.response) );
-	DBG_IF_LN("(method: %zd)", sizeof(http_req.simple_req.method) );
-	DBG_IF_LN("(curl_slist: %zd)", sizeof(http_req.simple_req.headers) );
+	DBG_IF_LN("(res_size: %zd)", sizeof(http_req.simple_req.res_size));
+	DBG_IF_LN("(response: %zd)", sizeof(http_req.simple_req.response));
+	DBG_IF_LN("(method: %zd)", sizeof(http_req.simple_req.method));
+	DBG_IF_LN("(curl_slist: %zd)", sizeof(http_req.simple_req.headers));
 
 	DBG_IF_LN("------------");
-	DBG_IF_LN("(max_size: %zd)", sizeof(http_req.mjpeg_req.max_size) );
-	DBG_IF_LN("(filename: %zd)", sizeof(http_req.mjpeg_req.filename) );
-	DBG_IF_LN("(fp: %zd)", sizeof(http_req.mjpeg_req.fp) );
-	DBG_IF_LN("(qbuf: %zd)", sizeof(http_req.mjpeg_req.qbuf) );
-	DBG_IF_LN("(boundary: %zd)", sizeof(http_req.mjpeg_req.boundary) );
-	DBG_IF_LN("(state: %zd)", sizeof(http_req.mjpeg_req.state) );
+	DBG_IF_LN("(max_size: %zd)", sizeof(http_req.mjpeg_req.max_size));
+	DBG_IF_LN("(filename: %zd)", sizeof(http_req.mjpeg_req.filename));
+	DBG_IF_LN("(fp: %zd)", sizeof(http_req.mjpeg_req.fp));
+	DBG_IF_LN("(qbuf: %zd)", sizeof(http_req.mjpeg_req.qbuf));
+	DBG_IF_LN("(boundary: %zd)", sizeof(http_req.mjpeg_req.boundary));
+	DBG_IF_LN("(state: %zd)", sizeof(http_req.mjpeg_req.state));
 
 	DBG_IF_LN("------------");
 	RTSPRequest_t rtsp_req;
-	DBG_IF_LN("(track: %zd)", sizeof(rtsp_req.track) );
-	DBG_IF_LN("(track[0]: %zd)", sizeof(rtsp_req.track[0]) );
+	DBG_IF_LN("(track: %zd)", sizeof(rtsp_req.track));
+	DBG_IF_LN("(track[0]: %zd)", sizeof(rtsp_req.track[0]));
 #endif
 
 	exit(0);

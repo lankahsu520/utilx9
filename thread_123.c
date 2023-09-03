@@ -26,12 +26,12 @@ static void *thread_handler(void *user)
 	int count = 0;
 	DBG_IF_LN("(count: %d)", count++);
 
-	while (threadx_isquit(tidx_req)==0)
+	while(threadx_isquit(tidx_req)==0)
 	{
-		if (threadx_ispause(tidx_req)==0)
+		if(threadx_ispause(tidx_req)==0)
 		{
 			DBG_IF_LN("(name: %s, count: %d)", tidx_req->name, count++);
-			if (( count % 3) == 0)
+			if((count % 3) == 0)
 			{
 				DBG_IF_LN("wait 3 seconds ...");
 				threadx_timewait_simple(tidx_req, 3*1000);
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
 	threadx_init(&tidx_data_B, "thread_B");
 
-	while ( (threadx_isquit(&tidx_data_A)==0) && (threadx_isquit(&tidx_data_B)==0) )
+	while((threadx_isquit(&tidx_data_A)==0) && (threadx_isquit(&tidx_data_B)==0))
 	{
 		// busy loop
 		sleep(1);

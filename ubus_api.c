@@ -19,7 +19,8 @@ pthread_t ubus_tid = 0;
 QUIT_ID is_quit = QUIT_ID_NONE;
 READY_ID is_ready = READY_ID_NONE;
 
-const char * const p_type_str[] = {
+const char * const p_type_str[] =
+{
 	[BLOBMSG_TYPE_UNSPEC] = "Unspec",
 	[BLOBMSG_TYPE_ARRAY] = "Array",
 	[BLOBMSG_TYPE_TABLE] = "Table",
@@ -75,7 +76,7 @@ void uloop_timeout_set_ex(void)
 {
 	UTimerList_t *cur = NULL;
 
-	for (cur = clist_head(ubus_timer_list); cur != NULL; cur = clist_item_next(cur))
+	for(cur = clist_head(ubus_timer_list); cur != NULL; cur = clist_item_next(cur))
 	{
 		struct uloop_timeout *u_timer = cur->u_timer;
 		int msecs = cur->msecs;
@@ -87,7 +88,7 @@ static void uloop_timerlist_stop(void)
 {
 	UTimerList_t *cur = NULL;
 
-	for (cur = clist_head(ubus_timer_list); cur != NULL; cur = clist_item_next(cur))
+	for(cur = clist_head(ubus_timer_list); cur != NULL; cur = clist_item_next(cur))
 	{
 		struct uloop_timeout *u_timer = cur->u_timer;
 		uloop_timeout_cancel(u_timer);
@@ -99,10 +100,10 @@ int uloop_timerlist_add(uloop_timeout_handler cb, int msecs)
 	int ret = -1;
 	UTimerList_t *ubus_timer = (UTimerList_t *)SAFE_CALLOC(1, sizeof(UTimerList_t));
 
-	if (ubus_timer)
+	if(ubus_timer)
 	{
 		ubus_timer->u_timer = (struct uloop_timeout *)SAFE_CALLOC(1, sizeof(struct uloop_timeout));
-		if (ubus_timer->u_timer)
+		if(ubus_timer->u_timer)
 		{
 			ubus_timer->u_timer->cb = cb;
 			ubus_timer->msecs = msecs;
@@ -128,7 +129,7 @@ static void uloop_timerlist_item_free(void *item)
 {
 	UTimerList_t *ubus_timer = (UTimerList_t *)item;
 
-	if ((ubus_timer) && (ubus_timer->u_timer))
+	if((ubus_timer) && (ubus_timer->u_timer))
 	{
 		SAFE_FREE(ubus_timer->u_timer);
 	}
@@ -150,15 +151,15 @@ int ubus_cli_register_event(const char *pattern, ubus_event_handler_t cb)
 	int ret = -1;
 	UEventList_t *ubus_event = (UEventList_t *)SAFE_CALLOC(1, sizeof(UEventList_t));
 
-	if (ubus_event)
+	if(ubus_event)
 	{
 		ubus_event->ev = (struct ubus_event_handler *)SAFE_CALLOC(1, sizeof(struct ubus_event_handler));
-		if (ubus_event->ev)
+		if(ubus_event->ev)
 		{
 			ubus_event->ev->cb = cb;
 
 			int result = ubus_register_event_handler(ubus_conn_get(), ubus_event->ev, pattern);
-			if (result)
+			if(result)
 			{
 				DBG_ER_LN("ubus_register_event_handler error !!! (pattern: %s, ret: %d %s)", pattern, ret, ubus_strerror(ret));
 				SAFE_FREE(ubus_event->ev);
@@ -188,7 +189,7 @@ int ubus_cli_register_event(const char *pattern, ubus_event_handler_t cb)
 static int ubus_cli_subscribe_ex(char *obj_name, struct ubus_subscriber *s)
 {
 	int ret = ubus_register_subscriber(ubus_conn_get(), s);
-	if (ret)
+	if(ret)
 	{
 		DBG_ER_LN("ubus_register_subscriber error !!! (obj_name: %s, ret: %d %s)", obj_name, ret, ubus_strerror(ret));
 		goto exit_sub;
@@ -196,14 +197,14 @@ static int ubus_cli_subscribe_ex(char *obj_name, struct ubus_subscriber *s)
 
 	uint32_t obj_id;
 	ret = ubus_lookup_id(ubus_conn_get(), obj_name, &obj_id);
-	if (ret)
+	if(ret)
 	{
 		DBG_ER_LN("ubus_lookup_id error !!! (obj_name: %s, ret: %d %s)", obj_name, ret, ubus_strerror(ret));
 		goto exit_sub;
 	}
 
 	ret = ubus_subscribe(ubus_conn_get(), s, obj_id);
-	if (ret)
+	if(ret)
 	{
 		DBG_ER_LN("ubus_subscribe error !!! (obj_name: %s, ret: %d %s)", obj_name, ret, ubus_strerror(ret));
 		goto exit_sub;
@@ -219,16 +220,16 @@ int ubus_cli_subscribe(char *obj_name, ubus_handler_t cb, ubus_remove_handler_t 
 	int ret = -1;
 	USubscriberList_t *ubus_subscriber = (USubscriberList_t *)SAFE_CALLOC(1, sizeof(USubscriberList_t));
 
-	if (ubus_subscriber)
+	if(ubus_subscriber)
 	{
 		ubus_subscriber->s = (struct ubus_subscriber *)SAFE_CALLOC(1, sizeof(struct ubus_subscriber));
-		if (ubus_subscriber->s)
+		if(ubus_subscriber->s)
 		{
 			ubus_subscriber->s->cb = cb;
 			ubus_subscriber->s->remove_cb = remove_cb;
 
 			int result = ubus_cli_subscribe_ex(obj_name, ubus_subscriber->s);
-			if (result)
+			if(result)
 			{
 				DBG_ER_LN("ubus_cli_subscribe_ex error !!! (obj_name: %s)", obj_name);
 				SAFE_FREE(ubus_subscriber->s);
@@ -257,10 +258,13 @@ int ubus_cli_subscribe(char *obj_name, ubus_handler_t cb, ubus_remove_handler_t 
 
 int ubus_cli_invoke_ex(char *obj_name, const char *method, struct blob_buf *bbuf, ubus_data_handler_t cb, int timeout)
 {
-	if ( ubus_quit() == QUIT_ID_NOW ) return -1;
+	if(ubus_quit() == QUIT_ID_NOW)
+	{
+		return -1;
+	}
 	uint32_t obj_id;
 
-	if (ubus_lookup_id(ubus_conn_get(), obj_name, &obj_id))
+	if(ubus_lookup_id(ubus_conn_get(), obj_name, &obj_id))
 	{
 		DBG_ER_LN("ubus_lookup_id error !!! (obj_name: %s)", obj_name);
 		return -1;
@@ -276,20 +280,26 @@ static int ubus_srv_notify_ex(struct ubus_object *obj, const char *type, struct 
 
 int ubus_srv_notify_simple(const char *method, struct ubus_object *obj, char *key, char *val)
 {
-	if ( ubus_quit() == QUIT_ID_NOW ) return -1;
+	if(ubus_quit() == QUIT_ID_NOW)
+	{
+		return -1;
+	}
 	DBG_DB_LN("(method: %s, key: %s, val: %s)", method, key, val);
 
 	struct blob_buf bbuf = {};
 	blob_buf_init(&bbuf, 0);
 	blobmsg_add_string(&bbuf, key, val);
-	int ret = ubus_srv_notify_ex( obj, method, &bbuf);
+	int ret = ubus_srv_notify_ex(obj, method, &bbuf);
 	blob_buf_free(&bbuf);
 	return ret;
 }
 
 int ubus_srv_send_event_ex(const char *obj_name, struct blob_buf *bbuf)
 {
-	if ( ubus_quit() == QUIT_ID_NOW ) return -1;
+	if(ubus_quit() == QUIT_ID_NOW)
+	{
+		return -1;
+	}
 	return ubus_send_event(ubus_conn_get(), obj_name, bbuf->head);
 }
 
@@ -297,7 +307,10 @@ int ubus_srv_send_event_simple(const char *obj_name, char *key, char *val)
 {
 	int ret = 0;
 
-	if ( ubus_quit() == QUIT_ID_NOW ) return -1;
+	if(ubus_quit() == QUIT_ID_NOW)
+	{
+		return -1;
+	}
 
 #ifdef SEND_EVENT_DIRECTLY
 	struct blob_buf bbuf = {};
@@ -308,7 +321,7 @@ int ubus_srv_send_event_simple(const char *obj_name, char *key, char *val)
 	blob_buf_free(&bbuf);
 #else
 	UEventQueue_t *ubus_equeue = (UEventQueue_t *)SAFE_CALLOC(1, sizeof(UEventQueue_t));
-	if (ubus_equeue)
+	if(ubus_equeue)
 	{
 		SAFE_ASPRINTF(ubus_equeue->obj_name, "%s", obj_name);
 		blob_buf_init(&ubus_equeue->bbuf, 0);
@@ -331,9 +344,9 @@ static void ubus_srv_add_object_show(struct ubus_object *srv_obj)
 	int n_methods = srv_obj->n_methods;
 	int i = 0;
 
-	if (n_methods)
+	if(n_methods)
 	{
-		for (i=0; i<n_methods; i++)
+		for(i=0; i<n_methods; i++)
 		{
 			const char *m_name = methods[i].name;
 
@@ -341,13 +354,15 @@ static void ubus_srv_add_object_show(struct ubus_object *srv_obj)
 			int n_policy = methods[i].n_policy;
 
 			int j = 0;
-			for (j=0; j<n_policy; j++)
+			for(j=0; j<n_policy; j++)
 			{
 				const char *p_name = policy[j].name;
 				enum blobmsg_type typeid = policy[j].type;
 				const char *p_type = p_type_str[0];
-				if (typeid < __BLOBMSG_TYPE_LAST)
+				if(typeid < __BLOBMSG_TYPE_LAST)
+				{
 					p_type = p_type_str[typeid];
+				}
 
 				DBG_IF_LN("(%s/%s, %s-%s)", o_name, m_name, p_name, p_type);
 			}
@@ -373,7 +388,8 @@ int ubus_srv_object_subscribe(struct ubus_context *ctx, struct ubus_object *obj,
 
 static const char *json_format_type(void *priv, struct blob_attr *attr)
 {
-	static const char * const attr_types[] = {
+	static const char * const attr_types[] =
+	{
 		[BLOBMSG_TYPE_INT8] = "\"Boolean\"",
 		[BLOBMSG_TYPE_INT32] = "\"Integer\"",
 		[BLOBMSG_TYPE_STRING] = "\"String\"",
@@ -383,14 +399,20 @@ static const char *json_format_type(void *priv, struct blob_attr *attr)
 	const char *type = NULL;
 	int typeid;
 
-	if (blob_id(attr) != BLOBMSG_TYPE_INT32)
+	if(blob_id(attr) != BLOBMSG_TYPE_INT32)
+	{
 		return NULL;
+	}
 
 	typeid = blobmsg_get_u32(attr);
-	if (typeid < ARRAY_SIZE(attr_types))
+	if(typeid < ARRAY_SIZE(attr_types))
+	{
 		type = attr_types[typeid];
-	if (!type)
+	}
+	if(!type)
+	{
 		type = "\"(unknown)\"";
+	}
 
 	return type;
 }
@@ -403,10 +425,13 @@ static void ubus_cli_list_cb(struct ubus_context *ctx, struct ubus_object_data *
 
 	DBG_IF_LN("'%s' @%08x", obj->path, obj->id);
 
-	if (!obj->signature)
+	if(!obj->signature)
+	{
 		return;
+	}
 
-	blob_for_each_attr(cur, obj->signature, rem) {
+	blob_for_each_attr(cur, obj->signature, rem)
+	{
 		s = blobmsg_format_json_with_cb(cur, false, json_format_type, NULL, -1);
 		DBG_IF_LN("\t%s", s);
 		SAFE_FREE(s);
@@ -415,7 +440,7 @@ static void ubus_cli_list_cb(struct ubus_context *ctx, struct ubus_object_data *
 
 void ubus_cli_list_register(const char *path, ubus_lookup_handler_t cb)
 {
-	if (cb)
+	if(cb)
 	{
 		ubus_lookup(ubus_conn_get(), path, cb, NULL);
 	}
@@ -429,7 +454,7 @@ static void ubus_cli_event_item_free(void *item)
 {
 	UEventList_t *ubus_event = (UEventList_t *)item;
 
-	if ((ubus_event) && (ubus_event->ev))
+	if((ubus_event) && (ubus_event->ev))
 	{
 		SAFE_FREE(ubus_event->ev);
 	}
@@ -444,7 +469,7 @@ static void ubus_cli_subscriber_item_free(void *item)
 {
 	USubscriberList_t *ubus_subscriber  = (USubscriberList_t *)item;
 
-	if ((ubus_subscriber) && (ubus_subscriber->s))
+	if((ubus_subscriber) && (ubus_subscriber->s))
 	{
 		SAFE_FREE(ubus_subscriber->s);
 	}
@@ -459,7 +484,7 @@ static void ubus_srv_equeue_item_free(void *item)
 {
 	UEventQueue_t *ubus_equeue = (UEventQueue_t *)item;
 
-	if (ubus_equeue)
+	if(ubus_equeue)
 	{
 		blob_buf_free(&ubus_equeue->bbuf);
 		SAFE_FREE(ubus_equeue->obj_name);
@@ -480,7 +505,7 @@ static void ubus_srv_conn_lost(struct ubus_context *ctx)
 struct ubus_context *ubus_srv_init(void)
 {
 	struct ubus_context *ubus_req = ubus_conn_init();
-	if ( ubus_req == NULL )
+	if(ubus_req == NULL)
 	{
 		goto exit_ubus;
 	}
@@ -495,7 +520,7 @@ exit_ubus:
 #else
 void timer_200msec_loop(struct uloop_timeout *t)
 {
-	while ( clist_length(ubus_event_queue) > 0 )
+	while(clist_length(ubus_event_queue) > 0)
 	{
 		UEventQueue_t *item = (UEventQueue_t*)clist_pop(ubus_event_queue);
 
@@ -513,7 +538,7 @@ void timer_200msec_loop(struct uloop_timeout *t)
 
 void ubus_conn_free(void)
 {
-	if ( ubus_conn_get() )
+	if(ubus_conn_get())
 	{
 		uloop_timerlist_free();
 
@@ -521,14 +546,14 @@ void ubus_conn_free(void)
 		ubus_cli_subscriber_list_free();
 		ubus_cli_event_list_free();
 
-		ubus_free( ubus_conn_get() );
+		ubus_free(ubus_conn_get());
 	}
 }
 
 struct ubus_context *ubus_conn_init(void)
 {
 	DBG_DB_LN("(ubus_root: %s)", ubus_root);
-	if (SAFE_STRLEN(ubus_root) <= 0)
+	if(SAFE_STRLEN(ubus_root) <= 0)
 	{
 		ubus_conn = ubus_connect(NULL);
 	}
@@ -537,7 +562,7 @@ struct ubus_context *ubus_conn_init(void)
 		ubus_conn = ubus_connect(ubus_root);
 	}
 
-	if ( ubus_conn == NULL)
+	if(ubus_conn == NULL)
 	{
 		DBG_ER_LN("ubus_connect error !!!");
 	}
@@ -588,13 +613,13 @@ void ubus_ready_set(READY_ID ready)
 READY_ID ubus_ready(void)
 {
 	int retry = 3;
-	while ( ( is_ready != READY_ID_OK ) && ( retry > 0 ) && ( ubus_quit() == QUIT_ID_NONE ) )
+	while((is_ready != READY_ID_OK) && (retry > 0) && (ubus_quit() == QUIT_ID_NONE))
 	{
 		retry--;
 		sleep(1);
 	}
 
-	if ( is_ready == READY_ID_OK )
+	if(is_ready == READY_ID_OK)
 	{
 		return READY_ID_OK;
 	}
@@ -607,7 +632,7 @@ READY_ID ubus_ready(void)
 
 void ubus_add_uloop_ex(struct ubus_context *ctx)
 {
-	if (ctx)
+	if(ctx)
 	{
 		ubus_add_uloop(ctx);
 #ifdef FD_CLOEXEC
@@ -623,12 +648,12 @@ static void *ubus_thread_handler(void *arg)
 
 	//struct ubus_context *ubus_req = ubus_srv_conn_get();
 	//if ( ubus_req != NULL )
-	if ( (ubus_conn_get()) )
+	if((ubus_conn_get()))
 	{
 		//DBG_IF_LN("ubus listen ... (ubus_root: %s, local_id: 0x%08X)", ubus_root, ubus_req->local_id);
 		DBG_IF_LN("ubus listen ... (ubus_root: %s)", ubus_root);
 		uloop_init();
-		ubus_add_uloop_ex( ubus_conn_get() );
+		ubus_add_uloop_ex(ubus_conn_get());
 		uloop_timeout_set_ex();
 
 		ubus_ready_set(READY_ID_OK);
@@ -643,7 +668,7 @@ static void *ubus_thread_handler(void *arg)
 
 int ubus_thread_init(void)
 {
-	if (SAFE_THREAD_CREATE(ubus_tid, NULL, ubus_thread_handler, (void*)NULL) != 0)
+	if(SAFE_THREAD_CREATE(ubus_tid, NULL, ubus_thread_handler, (void*)NULL) != 0)
 	{
 		DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 		return -1;
@@ -658,7 +683,7 @@ void ubus_thread_stop(void)
 {
 	ubus_quit_set(QUIT_ID_NOW);
 
-	if (ubus_tid != 0)
+	if(ubus_tid != 0)
 	{
 		pthread_kill(ubus_tid, SIGINT);
 	}
@@ -670,10 +695,10 @@ void ubus_thread_stop(void)
 void ubus_thread_close(void)
 {
 	static int is_free = 0;
-	if (is_free == 0)
+	if(is_free == 0)
 	{
 		is_free ++;
-		if (ubus_tid != 0)
+		if(ubus_tid != 0)
 		{
 			pthread_join(ubus_tid, NULL);
 			ubus_tid = 0;

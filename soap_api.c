@@ -26,7 +26,7 @@ char *soap_element_2string(soap_node_t *parent_node)
 void soap_element_dump(soap_node_t *parent_node)
 {
 	char *buffer = soap_element_2string(parent_node);
-	DBG_LN_Y("(buffer: %s)", buffer );
+	DBG_LN_Y("(buffer: %s)", buffer);
 	SAFE_FREE(buffer);
 }
 
@@ -37,43 +37,43 @@ const char *soap_element_name(soap_node_t *parent_node)
 
 void soap_element_print(soap_node_t *curr_node)
 {
-	if ( (curr_node) && (mxmlGetType(curr_node) == MXML_ELEMENT) )
+	if((curr_node) && (mxmlGetType(curr_node) == MXML_ELEMENT))
 	{
 		DBG_LN_Y("(type: %d)", mxmlGetType(curr_node));
 
-		switch (mxmlGetType(curr_node))
+		switch(mxmlGetType(curr_node))
 		{
 			case MXML_IGNORE:
-		 		break;
+				break;
 			case MXML_ELEMENT:
 				DBG_LN_Y("	(name: %s)", mxmlGetElement(curr_node));
-				if (mxmlGetText(curr_node, NULL))
+				if(mxmlGetText(curr_node, NULL))
 				{
 					DBG_LN_Y("	(text: %s)", mxmlGetText(curr_node, NULL));
 				}
 				int i = 0;
-				for (i = 0; i < curr_node->value.element.num_attrs; i++)
+				for(i = 0; i < curr_node->value.element.num_attrs; i++)
 				{
-					if (curr_node->value.element.attrs )
+					if(curr_node->value.element.attrs)
 					{
 						DBG_LN_Y("		(%s=%s)", curr_node->value.element.attrs[i].name, curr_node->value.element.attrs[i].value);
 					}
 				}
-		 		break;
-		  case MXML_INTEGER:
-		 		break;
+				break;
+			case MXML_INTEGER:
+				break;
 			case MXML_OPAQUE:
-		 		break;
-		  case MXML_REAL:
-		 		break;
-		  case MXML_TEXT:
-				if (curr_node->value.text.string)
+				break;
+			case MXML_REAL:
+				break;
+			case MXML_TEXT:
+				if(curr_node->value.text.string)
 				{
 					DBG_LN_Y("	(string: %s)",  curr_node->value.text.string);
 				}
-		 		break;
-		  case MXML_CUSTOM:
-		 		break;
+				break;
+			case MXML_CUSTOM:
+				break;
 		}
 	}
 }
@@ -81,7 +81,7 @@ void soap_element_print(soap_node_t *curr_node)
 void soap_element_save(soap_node_t *parent_node, char *filename)
 {
 	FILE *fp = SAFE_FOPEN(filename, "w+");
-	if (fp)
+	if(fp)
 	{
 		mxmlSetWrapMargin(MAX_OF_WRAP);
 		mxmlSaveFile(parent_node, fp, MXML_NO_CALLBACK);
@@ -89,7 +89,7 @@ void soap_element_save(soap_node_t *parent_node, char *filename)
 	}
 	else
 	{
-		DBG_ER_LN("SAFE_FOPEN error !!! (%s)", filename );
+		DBG_ER_LN("SAFE_FOPEN error !!! (%s)", filename);
 	}
 }
 
@@ -98,7 +98,7 @@ soap_node_t *soap_element_fetch(soap_node_t *parent_node, const char *ns, const 
 {
 	soap_node_t *curr_node = NULL;
 
-	if (parent_node)
+	if(parent_node)
 	{
 		curr_node = mxmlFindElement_ex(parent_node, parent_node, ns, element, attr, value, MXML_DESCEND);
 		//curr_node = mxmlFindElement(parent_node, parent_node, element, attr, value, MXML_DESCEND);
@@ -118,7 +118,7 @@ void soap_element_attr_set(soap_node_t *parent_node, const char *name, const cha
 
 const char *soap_element_text(soap_node_t *parent_node, int *whitespace)
 {
-#ifdef USE_MXML_OPAQUE	
+#ifdef USE_MXML_OPAQUE
 	return mxmlGetOpaque(parent_node);
 #else
 	return mxmlGetText(parent_node, whitespace);
@@ -132,7 +132,7 @@ void soap_element_text_new(soap_node_t *parent_node, int whitespace, const char 
 
 void soap_element_text_set(soap_node_t *parent_node, int whitespace, const char *string)
 {
-#ifdef USE_MXML_OPAQUE	
+#ifdef USE_MXML_OPAQUE
 	mxmlSetOpaque(parent_node, string);
 #else
 	mxmlSetText(parent_node, whitespace, string);
@@ -151,7 +151,7 @@ soap_node_t *soap_element_1st_child(soap_node_t *parent_node)
 
 soap_node_t *soap_element_add(soap_node_t *parent_node, const char *name)
 {
-	if (parent_node)
+	if(parent_node)
 	{
 		return mxmlNewElement(parent_node, name);
 	}
@@ -160,7 +160,7 @@ soap_node_t *soap_element_add(soap_node_t *parent_node, const char *name)
 
 void soap_element_remove(soap_node_t *parent_node)
 {
-	if (parent_node)
+	if(parent_node)
 	{
 		mxmlRemove(parent_node);
 	}
@@ -168,20 +168,20 @@ void soap_element_remove(soap_node_t *parent_node)
 
 void soap_element_delete(soap_node_t *parent_node)
 {
-	if (parent_node)
+	if(parent_node)
 	{
 		mxmlDelete(parent_node);
 	}
 }
-	
+
 soap_node_t *soap_load_file(char *filename)
 {
 	soap_node_t *root_node = NULL;
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
-	if (fp)
+	if(fp)
 	{
-#ifdef USE_MXML_OPAQUE	
+#ifdef USE_MXML_OPAQUE
 		root_node = mxmlLoadFile(NULL, fp, MXML_OPAQUE_CALLBACK);
 #else
 		root_node = mxmlLoadFile(NULL, fp, MXML_TEXT_CALLBACK);
@@ -190,16 +190,16 @@ soap_node_t *soap_load_file(char *filename)
 	}
 	else
 	{
-		DBG_ER_LN("SAFE_FOPEN error !!! (%s)", filename );
+		DBG_ER_LN("SAFE_FOPEN error !!! (%s)", filename);
 	}
 	return root_node;
 }
 
 soap_node_t *soap_load_string(char *xmlbuffer)
 {
-	if (xmlbuffer)
+	if(xmlbuffer)
 	{
-#ifdef USE_MXML_OPAQUE	
+#ifdef USE_MXML_OPAQUE
 		return mxmlLoadString(NULL, xmlbuffer, MXML_OPAQUE_CALLBACK);
 #else
 		return mxmlLoadString(NULL, xmlbuffer, MXML_TEXT_CALLBACK);
@@ -223,9 +223,9 @@ void soap_load_request(SoapX_t *soap, char *action)
 
 void soap_http_access(SoapX_t *soap, HttpX_t *http_req)
 {
-	if ((soap) && (soap->request_node) && (http_req) )
+	if((soap) && (soap->request_node) && (http_req))
 	{
-		// req_node -> request string 
+		// req_node -> request string
 		http_req->soap_req.request = soap_element_2string(soap->request_node);
 		DBG_TR_LN("(request: %s)", http_req->soap_req.request);
 
@@ -243,7 +243,7 @@ void soap_free(SoapX_t *soap)
 {
 	//http_request_free(soap->http_req);
 	//SAFE_FREE(soap->http_req);
-	if (soap)
+	if(soap)
 	{
 		soap_element_delete(soap->request_node);
 		soap_element_delete(soap->response_node);
@@ -254,7 +254,7 @@ void soap_free(SoapX_t *soap)
 SoapX_t *soap_create(char *xmlbuffer)
 {
 	SoapX_t *soap = (SoapX_t*)SAFE_CALLOC(1, sizeof(SoapX_t));
-	if (soap)
+	if(soap)
 	{
 		soap->request_node = soap_load_string(xmlbuffer);
 	}

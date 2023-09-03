@@ -38,7 +38,7 @@ static void network_loop(void * data)
 	struct ifaddrmsg * ifa;
 	struct rtattr * rth;
 
-	if ((nls = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
+	if((nls = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
 	{
 		printf("MY_PROG: socket failure\n");
 	}
@@ -47,31 +47,31 @@ static void network_loop(void * data)
 	addr.nl_family = AF_NETLINK;
 	addr.nl_groups = 0xffffffff;//RTMGRP_IPV4_IFADDR;
 
-	if (bind(nls, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+	if(bind(nls, (struct sockaddr *) &addr, sizeof(addr)) == -1)
 	{
 		printf("MY_PROG:network_work_handler bind failure\n");
 	}
 
 	nlh = (struct nlmsghdr *)buffer;
 
-	while ((len = recv(nls, nlh, 4096, 0)) > 0)
+	while((len = recv(nls, nlh, 4096, 0)) > 0)
 	{
-		for (; (NLMSG_OK(nlh, len)) && (nlh->nlmsg_type != NLMSG_DONE); nlh = NLMSG_NEXT(nlh, len))
+		for(; (NLMSG_OK(nlh, len)) && (nlh->nlmsg_type != NLMSG_DONE); nlh = NLMSG_NEXT(nlh, len))
 		{
-			if (nlh->nlmsg_type == RTM_NEWADDR)
+			if(nlh->nlmsg_type == RTM_NEWADDR)
 			{
 				printf("MY_PROG:network_work_handler RTM_NEWADDR\n");
 			}
-			else if (nlh->nlmsg_type == RTM_DELADDR)
+			else if(nlh->nlmsg_type == RTM_DELADDR)
 			{
 				printf("MY_PROG:network_work_handler RTM_DELADDR\n");
 			}
-			else 
+			else
 			{
 				printf("MY_PROG:network_work_handler nlmsg_type=%d\n", nlh->nlmsg_type);
 			}
 
-			if ((nlh->nlmsg_type != RTM_NEWADDR) && (nlh->nlmsg_type != RTM_DELADDR))
+			if((nlh->nlmsg_type != RTM_NEWADDR) && (nlh->nlmsg_type != RTM_DELADDR))
 			{
 				continue; /* some other kind of announcement */
 			}
@@ -81,12 +81,12 @@ static void network_loop(void * data)
 			rth = IFA_RTA(ifa);
 			rtl = IFA_PAYLOAD(nlh);
 
-			for (; rtl && RTA_OK(rth, rtl); rth = RTA_NEXT(rth, rtl))
+			for(; rtl && RTA_OK(rth, rtl); rth = RTA_NEXT(rth, rtl))
 			{
 				char name[IFNAMSIZ];
 				uint32_t ipaddr;
 
-				if (rth->rta_type != IFA_LOCAL)
+				if(rth->rta_type != IFA_LOCAL)
 				{
 					continue;
 				}
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 
 #ifdef UTIL_EX_CHAINX
 #ifdef USE_NSLOOKUP
-	if (argc>=2)
+	if(argc>=2)
 	{
 		char hostname[LEN_OF_HOSTNAME]="";
 		char ipv4[LEN_OF_IP] = "";

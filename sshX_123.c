@@ -25,7 +25,8 @@ static int is_quit = 0;
 
 char whoami[LEN_OF_USER] = "";
 
-SSH_t ssh_data = {
+SSH_t ssh_data =
+{
 //.server_ip = "192.168.50.100",
 //.server_ip = "localhost",
 //.server_ip = "192.168.50.109",
@@ -57,7 +58,7 @@ static void app_loop(void)
 	DBG_TR_LN("enter");
 
 	DBG_TR_LN("call ssh_new ...");
-	if ( sshX_client(&ssh_data) == NULL )
+	if(sshX_client(&ssh_data) == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");
 		return ;
@@ -70,7 +71,7 @@ static void app_loop(void)
 static void app_stop(void)
 {
 	DBG_TR_LN("enter");
-	if (app_quit()==0)
+	if(app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -94,7 +95,7 @@ static void app_exit(void)
 
 static void app_signal_handler(int signum)
 {
-	switch (signum)
+	switch(signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -114,60 +115,60 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-	signal(SIGINT, app_signal_handler );
-	signal(SIGTERM, app_signal_handler );
-	signal(SIGHUP, app_signal_handler );
-	signal(SIGUSR1, app_signal_handler );
-	signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler);
+	signal(SIGTERM, app_signal_handler);
+	signal(SIGHUP, app_signal_handler);
+	signal(SIGUSR1, app_signal_handler);
+	signal(SIGUSR2, app_signal_handler);
 
-	signal(SIGPIPE, SIG_IGN );
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int option_index = 0;
-const char* short_options = "i:p:u:s:vh"; 
+const char* short_options = "i:p:u:s:vh";
 static struct option long_options[] =
 {
-	{ "ip",          required_argument,   NULL,    'i'  },  
-	{ "port",        required_argument,   NULL,    'p'  },  
-	{ "user",        required_argument,   NULL,    'u'  },  
-	{ "pass",        required_argument,   NULL,    's'  },  
-	{ "verbose",     no_argument,         NULL,    'v'  },  
-	{ "help",        no_argument,         NULL,    'h'  },  
+	{ "ip",          required_argument,   NULL,    'i'  },
+	{ "port",        required_argument,   NULL,    'p'  },
+	{ "user",        required_argument,   NULL,    'u'  },
+	{ "pass",        required_argument,   NULL,    's'  },
+	{ "verbose",     no_argument,         NULL,    'v'  },
+	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
-};  
+};
 
 static void app_showusage(int exit_code)
 {
-	printf( "Usage: %s\n"
-					"  -i, --ip          ip\n"
-					"  -p, --port        port\n"
-					"  -u, --user        user\n"
-					"  -s, --pass        pass\n"
-					"  -v, --verbose\n"
-					"  -h, --help\n", TAG);
-	printf( "Version: %s\n", version_show());
-	printf( "Example:\n"
-					"  %s -i localhost -p 22 -u admin -s hahahaha\n", TAG
-				);
+	printf("Usage: %s\n"
+		   "  -i, --ip          ip\n"
+		   "  -p, --port        port\n"
+		   "  -u, --user        user\n"
+		   "  -s, --pass        pass\n"
+		   "  -v, --verbose\n"
+		   "  -h, --help\n", TAG);
+	printf("Version: %s\n", version_show());
+	printf("Example:\n"
+		   "  %s -i localhost -p 22 -u admin -s hahahaha\n", TAG
+		  );
 	exit(exit_code);
 }
 
 static void app_ParseArguments(int argc, char **argv)
 {
-	int opt;               
+	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)  
+	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch (opt)
+		switch(opt)
 		{
 			case 'i':
-				if (optarg)
+				if(optarg)
 				{
 					SAFE_SPRINTF(ssh_data.server_ip, "%s", optarg);
 				}
 				break;
 			case 'p':
-				if (optarg)
+				if(optarg)
 				{
 					ssh_data.server_port = atoi(optarg);
 				}
@@ -176,19 +177,20 @@ static void app_ParseArguments(int argc, char **argv)
 				ssh_data.verbosity = 1;
 				break;
 			case 'u':
-				if (optarg)
+				if(optarg)
 				{
 					SAFE_SPRINTF(ssh_data.server_user, "%s", optarg);
 				}
 				break;
 			case 's':
-				if (optarg)
+				if(optarg)
 				{
 					SAFE_SPRINTF(ssh_data.server_pass_dec, "%s", optarg);
 				}
 				break;
 			default:
-				app_showusage(-1); break;
+				app_showusage(-1);
+				break;
 		}
 	}
 }
@@ -206,8 +208,10 @@ static void app_init(int argc, char **argv)
 
 	app_ParseArguments(argc, argv);
 
-	if ( strlen(ssh_data.server_ip) <= 0 )
+	if(strlen(ssh_data.server_ip) <= 0)
+	{
 		app_showusage(-1);
+	}
 }
 
 int main(int argc, char* argv[])

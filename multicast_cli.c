@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 	srv.sin_port = htons(MULTICAST_PORT);
 
 	char buff[1024] = "";
-	if (argc>=2)
+	if(argc>=2)
 	{
 		sprintf(buff, "%s", argv[1]);
 		sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *)&srv, sizeof(srv));
@@ -40,13 +40,13 @@ int main(int argc, char* argv[])
 	else
 	{
 		int i = 0;
-		while (1)
+		while(1)
 		{
 			sprintf(buff, "%d", i++);
 			sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *)&srv, sizeof(srv));
 			printf("sendto (buff: %s)\n", buff);
-			
-		
+
+
 			sleep(1);
 		}
 	}

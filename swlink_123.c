@@ -23,7 +23,8 @@
 // ** app **
 static int is_quit = 0;
 
-SWLinkX_t sw_req = {
+SWLinkX_t sw_req =
+{
 	.cdev = "switch0",
 	.port = 0,
 	.cmd = SWLINK_CMD_ID_GET,
@@ -39,7 +40,7 @@ static void print_attr_val(const struct switch_attr *attr, const struct switch_v
 {
 	int i;
 
-	switch (attr->type)
+	switch(attr->type)
 	{
 		case SWITCH_TYPE_INT:
 			DBG_IF_LN("%d", val->value.i);
@@ -50,11 +51,12 @@ static void print_attr_val(const struct switch_attr *attr, const struct switch_v
 			DBG_IF_LN("%s", val->value.s);
 			break;
 		case SWITCH_TYPE_PORTS:
-			for(i = 0; i < val->len; i++) {
+			for(i = 0; i < val->len; i++)
+			{
 				DBG_IF_LN("%d%s ",
-									val->value.ports[i].id,
-									(val->value.ports[i].flags &
-									 SWLIB_PORT_FLAG_TAGGED) ? "t" : "");
+						  val->value.ports[i].id,
+						  (val->value.ports[i].flags &
+						   SWLIB_PORT_FLAG_TAGGED) ? "t" : "");
 			}
 			break;
 		default:
@@ -73,7 +75,7 @@ static void app_loop(void)
 	sw_req.val.port_vlan = sw_req.port;
 
 	int i = 10;
-	while (i>0)
+	while(i>0)
 	{
 		swlib_get_attr(sw_req.dev, sw_req.attr, &sw_req.val);
 		print_attr_val(sw_req.attr, &sw_req.val);
@@ -99,7 +101,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if (app_quit()==0)
+	if(app_quit()==0)
 	{
 		app_set_quit(1);
 	}
@@ -113,7 +115,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch (signum)
+	switch(signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -136,13 +138,13 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-	signal(SIGINT, app_signal_handler );
-	signal(SIGTERM, app_signal_handler );
-	signal(SIGHUP, app_signal_handler );
-	signal(SIGUSR1, app_signal_handler );
-	signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler);
+	signal(SIGTERM, app_signal_handler);
+	signal(SIGHUP, app_signal_handler);
+	signal(SIGUSR1, app_signal_handler);
+	signal(SIGUSR2, app_signal_handler);
 
-	signal(SIGPIPE, SIG_IGN );
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int option_index = 0;
@@ -156,12 +158,12 @@ static struct option long_options[] =
 
 static void app_showusage(int exit_code)
 {
-	printf( "Usage: %s\n"
-					"  -d, --debug       debug level\n"
-					"  -h, --help\n", TAG);
-	printf( "Version: %s\n", version_show());
-	printf( "Example:\n"
-					"  %s -d 4\n", TAG);
+	printf("Usage: %s\n"
+		   "  -d, --debug       debug level\n"
+		   "  -h, --help\n", TAG);
+	printf("Version: %s\n", version_show());
+	printf("Example:\n"
+		   "  %s -d 4\n", TAG);
 	exit(exit_code);
 }
 
@@ -169,12 +171,12 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
+	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch (opt)
+		switch(opt)
 		{
 			case 'd':
-				if (optarg)
+				if(optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
@@ -192,7 +194,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if ( app_init() == -1 )
+	if(app_init() == -1)
 	{
 		return -1;
 	}

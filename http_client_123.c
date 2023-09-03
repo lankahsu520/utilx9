@@ -25,9 +25,10 @@ char pass[LEN_OF_PASS] = "12345678"; //"888888";
 int http_download_mjpeg(char *url, char *prefixname)
 {
 	int ret = -1;
-	if ((url) && strlen(url) && (prefixname) )
+	if((url) && strlen(url) && (prefixname))
 	{
-		HttpX_t http_req ={
+		HttpX_t http_req =
+		{
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_MJPEG,
 			.url = "",
 			.log = "",
@@ -35,7 +36,7 @@ int http_download_mjpeg(char *url, char *prefixname)
 			.password = pass,
 
 			.mjpeg_req.max_size = 5*1024*1024, // 5MB
-			.mjpeg_req.maxfiles = 5, // 
+			.mjpeg_req.maxfiles = 5, //
 			.mjpeg_req.prefixname = "",
 
 			.mjpeg_req.fp = NULL,
@@ -55,9 +56,10 @@ int http_download_mjpeg(char *url, char *prefixname)
 int http_download_rtsp(char *url, char *filename)
 {
 	int ret = -1;
-	if ((url) && strlen(url) && (filename) )
+	if((url) && strlen(url) && (filename))
 	{
-		HttpX_t http_req ={
+		HttpX_t http_req =
+		{
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_RTSP,
 			.url = "",
 			.log = "",
@@ -68,7 +70,7 @@ int http_download_rtsp(char *url, char *filename)
 			.rtsp_req.filename = "",
 			.rtsp_req.fp = NULL,
 			.rtsp_req.duration = 15,
-			
+
 			.rtsp_req.rtp_port = rtp_port_get(),
 			.rtsp_req.interleaved = 0, // for firewall
 			.rtsp_req.stop = 0,
@@ -86,9 +88,10 @@ int http_download_rtsp(char *url, char *filename)
 int http_download_normal(char *url, char *filename)
 {
 	int ret = -1;
-	if ((url) && strlen(url) && (filename) )
+	if((url) && strlen(url) && (filename))
 	{
-		HttpX_t http_req ={
+		HttpX_t http_req =
+		{
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_NORMAL,
 			.url = "",
 			.log = "",
@@ -164,10 +167,11 @@ int main(int argc, char* argv[])
 	//http_download_rtsp("rtsp://192.168.50.183:554/11",  "./video.h264");
 	//http_download_rtsp("rtsp://192.168.50.109:8000/2.264",  "./video.h264");
 #endif
-	
+
 #if (0)
 #ifdef UTIL_EX_CURL
-	HttpX_t http_req ={
+	HttpX_t http_req =
+	{
 		.mode = HTTP_MODE_ID_DOWNLOAFILE_NORMAL,
 		.url = "https://curl.haxx.se/download/curl-7.60.0.tar.gz",
 		.log = "",

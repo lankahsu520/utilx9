@@ -191,7 +191,7 @@ int dbg_lvl_get(void);
 #define ASSERT assert
 
 time_t expiration_date(void);
-void* pcheck( void* a );
+void* pcheck(void* a);
 
 #define POINTER_CHECK(x) \
 		if (x==NULL) { \
@@ -518,7 +518,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 		} while(0); \
 		__ret; \
 	})
-	
+
 #define SAFE_COND_DESTROY_EX(ptr) SAFE_COND_DESTROY(&ptr->in_cond)
 
 #define SAFE_COND_ATTR_CLOCK(in_cond) \
@@ -751,7 +751,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 
 #define USE_THREAD_CLOCK
 
-typedef void *(*thread_fn) (void *);
+typedef void *(*thread_fn)(void *);
 
 typedef struct ThreadX_Struct
 {
@@ -840,7 +840,7 @@ uint8_t buff_crc8_xor(uint8_t *start, uint8_t *buf, int len);
 unsigned short buff_crc16_add(unsigned char b, unsigned short acc);
 unsigned short buff_crc16(const unsigned char *buf, int len, unsigned short acc);
 
-unsigned long buff_crc32( const void *buf, unsigned long size,unsigned long crc);
+unsigned long buff_crc32(const void *buf, unsigned long size,unsigned long crc);
 
 #define BB_LITTLE_ENDIAN 1
 unsigned short buf_cksum(unsigned short *addr, int nleft);
@@ -1633,7 +1633,8 @@ typedef struct NetworkInfo_STRUCT
 	char pass[LEN_OF_PASS];
 
 	union
-	{ // must < 32, for 1.x, it needs to save to flash with the fixed size.
+	{
+		// must < 32, for 1.x, it needs to save to flash with the fixed size.
 		char reserve[LEN_OF_RESERVE32];
 		char reversename[LEN_OF_HOSTNAME32];
 	};
@@ -1790,8 +1791,8 @@ int chainX_infinite_get(ChainX_t *chainX_req);
 int chainX_infinite_set(ChainX_t *chainX_req, int infinite);
 
 int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_len, char *ipv6_addr, int ipv6_len);
-int chainX_nslookup6(char *hostname , char *ip, int ip_len);
-int chainX_nslookup(char *hostname , char *ip, int ip_len);
+int chainX_nslookup6(char *hostname, char *ip, int ip_len);
+int chainX_nslookup(char *hostname, char *ip, int ip_len);
 int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len);
 
 int chainX_quit_check(ChainX_t *chainX_req);
@@ -1807,8 +1808,8 @@ void chainXssl_privatekey_file(ChainX_t *chainX_req, char *filename);
 void chainXssl_ca_file(ChainX_t *chainX_req, char *filename);
 #ifdef UTIL_EX_SOCKET_OPENSSL
 SSL *chainXssl_sslfd_get(ChainX_t *chainX_req);
-int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len );
-int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len );
+int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len);
+int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len);
 #elif defined(UTIL_EX_SOCKET_MBEDTLS)
 mbedtls_ssl_context *chainXssl_sslfd_get(ChainX_t *chainX_req);
 #endif
@@ -2850,7 +2851,7 @@ typedef struct SSH_STRUCT
 	char server_user[LEN_OF_USER];
 	char server_pass_enc[LEN_OF_PASS];
 	char server_pass_dec[LEN_OF_PASS];
-	
+
 	ssh_session session;
 	ssh_channel channel;
 
@@ -2927,7 +2928,7 @@ typedef struct SWLinkX_STRUCT
 	struct switch_val val;
 
 	int port;
-	SWLINK_CMD_ID cmd; 
+	SWLINK_CMD_ID cmd;
 	char ckey[LEN_OF_VAL32];
 
 } SWLinkX_t;
@@ -3371,7 +3372,7 @@ typedef struct
 	uv_loop_t *loop;
 	uv_fs_event_t req;
 
-	unsigned int flags; // UV_FS_EVENT_WATCH_ENTRY, UV_FS_EVENT_STAT, UV_FS_EVENT_RECURSIVE 
+	unsigned int flags; // UV_FS_EVENT_WATCH_ENTRY, UV_FS_EVENT_STAT, UV_FS_EVENT_RECURSIVE
 	uv_fs_event_cb detect_cb;
 } UvEvent_t;
 
@@ -3423,7 +3424,7 @@ typedef struct DbusX_Struct
 	char path[LEN_OF_NAME64];
 	DBusConnection *dbus_conn;
 	DBusConnection *dbus_conn_listen;
-	
+
 	dbusx_match_fn *add_match_cb;
 	dbusx_filter_fn *filter_user_cb;
 
@@ -3610,7 +3611,7 @@ int usbX_browse(UsbX_t *usbX_req, void *user_data);
 typedef struct UCIX_STRUCT
 {
 	char *uci_filename;
-	struct uci_context *uci_req; 
+	struct uci_context *uci_req;
 	struct uci_package *uci_pkg;
 
 } UCIX_t;

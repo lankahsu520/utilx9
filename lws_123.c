@@ -42,31 +42,31 @@ uv_async_t uv_async_fd;
 
 #ifdef USE_WS
 #define LWS_PORT WEBSOCKETS_URMET_PORT_7682//WEBSOCKETS_PORT_7681
-static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len )
+static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
 	int ret = -1;
 
 	LWSX_t *lws_req = lws2_protocol_user(wsi);
 
-	switch( reason )
+	switch(reason)
 	{
 		case LWS_CALLBACK_CLIENT_RECEIVE: // 8
-			{
-				lws2_lock(lws_req);
-				char tmpbuf[LEN_OF_WEBSOCKET] = "";
-				SAFE_MEMCPY(tmpbuf, in, len, LEN_OF_WEBSOCKET);
-				DBG_IF_LN("(tmpbuf: %s)", tmpbuf);
-				lws2_unlock(lws_req);
-				ret  = 0;
-			}
-			break;
+		{
+			lws2_lock(lws_req);
+			char tmpbuf[LEN_OF_WEBSOCKET] = "";
+			SAFE_MEMCPY(tmpbuf, in, len, LEN_OF_WEBSOCKET);
+			DBG_IF_LN("(tmpbuf: %s)", tmpbuf);
+			lws2_unlock(lws_req);
+			ret  = 0;
+		}
+		break;
 		case LWS_CALLBACK_RECEIVE: // 6
-			{
-				//LWSSession_t *session = (LWSSession_t*)user;//SAFE_CALLOC(1, sizeof(LWSSession_t));
-				DBG_IF_LN("(wsi: %p, user: %p, lws_req: %p, reason: %d - %s)", wsi, user, lws_req, reason, translate_lws_cb(reason));
-				//ret = lws_http_cb_receive(lws_req, session, in, len);
-			}
-			break;
+		{
+			//LWSSession_t *session = (LWSSession_t*)user;//SAFE_CALLOC(1, sizeof(LWSSession_t));
+			DBG_IF_LN("(wsi: %p, user: %p, lws_req: %p, reason: %d - %s)", wsi, user, lws_req, reason, translate_lws_cb(reason));
+			//ret = lws_http_cb_receive(lws_req, session, in, len);
+		}
+		break;
 
 		default:
 			break;
@@ -75,7 +75,8 @@ static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 	return ret;
 }
 
-LWSX_t lws_req = {
+LWSX_t lws_req =
+{
 	.name = TAG,
 	.isecho = 0,
 
@@ -111,7 +112,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 	struct tm *now_tm = localtime(&now_t);
 	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
-	if (app_quit()==1)
+	if(app_quit()==1)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
@@ -119,14 +120,16 @@ void timer_1sec_loop(uv_timer_t *handle)
 	}
 	else
 	{
-		if (is_service)
-		{ // server mode, send to myself
+		if(is_service)
+		{
+			// server mode, send to myself
 		}
 #ifdef USE_WS
 		//else if ( (count%10) == 0 )
 		else
-		{ // client mode
-			if (lws2_session_count(&lws_req) > 0)
+		{
+			// client mode
+			if(lws2_session_count(&lws_req) > 0)
 			{
 				char tmpbuf[LEN_OF_WEBSOCKET] = "";
 				SAFE_SPRINTF_EX(tmpbuf, "(count: %d)", count);
@@ -142,22 +145,22 @@ void timer_1sec_loop(uv_timer_t *handle)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if ( (is_free==0) && (app_quit()==1) )
+	if((is_free==0) && (app_quit()==1))
 	{
 		is_free = 1;
 #ifdef USE_UV
-		if (uv_loop)
+		if(uv_loop)
 		{
 #ifdef USE_TIMER_CREATE
 			SAFE_UV_TIMER_CLOSE(&uv_timer_1sec_fd, NULL);
 #endif
 
-			if (handle)
+			if(handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			if (force)
+			if(force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
@@ -185,7 +188,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if (app_quit()==0)
+	if(app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -198,8 +201,8 @@ static void app_stop(void)
 
 #ifdef USE_WS
 		{
-			lws2_thread_stop( &lws_req );
-			lws2_thread_close( &lws_req );
+			lws2_thread_stop(&lws_req);
+			lws2_thread_close(&lws_req);
 		}
 #endif
 	}
@@ -222,7 +225,7 @@ static void app_loop(void)
 #endif
 
 #ifdef USE_WS
-	if (is_service)
+	if(is_service)
 	{
 #ifdef USE_UV
 		lws2_srv_init(&lws_req, LWS_PORT, NULL, LWS_SERVER_OPTION_LIBUV, uv_loop);
@@ -252,17 +255,18 @@ static void app_loop(void)
 	SAFE_UV_LOOP_RUN(uv_loop);
 	SAFE_UV_LOOP_CLOSE(uv_loop);
 #else
-	while ( app_quit()==0 )
+	while(app_quit()==0)
 	{
 		static int count = 0;
 		count ++;
 		sleep(1);
 
-		if (is_service==0)
+		if(is_service==0)
 		{
 			//if ( (count%10) == 0 )
-			{ // client mode
-				if (lws2_session_count(&lws_req) > 0)
+			{
+				// client mode
+				if(lws2_session_count(&lws_req) > 0)
 				{
 					char tmpbuf[LEN_OF_WEBSOCKET] = "";
 					SAFE_SPRINTF_EX(tmpbuf, "[%d]", count);
@@ -295,7 +299,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch (signum)
+	switch(signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -318,13 +322,13 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-	signal(SIGINT, app_signal_handler );
-	signal(SIGTERM, app_signal_handler );
-	signal(SIGHUP, app_signal_handler );
-	signal(SIGUSR1, app_signal_handler );
-	signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler);
+	signal(SIGTERM, app_signal_handler);
+	signal(SIGHUP, app_signal_handler);
+	signal(SIGUSR1, app_signal_handler);
+	signal(SIGUSR2, app_signal_handler);
 
-	signal(SIGPIPE, SIG_IGN );
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int option_index = 0;
@@ -340,14 +344,14 @@ static struct option long_options[] =
 
 static void app_showusage(int exit_code)
 {
-	printf( "Usage: %s\n"
-					"  -d, --debug       debug level\n"
-					"  -s, --service\n"
-					"  -e, --echo\n"
-					"  -h, --help\n", TAG);
-	printf( "Version: %s\n", version_show());
-	printf( "Example:\n"
-					"  %s -d 4 -s -e\n", TAG);
+	printf("Usage: %s\n"
+		   "  -d, --debug       debug level\n"
+		   "  -s, --service\n"
+		   "  -e, --echo\n"
+		   "  -h, --help\n", TAG);
+	printf("Version: %s\n", version_show());
+	printf("Example:\n"
+		   "  %s -d 4 -s -e\n", TAG);
 	exit(exit_code);
 }
 
@@ -355,12 +359,12 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
+	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch (opt)
+		switch(opt)
 		{
 			case 'd':
-				if (optarg)
+				if(optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
@@ -391,7 +395,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if ( app_init() == -1 )
+	if(app_init() == -1)
 	{
 		return -1;
 	}

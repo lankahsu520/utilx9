@@ -19,7 +19,8 @@
 
 #define TAG "ping_123"
 
-ChainX_t chainX_i = {
+ChainX_t chainX_i =
+{
 	.mode = CHAINX_MODE_ID_PING,
 	.sockfd = -1,
 
@@ -35,46 +36,46 @@ ChainX_t chainX_i = {
 };
 
 int option_index = 0;
-const char* short_options = "i:c:vh"; 
+const char* short_options = "i:c:vh";
 static struct option long_options[] =
 {
-	{ "interval",    required_argument,   NULL,    'i'  },  
-	{ "count",       required_argument,   NULL,    'c'  },  
-	{ "verbose",     no_argument,         NULL,    'v'  },  
-	{ "help",        no_argument,         NULL,    'h'  },  
+	{ "interval",    required_argument,   NULL,    'i'  },
+	{ "count",       required_argument,   NULL,    'c'  },
+	{ "verbose",     no_argument,         NULL,    'v'  },
+	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
-};  
+};
 
 static void app_showusage(int exit_code)
 {
-	printf( "Usage: %s\n"
-					"  -i, --interval    interval\n"
-					"  -c, --count       count\n"
-					"  -v, --verbose     verbose\n"
-					"  -h, --help\n", TAG);
-	printf( "Version: %s\n", version_show());
-	printf( "Example:\n"
-					"  ping_123 -i 1 -c 3 google.com\n"
-				);
+	printf("Usage: %s\n"
+		   "  -i, --interval    interval\n"
+		   "  -c, --count       count\n"
+		   "  -v, --verbose     verbose\n"
+		   "  -h, --help\n", TAG);
+	printf("Version: %s\n", version_show());
+	printf("Example:\n"
+		   "  ping_123 -i 1 -c 3 google.com\n"
+		  );
 	exit(exit_code);
 }
 
 static void app_ParseArguments(int argc, char **argv)
 {
-	int opt;               
+	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)  
+	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch (opt)
+		switch(opt)
 		{
 			case 'c':
-				if (optarg)
+				if(optarg)
 				{
 					chainX_recycle_set(&chainX_i, atoi(optarg));
 				}
 				break;
 			case 'i':
-				if (optarg)
+				if(optarg)
 				{
 					chainX_i.select_wait = atoi(optarg);
 				}
@@ -83,15 +84,16 @@ static void app_ParseArguments(int argc, char **argv)
 				chainX_i.verbose = 1;
 				break;
 			default:
-				app_showusage(-1); break;
+				app_showusage(-1);
+				break;
 		}
 	}
 
-	if (argc > optind)
+	if(argc > optind)
 	{
 		int i = 0;
 		//for (i = optind; i < argc; i++)
-		for (i = optind; i < optind+1; i++)
+		for(i = optind; i < optind+1; i++)
 		{
 			chainX_hostname_set(&chainX_i, argv[i]);
 		}
@@ -102,8 +104,8 @@ int main(int argc, char* argv[])
 {
 	app_ParseArguments(argc, argv);
 
-	if ( (strlen(chainX_ip_get(&chainX_i)) > 0) ||
-		( strlen(chainX_hostname_get(&chainX_i)) > 0 ) )
+	if((strlen(chainX_ip_get(&chainX_i)) > 0) ||
+			(strlen(chainX_hostname_get(&chainX_i)) > 0))
 	{
 		int count = chainX_ping(&chainX_i);
 		DBG_IF_LN("(count: %d/%d)", count, chainX_i.recycle);

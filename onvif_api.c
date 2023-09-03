@@ -19,7 +19,7 @@
 
 static char *onvif_xml(SOAP_ACTION_ID act_id)
 {
-	switch (act_id)
+	switch(act_id)
 	{
 		case SOAP_ACTION_ID_DEVICE_GETCAPABILITIES:
 			return ONVIF_XML_GETCAPABILITIES;
@@ -100,7 +100,7 @@ char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len,
 
 #ifdef USE_EVP_MD
 exit_sha1:
-	if (ctx)
+	if(ctx)
 	{
 		EVP_MD_CTX_destroy(ctx);
 	}
@@ -128,7 +128,7 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 						time_t create_t;
 						char create_s[LEN_OF_VAL32] = "";
 
-						time (&create_t);
+						time(&create_t);
 						//strftime(create_s, sizeof(create_s), "%Y-%m-%dT%T.000Z", time(NULL));
 						strftime(create_s, sizeof(create_s), "%Y-%m-%dT%H:%M:%S.000Z", localtime(&create_t));
 
@@ -141,17 +141,17 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 						}
 
 						char *nonce_rand = os_urandom(20);
-						if (nonce_rand)
+						if(nonce_rand)
 						{
 							int enc_len = 0;
 							char *nonce_b64 = sec_base64_enc(nonce_rand, 20, &enc_len);
-							if (nonce_b64)
+							if(nonce_b64)
 							{
 								DBG_TMP_Y("nonce_b64 (enc_len: %d, [%s])", enc_len, nonce_b64);
 								soap_node_t *Nonce_node = soap_element_add(UsernameToken_node, "Nonce");
 								{
 									soap_element_attr_set(Nonce_node, "EncodingType", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary");
-								
+
 									soap_element_text_new(Nonce_node, 0, nonce_b64);
 								}
 								SAFE_FREE(nonce_b64);
@@ -163,18 +163,18 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 							}
 
 							char *password = onvif_pass_sha1(nonce_rand, 20, create_s, strlen(create_s), onvif_req->netinfo.pass, strlen(onvif_req->netinfo.pass));
-							if (password)
+							if(password)
 							{
 								int enc_len = 0;
 								char *password_b64 = sec_base64_enc(password, 20, &enc_len);
-								if (password_b64)
+								if(password_b64)
 								{
-									DBG_TMP_Y("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, onvif_req->netinfo.pass, password_b64);						
+									DBG_TMP_Y("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, onvif_req->netinfo.pass, password_b64);
 
 									soap_node_t *Password_node = soap_element_add(UsernameToken_node, "Password");
 									{
 										soap_element_attr_set(Password_node, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest");
-									
+
 										soap_element_text_new(Password_node, 0, password_b64);
 									}
 									SAFE_FREE(password_b64);
@@ -196,9 +196,10 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 {
 	soap_node_t *response_node = NULL;
-	if ( (onvif_req) && (strlen(onvif_req->netinfo.url)>0) )
+	if((onvif_req) && (strlen(onvif_req->netinfo.url)>0))
 	{
-		HttpX_t http_req ={
+		HttpX_t http_req =
+		{
 			.mode = HTTP_MODE_ID_SOAP,
 			.url = "",
 			.port = onvif_req->netinfo.port,
@@ -206,26 +207,26 @@ soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 		};
 		SAFE_SPRINTF(http_req.url, "%s", onvif_req->netinfo.url);
 
-		if (onvif_req->http_auth > 0)
+		if(onvif_req->http_auth > 0)
 		{
 			http_req.user = onvif_req->netinfo.user;
 			http_req.password = onvif_req->netinfo.pass;
 		}
 
 		SoapX_t *soap = soap_create(onvif_xml(onvif_req->act_id));
-		if (soap)
+		if(soap)
 		{
 			{
 				// to fill user and pass
 				onvif_auth(onvif_req, soap);
 
 				// to fill request
-				if (request_cb)
+				if(request_cb)
 				{
 					request_cb(soap, onvif_req);
 				}
 			}
-		
+
 			soap_http_access(soap, &http_req);
 
 			{
@@ -236,7 +237,7 @@ soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 				response_node = soap_element_fetch(soap->response_node, onvif_req->act_ns, act_name, NULL, NULL);
 				soap_element_remove(response_node);
 			}
-			
+
 			soap_free(soap);
 		}
 	}
@@ -251,7 +252,7 @@ static void onvif_media_GetSnapshotUri_request_cb(SoapX_t *soap, OnvifX_t *onvif
 {
 	char *ProfileToken = (char *)onvif_req->request;
 	soap_node_t *ptoken_node = soap_element_fetch(soap->request_node, NULL, "ProfileToken", NULL, NULL);
-	if (ptoken_node)
+	if(ptoken_node)
 	{
 		// to fill request
 		soap_element_text_set(ptoken_node, 0, ProfileToken);
@@ -262,7 +263,7 @@ static void onvif_media_GetStreamUri_request_cb(SoapX_t *soap, OnvifX_t *onvif_r
 {
 	char *ProfileToken = (char *)onvif_req->request;
 	soap_node_t *ptoken_node = soap_element_fetch(soap->request_node, NULL, "ProfileToken", NULL, NULL);
-	if (ptoken_node)
+	if(ptoken_node)
 	{
 		// to fill request
 		soap_element_text_set(ptoken_node, 0, ProfileToken);
@@ -272,7 +273,7 @@ static void onvif_media_GetStreamUri_request_cb(SoapX_t *soap, OnvifX_t *onvif_r
 static void onvif_GeCommon_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 {
 	soap_node_t *body_node = soap_element_fetch(soap->request_node, NULL, "Body", NULL, NULL);
-	if ( (onvif_req) && (body_node) )
+	if((onvif_req) && (body_node))
 	{
 		char act_name[LEN_OF_NAME_ONVIF_ACT];
 		SAFE_SNPRINTF(act_name, (int)sizeof(act_name), "%s:%s", onvif_req->act_ns, onvif_req->act_name);
@@ -287,7 +288,7 @@ static void onvif_GeCommon_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req)
 {
 	onvif_resuest_fn request_cb = NULL;
-	switch (onvif_req->act_id)
+	switch(onvif_req->act_id)
 	{
 		case SOAP_ACTION_ID_MEDIA_GETSNAPSHOTURI:
 			request_cb = onvif_media_GetSnapshotUri_request_cb;
@@ -317,14 +318,15 @@ soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req)
 int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname)
 {
 	int ret = 0;
-	if (snapshot_uri)
+	if(snapshot_uri)
 	{
-		HttpX_t http_req ={
+		HttpX_t http_req =
+		{
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_MJPEG,
 			.url = "",
 			.log = "",
 			.mjpeg_req.max_size = 2*1024*1024, // 2MB
-			.mjpeg_req.maxfiles = 1, // 
+			.mjpeg_req.maxfiles = 1, //
 			.mjpeg_req.prefixname = "",
 
 			.mjpeg_req.fp = NULL,
@@ -346,9 +348,10 @@ int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname)
 int onvif_GetVideoClip(OnvifX_t *onvif_req, char *videoclip_uri, char *filename, int duration)
 {
 	int ret = 0;
-	if (videoclip_uri)
+	if(videoclip_uri)
 	{
-		HttpX_t http_req ={
+		HttpX_t http_req =
+		{
 			.mode = HTTP_MODE_ID_DOWNLOAFILE_RTSP,
 			.url = "",
 			.log = "",
@@ -357,7 +360,7 @@ int onvif_GetVideoClip(OnvifX_t *onvif_req, char *videoclip_uri, char *filename,
 			.rtsp_req.filename = "",
 			.rtsp_req.fp = NULL,
 			.rtsp_req.duration = duration,
-			
+
 			.rtsp_req.rtp_port = rtp_port_get(),
 			.rtsp_req.interleaved = 0, // for firewall
 			.rtsp_req.stop = 0,

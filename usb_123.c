@@ -69,7 +69,7 @@ int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, li
 	UsbX_t *usbX_req = (UsbX_t *)user_data;
 
 	DBG_WN_LN("(event: %d)", event);
-	switch ( event )
+	switch(event)
 	{
 		case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
 			DBG_WN_LN("LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED");
@@ -107,14 +107,14 @@ void request_version(UsbX_t *usbX_req)
 	DBG_IF_DUMP(request, idx, " ", "usb_buff:");
 }
 
-#include <linux/netlink.h>  
+#include <linux/netlink.h>
 
 void usb_hotplug_loop(void)
 {
 	//int sockfd = socket(AF_NETLINK, SOCK_RAW, NETLINK_KOBJECT_UEVENT);
 	int sockfd = socket(PF_NETLINK, SOCK_RAW, NETLINK_KOBJECT_UEVENT);
 
-	if (sockfd >= 0)
+	if(sockfd >= 0)
 	{
 		char buff[LEN_OF_BUF1024];
 		int buff_len = sizeof(buff);
@@ -132,10 +132,10 @@ void usb_hotplug_loop(void)
 			SAFE_SSETOPT(sockfd, SOL_SOCKET, SO_RCVBUF, &buff_len, sizeof(buff_len));
 		}
 
-		if ( SAFE_BIND(sockfd, (struct sockaddr *)&socknl, sizeof(socknl))  >= 0 )
+		if(SAFE_BIND(sockfd, (struct sockaddr *)&socknl, sizeof(socknl))  >= 0)
 		{
 			fd_set fdrset;
-			while (1)
+			while(1)
 			{
 				struct timeval tv;
 				tv.tv_sec = 0;
@@ -146,21 +146,21 @@ void usb_hotplug_loop(void)
 				SAFE_FD_SET_EX(sockfd, &fdrset);
 				int result = SAFE_SELECT(sockfd + 1, &fdrset, NULL, NULL, &tv);
 
-				if ( result == -1 )
+				if(result == -1)
 				{
 					DBG_ER_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 				}
-				else if (result==0)
+				else if(result==0)
 				{
 					// no isset
 				}
-				else if (SAFE_FD_ISSET(sockfd, &fdrset))
+				else if(SAFE_FD_ISSET(sockfd, &fdrset))
 				{
 					int read_len = recv(sockfd, &buff, sizeof(buff), 0);
-					if (read_len > 0)
+					if(read_len > 0)
 					{
-						if ( ( ( SAFE_STRNCMP(buff, "remove@", SAFE_STRLEN("remove@")) == 0 ) || ( SAFE_STRNCMP(buff, "add@", SAFE_STRLEN("add@")) == 0 ) ) && 
-								(SAFE_STRSTR(buff, "usb")) )
+						if(((SAFE_STRNCMP(buff, "remove@", SAFE_STRLEN("remove@")) == 0) || (SAFE_STRNCMP(buff, "add@", SAFE_STRLEN("add@")) == 0)) &&
+								(SAFE_STRSTR(buff, "usb")))
 						{
 							DBG_IF_LN("%s", buff);
 						}
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 	dbg_lvl_set(DBG_LVL_DEBUG);
 
 #if (1)
-	if ( usbX_listen_open(&usbx_main, NULL) >= 0 )
+	if(usbX_listen_open(&usbx_main, NULL) >= 0)
 	{
 		usbX_dev_print_ex(&usbx_main);
 

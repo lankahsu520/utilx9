@@ -32,12 +32,12 @@ int main(int argc, char* argv[])
 	clist_init(demo_list);
 	DemoList_t *item = NULL;
 
-	while ( idx < 10 )
+	while(idx < 10)
 	{
 		item = (DemoList_t*)SAFE_CALLOC(1, sizeof(DemoList_t));
 		item->num = idx++;
 
-		if (item->num%4==0)
+		if(item->num%4==0)
 		{
 			clist_add(demo_list, item);
 		}
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	while ( clist_length(demo_list) > 0 )
+	while(clist_length(demo_list) > 0)
 	{
 		item = (DemoList_t*)clist_pop(demo_list);
 		DBG_IF_LN("(num: %d)", item->num);

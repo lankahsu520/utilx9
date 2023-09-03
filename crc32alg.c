@@ -87,15 +87,17 @@ static unsigned long buff_crc32_tab[] =
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-unsigned long buff_crc32( const void *buf, unsigned long size,unsigned long crc)
+unsigned long buff_crc32(const void *buf, unsigned long size,unsigned long crc)
 {
 	const unsigned char *p;
 
 	p = buf;
 	crc = crc ^ ~0U;
 
-	while (size--)
+	while(size--)
+	{
 		crc = buff_crc32_tab[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
+	}
 
 	return crc ^ ~0U;
 }

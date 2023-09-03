@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 	DBG_LN_Y("enter");
 
 	//dbg_lvl_set(DBG_LVL_DEBUG);
-	
+
 #ifdef UTIL_EX_SYSTEMINFO
 	SysInfoX_t sysinfo_ex;
 
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
 #if (1)
 	int freeram_percent = ((double)sysinfo_ex.meminfo.freeram/sysinfo_ex.meminfo.totalram) *100;
-	if (freeram_percent > 25)
+	if(freeram_percent > 25)
 	{
 		// nothing
 		DBG_LN_Y("safe !!! (freeram_percent: %d > 25, %ld, %ld)", freeram_percent, sysinfo_ex.meminfo.freeram, sysinfo_ex.meminfo.totalram);
@@ -54,9 +54,9 @@ int main(int argc, char* argv[])
 	procinfo.pid = 1633;
 
 	proc_info(&procinfo);
-	DBG_LN_Y("pid_info (pid: %ld, name %s, size: %ld, resident: %ld, cpu_usage: %d, fdSize: %ld, fdcount: %d)", procinfo.pid, procinfo.name, procinfo.size, procinfo.resident, (int)procinfo.cpu_usage, procinfo.fdsize, procinfo.fdcount );
+	DBG_LN_Y("pid_info (pid: %ld, name %s, size: %ld, resident: %ld, cpu_usage: %d, fdSize: %ld, fdcount: %d)", procinfo.pid, procinfo.name, procinfo.size, procinfo.resident, (int)procinfo.cpu_usage, procinfo.fdsize, procinfo.fdcount);
 	int i = 0;
-	for (i=0; i<procinfo.fdcount; i++)
+	for(i=0; i<procinfo.fdcount; i++)
 	{
 		DBG_LN_Y(" (fd: %d/%d -> %s)", procinfo.fdinfo[i].fd, procinfo.fdcount, procinfo.fdinfo[i].slink);
 	}

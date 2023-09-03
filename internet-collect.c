@@ -15,20 +15,20 @@
 #include "utilx9.h"
 #include <ctype.h>
 
-#ifdef UTIL_EX_BASIC 
+#ifdef UTIL_EX_BASIC
 // https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/
 char *bin2hex(const unsigned char *bin, int len)
 {
 	char * out;
 	int i;
 
-	if (bin == NULL || len == 0)
+	if(bin == NULL || len == 0)
 	{
 		return NULL;
 	}
 
 	out = SAFE_CALLOC(1, len * 2 + 1);
-	for (i = 0; i < len; i++)
+	for(i = 0; i < len; i++)
 	{
 		out[i * 2] = "0123456789ABCDEF"[bin[i] >> 4];
 		out[i * 2 + 1] = "0123456789ABCDEF"[bin[i] &0x0F];
@@ -41,24 +41,24 @@ char *bin2hex(const unsigned char *bin, int len)
 
 static int hexchr2bin(const char hex, char * out)
 {
-	if (out == NULL)
+	if(out == NULL)
 	{
 		return 0;
 	}
 
-	if (hex >= '0' && hex <= '9')
+	if(hex >= '0' && hex <= '9')
 	{
 		*out = hex - '0';
 	}
-	else if (hex >= 'A' && hex <= 'F')
+	else if(hex >= 'A' && hex <= 'F')
 	{
 		*out = hex - 'A' + 10;
 	}
-	else if (hex >= 'a' && hex <= 'f')
+	else if(hex >= 'a' && hex <= 'f')
 	{
 		*out = hex - 'a' + 10;
 	}
-	else 
+	else
 	{
 		return 0;
 	}
@@ -73,18 +73,18 @@ int hexs2bin(const char *hex, unsigned char **out)
 	char b2;
 	int i;
 
-	if (hex == NULL || *hex == '\0' || out == NULL)
+	if(hex == NULL || *hex == '\0' || out == NULL)
 	{
 		return 0;
 	}
 
 	len = SAFE_STRLEN((char*)hex);
-	if (len==0)
+	if(len==0)
 	{
 		return 0;
 	}
 
-	if (len % 2 != 0)
+	if(len % 2 != 0)
 	{
 		return 0;
 	}
@@ -93,9 +93,9 @@ int hexs2bin(const char *hex, unsigned char **out)
 	*out = (unsigned char*)SAFE_CALLOC(1, len);
 	SAFE_MEMSET(*out, 'A', len);
 
-	for (i = 0; i < len; i++)
+	for(i = 0; i < len; i++)
 	{
-		if (!hexchr2bin(hex[i * 2], &b1) || !hexchr2bin(hex[i * 2 + 1], &b2))
+		if(!hexchr2bin(hex[i * 2], &b1) || !hexchr2bin(hex[i * 2 + 1], &b2))
 		{
 			return 0;
 		}
@@ -130,45 +130,45 @@ int URLEncode(const char *str, const int strsz, char *result, const int resultsz
 	int i, j;
 	char ch;
 
-	if (strsz < 0 || resultsz < 0)
+	if(strsz < 0 || resultsz < 0)
 	{
 		return - 1;
 	}
-	for (i = 0, j = 0; i < strsz && j < resultsz; i++)
+	for(i = 0, j = 0; i < strsz && j < resultsz; i++)
 	{
 		ch = * (str + i);
-		if ( (ch >= 'A' && ch <= 'Z')
-			|| (ch >= 'a' && ch <= 'z')
-			|| (ch >= '0' && ch <= '9')
-			|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?')
+		if((ch >= 'A' && ch <= 'Z')
+				|| (ch >= 'a' && ch <= 'z')
+				|| (ch >= '0' && ch <= '9')
+				|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?')
 		{
 			result[j++] = ch;
 		}
-		else if (ch == ' ')
+		else if(ch == ' ')
 		{
 			result[j++] = '+';
 		}
-		else 
+		else
 		{
-			if (j + 3 <= resultsz)
+			if(j + 3 <= resultsz)
 			{
 				result[j++] = '%';
 				result[j++] = hexchars[(unsigned char)
-				ch >> 4];
+									   ch >> 4];
 				result[j++] = hexchars[(unsigned char)
-				ch & 0xF];
+									   ch & 0xF];
 			}
-			else 
+			else
 			{
 				return - 2;
 			}
 		}
 	}
-	if (i == 0)
+	if(i == 0)
 	{
 		return 0;
 	}
-	else if (i == strsz)
+	else if(i == strsz)
 	{
 		return j;
 	}
@@ -198,33 +198,33 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 	char a;
 
 	*last_pos = str;
-	if (strsz < 0 || resultsz < 0)
+	if(strsz < 0 || resultsz < 0)
 	{
 		return - 1;
 	}
-	while ( (i < strsz) && (j < resultsz) )
+	while((i < strsz) && (j < resultsz))
 	{
 		ch = * (str + i);
-		if (ch == '+')
+		if(ch == '+')
 		{
 			result[j] = ' ';
 			i += 1;
 			j ++;
 		}
-		else if (ch == '%')
+		else if(ch == '%')
 		{
-			if (i + 3 <= strsz)
+			if(i + 3 <= strsz)
 			{
 				ch = * (str + i + 1);
-				if (ch >= 'A' && ch <= 'F')
+				if(ch >= 'A' && ch <= 'F')
 				{
 					a = (ch - 'A') + 10;
 				}
-				else if (ch >= '0' && ch <= '9')
+				else if(ch >= '0' && ch <= '9')
 				{
 					a = ch - '0';
 				}
-				else if (ch >= 'a' && ch <= 'f')
+				else if(ch >= 'a' && ch <= 'f')
 				{
 					a = (ch - 'a') + 10;
 				}
@@ -234,24 +234,24 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 				}
 				a <<= 4;
 				ch = * (str + i + 2);
-				if (ch >= 'A' && ch <= 'F')
+				if(ch >= 'A' && ch <= 'F')
 				{
 					a |= (ch - 'A') + 10;
 				}
-				else if (ch >= '0' && ch <= '9')
+				else if(ch >= '0' && ch <= '9')
 				{
 					a |= (ch - '0');
 				}
-				else if (ch >= 'a' && ch <= 'f')
+				else if(ch >= 'a' && ch <= 'f')
 				{
 					a |= (ch - 'a') + 10;
 				}
-				else 
+				else
 				{
 					return - 2;
 				}
 
-				if ( (a == '"') || (a == '\''))
+				if((a == '"') || (a == '\''))
 				{
 					// to remove " or ' from the uri
 				}
@@ -267,12 +267,12 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 				break;
 			}
 		}
-		else if (ch == '"')
+		else if(ch == '"')
 		{
-			if (i + 1 <= strsz)
+			if(i + 1 <= strsz)
 			{
 				ch = * (str + i + 1);
-				if (ch == '"')
+				if(ch == '"')
 				{
 					result[j] = ch;
 					j ++;
@@ -282,19 +282,19 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 			i += 1;
 		}
 #if (1)
-		else if (isascii(ch))
+		else if(isascii(ch))
 #else
-		else if ( (ch >= 'A' && ch <= 'Z')
-			|| (ch >= 'a' && ch <= 'z')
-			|| (ch >= '0' && ch <= '9')
-			|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?' || ch == '=' || ch == '&' || ch == '[' || ch == ']')
+		else if((ch >= 'A' && ch <= 'Z')
+				|| (ch >= 'a' && ch <= 'z')
+				|| (ch >= '0' && ch <= '9')
+				|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?' || ch == '=' || ch == '&' || ch == '[' || ch == ']')
 #endif
 		{
 			result[j] = ch;
 			j ++;
 			i += 1;
 		}
-		else 
+		else
 		{
 			return - 2;
 		}

@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
 	//dbg_lvl_set(DBG_LVL_DEBUG);
 	uuid_test();
-	
+
 
 #ifdef UTIL_EX_JSON
 	json_t *jroot = JSON_OBJ_NEW();
@@ -118,16 +118,17 @@ int main(int argc, char* argv[])
 
 	json_t *jfound = NULL;
 	jfound = JSON_OBJ_FIND_RECURSIVE(jroot, "logo", NULL, JSON_OBJ_FIND_ID_INFINITE, "", NULL);
-	if (jfound)
+	if(jfound)
 	{
 		const char *found = JSON_STR(jfound);
-		if (found)
+		if(found)
 		{
 			DBG_IF_LN("(logo: %s)", (char*)found);
 		}
 	}
 
-	JSON_TopicX_t jtopicx ={
+	JSON_TopicX_t jtopicx =
+	{
 		.jroot = jroot,
 	};
 
@@ -150,10 +151,10 @@ int main(int argc, char* argv[])
 
 	{
 		jroot = JSON_LOADFILE_EASY("./json/urmet.json");
-		if (jroot)
+		if(jroot)
 		{
 			json_t *jfound_ary = JSON_ARY_NEW();
-			if (jfound_ary)
+			if(jfound_ary)
 			{
 				json_t *jval = JSON_JSTR("Battery");
 				char topic[LEN_OF_TOPIC] = "";
@@ -177,7 +178,7 @@ int main(int argc, char* argv[])
 	{
 		// {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043}
 		json_t *jsunrise_sunset = JSON_LOADS_EASY("{\"sunrise\":\"3:22:56 AM\",\"sunset\":\"5:10:20 PM\",\"time_utc\":1652853043}");
-		if (jsunrise_sunset)
+		if(jsunrise_sunset)
 		{
 			json_t *jobj = NULL;
 			const char *sunrise = JSON_OBJ_GET_STR(jsunrise_sunset, jobj, JKEY_COMM_SUNRISE);
@@ -195,14 +196,14 @@ int main(int argc, char* argv[])
 	{
 		// {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043}
 		json_t *jsunrise_sunset = JSON_OBJ_NEW();
-		if (jsunrise_sunset)
+		if(jsunrise_sunset)
 		{
 			JSON_OBJ_SET_STR(jsunrise_sunset, JKEY_COMM_SUNRISE, "3:22:56 AM");
 			JSON_OBJ_SET_STR(jsunrise_sunset, JKEY_COMM_SUNSET, "5:10:20 PM");
 			JSON_OBJ_SET_INT(jsunrise_sunset, JKEY_COMM_TIME_UTC, 1652853043);
 
-			char *cJson = JSON_DUMPS_EASY( jsunrise_sunset );
-			if (cJson)
+			char *cJson = JSON_DUMPS_EASY(jsunrise_sunset);
+			if(cJson)
 			{
 				DBG_IF_LN("(cJson: %s)", cJson);
 				SAFE_FREE(cJson);

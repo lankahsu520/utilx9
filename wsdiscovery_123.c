@@ -23,33 +23,33 @@ static int is_quit = 0;
 
 static void wsd_ProbeMatches_cb(ChainX_t *chainX_req, soap_node_t *ProbeMatch_node)
 {
-	if (chainX_req)
+	if(chainX_req)
 	{
 		DBG_IF_LN("[%s:%d]", inet_ntoa(chainX_req->addr_frm.sin_addr), ntohs(chainX_req->addr_frm.sin_port));
 	}
 
-	if (ProbeMatch_node)
+	if(ProbeMatch_node)
 	{
 		soap_node_t *Address_node = soap_element_fetch(ProbeMatch_node, NULL, "Address", NULL, NULL);
-		if (Address_node)
+		if(Address_node)
 		{
 			DBG_IF_LN("(Address: %s)", soap_element_text(Address_node, 0));
 		}
 
 		soap_node_t *Types_node = soap_element_fetch(ProbeMatch_node, NULL, "Types", NULL, NULL);
-		if (Types_node)
+		if(Types_node)
 		{
 			DBG_IF_LN("(Types: %s)", soap_element_text(Types_node, 0));
 		}
 
 		soap_node_t *Scopes_node = soap_element_fetch(ProbeMatch_node, NULL, "Scopes", NULL, NULL);
-		if (Scopes_node)
+		if(Scopes_node)
 		{
 			DBG_IF_LN("(Scopes: %s)", soap_element_text(Scopes_node, 0));
 		}
-		
+
 		soap_node_t *XAddrs_node = soap_element_fetch(ProbeMatch_node, NULL, "XAddrs", NULL, NULL);
-		if (XAddrs_node)
+		if(XAddrs_node)
 		{
 			DBG_IF_LN("(XAddrs: %s)", soap_element_text(XAddrs_node, 0));
 		}
@@ -61,7 +61,7 @@ static void wsd_ProbeMatches_cb(ChainX_t *chainX_req, soap_node_t *ProbeMatch_no
 
 static void wsd_Probe_cb(ChainX_t *chainX_req, soap_node_t *parent_node)
 {
-	if (chainX_req)
+	if(chainX_req)
 	{
 		DBG_IF_LN("[%s:%d]", inet_ntoa(chainX_req->addr_frm.sin_addr), ntohs(chainX_req->addr_frm.sin_port));
 	}
@@ -71,33 +71,33 @@ static void wsd_Probe_cb(ChainX_t *chainX_req, soap_node_t *parent_node)
 
 static void wsd_Hello_cb(ChainX_t *chainX_req, soap_node_t *Hello_node)
 {
-	if (chainX_req)
+	if(chainX_req)
 	{
 		DBG_IF_LN("[%s:%d]", inet_ntoa(chainX_req->addr_frm.sin_addr), ntohs(chainX_req->addr_frm.sin_port));
 	}
 
-	if (Hello_node)
+	if(Hello_node)
 	{
 		soap_node_t *Types_node = soap_element_fetch(Hello_node, NULL, "Types", NULL, NULL);
-		if (Types_node)
+		if(Types_node)
 		{
 			DBG_IF_LN("(Types: %s)", soap_element_text(Types_node, 0));
 		}
 
 		soap_node_t *Scopes_node = soap_element_fetch(Hello_node, NULL, "Scopes", NULL, NULL);
-		if (Scopes_node)
+		if(Scopes_node)
 		{
 			DBG_IF_LN("(Scopes: %s)", soap_element_text(Scopes_node, 0));
 		}
 
 		soap_node_t *XAddrs_node = soap_element_fetch(Hello_node, NULL, "XAddrs", NULL, NULL);
-		if (XAddrs_node)
+		if(XAddrs_node)
 		{
 			DBG_IF_LN("(XAddrs: %s)", soap_element_text(XAddrs_node, 0));
 		}
 
 		soap_node_t *MetadataVersion_node = soap_element_fetch(Hello_node, NULL, "MetadataVersion", NULL, NULL);
-		if (MetadataVersion_node)
+		if(MetadataVersion_node)
 		{
 			DBG_IF_LN("(MetadataVersion: %s)", soap_element_text(MetadataVersion_node, 0));
 		}
@@ -107,13 +107,13 @@ static void wsd_Hello_cb(ChainX_t *chainX_req, soap_node_t *Hello_node)
 
 static void wsd_Others_cb(ChainX_t *chainX_req, soap_node_t *parent_node)
 {
-	if (chainX_req)
+	if(chainX_req)
 	{
 		DBG_IF_LN("[%s:%d]", inet_ntoa(chainX_req->addr_frm.sin_addr), ntohs(chainX_req->addr_frm.sin_port));
 	}
 
 	char *buffer = soap_element_2string(parent_node);
-	if (buffer)
+	if(buffer)
 	{
 		DBG_TR_LN("(%s)\n", buffer);
 		SAFE_FREE(buffer);
@@ -122,7 +122,7 @@ static void wsd_Others_cb(ChainX_t *chainX_req, soap_node_t *parent_node)
 
 void chainX_linked_cb(ChainX_t *chainX_req)
 {
-	if (chainX_linked_check(chainX_req)==0)
+	if(chainX_linked_check(chainX_req)==0)
 	{
 		WSDiscoveryX_t *wsd_req = (WSDiscoveryX_t *)chainX_req->c_data;
 		// send 1st
@@ -150,12 +150,12 @@ static int app_quit(void)
 
 static void app_stop(void)
 {
-	if (app_quit()==0)
-	{	
+	if(app_quit()==0)
+	{
 		app_set_quit(1);
 		//app_wakeup();
 
-		if (wsdiscovery_get())
+		if(wsdiscovery_get())
 		{
 			wsdiscovery_stop();
 			wsdiscovery_close();
@@ -175,7 +175,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	//ICLOUD_DEBUGLN(DBG_LVL_ERROR, "(signum: %d)", signum);
-	switch (signum)
+	switch(signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -187,13 +187,13 @@ static void app_signal_handler(int signum)
 
 static void app_signal_register(void)
 {
-	signal(SIGINT, app_signal_handler );
-	signal(SIGTERM, app_signal_handler );
-	signal(SIGHUP, app_signal_handler );
-	signal(SIGUSR1, app_signal_handler );
-	signal(SIGUSR2, app_signal_handler );
+	signal(SIGINT, app_signal_handler);
+	signal(SIGTERM, app_signal_handler);
+	signal(SIGHUP, app_signal_handler);
+	signal(SIGUSR1, app_signal_handler);
+	signal(SIGUSR2, app_signal_handler);
 
-	signal(SIGPIPE, SIG_IGN );
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int option_index = 0;
@@ -207,12 +207,12 @@ static struct option long_options[] =
 
 static void app_showusage(int exit_code)
 {
-	printf( "Usage: %s\n"
-					"  -d, --debug       debug level\n"
-					"  -h, --help\n", TAG);
-	printf( "Version: %s\n", version_show());
-	printf( "Example:\n"
-					"  %s -d 4\n", TAG);
+	printf("Usage: %s\n"
+		   "  -d, --debug       debug level\n"
+		   "  -h, --help\n", TAG);
+	printf("Version: %s\n", version_show());
+	printf("Example:\n"
+		   "  %s -d 4\n", TAG);
 	exit(exit_code);
 }
 
@@ -220,12 +220,12 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long (argc, argv, short_options, long_options, &option_index)) != -1)
+	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch (opt)
+		switch(opt)
 		{
 			case 'd':
-				if (optarg)
+				if(optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
@@ -246,18 +246,18 @@ int main(int argc, char* argv[])
 #if (1)
 	ws_entry_init();
 
-	if ( wsdiscovery_open() )
+	if(wsdiscovery_open())
 	{
 		wsdiscovery_probematches_register(wsd_ProbeMatches_cb);
 		wsdiscovery_probe_register(wsd_Probe_cb);
 		wsdiscovery_hello_register(wsd_Hello_cb);
 		wsdiscovery_others_register(wsd_Others_cb);
-		
+
 		wsdiscovery_linked_register(chainX_linked_cb);
 		sleep(2);
 	}
 
-	while (app_quit() == 0)
+	while(app_quit() == 0)
 	{
 		ws_devices_refresh();
 		sleep(10);

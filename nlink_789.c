@@ -14,7 +14,8 @@
  ***************************************************************************/
 #include "utilx9.h"
 
-ChainX_t chainX_n = {
+ChainX_t chainX_n =
+{
 	.mode = CHAINX_MODE_ID_NETLINK,
 	.sockfd = -1,
 	.status = 0,
@@ -40,11 +41,11 @@ int main(int argc, char* argv[])
 	dbg_lvl_set(DBG_LVL_TRACE);
 	chainX_netlink_register(&chainX_n, netlink_recv);
 
-	chainX_thread_init(&chainX_n); 
-	while (1)
+	chainX_thread_init(&chainX_n);
+	while(1)
 	{
 		sleep(1);
-		if (chainX_linked_check(&chainX_n)==0)
+		if(chainX_linked_check(&chainX_n)==0)
 		{
 		}
 	}

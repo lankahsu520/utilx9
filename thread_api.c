@@ -16,10 +16,13 @@
 
 void threadx_mutex_init(ThreadX_t *tidx_req)
 {
-	if (tidx_req==NULL) return;
+	if(tidx_req==NULL)
+	{
+		return;
+	}
 
 	int rc = SAFE_MUTEX_ATTR_RECURSIVE(tidx_req->in_mtx);
-	if (rc == 0)
+	if(rc == 0)
 	{
 #ifdef USE_THREAD_CLOCK
 		SAFE_COND_ATTR_CLOCK(tidx_req->in_cond);
@@ -79,13 +82,25 @@ void threadx_set_quit(ThreadX_t *tidx_req, int flag)
 // 20 = 2 secs
 int threadx_isready(ThreadX_t *tidx_req, int retry)
 {
-	if (retry<0) retry = 10;
-
-	while (retry>0)
+	if(retry<0)
 	{
-		if (tidx_req->isloop==1) break;
-		if (tidx_req->isquit==1) break;
-		if (tidx_req->isexit==1) break;
+		retry = 10;
+	}
+
+	while(retry>0)
+	{
+		if(tidx_req->isloop==1)
+		{
+			break;
+		}
+		if(tidx_req->isquit==1)
+		{
+			break;
+		}
+		if(tidx_req->isexit==1)
+		{
+			break;
+		}
 
 		retry--;
 		usleep(100*1000);
@@ -106,7 +121,10 @@ int threadx_unlock(ThreadX_t *tidx_req)
 
 int threadx_timewait(ThreadX_t *tidx_req, int ms)
 {
-	if ( threadx_isquit(tidx_req) ) return EINVAL;
+	if(threadx_isquit(tidx_req))
+	{
+		return EINVAL;
+	}
 
 	int ret = EINVAL;
 
@@ -121,7 +139,10 @@ int threadx_timewait(ThreadX_t *tidx_req, int ms)
 
 int threadx_timewait_simple(ThreadX_t *tidx_req, int ms)
 {
-	if ( threadx_isquit(tidx_req) ) return EINVAL;
+	if(threadx_isquit(tidx_req))
+	{
+		return EINVAL;
+	}
 
 	int ret = EINVAL;
 
@@ -134,14 +155,20 @@ int threadx_timewait_simple(ThreadX_t *tidx_req, int ms)
 
 int threadx_wait(ThreadX_t *tidx_req)
 {
-	if ( threadx_isquit(tidx_req) ) return EINVAL;
+	if(threadx_isquit(tidx_req))
+	{
+		return EINVAL;
+	}
 
 	return SAFE_THREAD_WAIT_EX(tidx_req);
 }
 
 int threadx_wait_simple(ThreadX_t *tidx_req)
 {
-	if ( threadx_isquit(tidx_req) ) return EINVAL;
+	if(threadx_isquit(tidx_req))
+	{
+		return EINVAL;
+	}
 
 	int __ret = EINVAL;
 	threadx_lock(tidx_req);
@@ -182,7 +209,7 @@ int threadx_join(ThreadX_t *tidx_req)
 
 void threadx_stop(ThreadX_t *tidx_req)
 {
-	if (tidx_req)
+	if(tidx_req)
 	{
 		threadx_set_quit(tidx_req, 1);
 		threadx_wakeup_simple(tidx_req);
@@ -191,7 +218,7 @@ void threadx_stop(ThreadX_t *tidx_req)
 
 void threadx_close(ThreadX_t *tidx_req)
 {
-	if ( (tidx_req) && (tidx_req->isfree == 0) )
+	if((tidx_req) && (tidx_req->isfree == 0))
 	{
 		tidx_req->isfree++;
 
@@ -207,7 +234,7 @@ int threadx_init(ThreadX_t *tidx_req, char *name)
 {
 	int ret = 0;
 
-	if (tidx_req)
+	if(tidx_req)
 	{
 		SAFE_SPRINTF_EX(tidx_req->name, "%s", name);
 		tidx_req->isexit = 0;
@@ -218,7 +245,7 @@ int threadx_init(ThreadX_t *tidx_req, char *name)
 
 		threadx_mutex_init(tidx_req);
 
-		if (SAFE_THREAD_CREATE(tidx_req->tid, NULL, tidx_req->thread_cb, (void*)tidx_req->data) != 0)
+		if(SAFE_THREAD_CREATE(tidx_req->tid, NULL, tidx_req->thread_cb, (void*)tidx_req->data) != 0)
 		{
 			DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 			ret = -1;

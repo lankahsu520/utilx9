@@ -808,14 +808,14 @@
 #define JKEY_ISSUEID_CC_PHONE                    0x000A9701 //
 #define JKEY_ISSUEID_CC_PHONE_STR                "000A9701" //
 
-// JKEY_ISSUEID_GW, 
+// JKEY_ISSUEID_GW,
 #define ZWAVE_EVT_GW_CFG                        95
 #define ZWAVE_EVT_GW_CMD                        96
 #define ZWAVE_EVT_GW_DEBUG                      97
 #define ZWAVE_EVT_GW_WATCH_OFF                  98
 #define ZWAVE_EVT_GW_ECHO                       99
 
-// JKEY_ISSUEID_ADDING, 
+// JKEY_ISSUEID_ADDING,
 #define ZWAVE_EVT_ADDING_START                  0
 #define ZWAVE_EVT_ADDING_SSA_SET                80
 #define ZWAVE_EVT_ADDING_CSA                    81
@@ -860,7 +860,7 @@
 #define ZWAVE_EVT_REPLACING_REPLACED            98
 #define ZWAVE_EVT_REPLACING_FAIL                99
 
-// JKEY_ISSUEID_RESETING, 
+// JKEY_ISSUEID_RESETING,
 #define ZWAVE_EVT_RESETING_START                0
 #define ZWAVE_EVT_RESETING_DONE                 97
 #define ZWAVE_EVT_RESETING_REMOVED              98

@@ -30,12 +30,18 @@ int main(int argc, char* argv[])
 	DBG_ER_LN("(MCTT: %s:%d)", PJ_MCTT_IP, (int)MCTT_PORT);
 
 	int num = 0;
-	BIT_SET(num,0); DBG_ER_LN("BIT_SET(num,0) (num: 0x%08X)", num);
-	BIT_SET(num,2); DBG_ER_LN("BIT_SET(num,2) (num: 0x%08X)", num);
-	BIT_SET(num,4); DBG_ER_LN("BIT_SET(num,4) (num: 0x%08X)", num);
-	BIT_SET(num,6); DBG_ER_LN("BIT_SET(num,6) (num: 0x%08X)", num);
-	BIT_SET(num,8); DBG_ER_LN("BIT_SET(num,8) (num: 0x%08X)", num);
-	BIT_INVERSE(num,3); DBG_ER_LN("BIT_INVERSE(num,3) (num: 0x%08X, num.bit2: %d, num.bit3: %d)", num, BIT_GET(num,2), BIT_GET(num,3));
+	BIT_SET(num,0);
+	DBG_ER_LN("BIT_SET(num,0) (num: 0x%08X)", num);
+	BIT_SET(num,2);
+	DBG_ER_LN("BIT_SET(num,2) (num: 0x%08X)", num);
+	BIT_SET(num,4);
+	DBG_ER_LN("BIT_SET(num,4) (num: 0x%08X)", num);
+	BIT_SET(num,6);
+	DBG_ER_LN("BIT_SET(num,6) (num: 0x%08X)", num);
+	BIT_SET(num,8);
+	DBG_ER_LN("BIT_SET(num,8) (num: 0x%08X)", num);
+	BIT_INVERSE(num,3);
+	DBG_ER_LN("BIT_INVERSE(num,3) (num: 0x%08X, num.bit2: %d, num.bit3: %d)", num, BIT_GET(num,2), BIT_GET(num,3));
 
 	exit(0);
 }

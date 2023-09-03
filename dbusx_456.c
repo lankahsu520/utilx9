@@ -43,30 +43,30 @@ static DBusHandlerResult dbus_filter_cb(DBusConnection *connection, DBusMessage 
 	//const char *iface = dbus_message_get_interface(message);
 	//const char *path = dbus_message_get_path(message);
 
-	if(dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, DBUS_S_NAME_COMMAND))
+	if (dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, DBUS_S_NAME_COMMAND))
 	{
 		//handled = demo_signal_cb(connection, message, NULL);
 		const char *signal_name = dbus_message_get_member(message);
 		handled = demo_signal_name_cb(connection, message, signal_name, NULL);
 	}
 #if (1)
-	else if(dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT16"))
+	else if (dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT16"))
 	{
 		const char *signal_name = dbus_message_get_member(message);
 		handled = demo_signal_name_cb(connection, message, signal_name, NULL);
 	}
-	else if(dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT32"))
+	else if (dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT32"))
 	{
 		const char *signal_name = dbus_message_get_member(message);
 		handled = demo_signal_name_cb(connection, message, signal_name, NULL);
 	}
-	else if(dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT64"))
+	else if (dbus_message_is_signal(message, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT64"))
 	{
 		const char *signal_name = dbus_message_get_member(message);
 		handled = demo_signal_name_cb(connection, message, signal_name, NULL);
 	}
 #endif
-	else if(dbus_message_is_method_call(message, DBUS_M_IFAC_LANKAHSU520_DEMO, DBUS_METHOD_COMMAND))
+	else if (dbus_message_is_method_call(message, DBUS_M_IFAC_LANKAHSU520_DEMO, DBUS_METHOD_COMMAND))
 	{
 		handled = dbusx_method_echo_cb(connection, message, NULL);
 	}
@@ -80,14 +80,14 @@ static int dbus_match_cb(DBusConnection *dbus_listen, DBusError *err, void *usr_
 
 	// add a rule for which messages we want to see
 	dbus_bus_add_match(dbus_listen, DBUS_S_MATCH_LANKAHSU520_DEMO, err); // see signals from the given interface
-	if(dbus_error_is_set(err))
+	if (dbus_error_is_set(err))
 	{
 		DBG_ER_LN("dbus_bus_add_match error !!! (%s, %s)", DBUS_S_MATCH_LANKAHSU520_DEMO, err->message);
 		goto exit_match;
 	}
 
 	dbus_bus_request_name(dbus_listen, DBUS_DEST_LANKAHSU520, DBUS_NAME_FLAG_REPLACE_EXISTING, err);
-	if(dbus_error_is_set(err))
+	if (dbus_error_is_set(err))
 	{
 		DBG_ER_LN("dbus_bus_request_name error !!! (%s, %s)", DBUS_DEST_LANKAHSU520, err->message);
 		goto exit_match;
@@ -112,11 +112,11 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
-		if(is_service)
+		if (is_service)
 		{
 			dbusx_thread_close(&dbusx_456);
 		}
@@ -125,11 +125,11 @@ static void app_stop(void)
 
 static void app_loop(void)
 {
-	if(is_service)
+	if (is_service)
 	{
 		dbusx_thread_init(dbus_match_cb, dbus_filter_cb, &dbusx_456);
 
-		while(app_quit()==0)
+		while (app_quit()==0)
 		{
 			sleep(1);
 		}
@@ -143,7 +143,7 @@ static void app_loop(void)
 			dbusx_signal_str(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, DBUS_S_NAME_COMMAND, msg);
 		}
 
-		if(1)
+		if (1)
 		{
 			// method - send string
 			char *retStr = dbusx_method_str2str(&dbusx_456, DBUS_DEST_LANKAHSU520, DBUS_M_IFAC_LANKAHSU520_DEMO, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
@@ -183,7 +183,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -242,18 +242,18 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 			case 'e':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(msg, "%s", optarg);
 				}
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

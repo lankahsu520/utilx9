@@ -71,7 +71,7 @@ buff_crc16(const unsigned char *data, int len, unsigned short acc)
 {
 	int i;
 
-	for(i = 0; i < len; ++i)
+	for (i = 0; i < len; ++i)
 	{
 		acc = buff_crc16_add(*data, acc);
 		++data;

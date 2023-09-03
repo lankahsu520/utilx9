@@ -42,10 +42,10 @@ int main(int argc, char* argv[])
 	chainX_netlink_register(&chainX_n, netlink_recv);
 
 	chainX_thread_init(&chainX_n);
-	while(1)
+	while (1)
 	{
 		sleep(1);
-		if(chainX_linked_check(&chainX_n)==0)
+		if (chainX_linked_check(&chainX_n)==0)
 		{
 		}
 	}

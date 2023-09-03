@@ -25,7 +25,7 @@ char pass[LEN_OF_PASS] = "12345678"; //"888888";
 int http_download_mjpeg(char *url, char *prefixname)
 {
 	int ret = -1;
-	if((url) && strlen(url) && (prefixname))
+	if ((url) && strlen(url) && (prefixname))
 	{
 		HttpX_t http_req =
 		{
@@ -56,7 +56,7 @@ int http_download_mjpeg(char *url, char *prefixname)
 int http_download_rtsp(char *url, char *filename)
 {
 	int ret = -1;
-	if((url) && strlen(url) && (filename))
+	if ((url) && strlen(url) && (filename))
 	{
 		HttpX_t http_req =
 		{
@@ -88,7 +88,7 @@ int http_download_rtsp(char *url, char *filename)
 int http_download_normal(char *url, char *filename)
 {
 	int ret = -1;
-	if((url) && strlen(url) && (filename))
+	if ((url) && strlen(url) && (filename))
 	{
 		HttpX_t http_req =
 		{

@@ -51,33 +51,33 @@ static int app_quit(void)
 #ifdef UTIL_EX_TTY
 static void tty_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
-	if((chainX_req) && (buff))
+	if ((chainX_req) && (buff))
 	{
 #if (1)
 		DBG_IF_LN("(buff: %s, buff_len: %d)", buff, buff_len);
 #else
 		QBUF_t *qbuf = (QBUF_t *)chainX_req->c_data;
 
-		if(qbuf)
+		if (qbuf)
 		{
 			char *breakptr = NULL;
 
 			qbuf_write(qbuf, buff, buff_len);
 			//DBG_IF_LN(">>>>>>>>>>>>%s, %d, %02x", buff, buff_len, buff[buff_len-1]);
-			if((breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NEWLINE, NULL)) ||
+			if ((breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NEWLINE, NULL)) ||
 					(breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_RETURN, NULL)) ||
 					(breakptr = qbuf_memchr(qbuf, COMMAND_DELIMITED_NULL, NULL))
-			  )
+			   )
 			{
 				char *startptr = qbuf_buff(qbuf);
 				int cmdline_len = (int)(breakptr - startptr) + 1;
 
 				//DBG_IF_LN("(linelen: %d, startptr: %s)", linelen, startptr);
 				char *cmdline = NULL;
-				if((cmdline_len>0) && (cmdline = SAFE_CALLOC(1, cmdline_len+1)))
+				if ((cmdline_len>0) && (cmdline = SAFE_CALLOC(1, cmdline_len+1)))
 				{
 					SAFE_SNPRINTF(cmdline, cmdline_len, "%s", startptr);
-					if(strlen(cmdline) > 0)
+					if (strlen(cmdline) > 0)
 					{
 						SOCKETX_WRITE(chainX_req, cmdline, cmdline_len);
 						DBG_IF_LN("(cmdline: %s)", cmdline);
@@ -94,7 +94,7 @@ static void tty_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 static void tty_linked(ChainX_t *chainX_req)
 {
-	if(chainX_linked_check(chainX_req)==0)
+	if (chainX_linked_check(chainX_req)==0)
 	{
 		DBG_IF_LN("%s (ttyname: %s)", DBG_TXT_LINKED, chainX_req->ttyinfo.ttyname);
 	}
@@ -110,12 +110,12 @@ static int tty_init(void)
 	chainX_serial_register(&chainX_T, tty_response);
 	chainX_linked_register(&chainX_T, tty_linked);
 
-	if(chainX_thread_init(&chainX_T)==-1)
+	if (chainX_thread_init(&chainX_T)==-1)
 	{
 		return ret;
 	}
 
-	while(app_quit() == 0)
+	while (app_quit() == 0)
 	{
 		char buff[LEN_OF_VAL32]="";
 		//SAFE_SPRINTF_EX(buff, "%03d\r\n", i++);
@@ -137,7 +137,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -153,7 +153,7 @@ static void app_showusage(int exit_code);
 static void app_loop(void)
 {
 #ifdef UTIL_EX_TTY
-	if(tty_init() == -1)
+	if (tty_init() == -1)
 	{
 		app_showusage(-1);
 		goto exit_loop;
@@ -181,7 +181,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -241,18 +241,18 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 			case 't':
-				if(optarg)
+				if (optarg)
 				{
 #ifdef UTIL_EX_TTY
 					chainX_tty_setname(&chainX_T, optarg);
@@ -260,7 +260,7 @@ static void app_ParseArguments(int argc, char **argv)
 				}
 				break;
 			case 'b':
-				if(optarg)
+				if (optarg)
 				{
 #ifdef UTIL_EX_TTY
 					int baudrate = 57600;
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 	//dbg_lvl_set(DBG_LVL_DEBUG);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

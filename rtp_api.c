@@ -24,7 +24,7 @@ int rtp_port_get(void)
 	static int rtp_port_g = 78798;
 	rtp_port_g +=2;
 
-	if(rtp_port_g >=78800)
+	if (rtp_port_g >=78800)
 	{
 		rtp_port_g = 78700;
 	}
@@ -42,7 +42,7 @@ static unsigned char rtp_padding(rtp_hdr *rtp_hdr_msg, char *msg, int sz)
 	 * Gestion du padding.
 	 */
 	padding = (rtp_hdr_msg->flags & 0x20) >> 5;
-	if(padding)
+	if (padding)
 	{
 		memcpy(&len_padding, msg + (sz - 1), 1);
 	}
@@ -56,7 +56,7 @@ static unsigned char rtp_padding(rtp_hdr *rtp_hdr_msg, char *msg, int sz)
 #ifdef DBG_RTP_INFO
 static void rtp_header_print(rtp_pkt *pkt)
 {
-	if(pkt->RTP_header)
+	if (pkt->RTP_header)
 	{
 		DBG_TR_LN("Version       [%d]", (pkt->RTP_header->flags & 0xd0) >> 6);
 		DBG_TR_LN("Padding       [%d]", (pkt->RTP_header->flags & 0x20) >> 5);
@@ -67,12 +67,12 @@ static void rtp_header_print(rtp_pkt *pkt)
 		DBG_TR_LN("Sequence      [%d]", pkt->RTP_header->sq_nb);
 		DBG_TR_LN("Timestamp     [%u]", pkt->RTP_header->ts);
 		DBG_TR_LN("Sync Source   [0x%08x]", pkt->RTP_header->ssrc);
-		if(pkt->RTP_header->csrc)
+		if (pkt->RTP_header->csrc)
 		{
 			DBG_TR_LN("csrc          [%d]", (pkt->RTP_header->csrc[0]));
 		}
 	}
-	if(pkt->RTP_extension)
+	if (pkt->RTP_extension)
 	{
 		DBG_TR_LN("ext->type     [%d]", (pkt->RTP_extension->ext_type));
 		DBG_TR_LN("ext->len      [%d]", (pkt->RTP_extension->ext_len));
@@ -118,12 +118,12 @@ static rtp_pkt	*rtp_header_parse(char *msg, int  sz)
 	 * Recuperation du csrc.
 	 */
 	cc = (rtp_hdr_msg->flags) & 0x0f;
-	if(cc)
+	if (cc)
 	{
 		//MEM_SALLOC(rtp_hdr_msg->csrc, (cc * 4));
 		rtp_hdr_msg->csrc = (unsigned long*)SAFE_CALLOC(1, (cc * 4));
 		int i = 0;
-		for(i = 0 ; i < cc; i++)
+		for (i = 0 ; i < cc; i++)
 		{
 			rtp_hdr_msg->csrc[i] = byte2big_endian(4, (unsigned char*)msg+raw_offset);
 			raw_offset += 4;
@@ -135,7 +135,7 @@ static rtp_pkt	*rtp_header_parse(char *msg, int  sz)
 	 * Recuperation de Ext_type et Ext_len, puis des Ext.
 	 */
 	ext = (rtp_hdr_msg->flags & 0x10) >> 4;
-	if(ext)
+	if (ext)
 	{
 		//MEM_ALLOC(rtp_ext_msg);
 		rtp_ext_msg = (rtp_ext*)SAFE_CALLOC(1, sizeof(rtp_ext));
@@ -147,7 +147,7 @@ static rtp_pkt	*rtp_header_parse(char *msg, int  sz)
 		//MEM_SALLOC(rtp_ext_msg->hd_ext, 4 * rtp_ext_msg->ext_len);
 		rtp_ext_msg->hd_ext = (unsigned long *)SAFE_CALLOC(1, 4 * rtp_ext_msg->ext_len);
 		int i = 0;
-		for(i = 0; i < rtp_ext_msg->ext_len; i++)
+		for (i = 0; i < rtp_ext_msg->ext_len; i++)
 		{
 			rtp_ext_msg->hd_ext[i] = byte2big_endian(4, (unsigned char*)msg+raw_offset);
 			raw_offset += 4;
@@ -179,7 +179,7 @@ static rtp_pkt	*rtp_header_parse(char *msg, int  sz)
 
 void rtp_context_print(sess_context_t *sess_req)
 {
-	if(sess_req == NULL)
+	if (sess_req == NULL)
 	{
 		DBG_ER_LN("return, sess_req is NULL !!!");
 		return;
@@ -195,7 +195,7 @@ void rtp_context_print(sess_context_t *sess_req)
 	DBG_DB_LN("Padding length                   [%d]", sess_req->padding);
 	DBG_DB_LN("CSRC length                      [%d]", sess_req->CSRClen);
 	DBG_DB_LN("Payload type                     [%d]", sess_req->pt);
-	for(i = 0; i < sess_req->CSRClen; i++)
+	for (i = 0; i < sess_req->CSRClen; i++)
 	{
 		DBG_DB_LN("CSRC list[%i]                     [%d]", i, sess_req->CSRCList[i]);
 	}
@@ -206,11 +206,11 @@ void rtp_context_print(sess_context_t *sess_req)
 	DBG_DB_LN("Current sequence number          [%d]", sess_req->seq_no);
 	DBG_DB_LN("Lost sequence count              [%d]", (sess_req->seq_no - sess_req->init_seq_no + 1) - sess_req->sending_pkt_count);
 
-	if(sess_req->hdr_extension)
+	if (sess_req->hdr_extension)
 	{
 		DBG_DB_LN("Extension header Type            [%d]", sess_req->hdr_extension->ext_type);
 		DBG_DB_LN("Extension header Len             [%d]", sess_req->hdr_extension->ext_len);
-		for(i = 0; i < sess_req->hdr_extension->ext_len; i++)
+		for (i = 0; i < sess_req->hdr_extension->ext_len; i++)
 		{
 			DBG_DB_LN("Extension header[%d]              [%ld]", i, sess_req->hdr_extension->hd_ext[i]);
 		}
@@ -222,7 +222,7 @@ static void rtp_context_parse(rtp_pkt *pkt, char *msg, int sz)
 {
 	int i;
 
-	if(pkt == NULL)
+	if (pkt == NULL)
 	{
 		DBG_ER_LN("return, pkt is NULL !!!");
 		return;
@@ -263,13 +263,13 @@ static void rtp_context_parse(rtp_pkt *pkt, char *msg, int sz)
 	sess_req->RTP_timestamp = pkt->RTP_header->ts;
 
 	/* First value of timestamp - send/receive */
-	if(sess_req->sending_pkt_count == 1)
+	if (sess_req->sending_pkt_count == 1)
 	{
 		sess_req->init_RTP_timestamp = sess_req->RTP_timestamp;
 	}
 
 	/* Time elapsed since the beginning - send/receive */
-	if(sess_req->sending_pkt_count == 1)
+	if (sess_req->sending_pkt_count == 1)
 	{
 		sess_req->time_elapsed = 0;
 	}
@@ -282,14 +282,14 @@ static void rtp_context_parse(rtp_pkt *pkt, char *msg, int sz)
 	sess_req->seq_no = pkt->RTP_header->sq_nb; //ntohs(pkt->RTP_header->sq_nb);
 
 	/* First sequence number - send/receive */
-	if(sess_req->sending_pkt_count == 1)
+	if (sess_req->sending_pkt_count == 1)
 	{
 		sess_req->init_seq_no = sess_req->seq_no;
 	}
 
 	//DBG_TR_LN("(sess_req->pt: %d, sess_req->seq_no: %d, pkt->RTP_extension: %p)", sess_req->pt, sess_req->seq_no, pkt->RTP_extension);
 
-	if(pkt->RTP_extension)
+	if (pkt->RTP_extension)
 	{
 		/* Extension header - send/receive */
 		//MEM_ALLOC(sess_req[cid]->hdr_extension);
@@ -299,12 +299,12 @@ static void rtp_context_parse(rtp_pkt *pkt, char *msg, int sz)
 
 		DBG_TR_LN("(sess_req->hdr_extension->ext_len: %d)", sess_req->hdr_extension->ext_len);
 		DBG_TR_LN("(sess_req->hdr_extension->ext_type: %d)", sess_req->hdr_extension->ext_type);
-		if(sess_req->hdr_extension->ext_len)
+		if (sess_req->hdr_extension->ext_len)
 		{
 			//MEM_SALLOC(sess_req->hdr_extension->hd_ext,  (4 * sess_req->hdr_extension->ext_len));
 			sess_req->hdr_extension->hd_ext = (unsigned long*)SAFE_CALLOC(1, (4 * sess_req->hdr_extension->ext_len));
 			memcpy(sess_req->hdr_extension->hd_ext, pkt->RTP_extension->hd_ext, (4 * sess_req->hdr_extension->ext_len));
-			for(i = 0; i < sess_req->hdr_extension->ext_len; i++)
+			for (i = 0; i < sess_req->hdr_extension->ext_len; i++)
 			{
 				sess_req->hdr_extension->hd_ext[i] = sess_req->hdr_extension->hd_ext[i];
 			}
@@ -314,12 +314,12 @@ static void rtp_context_parse(rtp_pkt *pkt, char *msg, int sz)
 
 static int h264_write_nal(RTPX_t *rtp_req)
 {
-	if(rtp_req)
+	if (rtp_req)
 	{
 		FILE *fp = NULL;
-		if((rtp_req) && (rtp_req->http_req) && (fp = rtp_req->http_req->rtsp_req.fp))
+		if ((rtp_req) && (rtp_req->http_req) && (fp = rtp_req->http_req->rtsp_req.fp))
 		{
-			if((rtp_req->max_size==0) || ((rtp_req->total + 4) <= rtp_req->max_size))
+			if ((rtp_req->max_size==0) || ((rtp_req->total + 4) <= rtp_req->max_size))
 			{
 				unsigned char nal_header[4] = {0x00, 0x00, 0x00, 0x01};
 				//unsigned char nal_header[3] = {0x00, 0x00, 0x01};
@@ -334,12 +334,12 @@ static int h264_write_nal(RTPX_t *rtp_req)
 
 static int h264_write(RTPX_t *rtp_req, char *buf, size_t count)
 {
-	if(rtp_req)
+	if (rtp_req)
 	{
 		FILE *fp = NULL;
-		if((rtp_req) && (rtp_req->http_req) && (fp = rtp_req->http_req->rtsp_req.fp))
+		if ((rtp_req) && (rtp_req->http_req) && (fp = rtp_req->http_req->rtsp_req.fp))
 		{
-			if((rtp_req->max_size==0) || ((rtp_req->total + 4) <= rtp_req->max_size))
+			if ((rtp_req->max_size==0) || ((rtp_req->total + 4) <= rtp_req->max_size))
 			{
 				rtp_req->total += count;
 
@@ -355,7 +355,7 @@ static int h264_write(RTPX_t *rtp_req, char *buf, size_t count)
 static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 {
 	int ret = -1;
-	if(rtp_req)
+	if (rtp_req)
 	{
 		{
 			DBG_TMP_DUMP(payload, 16, " ", "(len: %d)", 16);
@@ -369,7 +369,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 			//SAFE_FWRITE(payload, 1, payload_len, fp);
 #endif
 
-			if((nal_type>= NAL_TYPE_SINGLE_NAL_MIN) && (nal_type <= NAL_TYPE_SINGLE_NAL_MAX))
+			if ((nal_type>= NAL_TYPE_SINGLE_NAL_MIN) && (nal_type <= NAL_TYPE_SINGLE_NAL_MAX))
 			{
 				/* Write NAL header */
 				ret = h264_write_nal(rtp_req);
@@ -377,7 +377,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 				/* Write NAL unit */
 				ret = h264_write(rtp_req, payload, payload_len);
 			}
-			else if((nal_type >= NAL_TYPE_STAP_A) && (nal_type <= NAL_TYPE_MTAP24))
+			else if ((nal_type >= NAL_TYPE_STAP_A) && (nal_type <= NAL_TYPE_MTAP24))
 			{
 				unsigned char *q;
 				unsigned short nalu_size;
@@ -386,7 +386,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 				int nidx = 0;
 
 				nidx = 0;
-				while(nidx < payload_len - 1)
+				while (nidx < payload_len - 1)
 				{
 					/* write NAL header */
 					ret = h264_write_nal(rtp_req);
@@ -399,7 +399,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 					/* write NALU size */
 					ret = h264_write(rtp_req, (char *)&nalu_size, 2);
 
-					if(nalu_size == 0)
+					if (nalu_size == 0)
 					{
 						nidx++;
 						continue;
@@ -410,7 +410,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 					nidx += nalu_size;
 				}
 			}
-			else if((nal_type == NAL_TYPE_FU_A) || (nal_type == NAL_TYPE_FU_B))
+			else if ((nal_type == NAL_TYPE_FU_A) || (nal_type == NAL_TYPE_FU_B))
 			{
 				unsigned char *q = (unsigned char *)payload;
 
@@ -423,7 +423,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 
 
 				DBG_TMP_Y("	(S: %d, E: %d, type: 0x%02x, key: 0x%02x)", h264_start_bit, h264_end_bit, h264_type, h264_key);
-				if(h264_start_bit)
+				if (h264_start_bit)
 				{
 					/* write NAL header */
 					ret = h264_write_nal(rtp_req);
@@ -433,7 +433,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 				}
 				ret = h264_write(rtp_req, (char *)q + 2, payload_len - 2);
 
-				if(h264_end_bit)
+				if (h264_end_bit)
 				{
 					/* nothing to do... */
 				}
@@ -448,12 +448,12 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 
 int dummy_write(RTPX_t *rtp_req, void *buf, size_t count)
 {
-	if(rtp_req)
+	if (rtp_req)
 	{
 		FILE *fp = NULL;
-		if((rtp_req) && (rtp_req->http_req) && (fp = rtp_req->http_req->rtsp_req.fp))
+		if ((rtp_req) && (rtp_req->http_req) && (fp = rtp_req->http_req->rtsp_req.fp))
 		{
-			if((rtp_req->max_size==0) || ((rtp_req->total + 4) <= rtp_req->max_size))
+			if ((rtp_req->max_size==0) || ((rtp_req->total + 4) <= rtp_req->max_size))
 			{
 				rtp_req->total += count;
 
@@ -468,7 +468,7 @@ int dummy_write(RTPX_t *rtp_req, void *buf, size_t count)
 
 static void rtp_body_free(rtp_pkt *pkt)
 {
-	if(pkt == NULL)
+	if (pkt == NULL)
 	{
 		DBG_ER_LN("return, pkt is NULL !!!");
 		return;
@@ -479,19 +479,19 @@ static void rtp_body_free(rtp_pkt *pkt)
 	/*
 	 * Free Memoire.
 	 */
-	if((pkt) && (pkt->RTP_extension))
+	if ((pkt) && (pkt->RTP_extension))
 	{
 		SAFE_FREE(pkt->RTP_extension->hd_ext);
 		SAFE_FREE(pkt->RTP_extension);
 	}
-	if((pkt) && (pkt->RTP_header))
+	if ((pkt) && (pkt->RTP_header))
 	{
 		SAFE_FREE(pkt->RTP_header->csrc);
 		SAFE_FREE(pkt->RTP_header);
 	}
 	SAFE_FREE(pkt);
 
-	if(sess_req->hdr_extension)
+	if (sess_req->hdr_extension)
 	{
 		SAFE_FREE(sess_req->hdr_extension->hd_ext);
 		SAFE_FREE(sess_req->hdr_extension);
@@ -502,29 +502,29 @@ static void rtp_body_free(rtp_pkt *pkt)
 
 void rtp_body_parse(RTPX_t *rtp_req, char *buff, int buff_len)
 {
-	if(rtp_req)
+	if (rtp_req)
 	{
 		DBG_TMP_DUMP(buff, 32, " ", "(len: %d)", 32);
 		rtp_pkt	*pkt = rtp_header_parse(buff, buff_len);
 
-		if(pkt)
+		if (pkt)
 		{
 			pkt->sess_req = &rtp_req->sess_data;
 
 			rtp_context_parse(pkt, buff, buff_len);
 
 #ifdef DBG_RTP_INFO
-			if(pkt->sess_req->sending_pkt_count==1)
+			if (pkt->sess_req->sending_pkt_count==1)
 			{
 				rtp_header_print(pkt);
 			}
 			rtp_context_print(&rtp_req->sess_data);
 #endif
 
-			if(pkt->RTP_header)
+			if (pkt->RTP_header)
 			{
 				int result = 0;
-				switch(pkt->RTP_header->mk_pt & 0x7f)
+				switch (pkt->RTP_header->mk_pt & 0x7f)
 				{
 					case 96:
 						result = rtp_h264(rtp_req, pkt->payload, pkt->payload_len);
@@ -535,10 +535,10 @@ void rtp_body_parse(RTPX_t *rtp_req, char *buff, int buff_len)
 						break;
 				}
 
-				if(result==-1)
+				if (result==-1)
 				{
 					HttpX_t *http_req = NULL;
-					if((http_req = rtp_req->http_req))
+					if ((http_req = rtp_req->http_req))
 					{
 						http_req->rtsp_req.stop = 1;
 					}
@@ -552,7 +552,7 @@ void rtp_body_parse(RTPX_t *rtp_req, char *buff, int buff_len)
 
 static void rtp_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
-	if((chainX_req) && (chainX_req->c_data))
+	if ((chainX_req) && (chainX_req->c_data))
 	{
 		RTPX_t *rtp_req = (RTPX_t *)chainX_req->c_data;
 		rtp_body_parse(rtp_req, buff, buff_len);
@@ -561,7 +561,7 @@ static void rtp_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 void rtp_free(RTPX_t *rtp_req)
 {
-	if(rtp_req)
+	if (rtp_req)
 	{
 		{
 			rtp_context_print(&rtp_req->sess_data);
@@ -575,14 +575,14 @@ RTPX_t *rtp_init(int port, int interleaved)
 {
 	RTPX_t *rtp_req = (RTPX_t*)SAFE_CALLOC(1, sizeof(RTPX_t));
 
-	if(rtp_req)
+	if (rtp_req)
 	{
 		rtp_req->total = 0;
 
-		if(interleaved==0)
+		if (interleaved==0)
 		{
 			ChainX_t *chainX_req = (ChainX_t*)SAFE_CALLOC(1, sizeof(ChainX_t));
-			if(chainX_req)
+			if (chainX_req)
 			{
 				rtp_req->total = 0;
 
@@ -591,7 +591,7 @@ RTPX_t *rtp_init(int port, int interleaved)
 				chainX_req->c_data = (void*)rtp_req;
 				chainX_req->select_wait = TIMEOUT_OF_SELECT_1;
 
-				if(port==0)
+				if (port==0)
 				{
 					port = rtp_port_get();
 				}

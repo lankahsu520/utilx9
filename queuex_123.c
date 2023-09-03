@@ -33,7 +33,7 @@ static int test_q_exec_cb(void *arg)
 {
 	TestX_t *data_pop = (TestX_t *)arg;
 
-	if((data_pop))
+	if ((data_pop))
 	{
 		DBG_IF_LN("(data_pop->idx: %d)", data_pop->idx);
 		idx--;
@@ -47,7 +47,7 @@ static int test_q_free_cb(void *arg)
 {
 	TestX_t *data_pop = (TestX_t *)arg;
 
-	if(data_pop)
+	if (data_pop)
 	{
 	}
 
@@ -77,7 +77,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 	}
@@ -91,7 +91,7 @@ static void app_loop(void)
 	test_q->dbg_more = DBG_LVL_INFO;
 	queuex_isready(test_q, 5);
 
-	while((idx < 5) && (is_quit==0))
+	while ((idx < 5) && (is_quit==0))
 	{
 #if (0)
 		idx++;
@@ -102,7 +102,7 @@ static void app_loop(void)
 #endif
 	}
 
-	while(idx>0)
+	while (idx>0)
 	{
 		sleep(1);
 	}
@@ -130,7 +130,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

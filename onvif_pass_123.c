@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 	char tmpbuf[LEN_OF_BUF256] = "";
 	DBG_IF_LN("(argc: %d)", argc);
 
-	if(argc==2)
+	if (argc==2)
 	{
 		char pass[LEN_OF_PASS] = "";
 
@@ -58,11 +58,11 @@ int main(int argc, char* argv[])
 			nonce_rand = os_urandom(20);
 			//DBG_ER_DUMP(nonce_rand, 20, " ", "nonce_rand:");
 #endif
-			if(nonce_rand)
+			if (nonce_rand)
 			{
 				int enc_len = 0;
 				char *nonce_b64 = sec_base64_enc(nonce_rand, 20, &enc_len);
-				if(nonce_b64)
+				if (nonce_b64)
 				{
 					DBG_IF_LN("nonce_b64 (enc_len: %d, [%s])", enc_len, nonce_b64);
 					SAFE_SPRINTF(tmpbuf, "export ONVIF_XML_NONCE=%s\n", nonce_b64);
@@ -74,11 +74,11 @@ int main(int argc, char* argv[])
 				size_t pass_len = SAFE_STRLEN(pass);
 				DBG_IF_LN(">> (pass: %s %zd)", pass, pass_len);
 				char *password = onvif_pass_sha1(nonce_rand, 20, create_s, SAFE_STRLEN(create_s), pass, SAFE_STRLEN(pass));
-				if(password)
+				if (password)
 				{
 					int enc_len = 0;
 					char *password_b64 = sec_base64_enc(password, 20, &enc_len);
-					if(password_b64)
+					if (password_b64)
 					{
 						DBG_IF_LN("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, pass, password_b64);
 						SAFE_SPRINTF(tmpbuf, "export ONVIF_XML_PASSWORD=%s\n", password_b64);

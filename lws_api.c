@@ -59,7 +59,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 	int m;
 
 	DBG_IF_LN("%d %s !!! (wsi: %p)", reason, translate_lws_cb(reason), wsi);
-	switch(reason)
+	switch (reason)
 	{
 		case LWS_CALLBACK_PROTOCOL_INIT:
 			vhd = lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi), lws_get_protocol(wsi), sizeof(struct per_vhost_data__minimal));
@@ -82,12 +82,12 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 			break;
 
 		case LWS_CALLBACK_SERVER_WRITEABLE:
-			if(!vhd->amsg.payload)
+			if (!vhd->amsg.payload)
 			{
 				break;
 			}
 
-			if(pss->last == vhd->current)
+			if (pss->last == vhd->current)
 			{
 				break;
 			}
@@ -95,7 +95,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 			/* notice we allowed for LWS_PRE in the payload already */
 			m = lws_write(wsi, ((unsigned char *)vhd->amsg.payload) +
 						  LWS_PRE, vhd->amsg.len, LWS_WRITE_TEXT);
-			if(m < (int)vhd->amsg.len)
+			if (m < (int)vhd->amsg.len)
 			{
 				lwsl_err("ERROR %d writing to ws\n", m);
 				return -1;
@@ -105,7 +105,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 			break;
 
 		case LWS_CALLBACK_RECEIVE:
-			if(vhd->amsg.payload)
+			if (vhd->amsg.payload)
 			{
 				__minimal_destroy_message(&vhd->amsg);
 			}
@@ -113,7 +113,7 @@ static int callback_minimal(struct lws *wsi, enum lws_callback_reasons reason, v
 			vhd->amsg.len = len;
 			/* notice we over-allocate by LWS_PRE */
 			vhd->amsg.payload = malloc(LWS_PRE + len);
-			if(!vhd->amsg.payload)
+			if (!vhd->amsg.payload)
 			{
 				lwsl_user("OOM: dropping\n");
 				break;
@@ -147,15 +147,15 @@ static int lws2_simple_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 
 	LWSX_t *lws_req = lws2_protocol_user(wsi);
 
-	if((lws_req) && (lws_req->callback))
+	if ((lws_req) && (lws_req->callback))
 	{
 		ret = lws_req->callback(wsi, reason, user, in, len);
 	}
 
-	if(ret != 0)
+	if (ret != 0)
 	{
 		//DBG_WN_LN("%d %s !!! (wsi: %p)", reason, translate_lws_cb(reason), wsi);
-		switch(reason)
+		switch (reason)
 		{
 			case LWS_CALLBACK_HTTP:
 #if (0)
@@ -172,15 +172,15 @@ static int lws2_simple_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 			{
 				lws2_lock(lws_req);
 				LWSSession_t *session = (LWSSession_t*)user;//SAFE_CALLOC(1, sizeof(LWSSession_t));
-				if(session)
+				if (session)
 				{
-					if(clist_contains(lws_req->session_list, session)==1)
+					if (clist_contains(lws_req->session_list, session)==1)
 					{
 						DBG_IF_LN("%d %s - dupicate !!! (session: %p)", reason, translate_lws_cb(reason), session);
 					}
 					else
 					{
-						if(lws_req->cinfo.foreign_loops)
+						if (lws_req->cinfo.foreign_loops)
 						{
 							session->use_foreign_loops = 1;
 						}
@@ -205,9 +205,9 @@ static int lws2_simple_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 			case LWS_CALLBACK_RECEIVE: // 6
 			{
 				lws2_lock(lws_req);
-				if(lws_req->wsi_id == LWS_WSI_ID_SERVER)
+				if (lws_req->wsi_id == LWS_WSI_ID_SERVER)
 				{
-					if(lws_req->isecho)
+					if (lws_req->isecho)
 					{
 						//lws2_session_write_q_push((LWSSession_t *)user, in, len);
 						lws2_session_write_q_broadcast(lws_req, in, len);
@@ -220,7 +220,7 @@ static int lws2_simple_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 			case LWS_CALLBACK_SERVER_WRITEABLE: // 11
 			{
 				lws2_lock(lws_req);
-				if(lws_req->wsi_id == LWS_WSI_ID_SERVER)
+				if (lws_req->wsi_id == LWS_WSI_ID_SERVER)
 				{
 					lws2_session_write((LWSSession_t *)user);
 				}
@@ -231,7 +231,7 @@ static int lws2_simple_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 			case LWS_CALLBACK_CLIENT_WRITEABLE: // 10
 			{
 				lws2_lock(lws_req);
-				if(lws_req->wsi_id == LWS_WSI_ID_CLIENT)
+				if (lws_req->wsi_id == LWS_WSI_ID_CLIENT)
 				{
 					lws2_session_write((LWSSession_t *)user);
 				}
@@ -241,7 +241,7 @@ static int lws2_simple_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 
 			case LWS_CALLBACK_WSI_DESTROY: // 30
 			{
-				if((lws_req->isfree == 0) && (user))
+				if ((lws_req->isfree == 0) && (user))
 				{
 					LWSSession_t *session = (LWSSession_t*)user;
 					lws2_session_lock(session);
@@ -286,7 +286,7 @@ static struct lws_protocols protocols_simple[] =
 
 char* translate_lws_cb(enum lws_callback_reasons reason)
 {
-	switch(reason)
+	switch (reason)
 	{
 		case LWS_CALLBACK_ESTABLISHED: // 0
 			return "LWS_CALLBACK_ESTABLISHED";
@@ -379,7 +379,7 @@ LWSX_t *lws2_protocol_user(struct lws *wsi)
 	//struct lws_context *context = lws_get_context( wsi );
 	//LWSX_t *lws_req = (LWSX_t *)protocol->user;
 
-	if(protocol)
+	if (protocol)
 	{
 		lws_req = (LWSX_t *)protocol->user;
 	}
@@ -391,7 +391,7 @@ void lws2_session_lock(LWSSession_t *session)
 {
 	LWSX_t *lws_req = lws2_protocol_user(session->wsi);
 
-	if(lws_req->isfree == 0)
+	if (lws_req->isfree == 0)
 	{
 		lws2_lock(lws_req);
 	}
@@ -400,7 +400,7 @@ void lws2_session_lock(LWSSession_t *session)
 void lws2_session_unlock(LWSSession_t *session)
 {
 	LWSX_t *lws_req = lws2_protocol_user(session->wsi);
-	if(lws_req->isfree == 0)
+	if (lws_req->isfree == 0)
 	{
 		lws2_unlock(lws_req);
 	}
@@ -409,7 +409,7 @@ void lws2_session_unlock(LWSSession_t *session)
 static void lws2_session_msg_free_cb(void *item)
 {
 	LWSMsg_t *msg = (LWSMsg_t *)item;
-	if(msg)
+	if (msg)
 	{
 		char *payload = msg->payload;
 		SAFE_FREE(payload);
@@ -420,7 +420,7 @@ static void lws2_session_free_cb(void *item)
 {
 	LWSSession_t *session = (LWSSession_t *)item;
 	DBG_IF_LN("(session: %p)", session);
-	if(session)
+	if (session)
 	{
 		clist_free_ex(session->msg_list, lws2_session_msg_free_cb);
 	}
@@ -428,12 +428,12 @@ static void lws2_session_free_cb(void *item)
 
 void lws2_session_pop(LWSX_t *lws_req, LWSSession_t *session)
 {
-	if(session)
+	if (session)
 	{
 		clist_free_ex(session->msg_list, lws2_session_msg_free_cb);
 		//SAFE_MUTEX_DESTROY_EX(session);
 		DBG_IF_LN("(session: %p)", session);
-		if(lws_req)
+		if (lws_req)
 		{
 			clist_remove(lws_req->session_list, session);
 		}
@@ -442,22 +442,22 @@ void lws2_session_pop(LWSX_t *lws_req, LWSSession_t *session)
 
 void lws2_session_write(LWSSession_t *session)
 {
-	if(session)
+	if (session)
 	{
 		lws2_session_lock(session);
 
 		LWSMsg_t *msg = clist_pop(session->msg_list);
-		if((msg) && (msg->payload))
+		if ((msg) && (msg->payload))
 		{
 			SAFE_LWS_WRITE(session->wsi, msg->payload, msg->payload_len, LWS_WRITE_TEXT);
 			SAFE_FREE(msg->payload);
 
-			if(clist_length(session->msg_list) > 0)
+			if (clist_length(session->msg_list) > 0)
 			{
 				lws_callback_on_writable(session->wsi);
 				// 20211122 Lanka Hsu: send data ASAP
 				// https://issueexplorer.com/issue/warmcat/libwebsockets/2358
-				if(session->use_foreign_loops==0)
+				if (session->use_foreign_loops==0)
 				{
 					lws_cancel_service_pt(session->wsi);
 				}
@@ -471,15 +471,15 @@ void lws2_session_write(LWSSession_t *session)
 
 void lws2_session_write_q_push(LWSSession_t *session, char *payload, int payload_len)
 {
-	if(session)
+	if (session)
 	{
 		lws2_session_lock(session);
 
 		LWSMsg_t *msg = (LWSMsg_t*)SAFE_CALLOC(1, sizeof(LWSMsg_t));
-		if(msg)
+		if (msg)
 		{
 			msg->payload = (char*)SAFE_CALLOC(1, LWS_SEND_BUFFER_PRE_PADDING + payload_len + 1);
-			if(msg->payload)
+			if (msg->payload)
 			{
 				SAFE_LWS_MEMCPY(msg->payload, payload, payload_len, payload);
 			}
@@ -490,7 +490,7 @@ void lws2_session_write_q_push(LWSSession_t *session, char *payload, int payload
 			lws_callback_on_writable(session->wsi);
 			// 20211122 Lanka Hsu: send data ASAP
 			// https://issueexplorer.com/issue/warmcat/libwebsockets/2358
-			if(session->use_foreign_loops==0)
+			if (session->use_foreign_loops==0)
 			{
 				lws_cancel_service_pt(session->wsi);
 			}
@@ -501,11 +501,11 @@ void lws2_session_write_q_push(LWSSession_t *session, char *payload, int payload
 
 void lws2_session_write_q_broadcast(LWSX_t *lws_req, char *payload, int payload_len)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		LWSSession_t *cur = NULL;
 
-		for(cur = clist_head(lws_req->session_list); cur != NULL; cur = clist_item_next(cur))
+		for (cur = clist_head(lws_req->session_list); cur != NULL; cur = clist_item_next(cur))
 		{
 			lws2_session_write_q_push(cur, payload, payload_len);
 		}
@@ -516,7 +516,7 @@ int lws2_session_count(LWSX_t *lws_req)
 {
 	int ret = 0;
 
-	if(lws_req)
+	if (lws_req)
 	{
 		ret = clist_length(lws_req->session_list);
 	}
@@ -526,10 +526,10 @@ int lws2_session_count(LWSX_t *lws_req)
 
 static void lws2_context_close(LWSX_t *lws_req)
 {
-	if((lws_req) && (lws_req->context))
+	if ((lws_req) && (lws_req->context))
 	{
 		DBG_IF_LN("%s (port: %d, context: %p)", DBG_TXT_BYE_BYE, lws_req->cinfo.port, lws_req->context);
-		if(lws_req->context)
+		if (lws_req->context)
 		{
 			//for libwebsockets-4.2.2
 			//clist_free_ex(lws_req->session_list, lws2_session_free_cb);
@@ -543,7 +543,7 @@ static void lws2_context_close(LWSX_t *lws_req)
 
 void lws2_lock(LWSX_t *lws_req)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		ThreadX_t *tidx_req = &lws_req->tidx;
 		threadx_lock(tidx_req);
@@ -552,7 +552,7 @@ void lws2_lock(LWSX_t *lws_req)
 
 void lws2_unlock(LWSX_t *lws_req)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		ThreadX_t *tidx_req = &lws_req->tidx;
 		threadx_unlock(tidx_req);
@@ -575,14 +575,14 @@ static void lws2_mutex_free(LWSX_t *lws_req)
 
 void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		//SAFE_MEMSET(lws_req, 0, sizeof(LWSX_t));
 
 		lws_req->wsi_id = LWS_WSI_ID_CLIENT;
 
 		lws_req->cinfo.port = CONTEXT_PORT_NO_LISTEN;
-		if(protocols)
+		if (protocols)
 		{
 			lws_req->cinfo.protocols = protocols;
 		}
@@ -596,7 +596,7 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 		{
 			// to set user as lws_req
 			int idx = 0;
-			while(protocols[idx].name)
+			while (protocols[idx].name)
 			{
 				DBG_IF_LN("(protocols[%d].name: %s)", idx, protocols[idx].name);
 				protocols[idx].user = (void *)lws_req;
@@ -606,9 +606,9 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 
 		lws_req->cinfo.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
 
-		if(lws_req->security)
+		if (lws_req->security)
 		{
-			if((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1) ||
+			if ((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1) ||
 					(SAFE_ACCESS(lws_req->privatekey_file, F_OK) == -1))
 			{
 				DBG_ER_LN("SAFE_ACCESS error !!! (certificate_file: %s, privatekey_file: %s)", lws_req->certificate_file, lws_req->privatekey_file);
@@ -621,7 +621,7 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 			}
 		}
 
-		if(loop)
+		if (loop)
 		{
 			lws_req->cinfo.options |= options;
 			lws_req->cinfo.foreign_loops = (void*[])
@@ -632,7 +632,7 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 		}
 
 		struct lws_context *context = lws_create_context(&lws_req->cinfo);
-		if(context)
+		if (context)
 		{
 			lws_req->context = context;
 		}
@@ -645,7 +645,7 @@ void lws2_cli_init(LWSX_t *lws_req, struct lws_protocols *protocols, unsigned in
 
 void lws2_cli_open(LWSX_t *lws_req, char *address, int port, char *filename)
 {
-	if((lws_req) && (lws_req->context))
+	if ((lws_req) && (lws_req->context))
 	{
 		CLIST_STRUCT_INIT(lws_req, session_list);
 
@@ -660,7 +660,7 @@ void lws2_cli_open(LWSX_t *lws_req, char *address, int port, char *filename)
 
 		lws_client_connect_via_info(&lws_req->ccinfo);
 
-		if(lws2_session_count(lws_req) >  0)
+		if (lws2_session_count(lws_req) >  0)
 		{
 			DBG_IF_LN("link - ok !!! (host: %s:%d, filename: %s)", lws_req->ccinfo.host, lws_req->ccinfo.port, filename);
 		}
@@ -674,7 +674,7 @@ void lws2_cli_open(LWSX_t *lws_req, char *address, int port, char *filename)
 #if (0)
 void lws2_cli_close(LWSX_t *lws_req)
 {
-	if((lws_req) && (lws_req->context))
+	if ((lws_req) && (lws_req->context))
 	{
 		lws_cancel_service(lws_req->context);
 
@@ -692,14 +692,14 @@ void lws2_cli_close(LWSX_t *lws_req)
 
 void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, unsigned int options, uv_loop_t *loop)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		//SAFE_MEMSET(lws_req, 0, sizeof(LWSX_t));
 
 		lws_req->wsi_id = LWS_WSI_ID_SERVER;
 
 		lws_req->cinfo.port = port;
-		if(protocols)
+		if (protocols)
 		{
 			lws_req->cinfo.protocols = protocols;
 		}
@@ -713,7 +713,7 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 		{
 			// to set user as lws_req
 			int idx = 0;
-			while(protocols[idx].name)
+			while (protocols[idx].name)
 			{
 				DBG_IF_LN("(protocols[%d].name: %s)", idx, protocols[idx].name);
 				protocols[idx].user = (void *)lws_req;
@@ -725,9 +725,9 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 
 		lws_req->cinfo.options = LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
 
-		if(lws_req->security)
+		if (lws_req->security)
 		{
-			if((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1) ||
+			if ((SAFE_ACCESS(lws_req->certificate_file, F_OK) == -1) ||
 					(SAFE_ACCESS(lws_req->privatekey_file, F_OK) == -1))
 			{
 				DBG_ER_LN("SAFE_ACCESS error !!! (certificate_file: %s, privatekey_file: %s)", lws_req->certificate_file, lws_req->privatekey_file);
@@ -740,7 +740,7 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 			}
 		}
 
-		if(loop)
+		if (loop)
 		{
 			lws_req->cinfo.options |= options;
 			lws_req->cinfo.foreign_loops = (void*[])
@@ -751,7 +751,7 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 		}
 
 		struct lws_context *context = lws_create_context(&lws_req->cinfo);
-		if(context)
+		if (context)
 		{
 			lws_req->context = context;
 		}
@@ -765,19 +765,19 @@ void lws2_srv_init(LWSX_t *lws_req, int port, struct lws_protocols *protocols, u
 #if (0)
 void lws2_srv_open(LWSX_t *lws_req, int timeout_ms)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		lws2_mutex_init(lws_req);
 
 		CLIST_STRUCT_INIT(lws_req, session_list);
 
 		DBG_IF_LN("listen !!! (port: %d, context: %p)", lws_req->cinfo.port, lws_req->context);
-		if(lws_req->cinfo.foreign_loops)
+		if (lws_req->cinfo.foreign_loops)
 		{
 		}
 		else
 		{
-			while(threadx_isquit(tidx_req) == 0)
+			while (threadx_isquit(tidx_req) == 0)
 			{
 				lws_service(lws_req->context, timeout_ms);
 			}
@@ -790,17 +790,17 @@ static void *lws2_thread_handler(void *user)
 {
 	LWSX_t *lws_req = (LWSX_t*)user;
 
-	if(lws_req)
+	if (lws_req)
 	{
 		ThreadX_t *tidx_req = &lws_req->tidx;
 		threadx_detach(tidx_req);
 
 		CLIST_STRUCT_INIT(lws_req, session_list);
 
-		if(lws_req->cinfo.foreign_loops)
+		if (lws_req->cinfo.foreign_loops)
 		{
 			DBG_IF_LN("%s (threadx_timewait_simple, port: %d, context: %p)", DBG_TXT_RUN_LOOP, lws_req->cinfo.port, lws_req->context);
-			while(threadx_isquit(tidx_req) == 0)
+			while (threadx_isquit(tidx_req) == 0)
 			{
 				threadx_timewait_simple(tidx_req, 1000);
 			}
@@ -808,7 +808,7 @@ static void *lws2_thread_handler(void *user)
 		else
 		{
 			DBG_IF_LN("%s (lws_service, port: %d, context: %p)", DBG_TXT_RUN_LOOP, lws_req->cinfo.port, lws_req->context);
-			while(threadx_isquit(tidx_req) == 0)
+			while (threadx_isquit(tidx_req) == 0)
 			{
 				lws_service(lws_req->context, lws_req->timeout_ms);
 			}
@@ -826,12 +826,12 @@ static void *lws2_thread_handler(void *user)
 
 void lws2_thread_stop(LWSX_t *lws_req)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		ThreadX_t *tidx_req = &lws_req->tidx;
 		threadx_stop(tidx_req);
 
-		if(lws_req->context)
+		if (lws_req->context)
 		{
 			lws_cancel_service(lws_req->context);
 		}
@@ -840,7 +840,7 @@ void lws2_thread_stop(LWSX_t *lws_req)
 
 void lws2_thread_close(LWSX_t *lws_req)
 {
-	if((lws_req) && (lws_req->isfree == 0))
+	if ((lws_req) && (lws_req->isfree == 0))
 	{
 		lws_req->isfree ++;
 
@@ -851,7 +851,7 @@ void lws2_thread_close(LWSX_t *lws_req)
 
 void lws2_thread_init(LWSX_t *lws_req)
 {
-	if(lws_req)
+	if (lws_req)
 	{
 		ThreadX_t *tidx_req = &lws_req->tidx;
 		tidx_req->thread_cb = lws2_thread_handler;

@@ -152,7 +152,7 @@ const unsigned char RSA_CLIENT_CA_CERT[]="";
 
 static void chainXssl_cert_lankahsu520(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		//chainX_req->seed = LUFFANET_SEED;
 #ifdef UTIL_EX_SOCKET_CERT_TXT
@@ -181,7 +181,7 @@ void qrequest_push(ChainX_t *chainX_req, char *buff, int buff_len)
 
 static void socket_linked(ChainX_t *chainX_req)
 {
-	if(chainX_linked_check(chainX_req)==0)
+	if (chainX_linked_check(chainX_req)==0)
 	{
 		DBG_IF_LN("%s (%s:%u)", DBG_TXT_LINKED, chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
 	}
@@ -212,10 +212,10 @@ int main(int argc, char* argv[])
 	socket_init();
 
 	int count = 0;
-	while(1)
+	while (1)
 	{
 		sleep(1);
-		if(chainX_linked_check(&chainX_S)==0)
+		if (chainX_linked_check(&chainX_S)==0)
 		{
 			char buff[16] = "";
 			sprintf(buff, "%06d", count++);

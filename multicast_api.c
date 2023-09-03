@@ -32,15 +32,15 @@ void mctt_publish(ChainX_t *chainX_req, char *payload, int payload_len)
 
 static void mctt_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
-	if((chainX_req) && (buff) && (buff_len > (4+sizeof(int))))
+	if ((chainX_req) && (buff) && (buff_len > (4+sizeof(int))))
 	{
 		MCTT_t *packet_rcv = (MCTT_t *)buff;
-		if(packet_rcv->bom == MCTT_BOM)
+		if (packet_rcv->bom == MCTT_BOM)
 		{
 			unsigned checksum = buff_crc16(packet_rcv->payload, packet_rcv->payload_len, 0xFFFF);
-			if(checksum == packet_rcv->checksum)
+			if (checksum == packet_rcv->checksum)
 			{
-				if(mctt_recv_cb)
+				if (mctt_recv_cb)
 				{
 					mctt_recv_cb(chainX_req->c_data, packet_rcv->payload, packet_rcv->payload_len);
 				}
@@ -51,7 +51,7 @@ static void mctt_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 void mctt_thread_close(ChainX_t *chainX_req)
 {
-	if((chainX_req) && (chainX_req->isfree == 0))
+	if ((chainX_req) && (chainX_req->isfree == 0))
 	{
 		chainX_thread_stop(chainX_req);
 		chainX_thread_close(chainX_req);
@@ -63,7 +63,7 @@ ChainX_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb)
 {
 	ChainX_t *chainX_req = (ChainX_t*)SAFE_CALLOC(1, sizeof(ChainX_t));
 
-	if(chainX_req)
+	if (chainX_req)
 	{
 		chainX_req->mode = CHAINX_MODE_ID_MULTI_RECEIVER;
 		chainX_req->sockfd = -1;

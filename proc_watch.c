@@ -43,7 +43,7 @@ void sys_info_show(void)
 
 #if (1)
 	int freeram_percent = ((double)sysinfo_ex.meminfo.freeram/sysinfo_ex.meminfo.totalram) *100;
-	if(freeram_percent > 25)
+	if (freeram_percent > 25)
 	{
 		// nothing
 		DBG_LN_Y("safe !!! (freeram_percent: %d > 25, %ld, %ld)", freeram_percent, sysinfo_ex.meminfo.freeram, sysinfo_ex.meminfo.totalram);
@@ -209,7 +209,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -222,7 +222,7 @@ static void app_stop(void)
 
 static void app_loop(void)
 {
-	while(app_quit() == 0)
+	while (app_quit() == 0)
 	{
 		sys_info_show();
 		proc_info_show();
@@ -250,7 +250,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 
 	SAFE_STDOUT_NONE();
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

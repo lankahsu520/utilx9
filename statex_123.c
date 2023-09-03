@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 	//statex_add(&statex_sys, 0, SUBITEM_ID_NONE, ACTION_ID_OFF, ACTION_RUN_ID_NORMAL);
 	//statex_add(&statex_sys, 1, SUBITEM_ID_NONE, ACTION_ID_OFF, ACTION_RUN_ID_NORMAL);
 	int retry = 4;
-	while(retry>0)
+	while (retry>0)
 	{
 		sleep(1);
 		retry--;

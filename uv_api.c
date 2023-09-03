@@ -16,7 +16,7 @@
 
 void on_uv_close(uv_handle_t *handle)
 {
-	if(handle != NULL)
+	if (handle != NULL)
 	{
 	}
 }
@@ -30,7 +30,7 @@ void uv_loop_close_ex(uv_loop_t *loop)
 {
 	uv_stop(loop);
 	int result = uv_loop_close(loop);
-	if(result == UV_EBUSY)
+	if (result == UV_EBUSY)
 	{
 		uv_walk(loop, on_uv_walk, NULL);
 	}
@@ -40,7 +40,7 @@ static void uv_write_ex_cb(uv_write_t *req, int status)
 {
 	UvWriteEx_t *wreq = (UvWriteEx_t *)req;
 
-	if(wreq->cb)
+	if (wreq->cb)
 	{
 		wreq->cb(req, status);
 	}
@@ -64,11 +64,11 @@ void uv_write_ex(uv_stream_t *dest, size_t size, char *buf, uv_write_cb cb)
 
 static void uv_spawn_exit_cb(uv_process_t *process, int64_t exit_status, int term_signal)
 {
-	if(process)
+	if (process)
 	{
 		SpawnX_t *spawn_req = (SpawnX_t *)process->data;
 
-		if(spawn_req)
+		if (spawn_req)
 		{
 			SAFE_UV_CLOSE((uv_handle_t*)&spawn_req->pipe_in, NULL);
 			SAFE_UV_CLOSE((uv_handle_t*)&spawn_req->pipe_out, NULL);
@@ -101,15 +101,15 @@ static void uv_alloc_ex_cb(uv_handle_t *handle, size_t suggested_size, uv_buf_t 
 
 static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 {
-	if(nread < 0)
+	if (nread < 0)
 	{
 		//DBG_ER_LN("%s (nread: %d)", DBG_TXT_WRONG, nread);
 		SAFE_UV_CLOSE(stream, NULL);
 	}
-	else if(nread > 0)
+	else if (nread > 0)
 	{
 		SpawnX_t *spawn_req = (SpawnX_t *)stream->data;
-		if((spawn_req) && (spawn_req->pipe_out_cb))
+		if ((spawn_req) && (spawn_req->pipe_out_cb))
 		{
 			spawn_req->pipe_out_cb(stream, nread, buf);
 		}
@@ -120,7 +120,7 @@ static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv
 	}
 
 	// OK to free buffer as write_data copies it.
-	if(buf->base)
+	if (buf->base)
 	{
 		free(buf->base);
 	}
@@ -128,13 +128,13 @@ static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv
 
 void uv_spawn_close_ex(SpawnX_t *spawn_req)
 {
-	if((spawn_req) && (spawn_req->quit==0))
+	if ((spawn_req) && (spawn_req->quit==0))
 	{
 		SAFE_UV_PROCESS_KILL(&spawn_req->child_req, SIGTERM);
 		//SAFE_UV_PROCESS_KILL(&spawn_req->child_req, SIGQUIT);
 		//SAFE_UV_KILL(spawn_req->child_req.pid, SIGTERM);
 
-		if((spawn_req->options.flags & UV_PROCESS_DETACHED) == UV_PROCESS_DETACHED)
+		if ((spawn_req->options.flags & UV_PROCESS_DETACHED) == UV_PROCESS_DETACHED)
 		{
 			SAFE_UV_UNREF(&spawn_req->child_req);
 		}
@@ -143,7 +143,7 @@ void uv_spawn_close_ex(SpawnX_t *spawn_req)
 
 void uv_spawn_open_ex(SpawnX_t *spawn_req)
 {
-	if(spawn_req)
+	if (spawn_req)
 	{
 		uv_spawn_pipe_init(spawn_req);
 
@@ -154,7 +154,7 @@ void uv_spawn_open_ex(SpawnX_t *spawn_req)
 
 		spawn_req->child_req.data = (void *)spawn_req;
 		int r = uv_spawn(spawn_req->loop, &spawn_req->child_req, &spawn_req->options);
-		if(r == 0)
+		if (r == 0)
 		{
 			spawn_req->pipe_out.data = (void *)spawn_req;
 			SAFE_UV_READ_START((uv_stream_t*)&spawn_req->pipe_out, uv_alloc_ex_cb, uv_spawn_pipe_stdout_cb);
@@ -182,20 +182,20 @@ void uv_spawn_on_exit(uv_process_t *req, int64_t exit_status, int term_signal)
 
 void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...)
 {
-	if((spawn_req) && (spawn_req->loop) && (num < MAX_OF_SPAWN_ARGS))
+	if ((spawn_req) && (spawn_req->loop) && (num < MAX_OF_SPAWN_ARGS))
 	{
 		int i = 0;
 
 		va_list args;
 		va_start(args, num);
-		for(i = 0; i < num; i++)
+		for (i = 0; i < num; i++)
 		{
 			spawn_req->args[i] = va_arg(args, char*);
 		}
 		spawn_req->args[num] = NULL;
 		va_end(args);
 
-		if(spawn_req->options.exit_cb == NULL)
+		if (spawn_req->options.exit_cb == NULL)
 		{
 			spawn_req->options.exit_cb = uv_spawn_on_exit;
 		}
@@ -204,7 +204,7 @@ void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...)
 		spawn_req->options.flags |= UV_PROCESS_DETACHED;
 
 		int r;
-		if((r = uv_spawn(spawn_req->loop, &spawn_req->child_req, &spawn_req->options)))
+		if ((r = uv_spawn(spawn_req->loop, &spawn_req->child_req, &spawn_req->options)))
 		{
 			DBG_IF_LN("uv_spawn error !!! (%s)", uv_strerror(r));
 		}
@@ -222,12 +222,12 @@ void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...)
 
 static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events, int status)
 {
-	if(handle)
+	if (handle)
 	{
 		UvEvent_t *event_req = (UvEvent_t *)handle->data;
-		if(event_req)
+		if (event_req)
 		{
-			if(event_req->detect_cb)
+			if (event_req->detect_cb)
 			{
 				event_req->detect_cb(handle, filename, events, status);
 			}
@@ -241,7 +241,7 @@ static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events,
 
 void uv_event_close_ex(UvEvent_t *event_req)
 {
-	if((event_req) && (event_req->isquit==0))
+	if ((event_req) && (event_req->isquit==0))
 	{
 		event_req->isquit = 1;
 		uv_fs_event_stop(&event_req->req);
@@ -251,7 +251,7 @@ void uv_event_close_ex(UvEvent_t *event_req)
 
 void uv_event_open_ex(UvEvent_t *event_req)
 {
-	if((event_req) && (event_req->loop))
+	if ((event_req) && (event_req->loop))
 	{
 		event_req->req.data = (void *)event_req;
 		uv_fs_event_init(event_req->loop, &event_req->req);

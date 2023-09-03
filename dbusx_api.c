@@ -24,7 +24,7 @@ DBusHandlerResult demo_signal_cb(DBusConnection *connection, DBusMessage *messag
 
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	if(!dbus_message_get_args(message, &dbus_err, DBUS_TYPE_STRING, &val, DBUS_TYPE_INVALID))
+	if (!dbus_message_get_args(message, &dbus_err, DBUS_TYPE_STRING, &val, DBUS_TYPE_INVALID))
 	{
 		DBG_ER_LN("dbus_message_get_args error !!! (message: %s)", dbus_err.message);
 		handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -55,7 +55,7 @@ DBusHandlerResult demo_signal_name_cb(DBusConnection *connection, DBusMessage *m
 
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	if(!dbus_message_iter_init(message, &dbus_iter))
+	if (!dbus_message_iter_init(message, &dbus_iter))
 	{
 		DBG_ER_LN("dbus_message_iter_init error !!! (message: %s)", dbus_err.message);
 		goto done;
@@ -63,9 +63,9 @@ DBusHandlerResult demo_signal_name_cb(DBusConnection *connection, DBusMessage *m
 	else
 	{
 		int ctype = DBUS_TYPE_INVALID;
-		while((ctype = dbus_message_iter_get_arg_type(&dbus_iter)) != DBUS_TYPE_INVALID)
+		while ((ctype = dbus_message_iter_get_arg_type(&dbus_iter)) != DBUS_TYPE_INVALID)
 		{
-			switch(ctype)
+			switch (ctype)
 			{
 				case DBUS_TYPE_STRING:
 				{
@@ -85,13 +85,13 @@ DBusHandlerResult demo_signal_name_cb(DBusConnection *connection, DBusMessage *m
 						char *item = NULL;
 						dbus_message_iter_get_basic(&dSubIter, &item);
 
-						if(item)
+						if (item)
 						{
 							JSON_ARY_APPEND_STR(jitem_ary, item);
 							DBG_DB_LN("(item: %s)", item);
 						}
 					}
-					while(dbus_message_iter_next(&dSubIter) == TRUE);
+					while (dbus_message_iter_next(&dSubIter) == TRUE);
 
 					reqStr = JSON_DUMPS_EASY(jitem_ary);
 					JSON_FREE(jitem_ary);
@@ -127,17 +127,17 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 	int ret = -1;
 	DBusMessage *dbus_msg_req = NULL;
 
-	if(dbus_conn == NULL)
+	if (dbus_conn == NULL)
 	{
 		DBG_ER_LN("dbus_conn is NULL !!!");
 		goto exit_send;
 	}
-	else if((ifac == NULL) || (cmd == NULL))
+	else if ((ifac == NULL) || (cmd == NULL))
 	{
 		DBG_ER_LN("ifac or cmd is NULL !!! (ifac: %p, cmd: %p)", ifac, cmd);
 		goto exit_send;
 	}
-	else if(arg == NULL)
+	else if (arg == NULL)
 	{
 		DBG_ER_LN("arg is NULL !!!");
 		goto exit_send;
@@ -145,18 +145,18 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 
 	// create a signal and check for errors
 	dbus_msg_req = dbus_message_new_signal(dbus_path, ifac, cmd);
-	if(NULL == dbus_msg_req)
+	if (NULL == dbus_msg_req)
 	{
 		DBG_ER_LN("dbus_message_new_signal error !!!");
 		goto exit_send;
 	}
 
-	switch(itype)
+	switch (itype)
 	{
 		case DBUS_TYPE_INVALID:
 			break;
 		case DBUS_TYPE_STRING:
-			if(!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&arg, DBUS_TYPE_INVALID))
+			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
@@ -170,7 +170,7 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 		case DBUS_TYPE_UINT64:
 		case DBUS_TYPE_DOUBLE:
 		default:
-			if(!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
+			if (!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
@@ -178,7 +178,7 @@ int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *
 	}
 
 	// send the message and flush the connection
-	if(!dbus_connection_send(dbus_conn, dbus_msg_req, NULL))
+	if (!dbus_connection_send(dbus_conn, dbus_msg_req, NULL))
 	{
 		DBG_ER_LN("dbus_connection_send error !!!");
 		goto exit_send;
@@ -213,7 +213,7 @@ DBusHandlerResult dbusx_method_echo_cb(DBusConnection *connection, DBusMessage *
 	char *retStr = NULL;
 
 	dbus_msg_res = dbus_message_new_method_return(message);
-	if(!dbus_msg_res)
+	if (!dbus_msg_res)
 	{
 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
 	}
@@ -222,14 +222,14 @@ DBusHandlerResult dbusx_method_echo_cb(DBusConnection *connection, DBusMessage *
 
 	{
 		char *response = NULL;
-		if(!dbus_message_get_args(message, &dbus_err, DBUS_TYPE_STRING, &response, DBUS_TYPE_INVALID))
+		if (!dbus_message_get_args(message, &dbus_err, DBUS_TYPE_STRING, &response, DBUS_TYPE_INVALID))
 		{
 			DBG_ER_LN("dbus_message_get_args error !!! (message: %s)", dbus_err.message);
 			handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 			goto done;
 		}
 
-		if(response)
+		if (response)
 		{
 			SAFE_ASPRINTF(retStr, "%s", response);
 		}
@@ -260,17 +260,17 @@ char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const cha
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
 	//LOGE_EX(TAG,"(cmd: %s, key: %s, val: %s)", cmd, key, val);
-	if(dbus_conn == NULL)
+	if (dbus_conn == NULL)
 	{
 		DBG_ER_LN("dbus_conn is NULL !!!");
 		goto exit_send;
 	}
-	else if((ifac == NULL) || (cmd == NULL))
+	else if ((ifac == NULL) || (cmd == NULL))
 	{
 		DBG_ER_LN("ifac or cmd is NULL !!! (ifac: %p, cmd: %p)", ifac, cmd);
 		goto exit_send;
 	}
-	else if((key == NULL) || (val == NULL))
+	else if ((key == NULL) || (val == NULL))
 	{
 		DBG_ER_LN("key or val is NULL !!! (key: %p, val: %p)", key, val);
 		goto exit_send;
@@ -278,25 +278,25 @@ char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const cha
 
 	dbus_msg_req = dbus_message_new_method_call(dest, dbus_path, ifac, cmd);
 
-	if(dbus_msg_req == NULL)
+	if (dbus_msg_req == NULL)
 	{
 		DBG_ER_LN("dbus_msg_req is NULL !!!");
 		goto exit_send;
 	}
 
-	if(!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&key, DBUS_TYPE_STRING, (char *)&val, DBUS_TYPE_INVALID))
+	if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&key, DBUS_TYPE_STRING, (char *)&val, DBUS_TYPE_INVALID))
 	{
 		goto exit_send;
 	}
 
 	dbus_msg_res = dbus_connection_send_with_reply_and_block(dbus_conn, dbus_msg_req, timeout, &dbus_err);
-	if(dbus_msg_res == NULL)
+	if (dbus_msg_res == NULL)
 	{
 		DBG_ER_LN("dbus_connection_send_with_reply_and_block error !!! (message: %s)", dbus_err.message);
 	}
 	else
 	{
-		if(!dbus_message_iter_init(dbus_msg_res, &dbus_iter))
+		if (!dbus_message_iter_init(dbus_msg_res, &dbus_iter))
 		{
 			DBG_ER_LN("dbus_message_iter_init error !!! (message: %s)", dbus_err.message);
 		}
@@ -304,7 +304,7 @@ char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const cha
 		{
 			char *response = NULL;
 			dbus_message_iter_get_basic(&dbus_iter, &response);
-			if(response)
+			if (response)
 			{
 				SAFE_ASPRINTF(retStr, "%s", response);
 			}
@@ -316,7 +316,7 @@ exit_send:
 	SAFE_DBUS_MSG_FREE(dbus_msg_res);
 	SAFE_DBUS_ERR_FREE(&dbus_err);
 
-	if(retStr==NULL)
+	if (retStr==NULL)
 	{
 		SAFE_ASPRINTF(retStr, "\n");
 	}
@@ -334,35 +334,35 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	if(dbus_conn == NULL)
+	if (dbus_conn == NULL)
 	{
 		DBG_ER_LN("dbus_conn is NULL !!!");
 		goto exit_send;
 	}
-	else if((ifac == NULL) || (cmd == NULL))
+	else if ((ifac == NULL) || (cmd == NULL))
 	{
 		DBG_ER_LN("ifac or cmd is NULL !!! (ifac: %p, cmd: %p)", ifac, cmd);
 		goto exit_send;
 	}
-	else if(arg == NULL)
+	else if (arg == NULL)
 	{
 		DBG_ER_LN("arg is NULL !!!");
 		goto exit_send;
 	}
 
 	dbus_msg_req = dbus_message_new_method_call(dest, dbus_path, ifac, cmd);
-	if(NULL == dbus_msg_req)
+	if (NULL == dbus_msg_req)
 	{
 		DBG_ER_LN("dbus_message_new_method_call error !!!");
 		goto exit_send;
 	}
 
-	switch(itype)
+	switch (itype)
 	{
 		case DBUS_TYPE_INVALID:
 			break;
 		case DBUS_TYPE_STRING:
-			if(!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&arg, DBUS_TYPE_INVALID))
+			if (!dbus_message_append_args(dbus_msg_req, DBUS_TYPE_STRING, (char *)&arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
@@ -376,16 +376,16 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 		case DBUS_TYPE_UINT64:
 		case DBUS_TYPE_DOUBLE:
 		default:
-			if(!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
+			if (!dbus_message_append_args(dbus_msg_req, itype, arg, DBUS_TYPE_INVALID))
 			{
 				goto exit_send;
 			}
 			break;
 	}
 
-	if(otype == DBUS_TYPE_INVALID)
+	if (otype == DBUS_TYPE_INVALID)
 	{
-		if(!dbus_connection_send(dbus_conn, dbus_msg_req, NULL))
+		if (!dbus_connection_send(dbus_conn, dbus_msg_req, NULL))
 		{
 			DBG_ER_LN("dbus_connection_send error !!!");
 			goto exit_send;
@@ -394,28 +394,28 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 	else
 	{
 		dbus_msg_res = dbus_connection_send_with_reply_and_block(dbus_conn, dbus_msg_req, timeout, &dbus_err);
-		if(dbus_msg_res == NULL)
+		if (dbus_msg_res == NULL)
 		{
 			DBG_ER_LN("dbus_connection_send_with_reply_and_block error !!! (message: %s, timeout: %d)", dbus_err.message, timeout);
 		}
 		else
 		{
-			if(!dbus_message_iter_init(dbus_msg_res, &dbus_iter))
+			if (!dbus_message_iter_init(dbus_msg_res, &dbus_iter))
 			{
 				DBG_ER_LN("dbus_message_iter_init error !!! (message: %s)", dbus_err.message);
 			}
 			else
 			{
 				int ctype = DBUS_TYPE_INVALID;
-				while((ctype = dbus_message_iter_get_arg_type(&dbus_iter)) != DBUS_TYPE_INVALID)
+				while ((ctype = dbus_message_iter_get_arg_type(&dbus_iter)) != DBUS_TYPE_INVALID)
 				{
-					switch(ctype)
+					switch (ctype)
 					{
 						case DBUS_TYPE_STRING:
 						{
 							char *response = NULL;
 							dbus_message_iter_get_basic(&dbus_iter, &response);
-							if(response)
+							if (response)
 							{
 								SAFE_ASPRINTF(retStr, "%s", response);
 							}
@@ -432,13 +432,13 @@ char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char
 								char *item = NULL;
 								dbus_message_iter_get_basic(&dSubIter, &item);
 
-								if(item)
+								if (item)
 								{
 									JSON_ARY_APPEND_STR(jitem_ary, item);
 									DBG_DB_LN("(item: %s)", item);
 								}
 							}
-							while(dbus_message_iter_next(&dSubIter) == TRUE);
+							while (dbus_message_iter_next(&dSubIter) == TRUE);
 
 							retStr = JSON_DUMPS_EASY(jitem_ary);
 							JSON_FREE(jitem_ary);
@@ -465,7 +465,7 @@ exit_send:
 	SAFE_DBUS_MSG_FREE(dbus_msg_res);
 	SAFE_DBUS_ERR_FREE(&dbus_err);
 
-	if(retStr==NULL)
+	if (retStr==NULL)
 	{
 		SAFE_ASPRINTF(retStr, "\n");
 	}
@@ -507,18 +507,18 @@ static DBusHandlerResult dbusx_filter(DBusConnection *connection, DBusMessage *m
 {
 	dbus_bool_t handled = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 	DbusX_t *dbusx_req = (DbusX_t *)usr_data;
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		const char *method = dbus_message_get_member(message);
 		const char *iface = dbus_message_get_interface(message);
 		const char *path = dbus_message_get_path(message);
 
-		if(dbusx_req->filter_user_cb)
+		if (dbusx_req->filter_user_cb)
 		{
 			handled = dbusx_req->filter_user_cb(connection, message, usr_data);
 		}
 
-		if(handled != DBUS_HANDLER_RESULT_HANDLED)
+		if (handled != DBUS_HANDLER_RESULT_HANDLED)
 		{
 			DBG_DB_LN("DBUS request not handled (method: %s, iface: %s, path: %s)", method, iface, path);
 			handled = DBUS_HANDLER_RESULT_HANDLED;
@@ -535,12 +535,12 @@ void dbusx_shutdown(void)
 
 void dbusx_conn_free(DbusX_t *dbusx_req)
 {
-	if((dbusx_req) && ((dbusx_req->dbus_conn_listen) || (dbusx_req->dbus_conn)))
+	if ((dbusx_req) && ((dbusx_req->dbus_conn_listen) || (dbusx_req->dbus_conn)))
 	{
 		SAFE_DBUS_CONN_FREE(dbusx_req->dbus_conn_listen);
 		SAFE_DBUS_CONN_FREE(dbusx_req->dbus_conn);
 
-		if(dbusx_req->isgdbus==0)
+		if (dbusx_req->isgdbus==0)
 		{
 			dbus_shutdown();
 		}
@@ -555,13 +555,13 @@ int dbusx_client_init(DbusX_t *dbusx_req)
 	// initialize the errors
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	if((dbusx_req->dbus_conn = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_err)) == NULL)
+	if ((dbusx_req->dbus_conn = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_err)) == NULL)
 	{
 		DBG_ER_LN("dbus_bus_get_private error !!! (message: %s)", dbus_err.message);
 		goto exit_init;
 	}
 
-	if(dbus_error_is_set(&dbus_err))
+	if (dbus_error_is_set(&dbus_err))
 	{
 		DBG_ER_LN("dbus_bus_get_private error !!! (message: %s)", dbus_err.message);
 		goto exit_init;
@@ -580,9 +580,9 @@ static int dbusx_add_match(DBusConnection *dbus_listen, DBusError *err, void *us
 	int ret = -1;
 	DbusX_t *dbusx_req = (DbusX_t*)usr_data;
 
-	if(dbusx_req)
+	if (dbusx_req)
 	{
-		if(dbusx_req->add_match_cb)
+		if (dbusx_req->add_match_cb)
 		{
 			ret = dbusx_req->add_match_cb(dbus_listen, err, usr_data);
 		}
@@ -595,51 +595,51 @@ static void *dbusx_thread_handler(void *user)
 {
 	DbusX_t *dbusx_req = (DbusX_t*)user;
 
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_detach(tidx_req);
 
 		DBusError dbus_err;
 
-		if(dbusx_req_check(dbusx_req) == -1)
+		if (dbusx_req_check(dbusx_req) == -1)
 		{
 			goto exit_dbus;
 		}
 
 		// initialize the errors
-		if(dbusx_client_init(dbusx_req) == -1)
+		if (dbusx_client_init(dbusx_req) == -1)
 		{
 			goto exit_dbus;
 		}
 
 		SAFE_DBUS_ERR_INIT(&dbus_err);
 		dbusx_req->dbus_conn_listen = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbus_err);
-		if(dbus_error_is_set(&dbus_err))
+		if (dbus_error_is_set(&dbus_err))
 		{
 			DBG_ER_LN("dbus_bus_get_private error !!! (message: %s)", dbus_err.message);
 			goto exit_dbus;
 		}
 
-		if(NULL == dbusx_req->dbus_conn_listen)
+		if (NULL == dbusx_req->dbus_conn_listen)
 		{
 			DBG_ER_LN("dbus_conn_listen is NULL !!!");
 			goto exit_dbus;
 		}
 
-		if(!dbus_connection_add_filter(dbusx_req->dbus_conn_listen, dbusx_filter, (void *)user, NULL))
+		if (!dbus_connection_add_filter(dbusx_req->dbus_conn_listen, dbusx_filter, (void *)user, NULL))
 		{
 			DBG_ER_LN("dbus_connection_add_filter error !!!");
 			goto exit_dbus;
 		}
 
-		if(dbusx_add_match(dbusx_req->dbus_conn_listen, &dbus_err, (void *)user) != 0)
+		if (dbusx_add_match(dbusx_req->dbus_conn_listen, &dbus_err, (void *)user) != 0)
 		{
 			goto exit_dbus;
 		}
 
 		DBG_IF_LN("dbus listen ...");
-		while(threadx_isquit(tidx_req) == 0)
+		while (threadx_isquit(tidx_req) == 0)
 		{
 			dbus_connection_read_write_dispatch(dbusx_req->dbus_conn_listen, 1000);
 		}
@@ -657,7 +657,7 @@ exit_dbus:
 
 DBusConnection *dbusx_listen_get(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		return dbusx_req->dbus_conn_listen;
 	}
@@ -667,7 +667,7 @@ DBusConnection *dbusx_listen_get(DbusX_t *dbusx_req)
 
 DBusConnection *dbusx_conn_get(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		return dbusx_req->dbus_conn;
 	}
@@ -677,7 +677,7 @@ DBusConnection *dbusx_conn_get(DbusX_t *dbusx_req)
 
 char *dbusx_path_get(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		return dbusx_req->path;
 	}
@@ -687,7 +687,7 @@ char *dbusx_path_get(DbusX_t *dbusx_req)
 
 void dbusx_lock(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_lock(tidx_req);
@@ -696,7 +696,7 @@ void dbusx_lock(DbusX_t *dbusx_req)
 
 void dbusx_unlock(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_unlock(tidx_req);
@@ -705,7 +705,7 @@ void dbusx_unlock(DbusX_t *dbusx_req)
 
 void dbusx_wakeup_simple(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wakeup_simple(tidx_req);
@@ -714,7 +714,7 @@ void dbusx_wakeup_simple(DbusX_t *dbusx_req)
 
 void dbusx_wakeup(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wakeup(tidx_req);
@@ -725,7 +725,7 @@ int dbusx_timewait_simple(DbusX_t *dbusx_req, int ms)
 {
 	int ret = EINVAL;
 
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		ret = threadx_timewait_simple(tidx_req, ms);
@@ -738,7 +738,7 @@ int dbusx_timewait(DbusX_t *dbusx_req, int ms)
 {
 	int ret = EINVAL;
 
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		ret = threadx_timewait(tidx_req, ms);
@@ -749,7 +749,7 @@ int dbusx_timewait(DbusX_t *dbusx_req, int ms)
 
 void dbusx_wait_simple(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wait_simple(tidx_req);
@@ -758,7 +758,7 @@ void dbusx_wait_simple(DbusX_t *dbusx_req)
 
 void dbusx_wait(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_wait(tidx_req);
@@ -770,13 +770,13 @@ READY_ID dbusx_ready(DbusX_t *dbusx_req)
 	ThreadX_t *tidx_req = &dbusx_req->tidx;
 
 	int retry = 3;
-	while((dbusx_req->dbus_conn_listen==NULL) && (retry>0) && (threadx_isquit(tidx_req) == QUIT_ID_NONE))
+	while ((dbusx_req->dbus_conn_listen==NULL) && (retry>0) && (threadx_isquit(tidx_req) == QUIT_ID_NONE))
 	{
 		retry--;
 		sleep(1);
 	}
 
-	if(dbusx_req->dbus_conn_listen)
+	if (dbusx_req->dbus_conn_listen)
 	{
 		return READY_ID_OK;
 	}
@@ -799,7 +799,7 @@ int dbusx_req_check(DbusX_t *dbusx_req)
 {
 	int ret = 0;
 
-	if(SAFE_STRLEN(dbusx_req->path) <= 0)
+	if (SAFE_STRLEN(dbusx_req->path) <= 0)
 	{
 		DBG_ER_LN("(path: %s)", dbusx_req->path);
 		ret = -1;
@@ -825,7 +825,7 @@ int dbusx_thread_init(dbusx_match_fn *match_cb, dbusx_filter_fn *filter_cb, Dbus
 
 void dbusx_thread_stop(DbusX_t *dbusx_req)
 {
-	if(dbusx_req)
+	if (dbusx_req)
 	{
 		ThreadX_t *tidx_req = &dbusx_req->tidx;
 		threadx_stop(tidx_req);
@@ -834,7 +834,7 @@ void dbusx_thread_stop(DbusX_t *dbusx_req)
 
 void dbusx_thread_close(DbusX_t *dbusx_req)
 {
-	if((dbusx_req) && (dbusx_req->isfree == 0))
+	if ((dbusx_req) && (dbusx_req->isfree == 0))
 	{
 		dbusx_req->isfree ++;
 

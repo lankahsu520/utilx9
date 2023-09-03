@@ -58,7 +58,7 @@ static void app_loop(void)
 	DBG_TR_LN("enter");
 
 	DBG_TR_LN("call ssh_new ...");
-	if(sshX_client(&ssh_data) == NULL)
+	if (sshX_client(&ssh_data) == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");
 		return ;
@@ -71,7 +71,7 @@ static void app_loop(void)
 static void app_stop(void)
 {
 	DBG_TR_LN("enter");
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -95,7 +95,7 @@ static void app_exit(void)
 
 static void app_signal_handler(int signum)
 {
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -157,18 +157,18 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'i':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(ssh_data.server_ip, "%s", optarg);
 				}
 				break;
 			case 'p':
-				if(optarg)
+				if (optarg)
 				{
 					ssh_data.server_port = atoi(optarg);
 				}
@@ -177,13 +177,13 @@ static void app_ParseArguments(int argc, char **argv)
 				ssh_data.verbosity = 1;
 				break;
 			case 'u':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(ssh_data.server_user, "%s", optarg);
 				}
 				break;
 			case 's':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(ssh_data.server_pass_dec, "%s", optarg);
 				}
@@ -208,7 +208,7 @@ static void app_init(int argc, char **argv)
 
 	app_ParseArguments(argc, argv);
 
-	if(strlen(ssh_data.server_ip) <= 0)
+	if (strlen(ssh_data.server_ip) <= 0)
 	{
 		app_showusage(-1);
 	}

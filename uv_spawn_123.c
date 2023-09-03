@@ -72,7 +72,7 @@ void uv_spawn_simple_test(char *hostname)
 	child_options.flags = UV_PROCESS_DETACHED;
 
 	int r;
-	if((r = uv_spawn(uv_loop, &child_req, &child_options)))
+	if ((r = uv_spawn(uv_loop, &child_req, &child_options)))
 	{
 		DBG_IF_LN("uv_spawn error !!! (%s)", uv_strerror(r));
 	}
@@ -93,13 +93,13 @@ void timer_1sec_loop(uv_timer_t *handle)
 	count++;
 	DBG_IF_LN("(count: %d)", count);
 
-	if(count==2)
+	if (count==2)
 	{
 #ifdef USE_SPAWN_CREATE
 		uv_spawn_ping();
 #endif
 	}
-	else if((count%5) == 0)
+	else if ((count%5) == 0)
 	{
 #ifdef USE_SPAWN_SIMPLE_CREATE
 		//uv_spawn_simple_test("192.168.50.72");
@@ -134,10 +134,10 @@ static int app_quit(void)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if((is_free==0) && (app_quit()==1))
+	if ((is_free==0) && (app_quit()==1))
 	{
 		is_free = 1;
-		if(uv_loop)
+		if (uv_loop)
 		{
 			DBG_IF_LN("call SAFE_UV_TIMER_CLOSE ...");
 #ifdef USE_TIMER_CREATE
@@ -150,13 +150,13 @@ void app_stop_uv(uv_async_t *handle, int force)
 #endif
 
 			DBG_IF_LN("call SAFE_UV_CLOSE ...");
-			if(handle)
+			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
 			DBG_IF_LN("call SAFE_UV_LOOP_CLOSE ...");
-			if(force)
+			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
@@ -186,7 +186,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -237,7 +237,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -293,12 +293,12 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

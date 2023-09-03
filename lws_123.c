@@ -48,7 +48,7 @@ static int lws2_client_cb(struct lws *wsi, enum lws_callback_reasons reason, voi
 
 	LWSX_t *lws_req = lws2_protocol_user(wsi);
 
-	switch(reason)
+	switch (reason)
 	{
 		case LWS_CALLBACK_CLIENT_RECEIVE: // 8
 		{
@@ -112,7 +112,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 	struct tm *now_tm = localtime(&now_t);
 	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
-	if(app_quit()==1)
+	if (app_quit()==1)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
@@ -120,7 +120,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 	}
 	else
 	{
-		if(is_service)
+		if (is_service)
 		{
 			// server mode, send to myself
 		}
@@ -129,7 +129,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 		else
 		{
 			// client mode
-			if(lws2_session_count(&lws_req) > 0)
+			if (lws2_session_count(&lws_req) > 0)
 			{
 				char tmpbuf[LEN_OF_WEBSOCKET] = "";
 				SAFE_SPRINTF_EX(tmpbuf, "(count: %d)", count);
@@ -145,22 +145,22 @@ void timer_1sec_loop(uv_timer_t *handle)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if((is_free==0) && (app_quit()==1))
+	if ((is_free==0) && (app_quit()==1))
 	{
 		is_free = 1;
 #ifdef USE_UV
-		if(uv_loop)
+		if (uv_loop)
 		{
 #ifdef USE_TIMER_CREATE
 			SAFE_UV_TIMER_CLOSE(&uv_timer_1sec_fd, NULL);
 #endif
 
-			if(handle)
+			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			if(force)
+			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
@@ -188,7 +188,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -225,7 +225,7 @@ static void app_loop(void)
 #endif
 
 #ifdef USE_WS
-	if(is_service)
+	if (is_service)
 	{
 #ifdef USE_UV
 		lws2_srv_init(&lws_req, LWS_PORT, NULL, LWS_SERVER_OPTION_LIBUV, uv_loop);
@@ -255,18 +255,18 @@ static void app_loop(void)
 	SAFE_UV_LOOP_RUN(uv_loop);
 	SAFE_UV_LOOP_CLOSE(uv_loop);
 #else
-	while(app_quit()==0)
+	while (app_quit()==0)
 	{
 		static int count = 0;
 		count ++;
 		sleep(1);
 
-		if(is_service==0)
+		if (is_service==0)
 		{
 			//if ( (count%10) == 0 )
 			{
 				// client mode
-				if(lws2_session_count(&lws_req) > 0)
+				if (lws2_session_count(&lws_req) > 0)
 				{
 					char tmpbuf[LEN_OF_WEBSOCKET] = "";
 					SAFE_SPRINTF_EX(tmpbuf, "[%d]", count);
@@ -299,7 +299,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -359,12 +359,12 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
@@ -395,7 +395,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

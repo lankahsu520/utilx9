@@ -94,22 +94,22 @@ void qtask_GetCapabilities(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		soap_node_t *curr_node = soap_element_fetch(response_node, NULL, "Capabilities", NULL, NULL);
 		curr_node = soap_element_1st_child(curr_node);
-		while(curr_node)
+		while (curr_node)
 		{
 			const char *Name = soap_element_name(curr_node);
-			if(SAFE_STRSTR((char *)Name, "Extension"))
+			if (SAFE_STRSTR((char *)Name, "Extension"))
 			{
 				soap_node_t *Extension_node = soap_element_1st_child(curr_node);
-				while(Extension_node)
+				while (Extension_node)
 				{
 					const char *SubName = soap_element_name(Extension_node);
 					char *XAddr = NULL;
 					soap_node_t *XAddr_node = soap_element_fetch(Extension_node, NULL, "XAddr", NULL, NULL);
-					if(XAddr_node)
+					if (XAddr_node)
 					{
 						XAddr = (char*)soap_element_text(XAddr_node, NULL);
 					}
@@ -123,16 +123,16 @@ void qtask_GetCapabilities(TaskInfo_t *task)
 			{
 				char *XAddr = NULL;
 				soap_node_t *XAddr_node = soap_element_fetch(curr_node, NULL, "XAddr", NULL, NULL);
-				if(XAddr_node)
+				if (XAddr_node)
 				{
 					XAddr = (char*)soap_element_text(XAddr_node, NULL);
 				}
 
-				if(SAFE_STRSTR((char *)Name, "Device"))
+				if (SAFE_STRSTR((char *)Name, "Device"))
 				{
 					SAFE_SPRINTF(device_url, "%s", XAddr);
 				}
-				else if(SAFE_STRSTR((char *)Name, "Media"))
+				else if (SAFE_STRSTR((char *)Name, "Media"))
 				{
 					SAFE_SPRINTF(media_url, "%s", XAddr);
 				}
@@ -167,7 +167,7 @@ void qtask_GetDeviceInformation(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		char *Manufacturer = NULL;
 		char *Model = NULL;
@@ -176,31 +176,31 @@ void qtask_GetDeviceInformation(TaskInfo_t *task)
 		char *HardwareId = NULL;
 
 		soap_node_t *Manufacturer_node = soap_element_fetch(response_node, NULL, "Manufacturer", NULL, NULL);
-		if(Manufacturer_node)
+		if (Manufacturer_node)
 		{
 			Manufacturer = (char*)soap_element_text(Manufacturer_node, NULL);
 		}
 
 		soap_node_t *Model_node = soap_element_fetch(response_node, NULL, "Model", NULL, NULL);
-		if(Model_node)
+		if (Model_node)
 		{
 			Model = (char*)soap_element_text(Model_node, NULL);
 		}
 
 		soap_node_t *FirmwareVersion_node = soap_element_fetch(response_node, NULL, "FirmwareVersion", NULL, NULL);
-		if(FirmwareVersion_node)
+		if (FirmwareVersion_node)
 		{
 			FirmwareVersion = (char*)soap_element_text(FirmwareVersion_node, NULL);
 		}
 
 		soap_node_t *SerialNumber_node = soap_element_fetch(response_node, NULL, "SerialNumber", NULL, NULL);
-		if(SerialNumber_node)
+		if (SerialNumber_node)
 		{
 			SerialNumber = (char*)soap_element_text(SerialNumber_node, NULL);
 		}
 
 		soap_node_t *HardwareId_node = soap_element_fetch(response_node, NULL, "HardwareId", NULL, NULL);
-		if(HardwareId_node)
+		if (HardwareId_node)
 		{
 			HardwareId = (char*)soap_element_text(HardwareId_node, NULL);
 		}
@@ -236,19 +236,19 @@ void qtask_GetHostname(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		char *FromDHCP = NULL;
 		char *Name = NULL;
 
 		soap_node_t *FromDHCP_node = soap_element_fetch(response_node, NULL, "FromDHCP", NULL, NULL);
-		if(FromDHCP_node)
+		if (FromDHCP_node)
 		{
 			FromDHCP = (char*)soap_element_text(FromDHCP_node, NULL);
 		}
 
 		soap_node_t *Name_node = soap_element_fetch(response_node, NULL, "Name", NULL, NULL);
-		if(Name_node)
+		if (Name_node)
 		{
 			Name = (char*)soap_element_text(Name_node, NULL);
 		}
@@ -280,12 +280,12 @@ void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		int idx = 0;
 		soap_node_t *curr_node = soap_element_fetch(response_node, NULL, "NetworkInterfaces", NULL, NULL);
 		//soap_element_print(curr_node);
-		while(curr_node)
+		while (curr_node)
 		{
 			const char *token = soap_element_attr(curr_node, "token");
 			char *Enabled = NULL;
@@ -294,28 +294,28 @@ void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 			char *MTU = NULL;
 
 			soap_node_t *Enabled_node = soap_element_fetch(curr_node, NULL, "Enabled", NULL, NULL);
-			if(Enabled_node)
+			if (Enabled_node)
 			{
 				Enabled = (char*)soap_element_text(Enabled_node, NULL);
 			}
 
 			soap_node_t *Info_node = soap_element_fetch(curr_node, NULL, "Info", NULL, NULL);
-			if(Info_node)
+			if (Info_node)
 			{
 				soap_node_t *Name_node = soap_element_fetch(Info_node, NULL, "Name", NULL, NULL);
-				if(Name_node)
+				if (Name_node)
 				{
 					Name = (char*)soap_element_text(Name_node, NULL);
 				}
 
 				soap_node_t *HwAddress_node = soap_element_fetch(Info_node, NULL, "HwAddress", NULL, NULL);
-				if(HwAddress_node)
+				if (HwAddress_node)
 				{
 					HwAddress = (char*)soap_element_text(HwAddress_node, NULL);
 				}
 
 				soap_node_t *MTU_node = soap_element_fetch(Info_node, NULL, "MTU", NULL, NULL);
-				if(MTU_node)
+				if (MTU_node)
 				{
 					MTU = (char*)soap_element_text(MTU_node, NULL);
 				}
@@ -323,10 +323,10 @@ void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 
 			DBG_IF_LN("(gid:%d.%d, [%d] token: %s, Enabled: %s, Name: %s, HwAddress: %s, MTU: %s)", task->gid, task->cid, idx, token, Enabled, Name, HwAddress, MTU);
 			soap_node_t *IPv4_node = soap_element_fetch(curr_node, NULL, "IPv4", NULL, NULL);
-			if(IPv4_node)
+			if (IPv4_node)
 			{
 				soap_node_t *Enabled_node = soap_element_fetch(IPv4_node, NULL, "Enabled", NULL, NULL);
-				if(Enabled_node)
+				if (Enabled_node)
 				{
 					Enabled = (char*)soap_element_text(Enabled_node, NULL);
 				}
@@ -334,10 +334,10 @@ void qtask_GetNetworkInterfaces(TaskInfo_t *task)
 				DBG_IF_LN("(gid:%d.%d, [%d] IPv4 Enabled: %s)", task->gid, task->cid, idx, Enabled);
 			}
 			soap_node_t *IPv6_node = soap_element_fetch(curr_node, NULL, "IPv6", NULL, NULL);
-			if(IPv6_node)
+			if (IPv6_node)
 			{
 				soap_node_t *Enabled_node = soap_element_fetch(IPv6_node, NULL, "Enabled", NULL, NULL);
-				if(Enabled_node)
+				if (Enabled_node)
 				{
 					Enabled = (char*)soap_element_text(Enabled_node, NULL);
 				}
@@ -372,11 +372,11 @@ void qtask_GetServices(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.url, "%s", device_url);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		soap_node_t *curr_node = soap_element_fetch(response_node, NULL, "Service", NULL, NULL);
 		//soap_element_print(curr_node);
-		while(curr_node)
+		while (curr_node)
 		{
 			char *Namespace = NULL;
 			char *XAddr = NULL;
@@ -418,24 +418,24 @@ void qtask_GetScopes(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		int idx = 0;
 		soap_node_t *curr_node = soap_element_fetch(response_node, NULL, "Scopes", NULL, NULL);
 		//soap_element_print(curr_node);
-		while(curr_node)
+		while (curr_node)
 		{
 			char *ScopeDef = NULL;
 			char *ScopeItem = NULL;
 
 			soap_node_t *ScopeDef_node = soap_element_fetch(curr_node, NULL, "ScopeDef", NULL, NULL);
-			if(ScopeDef_node)
+			if (ScopeDef_node)
 			{
 				ScopeDef = (char*)soap_element_text(ScopeDef_node, NULL);
 			}
 
 			soap_node_t *ScopeItem_node = soap_element_fetch(curr_node, NULL, "ScopeItem", NULL, NULL);
-			if(ScopeItem_node)
+			if (ScopeItem_node)
 			{
 				ScopeItem = (char*)soap_element_text(ScopeItem_node, NULL);
 			}
@@ -470,15 +470,15 @@ void qtask_GetProfiles(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		char *token = NULL;
 		soap_node_t *curr_node = soap_element_fetch(response_node, NULL, "Profiles", NULL, NULL);
 		//soap_element_print(curr_node);
-		while((curr_node) && (token==NULL))
+		while ((curr_node) && (token==NULL))
 		{
 			//soap_element_print(Profiles_node);
-			if(token==NULL)
+			if (token==NULL)
 			{
 				SAFE_ASPRINTF(token, "%s", soap_element_attr(curr_node, "token"));
 			}
@@ -515,15 +515,15 @@ void qtask_GetSnapshotUri(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		soap_node_t *Uri_node = soap_element_fetch(response_node, NULL, "Uri", NULL, NULL);
-		if(Uri_node)
+		if (Uri_node)
 		{
 			char *snapshot_uri = (char*)soap_element_text(Uri_node, NULL);
 			DBG_DB_LN("GetSnapshotUri (snapshot_uri: %s)",  snapshot_uri);
 
-			if(onvif_GetSnapshot(&onvif_req, snapshot_uri, snapshot_prefixname) == 0)
+			if (onvif_GetSnapshot(&onvif_req, snapshot_uri, snapshot_prefixname) == 0)
 			{
 				DBG_IF_LN("GetSnapshot ok !!! (gid:%d.%d, %s.jpg)", task->gid, task->cid, snapshot_prefixname);
 			}
@@ -559,15 +559,15 @@ void qtask_GetStreamUri(TaskInfo_t *task)
 	SAFE_SPRINTF(onvif_req.netinfo.pass, "%s", srv_pass);
 
 	soap_node_t *response_node = onvif_GetCommon(&onvif_req);
-	if(response_node)
+	if (response_node)
 	{
 		soap_node_t *Uri_node = soap_element_fetch(response_node, NULL, "Uri", NULL, NULL);
-		if(Uri_node)
+		if (Uri_node)
 		{
 			char *media_uri = (char*)soap_element_text(Uri_node, NULL);
 			DBG_DB_LN("GetStreamUri (media_uri: %s)",  media_uri);
 
-			if(onvif_GetVideoClip(&onvif_req, media_uri, video_filename, 15) == 0)
+			if (onvif_GetVideoClip(&onvif_req, media_uri, video_filename, 15) == 0)
 			{
 				DBG_IF_LN("qtask_GetStreamUri ok !!! (gid:%d.%d, %s)", task->gid, task->cid, video_filename);
 			}
@@ -588,7 +588,7 @@ void qtask_GetStreamUri(TaskInfo_t *task)
 void qtask_process(TaskInfo_t *task)
 {
 	//DBG_IF_LN("(id: %d, gid:%d.%d)", task->id, task->gid, task->cid);
-	switch(task->id)
+	switch (task->id)
 	{
 		case SOAP_ACTION_ID_GETCOMMON:
 			DBG_IF_LN("SOAP_ACTION_ID_GETCOMMON (gid:%d.%d)", task->gid, task->cid);
@@ -633,7 +633,7 @@ static int qtask_exec_cb(void *arg)
 {
 	TaskInfo_t *data_pop = (TaskInfo_t *)arg;
 
-	if(data_pop)
+	if (data_pop)
 	{
 		qtask_process(data_pop);
 	}
@@ -686,7 +686,7 @@ static void app_wait(void)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 		app_wakeup();
@@ -705,7 +705,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_TR_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -772,48 +772,48 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 			case 'i':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(srv_ip, "%s", optarg);
 				}
 				break;
 			case 'p':
-				if(optarg)
+				if (optarg)
 				{
 					srv_port = atoi(optarg);
 				}
 				break;
 			case 'u':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(srv_user, "%s", optarg);
 				}
 				break;
 			case 's':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(srv_pass, "%s", optarg);
 				}
 				break;
 			case 'e':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(device_url_path, "%s", optarg);
 				}
 				break;
 			case 'm':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF(media_url_path, "%s", optarg);
 				}
@@ -837,9 +837,9 @@ int main(int argc, char* argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(strlen(srv_ip)>0)
+	if (strlen(srv_ip)>0)
 	{
-		if(srv_port==0)
+		if (srv_port==0)
 		{
 			srv_port=80;
 		}
@@ -850,7 +850,7 @@ int main(int argc, char* argv[])
 
 #ifdef USE_DAEMON
 	int result = daemon(0,1);
-	if(result == 0)
+	if (result == 0)
 #endif
 	{
 		qtask = queuex_thread_init("qtask", MAX_OF_TASK, sizeof(TaskInfo_t), qtask_exec_cb, NULL);
@@ -869,13 +869,13 @@ int main(int argc, char* argv[])
 		qtask_push(769, 0, SOAP_ACTION_ID_MEDIA_GETSNAPSHOTURI);
 
 #ifdef USE_DAEMON
-		while(app_quit() == 0)
+		while (app_quit() == 0)
 		{
 			app_loop();
 			app_wait();
 		}
 #else
-		while(!queuex_isempty(qtask))
+		while (!queuex_isempty(qtask))
 		{
 			sleep(1);
 		}

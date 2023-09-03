@@ -120,12 +120,12 @@ void *clist_tail(clist_t list)
 {
 	struct clist *l;
 
-	if(*list == NULL)
+	if (*list == NULL)
 	{
 		return NULL;
 	}
 
-	for(l = *list; l->next != NULL; l = l->next);
+	for (l = *list; l->next != NULL; l = l->next);
 
 	return l;
 }
@@ -153,7 +153,7 @@ void clist_push(clist_t list, void *item)
 
 	l = clist_tail(list);
 
-	if(l == NULL)
+	if (l == NULL)
 	{
 		*list = item;
 	}
@@ -192,18 +192,18 @@ void *clist_chop(clist_t list)
 {
 	struct clist *l, *r;
 
-	if(*list == NULL)
+	if (*list == NULL)
 	{
 		return NULL;
 	}
-	if(((struct clist *)*list)->next == NULL)
+	if (((struct clist *)*list)->next == NULL)
 	{
 		l = *list;
 		*list = NULL;
 		return l;
 	}
 
-	for(l = *list; l->next->next != NULL; l = l->next);
+	for (l = *list; l->next->next != NULL; l = l->next);
 
 	r = l->next;
 	l->next = NULL;
@@ -226,7 +226,7 @@ void *clist_pop(clist_t list)
 {
 	struct clist *l;
 	l = *list;
-	if(*list != NULL)
+	if (*list != NULL)
 	{
 		*list = ((struct clist *)*list)->next;
 	}
@@ -236,12 +236,12 @@ void *clist_pop(clist_t list)
 
 void clist_pop_ex(clist_t list, clist_item_free_fn free_cb)
 {
-	while(clist_length(list) > 0)
+	while (clist_length(list) > 0)
 	{
 		void *item = clist_pop(list);
-		if(item)
+		if (item)
 		{
-			if(free_cb)
+			if (free_cb)
 			{
 				free_cb(item);
 			}
@@ -264,17 +264,17 @@ void clist_remove(clist_t list, void *item)
 {
 	struct clist *l, *r;
 
-	if(*list == NULL)
+	if (*list == NULL)
 	{
 		return;
 	}
 
 	r = NULL;
-	for(l = *list; l != NULL; l = l->next)
+	for (l = *list; l != NULL; l = l->next)
 	{
-		if(l == item)
+		if (l == item)
 		{
-			if(r == NULL)
+			if (r == NULL)
 			{
 				/* First on list */
 				*list = l->next;
@@ -306,7 +306,7 @@ int clist_length(clist_t list)
 	struct clist *l;
 	int n = 0;
 
-	for(l = *list; l != NULL; l = l->next)
+	for (l = *list; l != NULL; l = l->next)
 	{
 		++n;
 	}
@@ -332,7 +332,7 @@ int clist_length(clist_t list)
  */
 void clist_insert(clist_t list, void *previtem, void *newitem)
 {
-	if(previtem == NULL)
+	if (previtem == NULL)
 	{
 		clist_add(list, newitem);
 	}
@@ -364,14 +364,14 @@ int clist_filter_ex(clist_t list, clist_item_filter_fn filter_cb)
 	int count = 0;
 	struct clist *l;
 
-	if(filter_cb)
+	if (filter_cb)
 	{
 		l = *list;
-		while(l != NULL)
+		while (l != NULL)
 		{
 			struct clist *curr = l;
 			l = l->next;
-			if(filter_cb(curr) == 0)
+			if (filter_cb(curr) == 0)
 			{
 				// nothing
 			}
@@ -399,9 +399,9 @@ int clist_contains(clist_t list, void *item)
 {
 	struct clist *l;
 
-	for(l = *list; l != NULL; l = l->next)
+	for (l = *list; l != NULL; l = l->next)
 	{
-		if(l == item)
+		if (l == item)
 		{
 			return 1;
 		}
@@ -411,12 +411,12 @@ int clist_contains(clist_t list, void *item)
 
 void clist_free_ex(clist_t list, clist_item_free_fn free_cb)
 {
-	while(clist_length(list) > 0)
+	while (clist_length(list) > 0)
 	{
 		void *item = clist_pop(list);
-		if(item)
+		if (item)
 		{
-			if(free_cb)
+			if (free_cb)
 			{
 				free_cb(item);
 			}
@@ -427,10 +427,10 @@ void clist_free_ex(clist_t list, clist_item_free_fn free_cb)
 
 void clist_free(clist_t list)
 {
-	while(clist_length(list) > 0)
+	while (clist_length(list) > 0)
 	{
 		void *item = clist_pop(list);
-		if(item)
+		if (item)
 		{
 			free(item);
 		}

@@ -19,7 +19,7 @@ int sshX_open_shell(SSH_t *ssh_req)
 	int rc;
 
 	rc = ssh_channel_open_session(ssh_req->channel);
-	if(rc != SSH_OK)
+	if (rc != SSH_OK)
 	{
 		DBG_ER_LN("ssh_channel_open_session error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 		return rc;
@@ -33,16 +33,16 @@ int sshX_request_pty(SSH_t *ssh_req)
 	int rc;
 
 	rc = ssh_channel_request_pty(ssh_req->channel);
-	if(rc != SSH_OK)
+	if (rc != SSH_OK)
 	{
 		DBG_ER_LN("ssh_channel_request_pty error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 		return rc;
 	}
 
-	if((ssh_req->cols != 0) && (ssh_req->rows != 0))
+	if ((ssh_req->cols != 0) && (ssh_req->rows != 0))
 	{
 		rc = ssh_channel_change_pty_size(ssh_req->channel, ssh_req->cols, ssh_req->rows);
-		if(rc != SSH_OK)
+		if (rc != SSH_OK)
 		{
 			DBG_ER_LN("ssh_channel_change_pty_size error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 			return rc;
@@ -57,7 +57,7 @@ int sshX_request_shell(SSH_t *ssh_req)
 	int rc;
 
 	rc = ssh_channel_request_shell(ssh_req->channel);
-	if(rc != SSH_OK)
+	if (rc != SSH_OK)
 	{
 		DBG_ER_LN("ssh_channel_request_shell error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 		return rc;
@@ -72,7 +72,7 @@ void sshX_stream_copy(ssh_channel channel_frm, ssh_channel channel_to)
 	char buffer[LEN_OF_BUF1024];
 	memset(buffer, 0, sizeof(buffer));
 
-	while((nbytes = ssh_channel_read_timeout(channel_frm, buffer, sizeof(buffer), 0, 100)) > 0)
+	while ((nbytes = ssh_channel_read_timeout(channel_frm, buffer, sizeof(buffer), 0, 100)) > 0)
 	{
 		nbytes = ssh_channel_write(channel_to, buffer, sizeof(buffer));
 		memset(buffer, 0, sizeof(buffer));
@@ -109,31 +109,31 @@ void sshX_select_loop_with_tunnel(SSH_t *ssh_req, SSH_t *ssh_req_frm)
 	ssh_connector_set_in_channel(connector_err, channel, SSH_CONNECTOR_STDERR);
 	ssh_event_add_connector(event, connector_err);
 
-	while(ssh_channel_is_open(channel) && (ssh_channel_is_eof(channel) == 0) &&
+	while (ssh_channel_is_open(channel) && (ssh_channel_is_eof(channel) == 0) &&
 			ssh_channel_is_open(channel_frm) && (ssh_channel_is_eof(channel_frm) == 0))
 	{
 		//if (signal_delayed) {
 		//	sizechanged();
 		//}
 		rc = ssh_event_dopoll(event, 60000);
-		if(rc == SSH_ERROR)
+		if (rc == SSH_ERROR)
 		{
 			DBG_ER_LN("ssh_event_dopoll error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(session), ssh_get_error(session));
 			break;
 		}
 	}
 
-	if(connector_in)
+	if (connector_in)
 	{
 		ssh_event_remove_connector(event, connector_in);
 		ssh_connector_free(connector_in);
 	}
-	if(connector_out)
+	if (connector_out)
 	{
 		ssh_event_remove_connector(event, connector_out);
 		ssh_connector_free(connector_out);
 	}
-	if(connector_err)
+	if (connector_err)
 	{
 		ssh_event_remove_connector(event, connector_err);
 		ssh_connector_free(connector_err);
@@ -170,29 +170,29 @@ void sshX_select_loop_with_fd(SSH_t *ssh_req, socket_t in_fd, socket_t out_fd, s
 	ssh_connector_set_in_channel(connector_err, channel, SSH_CONNECTOR_STDERR);
 	ssh_event_add_connector(event, connector_err);
 
-	while(ssh_channel_is_open(channel))
+	while (ssh_channel_is_open(channel))
 	{
 		//if (signal_delayed) {
 		//	sizechanged();
 		//}
 		rc = ssh_event_dopoll(event, 60000);
-		if(rc == SSH_ERROR)
+		if (rc == SSH_ERROR)
 		{
 			DBG_ER_LN("ssh_event_dopoll error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(session), ssh_get_error(session));
 			break;
 		}
 	}
-	if(connector_in)
+	if (connector_in)
 	{
 		ssh_event_remove_connector(event, connector_in);
 		ssh_connector_free(connector_in);
 	}
-	if(connector_out)
+	if (connector_out)
 	{
 		ssh_event_remove_connector(event, connector_out);
 		ssh_connector_free(connector_out);
 	}
-	if(connector_err)
+	if (connector_err)
 	{
 		ssh_event_remove_connector(event, connector_err);
 		ssh_connector_free(connector_err);
@@ -211,13 +211,13 @@ int sshX_interactive(SSH_t *ssh_req)
 {
 	int ret = 0;
 
-	if(sshX_open_channel(ssh_req))
+	if (sshX_open_channel(ssh_req))
 	{
 		struct termios terminal;
 		struct termios terminal_local;
 		int interactive=isatty(0);
 
-		if(interactive)
+		if (interactive)
 		{
 			tcgetattr(0, &terminal_local);
 			memcpy(&terminal, &terminal_local, sizeof(struct termios));
@@ -227,7 +227,7 @@ int sshX_interactive(SSH_t *ssh_req)
 		sshX_request_pty(ssh_req);
 		sshX_request_shell(ssh_req);
 
-		if(interactive)
+		if (interactive)
 		{
 			cfmakeraw(&terminal_local);
 			tcsetattr(0, TCSANOW, &terminal_local);
@@ -248,13 +248,13 @@ int sshX_authenticate(SSH_t *ssh_req)
 
 	DBG_TR_LN("call ssh_userauth_none ...");
 	rc = ssh_userauth_none(ssh_req->session, NULL);
-	if(rc == SSH_AUTH_ERROR)
+	if (rc == SSH_AUTH_ERROR)
 	{
 		return rc;
 	}
 
 	char *banner = ssh_get_issue_banner(ssh_req->session);
-	if(banner)
+	if (banner)
 	{
 		printf("%s\n",banner);
 		SSH_STRING_FREE_CHAR(banner);
@@ -263,51 +263,51 @@ int sshX_authenticate(SSH_t *ssh_req)
 	int method = ssh_userauth_list(ssh_req->session, NULL);
 	DBG_DB_LN("(method: %d)", method);
 
-	while(rc != SSH_AUTH_SUCCESS)
+	while (rc != SSH_AUTH_SUCCESS)
 	{
-		if(method & SSH_AUTH_METHOD_GSSAPI_MIC)
+		if (method & SSH_AUTH_METHOD_GSSAPI_MIC)
 		{
 			rc = ssh_userauth_gssapi(ssh_req->session);
-			if(rc == SSH_AUTH_ERROR)
+			if (rc == SSH_AUTH_ERROR)
 			{
 				DBG_ER_LN("ssh_userauth_gssapi error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 				return rc;
 			}
-			else if(rc == SSH_AUTH_SUCCESS)
+			else if (rc == SSH_AUTH_SUCCESS)
 			{
 				break;
 			}
 		}
 
-		if(method & SSH_AUTH_METHOD_PUBLICKEY)
+		if (method & SSH_AUTH_METHOD_PUBLICKEY)
 		{
 			rc = ssh_userauth_publickey_auto(ssh_req->session, NULL, NULL);
-			if(rc == SSH_AUTH_ERROR)
+			if (rc == SSH_AUTH_ERROR)
 			{
 				DBG_ER_LN("ssh_userauth_publickey_auto error !!! (rc: %d, %d %s)", rc, ssh_get_error_code(ssh_req->session), ssh_get_error(ssh_req->session));
 				return rc;
 			}
-			else if(rc == SSH_AUTH_SUCCESS)
+			else if (rc == SSH_AUTH_SUCCESS)
 			{
 				break;
 			}
 		}
 
-		if(method & SSH_AUTH_METHOD_PASSWORD)
+		if (method & SSH_AUTH_METHOD_PASSWORD)
 		{
 			char *password = NULL;
-			if(strlen(ssh_req->server_pass_dec) > 0)
+			if (strlen(ssh_req->server_pass_dec) > 0)
 			{
 				SAFE_ASPRINTF(password, "%s",  ssh_req->server_pass_dec);
 			}
-			else if(strlen(ssh_req->server_pass_enc) <= 0)
+			else if (strlen(ssh_req->server_pass_enc) <= 0)
 			{
 				char prompt[LEN_OF_BUF256] = "";
 				SAFE_SNPRINTF(prompt, sizeof(prompt), "%s@%s's passowrd: ", ssh_req->server_user, ssh_req->server_ip);
 
 				password = SAFE_CALLOC(1, LEN_OF_PASS);
 				memset(password, 0, LEN_OF_PASS);
-				if(ssh_getpass(prompt, password, LEN_OF_PASS, 0, 0) < 0)
+				if (ssh_getpass(prompt, password, LEN_OF_PASS, 0, 0) < 0)
 				{
 					return SSH_AUTH_ERROR;
 				}
@@ -318,11 +318,11 @@ int sshX_authenticate(SSH_t *ssh_req)
 				password = sec_base64_dec(ssh_req->server_pass_enc, strlen(ssh_req->server_pass_enc), &server_pass_dec_len);
 			}
 
-			if(password)
+			if (password)
 			{
 				//DBG_ER_LN("(password: %s)", password);
 				rc = ssh_userauth_password(ssh_req->session, NULL, password);
-				switch(rc)
+				switch (rc)
 				{
 					case SSH_AUTH_SUCCESS:
 						break;
@@ -342,7 +342,7 @@ int sshX_authenticate(SSH_t *ssh_req)
 
 void sshX_close_channel(SSH_t *ssh_req)
 {
-	if(ssh_req->channel)
+	if (ssh_req->channel)
 	{
 		ssh_channel_send_eof(ssh_req->channel);
 		ssh_channel_close(ssh_req->channel);
@@ -354,9 +354,9 @@ void sshX_close_channel(SSH_t *ssh_req)
 
 void sshX_close_session(SSH_t *ssh_req)
 {
-	if(ssh_req->session)
+	if (ssh_req->session)
 	{
-		if(ssh_is_connected(ssh_req->session))
+		if (ssh_is_connected(ssh_req->session))
 		{
 			ssh_disconnect(ssh_req->session);
 		}
@@ -378,7 +378,7 @@ ssh_session sshX_client(SSH_t *ssh_req)
 	//ssh_init();
 
 	ssh_req->session = ssh_new();
-	if(ssh_req->session == NULL)
+	if (ssh_req->session == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");
 		goto exit_connect;
@@ -393,12 +393,12 @@ ssh_session sshX_client(SSH_t *ssh_req)
 		// connect
 		ssh_options_set(ssh_req->session, SSH_OPTIONS_LOG_VERBOSITY, &ssh_req->verbosity);
 		ssh_options_set(ssh_req->session, SSH_OPTIONS_HOST, ssh_req->server_ip);
-		if(strlen(ssh_req->server_user) > 0)
+		if (strlen(ssh_req->server_user) > 0)
 		{
 			DBG_TR_LN("(ssh_req->server_user: %s)", ssh_req->server_user);
 			ssh_options_set(ssh_req->session, SSH_OPTIONS_USER, ssh_req->server_user);
 		}
-		if(ssh_req->server_port > 0)
+		if (ssh_req->server_port > 0)
 		{
 			ssh_options_set(ssh_req->session, SSH_OPTIONS_PORT, &ssh_req->server_port);
 		}
@@ -409,20 +409,20 @@ ssh_session sshX_client(SSH_t *ssh_req)
 		ssh_options_parse_config(ssh_req->session, NULL);
 
 		DBG_TR_LN("call ssh_connect ...");
-		if(ssh_connect(ssh_req->session))
+		if (ssh_connect(ssh_req->session))
 		{
 			DBG_ER_LN("ssh_new error !!! (%s)", ssh_get_error(ssh_req->session));
 			goto exit_connect;
 		}
 
 		char *banner = ssh_get_issue_banner(ssh_req->session);
-		if(banner)
+		if (banner)
 		{
 			DBG_DB_LN("(banner: %s)", banner);
 			SAFE_FREE(banner);
 		}
 
-		if(SSH_AUTH_SUCCESS != sshX_authenticate(ssh_req))
+		if (SSH_AUTH_SUCCESS != sshX_authenticate(ssh_req))
 		{
 			goto exit_connect;
 		}

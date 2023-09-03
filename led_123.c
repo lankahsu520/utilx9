@@ -34,14 +34,14 @@ static void led_turn_on_cb(void *usr_data)
 
 	DBG_TR_LN("(id: %d, action: %d, duration: %d)", ledon->id, ledon->action, ledon->duration);
 	char ledname[LEN_OF_BUF128] = "";
-	switch(ledon->id)
+	switch (ledon->id)
 	{
 		case LED_ID_1:
 		case LED_ID_2:
 		case LED_ID_3:
 			SAFE_SPRINTF_EX(ledname, "%s%d/brightness", LEDX_GPIOXX, ledon->id);
 
-			switch(ledon->action)
+			switch (ledon->action)
 			{
 				case LED_ACTION_ID_ON:
 					file_writer(ledname, LED_VAL_1, SAFE_STRLEN(LED_VAL_1));
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
 	LedRequest_t *ledreq_1 = led_thread_init("led1", -1, (LedOn_t*)&ledon_normal, led_turn_on_cb);
 
-	while(1)
+	while (1)
 	{
 		sleep(1);
 	}

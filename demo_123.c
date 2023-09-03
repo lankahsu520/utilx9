@@ -28,11 +28,11 @@
 int newline_lookupokup_cb(char *newline, void *arg)
 {
 	int ret = 0;
-	if(ret==0)
+	if (ret==0)
 	{
 		ret++;
 	}
-	switch(ret)
+	switch (ret)
 	{
 		case 1:
 		{
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
 	{
 		char path[] = "/etc/passwd";
 		char actualpath [PATH_MAX+1] = "";
-		if(file_path(path, actualpath))
+		if (file_path(path, actualpath))
 		{
 			DBG_IF_LN("(actualpath: %s)", actualpath);
 		}
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 #ifdef USE_TEST_COPY_FILE
 	char filename[LEN_OF_FULLNAME] ="";
 	int i = 0;
-	for(i=0; i< 256; i++)
+	for (i=0; i< 256; i++)
 	{
 		SAFE_SPRINTF_EX(filename, "./snapshot_%03d.jpg", i);
 		file_copy("./snapshot.jpg", filename);

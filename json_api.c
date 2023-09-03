@@ -17,7 +17,7 @@
 void json_dump_simple(json_t *jparent, char *name)
 {
 	char *dump = JSON_DUMPS_EASY(jparent);
-	if(dump)
+	if (dump)
 	{
 		DBG_LN_Y("(%s: %s)", name, dump);
 	}
@@ -33,17 +33,17 @@ int json_pass_base64_dec(json_t *jparent, const char *key, char *pass, int len)
 	int ret = -1;
 
 #ifdef UTIL_EX_SSL
-	if((jparent) && (key) && (pass) && (len))
+	if ((jparent) && (key) && (pass) && (len))
 	{
 		json_t *jobj = NULL;
 		const char *pass_enc = JSON_OBJ_GET_STR(jparent, jobj, key);
 		int pass_enc_len = SAFE_STRLEN((char *)pass_enc);
 
-		if((pass_enc) && (pass_enc_len>0))
+		if ((pass_enc) && (pass_enc_len>0))
 		{
 			int dec_len = 0;
 			char *pass_dec = sec_base64_dec((char *)pass_enc, pass_enc_len, &dec_len);
-			if(pass_dec)
+			if (pass_dec)
 			{
 				SAFE_SNPRINTF(pass, len, "%s", pass_dec);
 				ret = 0;
@@ -61,12 +61,12 @@ int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len)
 	int ret = -1;
 
 #ifdef UTIL_EX_SSL
-	if((jparent) && (key) && (pass) && (len))
+	if ((jparent) && (key) && (pass) && (len))
 	{
 		int enc_len = 0;
 		char *pass_enc = sec_base64_enc(pass, len, &enc_len);
 
-		if(pass_enc)
+		if (pass_enc)
 		{
 			JSON_OBJ_SET_STR(jparent, key, pass_enc);
 			ret = 0;
@@ -80,13 +80,13 @@ int json_pass_base64_enc(json_t *jparent, const char *key, char *pass, int len)
 
 json_t *json_ary_create(json_t *jparent, const char *key)
 {
-	if((jparent == NULL) && (JSON_CHECK_OBJ(jparent)))
+	if ((jparent == NULL) && (JSON_CHECK_OBJ(jparent)))
 	{
 		return NULL;
 	}
 
 	json_t *jary = JSON_OBJ_FIND_REUSE(jparent, key);
-	if((jary) || (jary = JSON_ARY_NEW()))
+	if ((jary) || (jary = JSON_ARY_NEW()))
 	{
 		JSON_OBJ_SET_OBJ(jparent, key, jary);
 	}
@@ -96,13 +96,13 @@ json_t *json_ary_create(json_t *jparent, const char *key)
 
 json_t *json_obj_create(json_t *jparent, const char *key)
 {
-	if((jparent == NULL) && (JSON_CHECK_OBJ(jparent)))
+	if ((jparent == NULL) && (JSON_CHECK_OBJ(jparent)))
 	{
 		return NULL;
 	}
 
 	json_t *jobj = JSON_OBJ_FIND_REUSE(jparent, key);
-	if((jobj) || (jobj = JSON_OBJ_NEW()))
+	if ((jobj) || (jobj = JSON_OBJ_NEW()))
 	{
 		JSON_OBJ_SET_OBJ(jparent, key, jobj);
 	}
@@ -117,7 +117,7 @@ json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 	topicx_req->deepth_json = -1;
 	SAFE_MEMSET(topicx_req->tokenx_ary, 0, MAX_OF_TOKENX_ARY*sizeof(JSON_TokenX_t));
 
-	if((topicx_req->jroot) && (SAFE_STRLEN(topicx_req->topic) > 0))
+	if ((topicx_req->jroot) && (SAFE_STRLEN(topicx_req->topic) > 0))
 	{
 		int idx_topic = -1;
 		int idx_json = -1;
@@ -130,11 +130,11 @@ json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 		char *token = NULL;
 
 		token = SAFE_STRTOK_R(topic_cpy, "/", &saveptr);
-		while(token)
+		while (token)
 		{
 			idx_topic ++;
 			JSON_TokenX_t *tokenx_req = (JSON_TokenX_t *)&topicx_req->tokenx_ary[idx_topic];
-			switch(act)
+			switch (act)
 			{
 				case JSON_ACTID_APPEND:
 					tokenx_req->jdata = JSON_OBJ_GET_OBJ_EX(jparent, token);
@@ -151,13 +151,13 @@ json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 
 			SAFE_STRCAT_EX(topic_walk, token, "/");
 
-			if(tokenx_req->jdata)
+			if (tokenx_req->jdata)
 			{
-				if(idx_need == idx_topic)
+				if (idx_need == idx_topic)
 				{
 					jfound = tokenx_req->jdata;
 				}
-				else if(idx_need == -1)
+				else if (idx_need == -1)
 				{
 					jfound = tokenx_req->jdata;
 				}
@@ -169,7 +169,7 @@ json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 			}
 			jparent = tokenx_req->jdata;
 
-			if(idx_topic>=MAX_OF_TOKENX_ARY)
+			if (idx_topic>=MAX_OF_TOKENX_ARY)
 			{
 				break;
 			}
@@ -182,16 +182,16 @@ json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 		topicx_req->deepth_json = idx_json;
 	}
 
-	if(topicx_req->deepth_topic != topicx_req->deepth_json)
+	if (topicx_req->deepth_topic != topicx_req->deepth_json)
 	{
 		jfound = NULL;
 	}
 
-	if((jfound) && (act==JSON_ACTID_DEL))
+	if ((jfound) && (act==JSON_ACTID_DEL))
 	{
 		json_t *jparent = topicx_req->jroot;
 		int idx = topicx_req->deepth_topic;
-		if(idx==0)
+		if (idx==0)
 		{
 			JSON_OBJ_DEL(jparent, topicx_req->tokenx_ary[idx].token);
 		}
@@ -208,11 +208,11 @@ json_t *json2topicx(JSON_TopicX_t *topicx_req, int idx_need, JSON_ACTID act)
 
 json_t *json_ary_find_val(json_t *jparent, json_t *jval, int *idx)
 {
-	if(jparent == NULL)
+	if (jparent == NULL)
 	{
 		return NULL;
 	}
-	if(jval == NULL)
+	if (jval == NULL)
 	{
 		return NULL;
 	}
@@ -223,7 +223,7 @@ json_t *json_ary_find_val(json_t *jparent, json_t *jval, int *idx)
 
 	JSON_ARY_FOREACH(jparent, i, jobj_found)
 	{
-		if((jobj_found) && (1 == JSON_EQUAL(jobj_found, jval)))
+		if ((jobj_found) && (1 == JSON_EQUAL(jobj_found, jval)))
 		{
 			// found !!!
 			*idx = i;
@@ -240,11 +240,11 @@ json_t *json_ary_find_val(json_t *jparent, json_t *jval, int *idx)
 
 json_t *json_ary_find_key_val(json_t *jparent, const char *key, json_t *jval, int *idx)
 {
-	if(jparent == NULL)
+	if (jparent == NULL)
 	{
 		return NULL;
 	}
-	if(jval == NULL)
+	if (jval == NULL)
 	{
 		return NULL;
 	}
@@ -256,7 +256,7 @@ json_t *json_ary_find_key_val(json_t *jparent, const char *key, json_t *jval, in
 	JSON_ARY_FOREACH(jparent, i, jobj_found)
 	{
 		json_t *jkey = JSON_OBJ_GET_OBJ(jobj_found, key);
-		if((jkey) && (1 == JSON_EQUAL(jkey, jval)))
+		if ((jkey) && (1 == JSON_EQUAL(jkey, jval)))
 		{
 			// found !!!
 			*idx = i;
@@ -273,7 +273,7 @@ json_t *json_ary_find_key_val(json_t *jparent, const char *key, json_t *jval, in
 // key like dongle/1/device/0/uid
 json_t *json_object_find_with_keys(json_t *jparent, const char *keys)
 {
-	if(jparent == NULL)
+	if (jparent == NULL)
 	{
 		return NULL;
 	}
@@ -286,11 +286,11 @@ json_t *json_object_find_with_keys(json_t *jparent, const char *keys)
 
 	char *saveptr = NULL;
 	char *token = SAFE_STRTOK_R(key_next, "/", &saveptr);
-	while((token) && (jobj_next))
+	while ((token) && (jobj_next))
 	{
 		char *token_next = SAFE_STRTOK_R(NULL, "/", &saveptr);
 
-		if((str_isnum(token) == 0) && (JSON_CHECK_ARY(jobj_next)))
+		if ((str_isnum(token) == 0) && (JSON_CHECK_ARY(jobj_next)))
 		{
 			jobj_next = JSON_ARY_GET(jobj_next, atoi(token));
 		}
@@ -299,7 +299,7 @@ json_t *json_object_find_with_keys(json_t *jparent, const char *keys)
 			jobj_next = JSON_OBJ_GET_OBJ(jobj_next, token);
 		}
 
-		if(token_next==NULL)
+		if (token_next==NULL)
 		{
 			// last
 			jobj = jobj_next;
@@ -313,11 +313,11 @@ json_t *json_object_find_with_keys(json_t *jparent, const char *keys)
 
 json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int deepth, char *topic_parent, json_t *jfound_ary)
 {
-	if(jparent == NULL)
+	if (jparent == NULL)
 	{
 		return NULL;
 	}
-	if(topic_parent == NULL)
+	if (topic_parent == NULL)
 	{
 		return NULL;
 	}
@@ -328,14 +328,14 @@ json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int d
 	int nextth = 0;
 
 	SAFE_SPRINTF_EX(topic, "%s", topic_parent);
-	if(deepth<0)
+	if (deepth<0)
 	{
 		// infinite
 		nextth = deepth;
 	}
-	else if(deepth==0)
+	else if (deepth==0)
 	{
-		if(jfound_ary==NULL)
+		if (jfound_ary==NULL)
 		{
 			return jobj;
 		}
@@ -345,39 +345,39 @@ json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int d
 		nextth = deepth-1;
 	}
 
-	if(jparent)
+	if (jparent)
 	{
-		if(JSON_CHECK_ARY(jparent))
+		if (JSON_CHECK_ARY(jparent))
 		{
 			int idx = 0;
 			JSON_ARY_FOREACH(jparent, idx, jobj_found)
 			{
-				if((JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found =json_object_lookup(jobj_found, key, jval, nextth, topic, jfound_ary)))
+				if ((JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found =json_object_lookup(jobj_found, key, jval, nextth, topic, jfound_ary)))
 				{
 					jobj = jobj_found;
-					if(jfound_ary == NULL)
+					if (jfound_ary == NULL)
 					{
 						break;
 					}
 				}
-				else if((JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found =json_object_lookup(jobj_found, key, jval, nextth, topic, jfound_ary)))
+				else if ((JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found =json_object_lookup(jobj_found, key, jval, nextth, topic, jfound_ary)))
 				{
 					jobj = jobj_found;
-					if(jfound_ary == NULL)
+					if (jfound_ary == NULL)
 					{
 						break;
 					}
 				}
 			}
 		}
-		else if(JSON_CHECK_OBJ(jparent))
+		else if (JSON_CHECK_OBJ(jparent))
 		{
 			const char *key_found = NULL;
 			JSON_OBJ_FOREACH(jparent, key_found, jobj_found)
 			{
 				char topic_new[LEN_OF_TOPIC] = "";
 
-				if(SAFE_STRLEN(topic) > 0)
+				if (SAFE_STRLEN(topic) > 0)
 				{
 					SAFE_SPRINTF_EX(topic_new, "%s/%s", topic, key_found);
 				}
@@ -386,11 +386,11 @@ json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int d
 					SAFE_SPRINTF_EX(topic_new, "%s", key_found);
 				}
 
-				if(SAFE_STRCMP((char*)key_found, (char*)key) ==0)
+				if (SAFE_STRCMP((char*)key_found, (char*)key) ==0)
 				{
-					if(jval)
+					if (jval)
 					{
-						if(1 == JSON_EQUAL(jobj_found, jval))
+						if (1 == JSON_EQUAL(jobj_found, jval))
 						{
 							jobj = jparent;
 						}
@@ -400,12 +400,12 @@ json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int d
 						jobj = jobj_found;
 					}
 
-					if(jobj)
+					if (jobj)
 					{
-						if(jfound_ary)
+						if (jfound_ary)
 						{
 							json_t *jnew = JSON_OBJ_NEW();
-							if(jval)
+							if (jval)
 							{
 								JSON_OBJ_SET_STR(jnew, JKEY_COMM_TOPIC, topic);
 							}
@@ -421,18 +421,18 @@ json_t *json_object_lookup(json_t *jparent, const char *key, json_t *jval, int d
 						break;
 					}
 				}
-				else if((JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, jval, nextth, topic_new, jfound_ary)))
+				else if ((JSON_CHECK_OBJ(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, jval, nextth, topic_new, jfound_ary)))
 				{
 					jobj = jobj_found;
-					if(jfound_ary == NULL)
+					if (jfound_ary == NULL)
 					{
 						break;
 					}
 				}
-				else if((JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, jval, nextth, topic_new, jfound_ary)))
+				else if ((JSON_CHECK_ARY(jobj_found)) && (nextth!=0) && (jobj_found = json_object_lookup(jobj_found, key, jval, nextth, topic_new, jfound_ary)))
 				{
 					jobj = jobj_found;
-					if(jfound_ary == NULL)
+					if (jfound_ary == NULL)
 					{
 						break;
 					}

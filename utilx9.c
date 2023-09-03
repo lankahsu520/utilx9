@@ -74,13 +74,13 @@ void* pcheck(void* a)
 	static double diff_t = 1;
 	time_t run_t = time(NULL);
 	time_t expired_t = expiration_date();
-	if(expired_t == 0)
+	if (expired_t == 0)
 	{
 		diff_t++;
 		//sleep(diff_t);
 		printf("%ld==0\n",expired_t);
 	}
-	else if(run_t > expired_t)
+	else if (run_t > expired_t)
 	{
 		diff_t = time_diff_days(run_t, expired_t);
 		//sleep(diff_t);
@@ -101,7 +101,7 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 	SAFE_FD_SET_EX(fd, fdwset_ptr);
 	SAFE_FD_SET_EX(fd, fdeset_ptr);
 
-	if(msec>0)
+	if (msec>0)
 	{
 		timeout.tv_sec = msec /1000;
 		timeout.tv_usec = (msec % 1000) * 1000;
@@ -124,7 +124,7 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 int str_isspace(char *str)
 {
 	char *s=" \n\t\r";
-	if(SAFE_STRCHR(s,str))
+	if (SAFE_STRCHR(s,str))
 	{
 		return 1;
 	}
@@ -139,7 +139,7 @@ int str_isspace(char *str)
 char *version_show(void)
 {
 	static char buff[LEN_OF_VAL64] = "";
-	if(SAFE_STRLEN(buff) == 0)
+	if (SAFE_STRLEN(buff) == 0)
 	{
 		time_t bootup_t = time(NULL);
 		SAFE_SPRINTF_EX(buff, "0x%08X, %s, %s, %s, %ld", LIBUTILX9_VERSION, PJ_REVISION, PJ_BUILDNO, PJ_BUILDER, bootup_t);
@@ -159,11 +159,11 @@ int system_ex(char *fmt, ...)
 	ret = vasprintf(&cmd, fmt, vargs);
 	va_end(vargs);
 
-	if(ret<0)
+	if (ret<0)
 	{
 		DBG_ER_LN("vasprintf error !!!");
 	}
-	if(cmd)
+	if (cmd)
 	{
 		DBG_DB_LN("(cmd: %s)", cmd);
 		rc = system(cmd);
@@ -174,12 +174,12 @@ int system_ex(char *fmt, ...)
 
 char *str_cat_ex(char *str, ...)
 {
-	if(str)
+	if (str)
 	{
 		va_list vargs;
 		va_start(vargs, str);
 		char *s = va_arg(vargs, char*);
-		while(s)
+		while (s)
 		{
 			strcat(str, s);
 			s = va_arg(vargs, char*);
@@ -195,9 +195,9 @@ int str_isnum(const char *str)
 {
 	int ret = -1;
 
-	while(*str != '\0')
+	while (*str != '\0')
 	{
-		if((*str < '0') || (*str > '9'))
+		if ((*str < '0') || (*str > '9'))
 		{
 			return ret;
 		}
@@ -209,14 +209,14 @@ int str_isnum(const char *str)
 
 char *str_rtrim(char *str)
 {
-	if((str == NULL) || (*str == '\0'))
+	if ((str == NULL) || (*str == '\0'))
 	{
 		return str;
 	}
 
 	int len = SAFE_STRLEN(str);
 	char *p = str + len - 1;
-	while((p >= str) && (isspace(*p)))
+	while ((p >= str) && (isspace(*p)))
 	{
 		*p = '\0';
 		--p;
@@ -227,20 +227,20 @@ char *str_rtrim(char *str)
 
 char *str_ltrim(char *str)
 {
-	if((str == NULL) || (*str == '\0'))
+	if ((str == NULL) || (*str == '\0'))
 	{
 		return str;
 	}
 
 	int len = 0;
 	char *p = str;
-	while((*p != '\0') && (isspace(*p)))
+	while ((*p != '\0') && (isspace(*p)))
 	{
 		++p;
 		++len;
 	}
 
-	if(len>0)
+	if (len>0)
 	{
 		SAFE_MEMMOVE(str, p, SAFE_STRLEN(str) - len + 1);
 	}
@@ -257,16 +257,16 @@ char *str_trim(char *str)
 
 char *str_trim_char(char *str, const char *delim, int delim_len)
 {
-	if((str == NULL) || (*str == '\0'))
+	if ((str == NULL) || (*str == '\0'))
 	{
 		return str;
 	}
 
 	char *p = str;
-	while(*p != '\0')
+	while (*p != '\0')
 	{
 		//if (*p == trim)
-		if(SAFE_MEMCHR((char*)delim, *p, delim_len))
+		if (SAFE_MEMCHR((char*)delim, *p, delim_len))
 		{
 			char *endp = NULL;
 			endp = p+SAFE_STRLEN(p+1);
@@ -284,13 +284,13 @@ char *str_trim_char(char *str, const char *delim, int delim_len)
 
 void str_toupper(char *str)
 {
-	if(str)
+	if (str)
 	{
 		int c = 0;
 
-		while(str[c] != '\0')
+		while (str[c] != '\0')
 		{
-			if(str[c] >= 'a' && str[c] <= 'z')
+			if (str[c] >= 'a' && str[c] <= 'z')
 			{
 				str[c] = str[c] - 32;
 			}
@@ -301,13 +301,13 @@ void str_toupper(char *str)
 
 void str_tolower(char *str)
 {
-	if(str)
+	if (str)
 	{
 		int c = 0;
 
-		while(str[c] != '\0')
+		while (str[c] != '\0')
 		{
-			if(str[c] >= 'A' && str[c] <= 'Z')
+			if (str[c] >= 'A' && str[c] <= 'Z')
 			{
 				str[c] = str[c] + 32;
 			}
@@ -319,7 +319,7 @@ void str_tolower(char *str)
 uint32_t byte2big_endian(uint8_t size, uint8_t *data)
 {
 	uint32_t val =0;
-	switch(size)
+	switch (size)
 	{
 		case 1:
 			//cmd[4] = cfg_param_rec->param_val & 0xFF;
@@ -348,7 +348,7 @@ uint32_t byte2big_endian(uint8_t size, uint8_t *data)
 
 void big_endian2byte(uint8_t size, uint32_t val, uint8_t *data)
 {
-	switch(size)
+	switch (size)
 	{
 		case 1:
 			data[0] = val & 0xFF;
@@ -374,7 +374,7 @@ void big_endian2byte(uint8_t size, uint32_t val, uint8_t *data)
 uint32_t byte2little_endian(uint8_t size, uint8_t *data)
 {
 	uint32_t val =0;
-	switch(size)
+	switch (size)
 	{
 		case 1:
 			//cmd[4] = cfg_param_rec->param_val & 0xFF;
@@ -403,7 +403,7 @@ uint32_t byte2little_endian(uint8_t size, uint8_t *data)
 
 void little_endian2byte(uint8_t size, uint32_t val, uint8_t *data)
 {
-	switch(size)
+	switch (size)
 	{
 		case 1:
 			data[0] = val & 0xFF;
@@ -432,7 +432,7 @@ uint8_t buff_crc8_xor(uint8_t *start, uint8_t *buf, int len)
 	int idx = 0;
 	uint8_t crc = 0;
 
-	if(start)
+	if (start)
 	{
 		idx = 0;
 		crc = start[0];
@@ -443,7 +443,7 @@ uint8_t buff_crc8_xor(uint8_t *start, uint8_t *buf, int len)
 		crc = buf[0];
 	}
 
-	for(i = idx; i < len; i++)
+	for (i = idx; i < len; i++)
 	{
 		crc ^= buf[i];
 	}
@@ -460,16 +460,16 @@ unsigned short buf_cksum(unsigned short *addr, int nleft)
 	 * 16 bits.
 	 */
 	unsigned sum = 0;
-	while(nleft > 1)
+	while (nleft > 1)
 	{
 		sum += *addr++;
 		nleft -= 2;
 	}
 
 	/* Mop up an odd byte, if necessary */
-	if(nleft == 1)
+	if (nleft == 1)
 	{
-		if(BB_LITTLE_ENDIAN)
+		if (BB_LITTLE_ENDIAN)
 		{
 			sum += *(unsigned char*)addr;
 		}
@@ -560,7 +560,7 @@ int file_exe_chk(char *filename)
 {
 	int ret = -1;
 	struct stat sb;
-	if((stat(filename, &sb) == 0) && (sb.st_mode & S_IXUSR))
+	if ((stat(filename, &sb) == 0) && (sb.st_mode & S_IXUSR))
 	{
 		ret = 0;
 	}
@@ -572,7 +572,7 @@ int file_slink(char *filename)
 {
 	struct stat file_stat= {0};
 
-	if(lstat(filename, &file_stat) == -1)
+	if (lstat(filename, &file_stat) == -1)
 	{
 		return 0;
 	}
@@ -583,7 +583,7 @@ int file_slink(char *filename)
 int file_spath(char *filename, char *spath, int length)
 {
 	int ret = -1;
-	if(file_slink(filename))
+	if (file_slink(filename))
 	{
 		DBG_DB_LN("S_ISLNK !!!(filename: %s)", filename);
 		ret = readlink(filename, spath, length);
@@ -613,7 +613,7 @@ char *file_path(char *filename, char *actualpath)
 #endif
 
 	char *ptr = realpath(filename, actualpath);
-	if(ptr)
+	if (ptr)
 	{
 		DBG_IF_LN("(actualpath: %s)", actualpath);
 	}
@@ -631,7 +631,7 @@ size_t file_append(char *filename, char *buf, int wantsize)
 	//time_t t;
 
 	fp = SAFE_FOPEN(filename, "a+");
-	if(fp == NULL)
+	if (fp == NULL)
 	{
 		DBG_ER_LN("return, SAFE_FOPEN error !!! (%s, errno: %d %s)", filename, errno, strerror(errno));
 		return 0;
@@ -640,7 +640,7 @@ size_t file_append(char *filename, char *buf, int wantsize)
 	SAFE_FSEEK_END(fp, 0);
 
 	writesize = SAFE_FWRITE(buf, 1, wantsize, fp);
-	if(writesize <= 0)
+	if (writesize <= 0)
 	{
 		DBG_ER_LN("SAFE_FWRITE error !!! (writesize: %zd, wantsize: %d)", writesize, wantsize);
 	}
@@ -657,14 +657,14 @@ size_t file_writer(char *filename, char *buf, int wantsize)
 	//time_t t;
 
 	fp = SAFE_FOPEN(filename, "w");
-	if(fp == NULL)
+	if (fp == NULL)
 	{
 		DBG_ER_LN("return, SAFE_FOPEN error !!! (%s, errno: %d %s)", filename, errno, strerror(errno));
 		return 0;
 	}
 
 	writesize = SAFE_FWRITE(buf, 1, wantsize, fp);
-	if(writesize <= 0)
+	if (writesize <= 0)
 	{
 		DBG_ER_LN("SAFE_FWRITE error !!! (writesize: %zd, wantsize: %d)", writesize, wantsize);
 	}
@@ -680,14 +680,14 @@ char *file_reader(char *filename, int *filesize)
 	int size = 0;
 	char *buf = NULL;
 
-	if(access(filename, F_OK) == -1)
+	if (access(filename, F_OK) == -1)
 	{
 		DBG_ER_LN("return, %s not exist !!!", filename);
 		return NULL;
 	}
 
 	fp = SAFE_FOPEN(filename, "r");
-	if(fp == NULL)
+	if (fp == NULL)
 	{
 		DBG_ER_LN("return, SAFE_FOPEN error !!! (%s, errno: %d %s)", filename, errno, strerror(errno));
 		return NULL;
@@ -697,7 +697,7 @@ char *file_reader(char *filename, int *filesize)
 	size = SAFE_FTELL(fp);
 	SAFE_FSEEK_SET(fp, 0);
 
-	if(size > 0)
+	if (size > 0)
 	{
 		buf = SAFE_CALLOC(1, size);
 		*filesize = SAFE_FREAD(buf, 1, size, fp);
@@ -718,7 +718,7 @@ int file_copy(const char *file_from, const char *file_to)
 	ssize_t nread;
 	//int saved_errno;
 
-	if((file_to == NULL) || (file_from == NULL))
+	if ((file_to == NULL) || (file_from == NULL))
 	{
 		DBG_ER_LN("file_to or file_from is NULL !!!");
 		ret = -1;
@@ -728,7 +728,7 @@ int file_copy(const char *file_from, const char *file_to)
 
 	SAFE_MEMSET(buf, 0, sizeof(buf));
 	fd_from = SAFE_OPEN((char *)file_from, O_RDONLY);
-	if(fd_from < 0)
+	if (fd_from < 0)
 	{
 		DBG_ER_LN("SAFE_OPEN error !!! (%s)", file_from);
 		ret = -1;
@@ -736,14 +736,14 @@ int file_copy(const char *file_from, const char *file_to)
 	}
 
 	fd_to = SAFE_OPEN((char *)file_to, O_WRONLY | O_CREAT, 0666);
-	if(fd_to < 0)
+	if (fd_to < 0)
 	{
 		DBG_ER_LN("SAFE_OPEN error !!! (%s)", file_to);
 		ret = -1;
 		goto cp_exit;
 	}
 
-	while((nread = read(fd_from, buf, sizeof(buf))) > 0)
+	while ((nread = read(fd_from, buf, sizeof(buf))) > 0)
 	{
 		char *out_ptr = buf;
 		ssize_t nwritten;
@@ -752,18 +752,18 @@ int file_copy(const char *file_from, const char *file_to)
 		{
 			nwritten = write(fd_to, out_ptr, nread);
 
-			if(nwritten >= 0)
+			if (nwritten >= 0)
 			{
 				nread -= nwritten;
 				out_ptr += nwritten;
 			}
-			else if(errno != EINTR)
+			else if (errno != EINTR)
 			{
 				ret = -1;
 				goto cp_exit;
 			}
 		}
-		while(nread > 0);
+		while (nread > 0);
 	}
 
 cp_exit:
@@ -777,18 +777,18 @@ cp_exit:
 
 void file_lookup(char *filename, newline_lookup_fn lookup_cb, void *arg)
 {
-	if((lookup_cb) && (filename) && (access(filename, F_OK) != -1))
+	if ((lookup_cb) && (filename) && (access(filename, F_OK) != -1))
 	{
 		char newline[LEN_OF_NEWLINE];
 
 		DBG_TR_LN("enter (%s)", filename);
 
 		FILE *fp = SAFE_FOPEN(filename, "r");
-		if(fp)
+		if (fp)
 		{
-			while(SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
+			while (SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
 			{
-				if(lookup_cb(newline, arg) != 0)
+				if (lookup_cb(newline, arg) != 0)
 				{
 					break;
 				}
@@ -808,18 +808,18 @@ void file_lookup(char *filename, newline_lookup_fn lookup_cb, void *arg)
 
 void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg)
 {
-	if((lookup_cb) && (cmdline) && (SAFE_STRLEN(cmdline) > 0))
+	if ((lookup_cb) && (cmdline) && (SAFE_STRLEN(cmdline) > 0))
 	{
 		char newline[LEN_OF_NEWLINE];
 
 		DBG_TR_LN("enter (%s)", cmdline);
 
 		FILE *fp = SAFE_POPEN(cmdline, "r");
-		if(fp)
+		if (fp)
 		{
-			while(SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
+			while (SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
 			{
-				if(lookup_cb(newline, arg) != 0)
+				if (lookup_cb(newline, arg) != 0)
 				{
 					break;
 				}
@@ -840,22 +840,22 @@ void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg)
 char *os_random_uuid(char *buf, int buf_len)
 {
 	static int srand_1st = 0;
-	if((buf) && (buf_len>=LEN_OF_UUID))
+	if ((buf) && (buf_len>=LEN_OF_UUID))
 	{
 		const char *c = "89ab";
 		char *p = buf;
 		int n;
 
-		if(srand_1st == 0)
+		if (srand_1st == 0)
 		{
 			srand_1st ++;
 			srand(time(NULL) + getpid());
 		}
 
-		for(n = 0; n < 16; ++n)
+		for (n = 0; n < 16; ++n)
 		{
 			int b = rand()%255;
-			switch(n)
+			switch (n)
 			{
 				case 6:
 					SAFE_SPRINTF(p, "4%X", b%15);
@@ -869,7 +869,7 @@ char *os_random_uuid(char *buf, int buf_len)
 			}
 
 			p += 2;
-			switch(n)
+			switch (n)
 			{
 				case 3:
 				case 5:
@@ -893,9 +893,9 @@ char *os_urandom(int byte_count)
 	char *data = SAFE_CALLOC(1, byte_count);
 
 	FILE *fp = SAFE_FOPEN("/dev/urandom", "r");
-	if((data) && (fp))
+	if ((data) && (fp))
 	{
-		if(SAFE_FREAD(data, 1, byte_count, fp) > 0)
+		if (SAFE_FREAD(data, 1, byte_count, fp) > 0)
 		{
 			// got !!!
 		}
@@ -924,14 +924,14 @@ int sec_aes_cbc_enc(char *in, char *out, char *aes_key)
 	int out_len;
 	unsigned char iv[AES_BLOCK_SIZE];
 
-	if(!in || !out)
+	if (!in || !out)
 	{
 		return 0;
 	}
 
 	memcpy(iv, aes_key, AES_BLOCK_SIZE);
 
-	if(AES_set_encrypt_key((unsigned char*)iv, 128, &aes) < 0)
+	if (AES_set_encrypt_key((unsigned char*)iv, 128, &aes) < 0)
 	{
 		return -1;
 	}
@@ -974,14 +974,14 @@ int sec_aes_cbc_dec(char *in, char *out, int out_len, char *aes_key)
 	AES_KEY aes;
 	unsigned char iv[AES_BLOCK_SIZE];
 
-	if(!in || !out)
+	if (!in || !out)
 	{
 		return 0;
 	}
 
 	memcpy(iv, aes_key, AES_BLOCK_SIZE);
 
-	if(AES_set_decrypt_key((unsigned char*)iv, 128, &aes) < 0)
+	if (AES_set_decrypt_key((unsigned char*)iv, 128, &aes) < 0)
 	{
 		return -1;
 	}
@@ -996,7 +996,7 @@ int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key)
 	int in_base_len = 0;
 	char *in_base = sec_base64_dec(in, SAFE_STRLEN(in), &in_base_len);
 
-	if(sec_aes_cbc_dec((char*)in_base, out, out_len, aes_key) < 0)
+	if (sec_aes_cbc_dec((char*)in_base, out, out_len, aes_key) < 0)
 	{
 		ret = -1;
 	}
@@ -1008,7 +1008,7 @@ int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key)
 #ifdef UTIL_EX_BASIC_QBUF
 void qbuf_init(QBUF_t *qbuf, size_t max_size)
 {
-	if(qbuf)
+	if (qbuf)
 	{
 		memset(qbuf, 0, sizeof(QBUF_t));
 		qbuf->max_size = max_size;
@@ -1017,7 +1017,7 @@ void qbuf_init(QBUF_t *qbuf, size_t max_size)
 
 size_t qbuf_total(QBUF_t *qbuf)
 {
-	if(qbuf)
+	if (qbuf)
 	{
 		return qbuf->total;
 	}
@@ -1026,7 +1026,7 @@ size_t qbuf_total(QBUF_t *qbuf)
 
 char *qbuf_endptr(QBUF_t *qbuf)
 {
-	if(qbuf)
+	if (qbuf)
 	{
 		return qbuf->buff + qbuf->total;
 	}
@@ -1035,7 +1035,7 @@ char *qbuf_endptr(QBUF_t *qbuf)
 
 char *qbuf_buff(QBUF_t *qbuf)
 {
-	if(qbuf)
+	if (qbuf)
 	{
 		return qbuf->buff;
 	}
@@ -1046,11 +1046,11 @@ static char *qbuf_jumpjump(QBUF_t *qbuf, char *jumpptr, size_t *jumplen)
 {
 	int skiplen = 0;
 	char *startptr = qbuf_buff(qbuf);
-	if((jumpptr) && (jumpptr > startptr))
+	if ((jumpptr) && (jumpptr > startptr))
 	{
 		char *endptr = qbuf_endptr(qbuf);
 
-		if(jumpptr>=endptr)
+		if (jumpptr>=endptr)
 		{
 			startptr = NULL;
 		}
@@ -1061,7 +1061,7 @@ static char *qbuf_jumpjump(QBUF_t *qbuf, char *jumpptr, size_t *jumplen)
 		}
 	}
 
-	if(jumplen)
+	if (jumplen)
 	{
 		*jumplen = skiplen;
 	}
@@ -1070,18 +1070,18 @@ static char *qbuf_jumpjump(QBUF_t *qbuf, char *jumpptr, size_t *jumplen)
 
 char *qbuf_jumprchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr)
 {
-	if((qbuf) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (qbuf_total(qbuf) > 0))
 	{
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
-		if(startptr)
+		if (startptr)
 		{
 			size_t n = qbuf_total(qbuf) - jumplen;
 			size_t idx = n-1;
-			while(idx > 0)
+			while (idx > 0)
 			{
-				if(SAFE_MEMCHR((char*)delim, startptr[idx], delim_len))
+				if (SAFE_MEMCHR((char*)delim, startptr[idx], delim_len))
 				{
 					// Found !!!
 					idx --;
@@ -1091,7 +1091,7 @@ char *qbuf_jumprchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumppt
 					break;
 				}
 			}
-			if(idx != (n-1))
+			if (idx != (n-1))
 			{
 				return startptr+idx+1;
 			}
@@ -1102,18 +1102,18 @@ char *qbuf_jumprchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumppt
 
 char *qbuf_jumpchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr)
 {
-	if((qbuf) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (qbuf_total(qbuf) > 0))
 	{
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
-		if(startptr)
+		if (startptr)
 		{
 			int n = qbuf_total(qbuf) - jumplen;
 			int idx = 0;
-			while(idx < n)
+			while (idx < n)
 			{
-				if(SAFE_MEMCHR((char*)delim, startptr[idx], delim_len))
+				if (SAFE_MEMCHR((char*)delim, startptr[idx], delim_len))
 				{
 					// Found !!!
 					idx ++;
@@ -1123,7 +1123,7 @@ char *qbuf_jumpchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr
 					break;
 				}
 			}
-			if(idx)
+			if (idx)
 			{
 				return startptr+idx-1;
 			}
@@ -1134,14 +1134,14 @@ char *qbuf_jumpchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr
 
 char *qbuf_memchr(QBUF_t *qbuf, char c, char *jumpptr)
 {
-	if((qbuf) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (qbuf_total(qbuf) > 0))
 	{
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
 		int n = qbuf_total(qbuf) - jumplen;
 
-		if(startptr)
+		if (startptr)
 		{
 			return SAFE_MEMCHR(startptr, c, n);
 		}
@@ -1151,12 +1151,12 @@ char *qbuf_memchr(QBUF_t *qbuf, char c, char *jumpptr)
 
 char *qbuf_memmem(QBUF_t *qbuf, char *needle, size_t needlelen, char *jumpptr)
 {
-	if((qbuf) && (needle) && (needlelen) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (needle) && (needlelen) && (qbuf_total(qbuf) > 0))
 	{
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
-		if(startptr)
+		if (startptr)
 		{
 			char *endptr = qbuf_endptr(qbuf);
 			size_t leftlen = endptr - startptr;
@@ -1168,12 +1168,12 @@ char *qbuf_memmem(QBUF_t *qbuf, char *needle, size_t needlelen, char *jumpptr)
 
 char *qbuf_strstr(QBUF_t *qbuf, char *substr, char *jumpptr)
 {
-	if((qbuf) && (substr) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (substr) && (qbuf_total(qbuf) > 0))
 	{
 		size_t jumplen = 0;
 		char *startptr = qbuf_jumpjump(qbuf, jumpptr, &jumplen);
 
-		if(startptr)
+		if (startptr)
 		{
 			return SAFE_STRSTR(startptr, substr);
 		}
@@ -1184,7 +1184,7 @@ char *qbuf_strstr(QBUF_t *qbuf, char *substr, char *jumpptr)
 char *qbuf_pop(QBUF_t *qbuf)
 {
 	char *buff = NULL;
-	if((qbuf) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (qbuf_total(qbuf) > 0))
 	{
 		buff = qbuf_buff(qbuf);
 
@@ -1200,12 +1200,12 @@ int qbuf_read(QBUF_t *qbuf, char *obuff, size_t count)
 {
 	int ret = -1;
 
-	if((qbuf) && (qbuf_total(qbuf) > 0))
+	if ((qbuf) && (qbuf_total(qbuf) > 0))
 	{
 		int nread = SAFE_MIN((SIZE_X)count, (SIZE_X)qbuf_total(qbuf));
 
 		//DBG_TR_LN("(buff: %s, total: %d, count: %d)", qbuf->buff, qbuf->total, count);
-		if(obuff)
+		if (obuff)
 		{
 			SAFE_MEMCPY(obuff, qbuf->buff, nread, nread);
 		}
@@ -1213,7 +1213,7 @@ int qbuf_read(QBUF_t *qbuf, char *obuff, size_t count)
 		size_t new_len = qbuf->total - nread;
 		SAFE_MEMMOVE(qbuf->buff, qbuf->buff+nread, new_len);
 		char *new_buff = SAFE_REALLOC(qbuf->buff, new_len+1);
-		if(new_buff == NULL)
+		if (new_buff == NULL)
 		{
 			// out of memory
 			// qbuf->buff will be free outside
@@ -1236,13 +1236,13 @@ int qbuf_trimrchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr)
 {
 	int ret = qbuf_total(qbuf);
 	char *breakptr = NULL;
-	if((ret) &&
+	if ((ret) &&
 			(breakptr = qbuf_jumprchr(qbuf, delim, delim_len, jumpptr)))
 	{
 		char *endptr = qbuf_endptr(qbuf);
 
 		size_t trim_num = (endptr-breakptr);
-		if(trim_num < qbuf->total)
+		if (trim_num < qbuf->total)
 		{
 			qbuf->total -= trim_num;
 			SAFE_MEMSET(breakptr, 0, trim_num);
@@ -1256,7 +1256,7 @@ int qbuf_trimchr(QBUF_t *qbuf, const char *delim, int delim_len, char *jumpptr)
 {
 	int ret = qbuf_total(qbuf);
 	char *breakptr = NULL;
-	if((ret) &&
+	if ((ret) &&
 			(breakptr = qbuf_jumpchr(qbuf, delim, delim_len, jumpptr)))
 	{
 		char *pbuff = qbuf_buff(qbuf);
@@ -1271,11 +1271,11 @@ int qbuf_shiftrstr(QBUF_t *qbuf, char *substr)
 	int ret = -1;
 	char *breakptr = NULL;
 
-	if((qbuf) && (substr) && ((breakptr = qbuf_memmem(qbuf, substr, SAFE_STRLEN(substr), NULL)) > 0))
+	if ((qbuf) && (substr) && ((breakptr = qbuf_memmem(qbuf, substr, SAFE_STRLEN(substr), NULL)) > 0))
 	{
 		char *endptr = qbuf_endptr(qbuf);
 		size_t trim_num = (endptr-breakptr);
-		if(trim_num < qbuf_total(qbuf))
+		if (trim_num < qbuf_total(qbuf))
 		{
 			qbuf->total -= trim_num;
 			SAFE_MEMSET(breakptr, 0, trim_num);
@@ -1290,11 +1290,11 @@ int qbuf_shiftstr(QBUF_t *qbuf, char *substr)
 	int ret = -1;
 	char *breakptr = NULL;
 
-	if((qbuf) && (substr) && ((breakptr = qbuf_memmem(qbuf, substr, SAFE_STRLEN(substr), NULL)) > 0))
+	if ((qbuf) && (substr) && ((breakptr = qbuf_memmem(qbuf, substr, SAFE_STRLEN(substr), NULL)) > 0))
 	{
 		int slen = SAFE_STRLEN(substr);
 		int mlen = breakptr - qbuf_buff(qbuf) + slen;
-		if(qbuf_read(qbuf, NULL, breakptr - qbuf_buff(qbuf) + slen) == mlen)
+		if (qbuf_read(qbuf, NULL, breakptr - qbuf_buff(qbuf) + slen) == mlen)
 		{
 			ret = 0;
 		}
@@ -1308,18 +1308,18 @@ int qbuf_write(QBUF_t *qbuf, char *ibuff, size_t count)
 {
 	int ret = -1;
 	//DBG_DB_LN("(buff: %s, count: %d)", buff, count);
-	if((qbuf) && (ibuff) && (count>0))
+	if ((qbuf) && (ibuff) && (count>0))
 	{
 		size_t new_total = qbuf->total + count;
 
-		if(new_total > qbuf->max_size)
+		if (new_total > qbuf->max_size)
 		{
 			DBG_ER_LN("No free memory !!! (new_total: %zd -> %zd)", new_total, qbuf->max_size);
 		}
 		else
 		{
 			char *new_buff = SAFE_REALLOC(qbuf->buff, new_total+1);
-			if(new_buff == NULL)
+			if (new_buff == NULL)
 			{
 				// out of memory
 				// qbuf->buff will be free outside
@@ -1344,7 +1344,7 @@ int qbuf_write(QBUF_t *qbuf, char *ibuff, size_t count)
 size_t qbuf_save(QBUF_t *qbuf, char *filename)
 {
 	size_t ret = 0;
-	if(qbuf)
+	if (qbuf)
 	{
 		ret = file_writer(filename, qbuf_buff(qbuf), qbuf_total(qbuf));
 	}
@@ -1353,7 +1353,7 @@ size_t qbuf_save(QBUF_t *qbuf, char *filename)
 
 void qbuf_free(QBUF_t *qbuf)
 {
-	if(qbuf)
+	if (qbuf)
 	{
 		SAFE_FREE(qbuf->buff);
 		qbuf->total = 0;
@@ -1381,14 +1381,14 @@ void sys_kernel(Kernel_t *kernel_req)
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
-	if(fp)
+	if (fp)
 	{
-		if(SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
+		if (SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
 		{
 			char *str_b = SAFE_STRCHR(newline,'(');
 			char *str_e = SAFE_STRCHR(newline,')');
 
-			if((str_b) && (str_e) && (str_e >str_b))
+			if ((str_b) && (str_e) && (str_e >str_b))
 			{
 				SAFE_SNPRINTF(kernel_req->builder, (int)(str_e-str_b), "%s", str_b+1);
 			}
@@ -1414,7 +1414,7 @@ const char *sys_username(void)
 {
 	uid_t uid = geteuid();
 	struct passwd *pw = getpwuid(uid);
-	if(pw)
+	if (pw)
 	{
 		return pw->pw_name;
 	}
@@ -1426,7 +1426,7 @@ const char *sys_homedir(void)
 {
 	uid_t uid = geteuid();
 	struct passwd *pw = getpwuid(uid);
-	if(pw)
+	if (pw)
 	{
 		return pw->pw_dir;
 	}
@@ -1458,7 +1458,7 @@ void sys_info_ex(SysInfoX_t *infox_req)
 			DBG_ER_LN("(Load average: %f %f %f)", infox_req->uptime.load[0], infox_req->uptime.load[1], infox_req->uptime.load[2]);
 		}
 #else
-		if(getloadavg(infox_req->uptime.load, 3) != -1)
+		if (getloadavg(infox_req->uptime.load, 3) != -1)
 		{
 			DBG_TMP_Y("(Load average: %f %f %f)", infox_req->uptime.load[0], infox_req->uptime.load[1], infox_req->uptime.load[2]);
 		}
@@ -1474,9 +1474,9 @@ unsigned long sys_cpu_info(CPUInfo_t *cpuinfox_req)
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
-	if(fp)
+	if (fp)
 	{
-		if(SAFE_FGETS(newline, sizeof(newline), fp) != NULL)
+		if (SAFE_FGETS(newline, sizeof(newline), fp) != NULL)
 		{
 			SAFE_SSCANF(newline, "%s %ld %ld %ld %ld", cpuinfox_req->name, &cpuinfox_req->user, &cpuinfox_req->nice, &cpuinfox_req->system, &cpuinfox_req->idle);
 		}
@@ -1492,7 +1492,7 @@ unsigned long sys_cpu_info(CPUInfo_t *cpuinfox_req)
 	}
 
 	unsigned long lasttime = (cpuinfox_req->user + cpuinfox_req->nice + cpuinfox_req->system + cpuinfox_req->idle);
-	if(cpuinfox_req->lasttime == 0)
+	if (cpuinfox_req->lasttime == 0)
 	{
 		cpuinfox_req->lasttime = lasttime;
 		cpuinfox_req->duration = 0;
@@ -1511,7 +1511,7 @@ void sys_mem_purge(int freeram_min)
 	sysinfo(&sinfo);
 
 	int freeram_low = ((double)sinfo.freeram/sinfo.totalram) *100;
-	if(freeram_low > freeram_min)
+	if (freeram_low > freeram_min)
 	{
 		// nothing
 		DBG_IF_LN("safe !!! (freeram_percent: %d > %d, %ld, %ld)", freeram_low, freeram_min, sinfo.freeram, sinfo.totalram);
@@ -1532,12 +1532,12 @@ static const char* get_items(const char*buffer,unsigned int item)
 	int len = SAFE_STRLEN((char*)buffer);
 	int count = 0;
 
-	for(i=0; i<len; i++)
+	for (i=0; i<len; i++)
 	{
-		if(' ' == *p)
+		if (' ' == *p)
 		{
 			count ++;
-			if(count == item -1)
+			if (count == item -1)
 			{
 				p++;
 				break;
@@ -1554,7 +1554,7 @@ unsigned long proc_cpu_info(ProcInfo_t *procinfo_req)
 	char filename[LEN_OF_FULLNAME]="";
 	char newline[LEN_OF_NEWLINE];
 
-	if(procinfo_req->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
 		DBG_ER_LN("procinfo_req->pid == 0 !!!");
 		return 0;
@@ -1564,9 +1564,9 @@ unsigned long proc_cpu_info(ProcInfo_t *procinfo_req)
 	DBG_TR_LN("enter (%s)", filename);
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
-	if(fp)
+	if (fp)
 	{
-		if(SAFE_FGETS(newline, sizeof(newline), fp) != NULL)
+		if (SAFE_FGETS(newline, sizeof(newline), fp) != NULL)
 		{
 			const char *q =get_items(newline, PROCESS_ITEM);
 			SAFE_SSCANF((char *)q,"%ld %ld %ld %ld", &procinfo_req->utime, &procinfo_req->stime, &procinfo_req->cutime, &procinfo_req->cstime);
@@ -1583,7 +1583,7 @@ unsigned long proc_cpu_info(ProcInfo_t *procinfo_req)
 	}
 
 	unsigned long lasttime = (procinfo_req->utime + procinfo_req->stime + procinfo_req->cutime + procinfo_req->cstime);
-	if(procinfo_req->lasttime == 0)
+	if (procinfo_req->lasttime == 0)
 	{
 		procinfo_req->lasttime = lasttime;
 		procinfo_req->duration = 0;
@@ -1610,7 +1610,7 @@ float proc_cpu_usage(ProcInfo_t *procinfo_req)
 	proc_cpu_info(procinfo_req);
 
 	procinfo_req->cpu_usage = 0.0;
-	if(0 != cpuinfo.duration)
+	if (0 != cpuinfo.duration)
 	{
 		procinfo_req->cpu_usage = 100.0 * (procinfo_req->duration)/(cpuinfo.duration);
 	}
@@ -1623,7 +1623,7 @@ void proc_mem_info(ProcInfo_t *procinfo_req)
 	char filename[LEN_OF_FULLNAME]="";
 	char newline[LEN_OF_NEWLINE];
 
-	if(procinfo_req->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
 		DBG_ER_LN("procinfo_req->pid == 0 !!!");
 		return;
@@ -1633,9 +1633,9 @@ void proc_mem_info(ProcInfo_t *procinfo_req)
 	DBG_TR_LN("enter (%s)", filename);
 
 	FILE *fp = SAFE_FOPEN(filename, "r");
-	if(fp)
+	if (fp)
 	{
-		if(SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
+		if (SAFE_FGETS(newline, sizeof(newline), fp)!= NULL)
 		{
 			SAFE_SSCANF(newline, "%ld %ld %ld %ld %ld %ld %ld", &procinfo_req->size, &procinfo_req->resident, &procinfo_req->shared, &procinfo_req->text, &procinfo_req->lib, &procinfo_req->data, &procinfo_req->dt);
 			procinfo_req->size *= 4;
@@ -1660,7 +1660,7 @@ void proc_fdsize_info(ProcInfo_t *procinfo_req)
 	char cmdline[LEN_OF_CMDLINE] = "";
 	char newline[LEN_OF_NEWLINE];
 
-	if(procinfo_req->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
 		DBG_ER_LN("procinfo_req->pid == 0 !!!");
 		return;
@@ -1670,25 +1670,25 @@ void proc_fdsize_info(ProcInfo_t *procinfo_req)
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
-	if(fp)
+	if (fp)
 	{
-		while((SAFE_FGETS(newline, sizeof(newline), fp)) != NULL)
+		while ((SAFE_FGETS(newline, sizeof(newline), fp)) != NULL)
 		{
 			char key[32]="";
 			char vals[32]="";
 
 			SAFE_SSCANF(newline,"%s %s", key, vals);
-			if(key[SAFE_STRLEN(key)-1]==':')
+			if (key[SAFE_STRLEN(key)-1]==':')
 			{
 				key[SAFE_STRLEN(key)-1] ='\0';
 			}
 			DBG_TR_LN("(key: %s, vals: %s)", key, vals);
 
-			if(SAFE_STRCMP(key, "Name") ==0)
+			if (SAFE_STRCMP(key, "Name") ==0)
 			{
 				SAFE_SPRINTF_EX(procinfo_req->name, "%s", vals);
 			}
-			else if(SAFE_STRCMP(key, "FDSize") ==0)
+			else if (SAFE_STRCMP(key, "FDSize") ==0)
 			{
 				procinfo_req->fdsize = atol(vals);
 			}
@@ -1710,7 +1710,7 @@ void proc_fddetail_info(ProcInfo_t *procinfo_req)
 	char cmdline[LEN_OF_CMDLINE] = "";
 	char newline[LEN_OF_NEWLINE];
 
-	if(procinfo_req->pid == 0)
+	if (procinfo_req->pid == 0)
 	{
 		DBG_ER_LN("procinfo_req->pid == 0 !!! (name: %s)", procinfo_req->name);
 		return;
@@ -1720,13 +1720,13 @@ void proc_fddetail_info(ProcInfo_t *procinfo_req)
 	DBG_TR_LN("enter (%s)", cmdline);
 
 	FILE *fp = SAFE_POPEN(cmdline, "r");
-	if(fp)
+	if (fp)
 	{
 		procinfo_req->fdcount = 0;
-		while((SAFE_FGETS(newline, sizeof(newline), fp)) != NULL)
+		while ((SAFE_FGETS(newline, sizeof(newline), fp)) != NULL)
 		{
 			DBG_TMP_Y("(newline: %s, %zd)", newline, SAFE_STRLEN(newline));
-			if(SAFE_STRLEN(newline)>=56)
+			if (SAFE_STRLEN(newline)>=56)
 			{
 				int idx = procinfo_req->fdcount;
 				SAFE_SSCANF(newline+56,"%d -> %s", &procinfo_req->fdinfo[idx].fd, procinfo_req->fdinfo[idx].slink);
@@ -1734,7 +1734,7 @@ void proc_fddetail_info(ProcInfo_t *procinfo_req)
 				DBG_TMP_Y("(newline: %s)", newline+56);
 				DBG_TMP_Y("(fd: %d, slink: %s)", procinfo_req->fdinfo[idx].fd, procinfo_req->fdinfo[idx].slink);
 				procinfo_req->fdcount ++;
-				if(procinfo_req->fdcount>=MAX_OF_FDSIZE)
+				if (procinfo_req->fdcount>=MAX_OF_FDSIZE)
 				{
 					DBG_ER_LN("procinfo_req->fdcount: %ld > MAX_OF_FDSIZE: %d !!!", procinfo_req->fdcount, MAX_OF_FDSIZE);
 					break;
@@ -1769,18 +1769,18 @@ unsigned long pidof(char *name)
 	struct dirent* ent;
 	char* endptr;
 
-	if(!(dir = opendir("/proc")))
+	if (!(dir = opendir("/proc")))
 	{
 		DBG_ER_LN("opendir error !!! (/proc)");
 		return ret;
 	}
 
-	while((ret == 0) && ((ent = readdir(dir)) != NULL))
+	while ((ret == 0) && ((ent = readdir(dir)) != NULL))
 	{
 		// if endptr is not a null character, the directory is not entirely numeric, so ignore it
 		char cmdline[LEN_OF_CMDLINE] = "";
 		unsigned long pid = strtol(ent->d_name, &endptr, 10);
-		if(*endptr != '\0')
+		if (*endptr != '\0')
 		{
 			continue;
 		}
@@ -1789,16 +1789,16 @@ unsigned long pidof(char *name)
 		SAFE_SNPRINTF(cmdline, (int)sizeof(cmdline), "/proc/%ld/cmdline", pid);
 		//DBG_ER_LN(">>>>>>>>> (cmdline: %s)", cmdline);
 		FILE* fp = SAFE_FOPEN(cmdline, "r");
-		if(fp)
+		if (fp)
 		{
-			if(SAFE_FGETS(cmdline, sizeof(cmdline), fp) != NULL)
+			if (SAFE_FGETS(cmdline, sizeof(cmdline), fp) != NULL)
 			{
 				//DBG_ER_LN(">>>>>>>>> (cmdline: %s)", cmdline);
 				// check the first token in the file, the program name
 				char *saveptr = NULL;
 				char *first = SAFE_STRTOK_R(cmdline, " ", &saveptr);
 
-				if(SAFE_STRRCMP(first, name) == 0)
+				if (SAFE_STRRCMP(first, name) == 0)
 				{
 					ret = pid;
 				}

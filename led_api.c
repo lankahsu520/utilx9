@@ -16,7 +16,7 @@
 
 void led_gosleep(LedRequest_t *ledreq)
 {
-	if(ledreq==NULL)
+	if (ledreq==NULL)
 	{
 		return;
 	}
@@ -27,7 +27,7 @@ void led_gosleep(LedRequest_t *ledreq)
 
 void led_wakeup_simple(LedRequest_t *ledreq)
 {
-	if(ledreq==NULL)
+	if (ledreq==NULL)
 	{
 		return;
 	}
@@ -44,24 +44,24 @@ static void *led_thread_handler(void *user)
 
 	threadx_detach(tidx_req);
 
-	if(ledreq == NULL)
+	if (ledreq == NULL)
 	{
 		goto led_exit;
 	}
-	if(ledreq->led_on_cb == NULL)
+	if (ledreq->led_on_cb == NULL)
 	{
 		goto led_exit;
 	}
-	if(ledreq->ledon_ary == NULL)
+	if (ledreq->ledon_ary == NULL)
 	{
 		goto led_exit;
 	}
 
 	int idx = 0;
-	for(idx = 0; idx < MAX_OF_LEDON; idx++)
+	for (idx = 0; idx < MAX_OF_LEDON; idx++)
 	{
 		LedOn_t *ledon = (LedOn_t *)&ledreq->ledon_ary[idx];
-		if((ledon->id > LED_ID_NONE) && (ledon->id < LED_ID_MAX))
+		if ((ledon->id > LED_ID_NONE) && (ledon->id < LED_ID_MAX))
 		{
 			ledreq->max_led = idx+1;
 		}
@@ -72,9 +72,9 @@ static void *led_thread_handler(void *user)
 	}
 
 	idx = 0;
-	while(threadx_isquit(tidx_req)==0)
+	while (threadx_isquit(tidx_req)==0)
 	{
-		if(threadx_ispause(tidx_req)==0)
+		if (threadx_ispause(tidx_req)==0)
 		{
 			LedOn_t *ledon = (LedOn_t *)&ledreq->ledon_ary[idx];
 			ledreq->led_on_cb(ledon);
@@ -83,18 +83,18 @@ static void *led_thread_handler(void *user)
 
 			threadx_timewait_simple(tidx_req, hold_next*TICK_OF_LEDON_10);
 
-			if((threadx_isquit(tidx_req)==0)  && (threadx_ispause(tidx_req)==0))
+			if ((threadx_isquit(tidx_req)==0)  && (threadx_ispause(tidx_req)==0))
 			{
 				idx ++;
 				idx %= ledreq->max_led;
-				if(ledreq->infinite < 0)
+				if (ledreq->infinite < 0)
 				{
 					// in loop
 				}
-				else if(idx == 0)
+				else if (idx == 0)
 				{
 					ledreq->infinite --;
-					if(ledreq->infinite == 0)
+					if (ledreq->infinite == 0)
 					{
 						// end the thread
 						break;
@@ -120,7 +120,7 @@ led_exit:
 
 static void led_thread_free(LedRequest_t *ledreq)
 {
-	if(ledreq)
+	if (ledreq)
 	{
 		SAFE_FREE(ledreq);
 	}
@@ -128,7 +128,7 @@ static void led_thread_free(LedRequest_t *ledreq)
 
 void led_thread_stop(LedRequest_t *ledreq)
 {
-	if(ledreq)
+	if (ledreq)
 	{
 		threadx_stop(&ledreq->tidx);
 	}
@@ -136,7 +136,7 @@ void led_thread_stop(LedRequest_t *ledreq)
 
 void led_thread_close(LedRequest_t *ledreq)
 {
-	if((ledreq) && (ledreq->isfree == 0))
+	if ((ledreq) && (ledreq->isfree == 0))
 	{
 		ledreq->isfree ++;
 
@@ -149,7 +149,7 @@ LedRequest_t *led_thread_init(char *name, int infinite, LedOn_t *ledon_ary, led_
 {
 	LedRequest_t *ledreq = (LedRequest_t*)SAFE_CALLOC(1, sizeof(LedRequest_t));
 
-	if(ledreq)
+	if (ledreq)
 	{
 		SAFE_SPRINTF_EX(ledreq->name, "%s", name);
 

@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	local_addr.sin_port = htons(MULTICAST_PORT);
 
 	printf("listen ... (%s:%d)\n", MULTICAST_IP, MULTICAST_PORT);
-	if(bind(sockfd, (struct sockaddr *) &local_addr, sizeof(local_addr)) < 0)
+	if (bind(sockfd, (struct sockaddr *) &local_addr, sizeof(local_addr)) < 0)
 	{
 		perror("bind");
 		return -1;
@@ -41,14 +41,14 @@ int main(int argc, char* argv[])
 	memset((unsigned char *)&seMember, 0x00, sizeof(seMember));
 	seMember.imr_multiaddr.s_addr = inet_addr(MULTICAST_IP);
 	seMember.imr_interface.s_addr = htonl(INADDR_ANY);
-	if(setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &seMember,sizeof(seMember)) < 0)
+	if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &seMember,sizeof(seMember)) < 0)
 	{
 		perror("setsockopt");
 		return -1;
 	}
 
 #if (1)
-	while(1)
+	while (1)
 	{
 		char buff[1024] = "";
 		struct sockaddr_in cli;
@@ -72,18 +72,18 @@ int main(int argc, char* argv[])
 		tv.tv_usec = 0;
 		int result = select(sockfd+1, &fdrset, (fd_set *)NULL, &fdeset, &tv);
 		//printf("(result: %d)\n", result);
-		if(result == -1)
+		if (result == -1)
 		{
 		}
-		else if(result==0)
+		else if (result==0)
 		{
 		}
-		else if(FD_ISSET(sockfd, &fdrset))
+		else if (FD_ISSET(sockfd, &fdrset))
 		{
 #if (1)
 			nread = recvfrom(sockfd, buff, 1023, 0, (struct sockaddr *)&cli, (socklen_t*)&n);
 
-			if(nread>0)
+			if (nread>0)
 			{
 				printf("%s - %s\n", inet_ntoa(cli.sin_addr), buff);
 			}
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 		sleep(1);
 	}
 #endif
-	if(sockfd>=0)
+	if (sockfd>=0)
 	{
 		close(sockfd);
 	}

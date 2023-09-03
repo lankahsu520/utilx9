@@ -12,9 +12,9 @@ void parseRtattr(struct rtattr *tb[], int max, struct rtattr *rta, int len)
 {
 	memset(tb, 0, sizeof(struct rtattr *) * (max + 1));
 
-	while(RTA_OK(rta, len))     // while not end of the message
+	while (RTA_OK(rta, len))    // while not end of the message
 	{
-		if(rta->rta_type <= max)
+		if (rta->rta_type <= max)
 		{
 			tb[rta->rta_type] = rta; // read attr
 		}
@@ -26,7 +26,7 @@ int main()
 {
 	int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);   // create netlink socket
 
-	if(fd < 0)
+	if (fd < 0)
 	{
 		printf("Failed to create netlink socket: %s\n", (char*)strerror(errno));
 		return 1;
@@ -53,7 +53,7 @@ int main()
 		msg.msg_iovlen = 1;                     // io size
 	}
 
-	if(bind(fd, (struct sockaddr*)&local, sizeof(local)) < 0)        // bind socket
+	if (bind(fd, (struct sockaddr*)&local, sizeof(local)) < 0)       // bind socket
 	{
 		printf("Failed to bind netlink socket: %s\n", (char*)strerror(errno));
 		close(fd);
@@ -61,14 +61,14 @@ int main()
 	}
 
 	// read and parse all messages from the
-	while(1)
+	while (1)
 	{
 		ssize_t status = recvmsg(fd, &msg, MSG_DONTWAIT);
 
 		//  check status
-		if(status < 0)
+		if (status < 0)
 		{
-			if(errno == EINTR || errno == EAGAIN)
+			if (errno == EINTR || errno == EAGAIN)
 			{
 				usleep(250000);
 				continue;
@@ -78,7 +78,7 @@ int main()
 			continue;
 		}
 
-		if(msg.msg_namelen != sizeof(local))    // check message length, just in case
+		if (msg.msg_namelen != sizeof(local))   // check message length, just in case
 		{
 			printf("Invalid length of the sender address struct\n");
 			continue;
@@ -87,20 +87,20 @@ int main()
 		// message parser
 		struct nlmsghdr *h;
 
-		for(h = (struct nlmsghdr*)buf; status >= (ssize_t)sizeof(*h);)       // read all messagess headers
+		for (h = (struct nlmsghdr*)buf; status >= (ssize_t)sizeof(*h);)      // read all messagess headers
 		{
 			int len = h->nlmsg_len;
 			int l = len - sizeof(*h);
 			char *ifName = NULL;
 
-			if((l < 0) || (len > status))
+			if ((l < 0) || (len > status))
 			{
 				printf("Invalid message length: %i\n", len);
 				continue;
 			}
 
 			// now we can check message type
-			if((h->nlmsg_type == RTM_NEWROUTE) || (h->nlmsg_type == RTM_DELROUTE))    // some changes in routing table
+			if ((h->nlmsg_type == RTM_NEWROUTE) || (h->nlmsg_type == RTM_DELROUTE))   // some changes in routing table
 			{
 				printf("Routing table was changed\n");
 			}
@@ -115,12 +115,12 @@ int main()
 
 				parseRtattr(tb, IFLA_MAX, IFLA_RTA(ifi), h->nlmsg_len);  // get attributes
 
-				if(tb[IFLA_IFNAME])     // validation
+				if (tb[IFLA_IFNAME])    // validation
 				{
 					ifName = (char*)RTA_DATA(tb[IFLA_IFNAME]); // get network interface name
 				}
 
-				if(ifi->ifi_flags & IFF_UP)    // get UP flag of the network interface
+				if (ifi->ifi_flags & IFF_UP)   // get UP flag of the network interface
 				{
 					ifUpp = (char*)"UP";
 				}
@@ -129,7 +129,7 @@ int main()
 					ifUpp = (char*)"DOWN";
 				}
 
-				if(ifi->ifi_flags & IFF_RUNNING)    // get RUNNING flag of the network interface
+				if (ifi->ifi_flags & IFF_RUNNING)   // get RUNNING flag of the network interface
 				{
 					ifRunn = (char*)"RUNNING";
 				}
@@ -146,12 +146,12 @@ int main()
 
 				parseRtattr(tba, IFA_MAX, IFA_RTA(ifa), h->nlmsg_len);
 
-				if(tba[IFA_LOCAL])
+				if (tba[IFA_LOCAL])
 				{
 					inet_ntop(AF_INET, RTA_DATA(tba[IFA_LOCAL]), ifAddress, sizeof(ifAddress)); // get IP addr
 				}
 
-				switch(h->nlmsg_type)    // what is actually happenned?
+				switch (h->nlmsg_type)   // what is actually happenned?
 				{
 					case RTM_DELADDR:
 						printf("Interface %s: address was removed\n", ifName);

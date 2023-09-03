@@ -43,7 +43,7 @@ void timer_1_loop(uv_timer_t *handle)
 	count++;
 	DBG_IF_LN("(count: %d)", count);
 	sleep(2); // this will lock loop
-	if(count >= MAX_OF_TEST)
+	if (count >= MAX_OF_TEST)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
@@ -56,7 +56,7 @@ void timer_2_loop(uv_timer_t *handle)
 	static int count = 0;
 	count++;
 	DBG_IF_LN("(count: %d)", count);
-	if(count >= MAX_OF_TEST)
+	if (count >= MAX_OF_TEST)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
@@ -72,7 +72,7 @@ uv_thread_t uv_thread_req;
 void thread_loop(void *arg)
 {
 	static int count = 0;
-	while(count < 10)
+	while (count < 10)
 	{
 		count++;
 		DBG_IF_LN("(count: %d)", count);
@@ -107,7 +107,7 @@ void queue_work_finisher(uv_work_t *req, int status)
 void queue_work_handler(uv_work_t *req)
 {
 	int count = 0;
-	while(count < MAX_OF_TEST)
+	while (count < MAX_OF_TEST)
 	{
 		count++;
 		int id = *((int*) req->data);
@@ -131,7 +131,7 @@ void idle_loop(uv_idle_t* handle)
 	static int count = 0;
 	count++;
 	DBG_IF_LN("(count: %d)", count);
-	if(count>=MAX_OF_TEST)
+	if (count>=MAX_OF_TEST)
 	{
 		SAFE_UV_IDLE_STOP(handle);
 		DBG_IF_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
@@ -157,7 +157,7 @@ void fs_read_cb(uv_fs_t *req);
 
 void fs_write_cb(uv_fs_t *req)
 {
-	if(req->result < 0)
+	if (req->result < 0)
 	{
 		DBG_ER_LN("write error !!! (%s)", uv_strerror(req->result));
 	}
@@ -175,11 +175,11 @@ static void pipe_w_cb(uv_write_t *req, int status)
 
 void fs_read_cb(uv_fs_t *req)
 {
-	if(req->result < 0)
+	if (req->result < 0)
 	{
 		DBG_ER_LN("read error !!! (%s)", uv_strerror(req->result));
 	}
-	else if(req->result == 0)
+	else if (req->result == 0)
 	{
 		uv_fs_t fs_close_req;
 
@@ -189,7 +189,7 @@ void fs_read_cb(uv_fs_t *req)
 		// pipe
 		SAFE_UV_CLOSE(&pipe_w_fd, NULL);
 	}
-	else if(req->result > 0)
+	else if (req->result > 0)
 	{
 		ssize_t nread = req->result;
 
@@ -206,7 +206,7 @@ void fs_read_cb(uv_fs_t *req)
 
 void fs_open_cb(uv_fs_t *req)
 {
-	if(req->result >= 0)
+	if (req->result >= 0)
 	{
 		buf_req = SAFE_UV_BUF_INIT(buffer, sizeof(buffer));
 		SAFE_UV_FS_READ(uv_loop, &fs_read_req, req->result, &buf_req, 1, -1, fs_read_cb);
@@ -238,10 +238,10 @@ static int app_quit(void)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if((is_free==0) && (app_quit()==1))
+	if ((is_free==0) && (app_quit()==1))
 	{
 		is_free = 1;
-		if(uv_loop)
+		if (uv_loop)
 		{
 #ifdef USE_TIMER_CREATE
 			SAFE_UV_TIMER_CLOSE(&uv_timer_1_fd, NULL);
@@ -251,7 +251,7 @@ void app_stop_uv(uv_async_t *handle, int force)
 #ifdef USE_QUEUE_CREATE
 			int i = 0;
 
-			for(i=0; i<MAX_OF_QUEUE; i++)
+			for (i=0; i<MAX_OF_QUEUE; i++)
 			{
 				SAFE_UV_CANCEL(&uv_work_req[i]);
 			}
@@ -272,12 +272,12 @@ void app_stop_uv(uv_async_t *handle, int force)
 			SAFE_UV_THREAD_JOIN_EX(&uv_thread_req);
 #endif
 
-			if(handle)
+			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			if(force)
+			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
@@ -306,7 +306,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -343,7 +343,7 @@ static void app_loop(void)
 #ifdef USE_QUEUE_CREATE
 	int i = 0;
 
-	for(i=0; i<MAX_OF_QUEUE; i++)
+	for (i=0; i<MAX_OF_QUEUE; i++)
 	{
 		work_data[i] = i+1;
 		uv_work_req[i].data = (void *) &work_data[i];
@@ -359,7 +359,7 @@ static void app_loop(void)
 #ifdef USE_FS_CREATE
 	// asynchronous and write to pipe
 	int fd = SAFE_UV_FS_OPEN(uv_loop, &fs_open_w_req, TEST_TXT_FILENAME, O_CREAT|O_WRONLY, 0666, NULL);
-	if(fd >=0)
+	if (fd >=0)
 	{
 		SAFE_UV_PIPE_INIT(uv_loop, &pipe_w_fd, 0);
 		SAFE_UV_PIPE_OPEN(&pipe_w_fd, fd);
@@ -367,7 +367,7 @@ static void app_loop(void)
 
 	// synchronous and read
 	DBG_ER_LN("(filename_r: %s)", filename_r);
-	if(strlen(filename_r) > 0)
+	if (strlen(filename_r) > 0)
 	{
 		SAFE_UV_FS_OPEN(uv_loop, &fs_open_r_req, filename_r, O_RDONLY, 0, fs_open_cb);
 	}
@@ -402,7 +402,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -464,19 +464,19 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 #ifdef USE_FS_CREATE
 			case 'f':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(filename_r, "%s", optarg);
 				}
@@ -495,7 +495,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

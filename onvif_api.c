@@ -19,7 +19,7 @@
 
 static char *onvif_xml(SOAP_ACTION_ID act_id)
 {
-	switch(act_id)
+	switch (act_id)
 	{
 		case SOAP_ACTION_ID_DEVICE_GETCAPABILITIES:
 			return ONVIF_XML_GETCAPABILITIES;
@@ -55,35 +55,35 @@ char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len,
 	unsigned int buffer_len = LEN_OF_VAL32;
 	EVP_MD_CTX *ctx = NULL;
 
-	if((ctx = EVP_MD_CTX_create()) == NULL)
+	if ((ctx = EVP_MD_CTX_create()) == NULL)
 	{
 		DBG_ER_LN("EVP_MD_CTX_create error !!!");
 		goto exit_sha1;
 	}
 
-	if(1 != EVP_DigestInit_ex(ctx, EVP_sha1(), NULL))
+	if (1 != EVP_DigestInit_ex(ctx, EVP_sha1(), NULL))
 	{
 		DBG_ER_LN("EVP_DigestInit_ex error !!!");
 		goto exit_sha1;
 	}
 
-	if(1 != EVP_DigestUpdate(ctx, nonce, nonce_len))
+	if (1 != EVP_DigestUpdate(ctx, nonce, nonce_len))
 	{
 		DBG_ER_LN("EVP_DigestUpdate error - nonce !!!");
 		goto exit_sha1;
 	}
-	if(1 != EVP_DigestUpdate(ctx, created, create_len))
+	if (1 != EVP_DigestUpdate(ctx, created, create_len))
 	{
 		DBG_ER_LN("EVP_DigestUpdate error - created !!!");
 		goto exit_sha1;
 	}
-	if(1 != EVP_DigestUpdate(ctx, password, password_len))
+	if (1 != EVP_DigestUpdate(ctx, password, password_len))
 	{
 		DBG_ER_LN("EVP_DigestUpdate error - created !!!");
 		goto exit_sha1;
 	}
 
-	if(1 != EVP_DigestFinal_ex(ctx, (unsigned char*)buffer, &buffer_len))
+	if (1 != EVP_DigestFinal_ex(ctx, (unsigned char*)buffer, &buffer_len))
 	{
 		DBG_ER_LN("EVP_DigestFinal_ex error !!!");
 		goto exit_sha1;
@@ -100,7 +100,7 @@ char *onvif_pass_sha1(char *nonce, int nonce_len, char *created, int create_len,
 
 #ifdef USE_EVP_MD
 exit_sha1:
-	if(ctx)
+	if (ctx)
 	{
 		EVP_MD_CTX_destroy(ctx);
 	}
@@ -141,11 +141,11 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 						}
 
 						char *nonce_rand = os_urandom(20);
-						if(nonce_rand)
+						if (nonce_rand)
 						{
 							int enc_len = 0;
 							char *nonce_b64 = sec_base64_enc(nonce_rand, 20, &enc_len);
-							if(nonce_b64)
+							if (nonce_b64)
 							{
 								DBG_TMP_Y("nonce_b64 (enc_len: %d, [%s])", enc_len, nonce_b64);
 								soap_node_t *Nonce_node = soap_element_add(UsernameToken_node, "Nonce");
@@ -163,11 +163,11 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 							}
 
 							char *password = onvif_pass_sha1(nonce_rand, 20, create_s, strlen(create_s), onvif_req->netinfo.pass, strlen(onvif_req->netinfo.pass));
-							if(password)
+							if (password)
 							{
 								int enc_len = 0;
 								char *password_b64 = sec_base64_enc(password, 20, &enc_len);
-								if(password_b64)
+								if (password_b64)
 								{
 									DBG_TMP_Y("password_b64 (enc_len: %d, [%s] -> [%s])", enc_len, onvif_req->netinfo.pass, password_b64);
 
@@ -196,7 +196,7 @@ void onvif_auth(OnvifX_t *onvif_req, SoapX_t *soap)
 soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 {
 	soap_node_t *response_node = NULL;
-	if((onvif_req) && (strlen(onvif_req->netinfo.url)>0))
+	if ((onvif_req) && (strlen(onvif_req->netinfo.url)>0))
 	{
 		HttpX_t http_req =
 		{
@@ -207,21 +207,21 @@ soap_node_t *onvif_open(OnvifX_t *onvif_req, onvif_resuest_fn request_cb)
 		};
 		SAFE_SPRINTF(http_req.url, "%s", onvif_req->netinfo.url);
 
-		if(onvif_req->http_auth > 0)
+		if (onvif_req->http_auth > 0)
 		{
 			http_req.user = onvif_req->netinfo.user;
 			http_req.password = onvif_req->netinfo.pass;
 		}
 
 		SoapX_t *soap = soap_create(onvif_xml(onvif_req->act_id));
-		if(soap)
+		if (soap)
 		{
 			{
 				// to fill user and pass
 				onvif_auth(onvif_req, soap);
 
 				// to fill request
-				if(request_cb)
+				if (request_cb)
 				{
 					request_cb(soap, onvif_req);
 				}
@@ -252,7 +252,7 @@ static void onvif_media_GetSnapshotUri_request_cb(SoapX_t *soap, OnvifX_t *onvif
 {
 	char *ProfileToken = (char *)onvif_req->request;
 	soap_node_t *ptoken_node = soap_element_fetch(soap->request_node, NULL, "ProfileToken", NULL, NULL);
-	if(ptoken_node)
+	if (ptoken_node)
 	{
 		// to fill request
 		soap_element_text_set(ptoken_node, 0, ProfileToken);
@@ -263,7 +263,7 @@ static void onvif_media_GetStreamUri_request_cb(SoapX_t *soap, OnvifX_t *onvif_r
 {
 	char *ProfileToken = (char *)onvif_req->request;
 	soap_node_t *ptoken_node = soap_element_fetch(soap->request_node, NULL, "ProfileToken", NULL, NULL);
-	if(ptoken_node)
+	if (ptoken_node)
 	{
 		// to fill request
 		soap_element_text_set(ptoken_node, 0, ProfileToken);
@@ -273,7 +273,7 @@ static void onvif_media_GetStreamUri_request_cb(SoapX_t *soap, OnvifX_t *onvif_r
 static void onvif_GeCommon_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 {
 	soap_node_t *body_node = soap_element_fetch(soap->request_node, NULL, "Body", NULL, NULL);
-	if((onvif_req) && (body_node))
+	if ((onvif_req) && (body_node))
 	{
 		char act_name[LEN_OF_NAME_ONVIF_ACT];
 		SAFE_SNPRINTF(act_name, (int)sizeof(act_name), "%s:%s", onvif_req->act_ns, onvif_req->act_name);
@@ -288,7 +288,7 @@ static void onvif_GeCommon_request_cb(SoapX_t *soap, OnvifX_t *onvif_req)
 soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req)
 {
 	onvif_resuest_fn request_cb = NULL;
-	switch(onvif_req->act_id)
+	switch (onvif_req->act_id)
 	{
 		case SOAP_ACTION_ID_MEDIA_GETSNAPSHOTURI:
 			request_cb = onvif_media_GetSnapshotUri_request_cb;
@@ -318,7 +318,7 @@ soap_node_t *onvif_GetCommon(OnvifX_t *onvif_req)
 int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname)
 {
 	int ret = 0;
-	if(snapshot_uri)
+	if (snapshot_uri)
 	{
 		HttpX_t http_req =
 		{
@@ -348,7 +348,7 @@ int onvif_GetSnapshot(OnvifX_t *onvif_req, char *snapshot_uri, char *prefixname)
 int onvif_GetVideoClip(OnvifX_t *onvif_req, char *videoclip_uri, char *filename, int duration)
 {
 	int ret = 0;
-	if(videoclip_uri)
+	if (videoclip_uri)
 	{
 		HttpX_t http_req =
 		{

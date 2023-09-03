@@ -59,7 +59,7 @@ static int chainX_netlink_socket(void)
 	ifi->ifi_family = AF_UNSPEC;
 	ifi->ifi_change = -1;
 
-	if(send(sockfd, n, n->nlmsg_len, 0) < 0)
+	if (send(sockfd, n, n->nlmsg_len, 0) < 0)
 	{
 		DBG_ER_LN("send error !!! (errno: %d %s)", errno, strerror(errno));
 		SAFE_SCLOSE(sockfd);
@@ -75,7 +75,7 @@ static int chainX_udp_socket(void)
 {
 	int sockfd = SAFE_SOPEN(AF_INET, SOCK_DGRAM, IPPROTO_IP);
 
-	if(sockfd>=0)
+	if (sockfd>=0)
 	{
 		int reuse = 1;
 		SAFE_SSETOPT(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
@@ -88,7 +88,7 @@ static int chainX_tcp_socket(void)
 {
 	int sockfd = SAFE_SOPEN(AF_INET, SOCK_STREAM, 0);
 
-	if(sockfd>=0)
+	if (sockfd>=0)
 	{
 		int reuse = 1;
 		SAFE_SSETOPT(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
@@ -112,12 +112,12 @@ static int chainX_fcntl_socket(ChainX_t * chainX_req)
 {
 	int ret = 0;
 #ifdef UTIL_EX_SOCKET_NOBLOCK
-	if(chainX_req->noblock==1)
+	if (chainX_req->noblock==1)
 	{
 		int flags = SAFE_FCNTL(chainX_fd_get(chainX_req), F_GETFL, 0);
 		/*  Now connect our socket to the server's socket.  */
 		flags = (flags|O_NONBLOCK);
-		if(SAFE_FCNTL(chainX_fd_get(chainX_req), F_SETFL, flags) < 0)
+		if (SAFE_FCNTL(chainX_fd_get(chainX_req), F_SETFL, flags) < 0)
 		{
 			DBG_ER_LN("fcntl O_NONBLOCK error !!! (errno: %d %s)", errno, strerror(errno));
 		}
@@ -128,7 +128,7 @@ static int chainX_fcntl_socket(ChainX_t * chainX_req)
 
 void chainX_addr2ipstr(int family, void *sinx_addr, char *ipstr, int len)
 {
-	if(ipstr)
+	if (ipstr)
 	{
 		inet_ntop(family, sinx_addr, ipstr, len);
 	}
@@ -140,17 +140,17 @@ int chainX_dns_get(char *dns)
 	char buf[LEN_OF_NEWLINE] = "", ns_str[LEN_OF_VAL32] = "";
 
 	FILE *fp = SAFE_FOPEN("/etc/resolv.conf", "r");
-	if(NULL == fp)
+	if (NULL == fp)
 	{
 		return ret;
 	}
-	while(SAFE_FGETS(buf, sizeof(buf), fp) != NULL)
+	while (SAFE_FGETS(buf, sizeof(buf), fp) != NULL)
 	{
-		if(SAFE_STRNCMP(buf, "nameserver", 10) != 0)
+		if (SAFE_STRNCMP(buf, "nameserver", 10) != 0)
 		{
 			continue;
 		}
-		if(SAFE_SSCANF(buf, "%s%s", ns_str, dns+strlen(dns)) == 2)
+		if (SAFE_SSCANF(buf, "%s%s", ns_str, dns+strlen(dns)) == 2)
 		{
 			dns[strlen(dns)] = ';';
 			ret = 0;
@@ -158,7 +158,7 @@ int chainX_dns_get(char *dns)
 	}
 	SAFE_FCLOSE(fp);
 
-	if((strlen(dns) > 0) && (dns[strlen(dns)-1] == ';'))
+	if ((strlen(dns) > 0) && (dns[strlen(dns)-1] == ';'))
 	{
 		dns[strlen(dns)-1] = '\0';
 	}
@@ -171,7 +171,7 @@ int chainX_dns_set(char *dns)
 {
 	int ret = -1;
 
-	if(dns == NULL)
+	if (dns == NULL)
 	{
 		DBG_ER_LN("dns is NULL !!!");
 		return ret;
@@ -179,17 +179,17 @@ int chainX_dns_set(char *dns)
 
 	//DBG_ER_LN("(dns: %s)", dns);
 	FILE *fp = SAFE_FOPEN("/etc/resolv.conf", "wb");
-	if(NULL == fp)
+	if (NULL == fp)
 	{
 		return ret;
 	}
 	char *saveptr = NULL;
 	char *server = SAFE_STRTOK_R(dns, ";", &saveptr);
-	while(server)
+	while (server)
 	{
 		in_addr_t addr = inet_addr(server);
 
-		if(addr != -1)
+		if (addr != -1)
 		{
 			char buf[LEN_OF_BUF256] = "";
 			SAFE_SNPRINTF(buf, sizeof(buf), "nameserver %s\n", server);
@@ -211,32 +211,32 @@ int chainX_if_staticip(char *iface, char *ip, char *netmask, char *gateway)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(ip == NULL)
+	if (ip == NULL)
 	{
 		DBG_ER_LN("ip is NULL !!!");
 		return ret;
 	}
 
-	if(netmask == NULL)
+	if (netmask == NULL)
 	{
 		DBG_ER_LN("netmask is NULL !!!");
 		return ret;
 	}
 
-	if(gateway == NULL)
+	if (gateway == NULL)
 	{
 		DBG_ER_LN("gateway is NULL !!!");
 		return ret;
 	}
 
 	int sockfd = chainX_udp_socket();
-	if(sockfd >= 0)
+	if (sockfd >= 0)
 	{
 		struct ifreq ifreq_info;
 		memset(&ifreq_info, 0, sizeof(struct ifreq));
@@ -246,26 +246,26 @@ int chainX_if_staticip(char *iface, char *ip, char *netmask, char *gateway)
 		ipv4->sin_family = AF_INET;
 
 		//ipaddr
-		if(inet_aton(ip, &(ipv4->sin_addr)) < 0)
+		if (inet_aton(ip, &(ipv4->sin_addr)) < 0)
 		{
 			DBG_ER_LN("inet_aton error !!! (ip: %s)", ip);
 			goto STATICIP_EXIT;
 		}
 
-		if(ioctl(sockfd, SIOCSIFADDR, &ifreq_info) < 0)
+		if (ioctl(sockfd, SIOCSIFADDR, &ifreq_info) < 0)
 		{
 			DBG_ER_LN("ioctl - SIOCSIFADDR error !!! (ip: %s)", ip);
 			goto STATICIP_EXIT;
 		}
 
 		//netmask
-		if(inet_aton(netmask, &(ipv4->sin_addr)) < 0)
+		if (inet_aton(netmask, &(ipv4->sin_addr)) < 0)
 		{
 			DBG_ER_LN("inet_aton error !!! (netmask: %s)", netmask);
 			goto STATICIP_EXIT;
 		}
 
-		if(ioctl(sockfd, SIOCSIFNETMASK, &ifreq_info) < 0)
+		if (ioctl(sockfd, SIOCSIFNETMASK, &ifreq_info) < 0)
 		{
 			DBG_ER_LN("ioctl - SIOCSIFNETMASK error !!! (netmask: %s)", netmask);
 			goto STATICIP_EXIT;
@@ -289,7 +289,7 @@ int chainX_if_staticip(char *iface, char *ip, char *netmask, char *gateway)
 
 		// errno -l
 		// ESRCH 3 No such process
-		if((ioctl(sockfd, SIOCDELRT, &routex) < 0) && (errno != ESRCH))
+		if ((ioctl(sockfd, SIOCDELRT, &routex) < 0) && (errno != ESRCH))
 		{
 			DBG_ER_LN("ioctl error !!! (errno: %d %s)", errno, strerror(errno));
 			goto STATICIP_EXIT;
@@ -298,14 +298,14 @@ int chainX_if_staticip(char *iface, char *ip, char *netmask, char *gateway)
 		ipv4 = (struct sockaddr_in*) &routex.rt_gateway;
 		ipv4->sin_family = AF_INET;
 		ipv4->sin_port = 0;
-		if(inet_aton(gateway, &ipv4->sin_addr) < 0)
+		if (inet_aton(gateway, &ipv4->sin_addr) < 0)
 		{
 			DBG_ER_LN("inet_aton error !!! (gateway: %s)", gateway);
 			goto STATICIP_EXIT;
 		}
 
 		routex.rt_flags = RTF_UP | RTF_GATEWAY;
-		if(ioctl(sockfd, SIOCADDRT, &routex) < 0)
+		if (ioctl(sockfd, SIOCADDRT, &routex) < 0)
 		{
 			DBG_ER_LN("ioctl error !!! (errno: %d %s)", errno, strerror(errno));
 			goto STATICIP_EXIT;
@@ -325,27 +325,27 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 
 	struct ifaddrs *ifaddrs_ptr = NULL, *ifa = NULL;
 
-	if(getifaddrs(&ifaddrs_ptr)== -1)
+	if (getifaddrs(&ifaddrs_ptr)== -1)
 	{
 		DBG_ER_LN("getifaddrs error !!!");
 		return ret;
 	}
 
-	for(ifa = ifaddrs_ptr; ifa != NULL; ifa = ifa->ifa_next)
+	for (ifa = ifaddrs_ptr; ifa != NULL; ifa = ifa->ifa_next)
 	{
 		char host[NI_MAXHOST] = "";
 
-		if(ifa->ifa_addr == NULL)
+		if (ifa->ifa_addr == NULL)
 		{
 			continue;
 		}
 
 		int family = ifa->ifa_addr->sa_family;
-		if((family == AF_INET) || (family == AF_INET6))
+		if ((family == AF_INET) || (family == AF_INET6))
 		{
 			// IPv4 or IPv6
 			int s = getnameinfo(ifa->ifa_addr, (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),	host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-			if(s !=0)
+			if (s !=0)
 			{
 				DBG_ER_LN("getnameinfo error !!! (%d)", s);
 			}
@@ -355,7 +355,7 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 				void *addr = &(((struct sockaddr_in*)(ifa->ifa_netmask))->sin_addr);
 				SAFE_SPRINTF_EX(netmask, "%s", inet_ntop(AF_INET, addr, netmask, sizeof(netmask)));
 
-				if(list_cb)
+				if (list_cb)
 				{
 					list_cb(ifa->ifa_name, ifa->ifa_flags, family, host, netmask);
 				}
@@ -370,16 +370,16 @@ int chainX_if_list(chainX_if_list_fn list_cb)
 				}
 			}
 		}
-		else if(family == PF_PACKET)
+		else if (family == PF_PACKET)
 		{
 			char ethmac[LEN_OF_MAC]= "";
 			char split[] = ":";
 			unsigned char *ptr = (unsigned char *)((struct sockaddr *)(ifa->ifa_addr)->sa_data);
 			int i = 0;
-			for(i = 0; i < 6; i++)
+			for (i = 0; i < 6; i++)
 			{
 				//mac[i] = s.ifr_addr.sa_data[i];
-				if(i!=0)
+				if (i!=0)
 				{
 					SAFE_SNPRINTF(ethmac+strlen(ethmac), sizeof(ethmac)-strlen(ethmac), "%s%02X", split, (unsigned char)ptr[i]);
 				}
@@ -402,25 +402,25 @@ int chainX_if_ipaddr(char *iface, char *ip, int ip_len)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(ip == NULL)
+	if (ip == NULL)
 	{
 		DBG_ER_LN("ip is NULL !!!");
 		return ret;
 	}
 
 	int sockfd = chainX_udp_socket();
-	if(sockfd >= 0)
+	if (sockfd >= 0)
 	{
 		struct ifreq ifreq_info;
 		memset(&ifreq_info, 0, sizeof(struct ifreq));
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
-		if(0 == SAFE_IOCTL(sockfd, SIOCGIFADDR, &ifreq_info))
+		if (0 == SAFE_IOCTL(sockfd, SIOCGIFADDR, &ifreq_info))
 		{
 			SAFE_SNPRINTF(ip, ip_len, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_addr)->sin_addr));
 			ret = 0;
@@ -435,25 +435,25 @@ int chainX_if_netmask(char *iface, char *netmask, int netmask_len)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(netmask == NULL)
+	if (netmask == NULL)
 	{
 		DBG_ER_LN("netmask is NULL !!!");
 		return ret;
 	}
 
 	int sockfd = chainX_udp_socket();
-	if(sockfd >= 0)
+	if (sockfd >= 0)
 	{
 		struct ifreq ifreq_info;
 		memset(&ifreq_info, 0, sizeof(struct ifreq));
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
-		if(0 == SAFE_IOCTL(sockfd, SIOCGIFNETMASK, &ifreq_info))
+		if (0 == SAFE_IOCTL(sockfd, SIOCGIFNETMASK, &ifreq_info))
 		{
 			SAFE_SNPRINTF(netmask, netmask_len, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_addr)->sin_addr));
 			ret = 0;
@@ -468,25 +468,25 @@ int chainX_if_broadcast(char *iface, char *broadcast, int broadcast_len)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(broadcast == NULL)
+	if (broadcast == NULL)
 	{
 		DBG_ER_LN("ip is NULL !!!");
 		return ret;
 	}
 
 	int sockfd = chainX_udp_socket();
-	if(sockfd >= 0)
+	if (sockfd >= 0)
 	{
 		struct ifreq ifreq_info;
 		memset(&ifreq_info, 0, sizeof(struct ifreq));
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
-		if(0 == SAFE_IOCTL(sockfd, SIOCGIFBRDADDR, &ifreq_info))
+		if (0 == SAFE_IOCTL(sockfd, SIOCGIFBRDADDR, &ifreq_info))
 		{
 			SAFE_SNPRINTF(broadcast, broadcast_len, "%s", inet_ntoa(((struct sockaddr_in *)&ifreq_info.ifr_broadaddr)->sin_addr));
 			ret = 0;
@@ -501,33 +501,33 @@ int chainX_if_gateway(char *iface, char *gateway, int gateway_len)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(gateway == NULL)
+	if (gateway == NULL)
 	{
 		DBG_ER_LN("gateway is NULL !!!");
 		return ret;
 	}
 
 	FILE *fp = SAFE_FOPEN("/proc/net/route", "r");
-	if(fp)
+	if (fp)
 	{
 		int iflags = 0;
 		unsigned long dest_addr, gate_addr;
 		char newline[LEN_OF_NEWLINE] = "";
 		SAFE_FGETS(newline, sizeof(newline), fp); // title
-		while(SAFE_FGETS(newline, sizeof(newline), fp))
+		while (SAFE_FGETS(newline, sizeof(newline), fp))
 		{
 			char iface_name[LEN_OF_VAL32] = "";
-			if((SAFE_SSCANF(newline, "%s\t%lX\t%lX\t%X", iface_name, &dest_addr, &gate_addr, &iflags) == 4)
+			if ((SAFE_SSCANF(newline, "%s\t%lX\t%lX\t%X", iface_name, &dest_addr, &gate_addr, &iflags) == 4)
 					&& (SAFE_STRCMP(iface_name, iface) == 0))
 			{
 				//if (dest_addr == 0)
-				if((iflags & (RTF_UP | RTF_GATEWAY)) == (RTF_UP | RTF_GATEWAY))
+				if ((iflags & (RTF_UP | RTF_GATEWAY)) == (RTF_UP | RTF_GATEWAY))
 				{
 					//DBG_ER_LN("(iface_name: %s, dest_addr: %d, gate_addr: %d, iflags: %d)", iface_name, dest_addr, gate_addr, iflags);
 					struct in_addr addr;
@@ -548,13 +548,13 @@ int chainX_if_hwaddr(char *iface, char *mac, int mac_len, char *split)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(mac == NULL)
+	if (mac == NULL)
 	{
 		DBG_ER_LN("mac is NULL !!!");
 		return ret;
@@ -563,18 +563,18 @@ int chainX_if_hwaddr(char *iface, char *mac, int mac_len, char *split)
 	mac[0] = '\0';
 
 	int sockfd = chainX_udp_socket();
-	if(sockfd >= 0)
+	if (sockfd >= 0)
 	{
 		struct ifreq ifreq_info;
 		memset(&ifreq_info, 0, sizeof(struct ifreq));
 		SAFE_SNPRINTF(ifreq_info.ifr_name, IF_NAMESIZE, "%s", iface);
-		if(0 == SAFE_IOCTL(sockfd, SIOCGIFHWADDR, &ifreq_info))
+		if (0 == SAFE_IOCTL(sockfd, SIOCGIFHWADDR, &ifreq_info))
 		{
 			int i = 0;
-			for(i = 0; i < 6; i++)
+			for (i = 0; i < 6; i++)
 			{
 				//mac[i] = s.ifr_addr.sa_data[i];
-				if(i!=0)
+				if (i!=0)
 				{
 					SAFE_SNPRINTF(mac+strlen(mac), mac_len-strlen(mac), "%s%02X", split,(unsigned char) ifreq_info.ifr_addr.sa_data[i]);
 				}
@@ -596,20 +596,20 @@ int chainX_if_ssid(char *iface, char *ssid, int ssid_len)
 {
 	int ret = -1;
 
-	if(iface == NULL)
+	if (iface == NULL)
 	{
 		DBG_ER_LN("iface is NULL !!!");
 		return ret;
 	}
 
-	if(ssid == NULL)
+	if (ssid == NULL)
 	{
 		DBG_ER_LN("ssid is NULL !!!");
 		return ret;
 	}
 
 	int sockfd = chainX_udp_socket();
-	if(sockfd >= 0)
+	if (sockfd >= 0)
 	{
 		char essid[IW_ESSID_MAX_SIZE];
 		memset(essid, 0, IW_ESSID_MAX_SIZE);
@@ -620,7 +620,7 @@ int chainX_if_ssid(char *iface, char *ssid, int ssid_len)
 		iwreq_info.u.essid.pointer = essid;
 		iwreq_info.u.essid.length = IW_ESSID_MAX_SIZE;
 
-		if(0 == SAFE_IOCTL(sockfd, SIOCGIWESSID, &iwreq_info))
+		if (0 == SAFE_IOCTL(sockfd, SIOCGIWESSID, &iwreq_info))
 		{
 			SAFE_SNPRINTF(ssid, ssid_len, "%s", essid);
 			ret = 0;
@@ -633,10 +633,10 @@ int chainX_if_ssid(char *iface, char *ssid, int ssid_len)
 
 int chainX_fd_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 #ifdef UTIL_EX_TTY
-		if(chainX_req->mode == CHAINX_MODE_ID_TTY)
+		if (chainX_req->mode == CHAINX_MODE_ID_TTY)
 		{
 			return chainX_req->ttyfd;
 		}
@@ -662,7 +662,7 @@ static void chainX_fdset_set(ChainX_t *chainX_req, fd_set *iset)
 
 static void chainX_fdset_setall(ChainX_t *chainX_req)
 {
-	if(chainX_fd_get(chainX_req) >=0)
+	if (chainX_fd_get(chainX_req) >=0)
 	{
 		chainX_fdset_set(chainX_req, &CHAINX_FDSET_R(chainX_req));
 		chainX_fdset_set(chainX_req, &CHAINX_FDSET_W(chainX_req));
@@ -672,7 +672,7 @@ static void chainX_fdset_setall(ChainX_t *chainX_req)
 
 static void chainX_fdset_clear(ChainX_t *chainX_req)
 {
-	if(chainX_fd_get(chainX_req) >=0)
+	if (chainX_fd_get(chainX_req) >=0)
 	{
 		CHAINX_FD_CLR_R(chainX_req);
 		CHAINX_FD_CLR_W(chainX_req);
@@ -682,7 +682,7 @@ static void chainX_fdset_clear(ChainX_t *chainX_req)
 
 int chainX_port_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->netinfo.port;
 	}
@@ -695,7 +695,7 @@ int chainX_port_get(ChainX_t *chainX_req)
 int chainX_port_set(ChainX_t *chainX_req, int port)
 {
 	int ret = 0;
-	if((chainX_req) && (port>0))
+	if ((chainX_req) && (port>0))
 	{
 		chainX_req->netinfo.port = port;
 	}
@@ -709,7 +709,7 @@ int chainX_port_set(ChainX_t *chainX_req, int port)
 
 int chainX_ip_len(ChainX_t * chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return sizeof(chainX_req->netinfo.addr.ipv4);
 	}
@@ -721,7 +721,7 @@ int chainX_ip_len(ChainX_t * chainX_req)
 
 char * chainX_ip_get(ChainX_t * chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->netinfo.addr.ipv4;
 	}
@@ -733,7 +733,7 @@ char * chainX_ip_get(ChainX_t * chainX_req)
 
 void chainX_ip_set(ChainX_t *chainX_req, char *ip)
 {
-	if((chainX_req) && (ip))
+	if ((chainX_req) && (ip))
 	{
 		SAFE_SPRINTF_EX(chainX_req->netinfo.addr.ipv4, "%s", ip);
 	}
@@ -741,7 +741,7 @@ void chainX_ip_set(ChainX_t *chainX_req, char *ip)
 
 struct sockaddr_in * chainX_addr_to_get(ChainX_t * chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return & chainX_req->addr_to;
 	}
@@ -756,12 +756,12 @@ int chainX_addr_to_set_ex(ChainX_t *chainX_req, int ai_family, char *ip_addr, in
 {
 	int ret = 0;
 	//DBG_IF_LN("(ip_addr: %s:%d)", ip_addr, port);
-	switch(ai_family)
+	switch (ai_family)
 	{
 		case AF_INET6:
 		{
 			struct in6_addr in6;
-			if(inet_pton(AF_INET6, ip_addr, &in6) != 0)
+			if (inet_pton(AF_INET6, ip_addr, &in6) != 0)
 			{
 				struct sockaddr_in6 *send_addr = (struct sockaddr_in6 *)chainX_addr_to_get(chainX_req);
 				/* set up destination address */
@@ -781,7 +781,7 @@ int chainX_addr_to_set_ex(ChainX_t *chainX_req, int ai_family, char *ip_addr, in
 		default:
 		{
 			struct in_addr in4;
-			if(inet_aton(ip_addr, &in4) != 0)
+			if (inet_aton(ip_addr, &in4) != 0)
 			{
 				struct sockaddr_in *send_addr = chainX_addr_to_get(chainX_req);
 				/* set up destination address */
@@ -810,7 +810,7 @@ int chainX_addr_to_set(ChainX_t *chainX_req, char *ipv4, int port)
 
 struct sockaddr_in * chainX_addr_from_get(ChainX_t * chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return & chainX_req->addr_frm;
 	}
@@ -823,7 +823,7 @@ struct sockaddr_in * chainX_addr_from_get(ChainX_t * chainX_req)
 
 char *chainX_hostname_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->netinfo.addr.hostname;
 	}
@@ -835,7 +835,7 @@ char *chainX_hostname_get(ChainX_t *chainX_req)
 
 void chainX_hostname_set(ChainX_t *chainX_req, char *hostname)
 {
-	if((chainX_req) && (hostname))
+	if ((chainX_req) && (hostname))
 	{
 		SAFE_SPRINTF_EX(chainX_req->netinfo.addr.hostname, "%s", hostname);
 	}
@@ -843,7 +843,7 @@ void chainX_hostname_set(ChainX_t *chainX_req, char *hostname)
 
 int chainX_reversename_len(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return sizeof(chainX_req->netinfo.reversename);
 	}
@@ -855,7 +855,7 @@ int chainX_reversename_len(ChainX_t *chainX_req)
 
 char *chainX_reversename_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->netinfo.reversename;
 	}
@@ -867,7 +867,7 @@ char *chainX_reversename_get(ChainX_t *chainX_req)
 
 void chainX_reversename_set(ChainX_t *chainX_req, char *hostname)
 {
-	if((chainX_req) && (hostname))
+	if ((chainX_req) && (hostname))
 	{
 		SAFE_SPRINTF_EX(chainX_req->netinfo.reversename, "%s", hostname);
 	}
@@ -875,7 +875,7 @@ void chainX_reversename_set(ChainX_t *chainX_req, char *hostname)
 
 int chainX_security_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->security;
 	}
@@ -887,9 +887,9 @@ int chainX_security_get(ChainX_t *chainX_req)
 
 int chainX_security_set(ChainX_t *chainX_req, int mode)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
-		switch(mode)
+		switch (mode)
 		{
 			case 1:
 				chainX_req->security= mode;
@@ -908,7 +908,7 @@ int chainX_security_set(ChainX_t *chainX_req, int mode)
 
 int chainX_recycle_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->recycle;
 	}
@@ -920,7 +920,7 @@ int chainX_recycle_get(ChainX_t *chainX_req)
 
 int chainX_recycle_dec(ChainX_t *chainX_req)
 {
-	if((chainX_req) && (chainX_req->recycle))
+	if ((chainX_req) && (chainX_req->recycle))
 	{
 		chainX_req->recycle --;
 		return chainX_req->recycle;
@@ -933,7 +933,7 @@ int chainX_recycle_dec(ChainX_t *chainX_req)
 
 int chainX_recycle_set(ChainX_t *chainX_req, int recycle)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		chainX_req->recycle= recycle;
 		return chainX_req->recycle;
@@ -946,7 +946,7 @@ int chainX_recycle_set(ChainX_t *chainX_req, int recycle)
 
 int chainX_infinite_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->infinite;
 
@@ -959,7 +959,7 @@ int chainX_infinite_get(ChainX_t *chainX_req)
 
 int chainX_infinite_set(ChainX_t *chainX_req, int infinite)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		chainX_req->infinite= infinite;
 		return chainX_req->infinite;
@@ -982,17 +982,17 @@ int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if((ret = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
+	if ((ret = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
 	{
 		DBG_ER_LN("getaddrinfo error !!! (%s)", gai_strerror(ret));
 		return ret;
 	}
 
-	for(p = res; p != NULL; p = p->ai_next)
+	for (p = res; p != NULL; p = p->ai_next)
 	{
 		void *addr;
 
-		if((p->ai_family == AF_INET) && (ipv4_addr))
+		if ((p->ai_family == AF_INET) && (ipv4_addr))
 		{
 			// IPv4
 			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
@@ -1000,13 +1000,13 @@ int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_
 			inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr));
 			SAFE_SNPRINTF(ipv4_addr, ipv4_len, "%s", ipstr);
 
-			if((ai_family==AF_UNSPEC) || (ai_family==AF_INET))
+			if ((ai_family==AF_UNSPEC) || (ai_family==AF_INET))
 			{
 				// found
 				ret = 0;
 			}
 		}
-		else if(ipv6_addr)
+		else if (ipv6_addr)
 		{
 			// IPv6
 			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
@@ -1014,7 +1014,7 @@ int chainX_nslookup_ex(char *hostname, int ai_family, char *ipv4_addr, int ipv4_
 			inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr));
 			SAFE_SNPRINTF(ipv6_addr, ipv6_len, "%s", ipstr);
 
-			if((ai_family==AF_UNSPEC) || (ai_family==AF_INET6))
+			if ((ai_family==AF_UNSPEC) || (ai_family==AF_INET6))
 			{
 				// found
 				ret = 0;
@@ -1043,7 +1043,7 @@ int chainX_nslookup(char *hostname, char *ip, int ip_len)
 	struct in_addr * *addr_list;
 	int i;
 
-	if((he = gethostbyname(hostname)) == NULL)
+	if ((he = gethostbyname(hostname)) == NULL)
 	{
 		// get the host info
 		DBG_ER_LN("gethostbyname error !!! (hostname: %s)", hostname);
@@ -1053,7 +1053,7 @@ int chainX_nslookup(char *hostname, char *ip, int ip_len)
 	addr_list = (struct in_addr * *)
 				he->h_addr_list;
 
-	for(i = 0; addr_list[i] != NULL; i++)
+	for (i = 0; addr_list[i] != NULL; i++)
 	{
 		//Return the first one;
 		strcpy(ip, (const char *) inet_ntoa(*addr_list[i]));
@@ -1077,13 +1077,13 @@ int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len)
 	temp_addr.sin_addr.s_addr = inet_addr(ip_addr);
 	len = sizeof(struct sockaddr_in);
 
-	if(getnameinfo((struct sockaddr *) &temp_addr, len, buf, sizeof(buf), NULL, 0, NI_NAMEREQD))
+	if (getnameinfo((struct sockaddr *) &temp_addr, len, buf, sizeof(buf), NULL, 0, NI_NAMEREQD))
 	{
 		DBG_ER_LN("getnameinfo error !!!");
 		return ret;
 	}
 
-	if(hostname)
+	if (hostname)
 	{
 		SAFE_SNPRINTF(hostname, hostname_len, "%s", buf);
 		ret = 0;
@@ -1094,10 +1094,10 @@ int chainX_nslookup_reverse(char *ip_addr, char *hostname, int hostname_len)
 static int chainX_status_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
-		if(0 == threadx_lock(tidx_req))
+		if (0 == threadx_lock(tidx_req))
 		{
 			ret = chainX_req->status;
 			threadx_unlock(tidx_req);
@@ -1108,10 +1108,10 @@ static int chainX_status_check(ChainX_t *chainX_req)
 
 static void chainX_status_set(ChainX_t *chainX_req, int status)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
-		if(0 == threadx_lock(tidx_req))
+		if (0 == threadx_lock(tidx_req))
 		{
 			chainX_req->status= status;
 			threadx_unlock(tidx_req);
@@ -1122,7 +1122,7 @@ static void chainX_status_set(ChainX_t *chainX_req, int status)
 int chainX_quit_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
 		ret = threadx_isquit(tidx_req);
@@ -1132,7 +1132,7 @@ int chainX_quit_check(ChainX_t *chainX_req)
 
 void chainX_quit_set(ChainX_t *chainX_req, int is_quit)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
 		threadx_set_quit(tidx_req, is_quit);
@@ -1142,12 +1142,12 @@ void chainX_quit_set(ChainX_t *chainX_req, int is_quit)
 int chainX_linked_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
-		if(0 == threadx_lock(tidx_req))
+		if (0 == threadx_lock(tidx_req))
 		{
-			if((chainX_status_check(chainX_req)) && (chainX_fd_get(chainX_req)>=0))
+			if ((chainX_status_check(chainX_req)) && (chainX_fd_get(chainX_req)>=0))
 			{
 				ret = 0;
 			}
@@ -1164,7 +1164,7 @@ int chainX_linked_check(ChainX_t *chainX_req)
 
 void chainX_wakeup_simple(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
 		threadx_wakeup_simple(tidx_req);
@@ -1175,7 +1175,7 @@ int chainX_timewait_simple(ChainX_t *chainX_req, int ms)
 {
 	int ret = EINVAL;
 
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ThreadX_t *tidx_req = &chainX_req->tidx;
 		ret = threadx_timewait_simple(tidx_req, ms);
@@ -1186,9 +1186,9 @@ int chainX_timewait_simple(ChainX_t *chainX_req, int ms)
 
 static void chainX_retry_wait(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
-		if(chainX_req->retry_hold>0)
+		if (chainX_req->retry_hold>0)
 		{
 			chainX_timewait_simple(chainX_req, chainX_req->retry_hold*1000);
 		}
@@ -1203,11 +1203,11 @@ static int chainX_socket_error(ChainX_t *chainX_req)
 {
 	int so_error = -1;
 	socklen_t err_len = sizeof(so_error);
-	if(SAFE_SGETOPT(chainX_fd_get(chainX_req), SOL_SOCKET, SO_ERROR, &so_error, &err_len) < 0)
+	if (SAFE_SGETOPT(chainX_fd_get(chainX_req), SOL_SOCKET, SO_ERROR, &so_error, &err_len) < 0)
 	{
 		DBG_ER_LN("getsockopt error !!! (errno: %d %s)", errno, strerror(errno));
 	}
-	else if(so_error==0)
+	else if (so_error==0)
 	{
 		// nothing
 	}
@@ -1224,7 +1224,7 @@ static int chainX_socket_error(ChainX_t *chainX_req)
 static int chainX_socket_select(ChainX_t *chainX_req, int timeout, int rw)
 {
 	int ret = -1;
-	if(chainX_req)
+	if (chainX_req)
 	{
 		chainX_fdset_clear(chainX_req);
 		chainX_fdset_setall(chainX_req);
@@ -1234,9 +1234,9 @@ static int chainX_socket_select(ChainX_t *chainX_req, int timeout, int rw)
 		struct timeval tv;
 		tv.tv_sec = timeout;             /* 10 second timeout */
 		tv.tv_usec = 0;
-		if(chainX_security_get(chainX_req)==1)
+		if (chainX_security_get(chainX_req)==1)
 		{
-			if(rw==1)
+			if (rw==1)
 			{
 				result = SAFE_SELECT(chainX_fd_get(chainX_req) + 1, NULL, &CHAINX_FDSET_W(chainX_req), NULL, &tv);
 			}
@@ -1250,18 +1250,18 @@ static int chainX_socket_select(ChainX_t *chainX_req, int timeout, int rw)
 			result = SAFE_SELECT(chainX_fd_get(chainX_req) + 1, &CHAINX_FDSET_R(chainX_req), &CHAINX_FDSET_W(chainX_req), NULL, &tv);
 		}
 
-		if(result  == -1)
+		if (result  == -1)
 		{
 			DBG_ER_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 		}
-		else if(result  == 0)
+		else if (result  == 0)
 		{
 			//DBG_ER_LN("select tomeout !!! (result: %d)", result);
 			ret = 1;
 		}
-		else if(result > 0)
+		else if (result > 0)
 		{
-			if(CHAINX_FD_ISSET_R(chainX_req) || CHAINX_FD_ISSET_W(chainX_req))
+			if (CHAINX_FD_ISSET_R(chainX_req) || CHAINX_FD_ISSET_W(chainX_req))
 			{
 				ret = chainX_socket_error(chainX_req);
 			}
@@ -1282,7 +1282,7 @@ static int chainX_RW_select(ChainX_t *chainX_req)
 
 	errno = 0;
 
-	if(chainX_req->select_wait < MIN_TIMEOUT_OF_SELECT)
+	if (chainX_req->select_wait < MIN_TIMEOUT_OF_SELECT)
 	{
 		struct timeval tv;
 		tv.tv_sec = MIN_TIMEOUT_OF_SELECT;
@@ -1304,7 +1304,7 @@ static int chainX_RW_select(ChainX_t *chainX_req)
 #ifdef UTIL_EX_SOCKET_CERT_FILE
 void chainXssl_certificate_file(ChainX_t *chainX_req, char *filename)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		SAFE_SPRINTF_EX(chainX_req->certificate_file, "%s", filename);
 	}
@@ -1312,7 +1312,7 @@ void chainXssl_certificate_file(ChainX_t *chainX_req, char *filename)
 
 void chainXssl_privatekey_file(ChainX_t *chainX_req, char *filename)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		SAFE_SPRINTF_EX(chainX_req->privatekey_file, "%s", filename);
 	}
@@ -1320,7 +1320,7 @@ void chainXssl_privatekey_file(ChainX_t *chainX_req, char *filename)
 
 void chainXssl_ca_file(ChainX_t *chainX_req, char *filename)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		SAFE_SPRINTF_EX(chainX_req->ca_file, "%s", filename);
 	}
@@ -1340,7 +1340,7 @@ static void chainXssl_init(ChainX_t *chainX_req)
 
 SSL *chainXssl_sslfd_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return chainX_req->cSSL;
 	}
@@ -1356,7 +1356,7 @@ int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t le
 	BIO *bio = NULL;
 	X509 *cert = NULL;
 
-	if((bio = BIO_new_mem_buf((char *)buff, -1)) &&
+	if ((bio = BIO_new_mem_buf((char *)buff, -1)) &&
 			(cert = PEM_read_bio_X509(bio, NULL, 0, NULL)) &&
 			(SSL_CTX_use_certificate(ctxSSL, cert) != 1))
 	{
@@ -1365,11 +1365,11 @@ int chainXssl_cert_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t le
 		ret = -1;
 	}
 
-	if(bio)
+	if (bio)
 	{
 		BIO_free(bio);
 	}
-	if(cert)
+	if (cert)
 	{
 		X509_free(cert);
 	}
@@ -1384,7 +1384,7 @@ int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len
 	BIO *kbio = NULL;
 	EVP_PKEY *pkey = NULL;
 
-	if((kbio = BIO_new_mem_buf((char *)buff, -1)) &&
+	if ((kbio = BIO_new_mem_buf((char *)buff, -1)) &&
 			(pkey = PEM_read_bio_PrivateKey(kbio, NULL, 0, NULL)) &&
 			(SSL_CTX_use_PrivateKey(ctxSSL, pkey) != 1))
 	{
@@ -1393,11 +1393,11 @@ int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len
 		ret = -1;
 	}
 
-	if(kbio)
+	if (kbio)
 	{
 		BIO_free(kbio);
 	}
-	if(pkey)
+	if (pkey)
 	{
 		EVP_PKEY_free(pkey);
 	}
@@ -1407,7 +1407,7 @@ int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len
 	BIO *kbio = NULL;
 	RSA *rsa = NULL;
 
-	if((kbio = BIO_new_mem_buf((char *)buff, -1)) &&
+	if ((kbio = BIO_new_mem_buf((char *)buff, -1)) &&
 			(rsa = PEM_read_bio_RSAPrivateKey(kbio, NULL, 0, NULL)) &&
 			(SSL_CTX_use_RSAPrivateKey(ctxSSL, rsa) != 1))
 	{
@@ -1416,11 +1416,11 @@ int chainXssl_key_readbuf(SSL_CTX *ctxSSL, const unsigned char *buff, size_t len
 		ret = -1;
 	}
 
-	if(kbio)
+	if (kbio)
 	{
 		BIO_free(kbio);
 	}
-	if(rsa)
+	if (rsa)
 	{
 		RSA_free(rsa);
 	}
@@ -1437,15 +1437,15 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 	BIO *ca_bio = NULL;
 #endif
 
-	if((chainX_req) && (chainX_req->ctxSSL))
+	if ((chainX_req) && (chainX_req->ctxSSL))
 	{
 		/* Load the client certificate into the SSL_CTX structure */
 #ifdef UTIL_EX_SOCKET_CERT_TXT
 		DBG_TR_LN("call SSL_CTX_use_certificate ... ");
-		if(chainXssl_cert_readbuf(chainX_req->ctxSSL, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0)
+		if (chainXssl_cert_readbuf(chainX_req->ctxSSL, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0)
 #else
 		DBG_TR_LN("call SSL_CTX_use_certificate_file ... (%s)", chainX_req->certificate_file);
-		if(SSL_CTX_use_certificate_file(chainX_req->ctxSSL, chainX_req->certificate_file,  SSL_FILETYPE_PEM) <= 0)
+		if (SSL_CTX_use_certificate_file(chainX_req->ctxSSL, chainX_req->certificate_file,  SSL_FILETYPE_PEM) <= 0)
 #endif
 		{
 			SOCKET_SSL_DEBUG(stderr);
@@ -1456,10 +1456,10 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 		/* Load the private-key corresponding to the client certificate */
 #ifdef UTIL_EX_SOCKET_CERT_TXT
 		DBG_TR_LN("call SSL_CTX_use_PrivateKey ...");
-		if(chainXssl_key_readbuf(chainX_req->ctxSSL, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size) != 0)
+		if (chainXssl_key_readbuf(chainX_req->ctxSSL, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size) != 0)
 #else
 		DBG_TR_LN("call SSL_CTX_use_PrivateKey_file ... (%s)", chainX_req->privatekey_file);
-		if(SSL_CTX_use_PrivateKey_file(chainX_req->ctxSSL, chainX_req->privatekey_file, SSL_FILETYPE_PEM) <= 0)
+		if (SSL_CTX_use_PrivateKey_file(chainX_req->ctxSSL, chainX_req->privatekey_file, SSL_FILETYPE_PEM) <= 0)
 #endif
 		{
 			SOCKET_SSL_DEBUG(stderr);
@@ -1469,7 +1469,7 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 
 		DBG_TR_LN("call SSL_CTX_check_private_key ...");
 		/* Check if the client certificate and private-key matches */
-		if(!SSL_CTX_check_private_key(chainX_req->ctxSSL))
+		if (!SSL_CTX_check_private_key(chainX_req->ctxSSL))
 		{
 			DBG_ER_LN("SSL_CTX_check_private_key error !!!");
 			goto CERT_EXIT;
@@ -1478,16 +1478,16 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 		/* Load the RSA CA certificate into the SSL_CTX structure */
 		/* This will allow this client to verify the server's     */
 		/* certificate.                                           */
-		if(chainX_req->ca_txt_size > 28)
+		if (chainX_req->ca_txt_size > 28)
 		{
 #ifdef UTIL_EX_SOCKET_CERT_TXT
 			X509_STORE *store = SSL_CTX_get_cert_store(chainX_req->ctxSSL);
-			if((ca_bio = BIO_new_mem_buf((char *)chainX_req->ca_txt, -1)) &&
+			if ((ca_bio = BIO_new_mem_buf((char *)chainX_req->ca_txt, -1)) &&
 					(ca_cert = PEM_read_bio_X509(ca_bio, NULL, 0, NULL)) &&
 					(X509_STORE_add_cert(store, ca_cert) != 1))
 #else
 			DBG_TR_LN("call SSL_CTX_load_verify_locations ... (%s)", chainX_req->ca_file);
-			if(!SSL_CTX_load_verify_locations(chainX_req->ctxSSL, chainX_req->ca_file, NULL))
+			if (!SSL_CTX_load_verify_locations(chainX_req->ctxSSL, chainX_req->ca_file, NULL))
 #endif
 			{
 				SOCKET_SSL_DEBUG(stderr);
@@ -1509,11 +1509,11 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 
 CERT_EXIT:
 #ifdef UTIL_EX_SOCKET_CERT_TXT
-	if(ca_bio)
+	if (ca_bio)
 	{
 		BIO_free(ca_bio);
 	}
-	if(ca_cert)
+	if (ca_cert)
 	{
 		X509_free(ca_cert);
 	}
@@ -1527,7 +1527,7 @@ static int chainXssl_create(ChainX_t *chainX_req)
 	DBG_TR_LN("enter");
 
 	int ret = -1;
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return ret;
@@ -1540,7 +1540,7 @@ static int chainXssl_create(ChainX_t *chainX_req)
 	//const SSL_METHOD* method = TLS_client_method();
 
 	chainX_req->ctxSSL = SSL_CTX_new(method);
-	if(chainX_req->ctxSSL == NULL)
+	if (chainX_req->ctxSSL == NULL)
 	{
 		DBG_ER_LN("ctxSSL is NULL !!!");
 		return ret;
@@ -1557,7 +1557,7 @@ static int chainXssl_certs_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return -1;
@@ -1568,19 +1568,19 @@ static int chainXssl_certs_check(ChainX_t *chainX_req)
 	DBG_IF_LN("(SSL_get_cipher : %s)", SSL_get_cipher(chainX_req->cSSL));
 	/* Get the server's certificate (optional) */
 	X509 *server_cert = SSL_get_peer_certificate(chainX_req->cSSL);
-	if(server_cert != NULL)
+	if (server_cert != NULL)
 	{
 		char *line= NULL;
 
 		line = X509_NAME_oneline(X509_get_subject_name(server_cert),0,0);
-		if(line)
+		if (line)
 		{
 			DBG_IF_LN("Server certificate - subject (%s)", line);
 			SAFE_FREE(line);
 		}
 
 		line = X509_NAME_oneline(X509_get_issuer_name(server_cert),0,0);
-		if(line)
+		if (line)
 		{
 			DBG_IF_LN("Server certificate - issuer (%s)", line);
 			SAFE_FREE(line);
@@ -1602,7 +1602,7 @@ static int chainXssl_certs_check(ChainX_t *chainX_req)
 static int chainXssl_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ret = chainXssl_certs_check(chainX_req);
 	}
@@ -1615,20 +1615,20 @@ int chainXssl_link(ChainX_t *chainX_req)
 	int retry = RETRY_OF_SSL;
 	//DBG_TR_LN("enter");
 
-	if((chainX_req) && (chainXssl_create(chainX_req) != 0))
+	if ((chainX_req) && (chainXssl_create(chainX_req) != 0))
 	{
 		DBG_ER_LN("SSL_setup error !!!");
 		return ret;
 	}
 
-	if(chainX_req->cSSL)
+	if (chainX_req->cSSL)
 	{
 		SSL_free(chainX_req->cSSL);
 		chainX_req->cSSL = NULL;
 	}
 
 	chainX_req->cSSL = SSL_new(chainX_req->ctxSSL);
-	if(chainX_req->cSSL==NULL)
+	if (chainX_req->cSSL==NULL)
 	{
 		DBG_ER_LN("cSSL is NULL !!!");
 		return ret;
@@ -1639,10 +1639,10 @@ int chainXssl_link(ChainX_t *chainX_req)
 do_handshake:
 	retry --;
 	DBG_TR_LN("call SSL_connect ...");
-	if(chainX_req->cSSL)
+	if (chainX_req->cSSL)
 	{
 		int handshake = SSL_connect(chainX_req->cSSL);
-		switch(handshake)
+		switch (handshake)
 		{
 			case 1:
 				DBG_TR_LN("SSL_connect ok !!!");
@@ -1651,13 +1651,13 @@ do_handshake:
 			default:
 			{
 				int err = SSL_get_error(chainX_req->cSSL, ret);
-				switch(err)
+				switch (err)
 				{
 					// 2
 					case SSL_ERROR_WANT_READ:
 					{
 						int sel = chainX_socket_select(chainX_req, TIMEOUT_OF_SSL, 0);
-						if((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
+						if ((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
 						{
 							DBG_TR_LN("retry ... (handshake: %d, err: %d SSL_ERROR_WANT_READ, sel: %d, retry: %d)", handshake, err, sel, retry);
 							goto do_handshake;
@@ -1673,7 +1673,7 @@ do_handshake:
 					case SSL_ERROR_WANT_WRITE:
 					{
 						int sel = chainX_socket_select(chainX_req, TIMEOUT_OF_SSL, 1);
-						if((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
+						if ((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
 						{
 							DBG_TR_LN("retry ... (handshake: %d, err: %d SSL_ERROR_WANT_WRITE, sel: %d, retry: %d)", handshake, err, sel, retry);
 							goto do_handshake;
@@ -1699,7 +1699,7 @@ do_handshake:
 		}
 	}
 
-	if(ret==0)
+	if (ret==0)
 	{
 		ret = chainXssl_check(chainX_req);
 	}
@@ -1723,15 +1723,15 @@ static int chainXssl_myrand(void *rng_state, unsigned char *output, size_t len)
 	size_t use_len;
 	int rnd;
 
-	if(rng_state != NULL)
+	if (rng_state != NULL)
 	{
 		rng_state  = NULL;
 	}
 
-	while(len > 0)
+	while (len > 0)
 	{
 		use_len = len;
-		if(use_len > sizeof(int))
+		if (use_len > sizeof(int))
 		{
 			use_len = sizeof(int);
 		}
@@ -1742,7 +1742,7 @@ static int chainXssl_myrand(void *rng_state, unsigned char *output, size_t len)
 		len -= use_len;
 	}
 
-	return(0);
+	return (0);
 }
 
 static void chainXssl_init(ChainX_t *chainX_req)
@@ -1766,7 +1766,7 @@ static void chainXssl_init(ChainX_t *chainX_req)
 
 mbedtls_ssl_context *chainXssl_sslfd_get(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		return & chainX_req->ssl;
 	}
@@ -1779,19 +1779,19 @@ mbedtls_ssl_context *chainXssl_sslfd_get(ChainX_t *chainX_req)
 static int chainXssl_cert(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if(mbedtls_x509_crt_parse(&chainX_req->clicert, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0)
+	if (mbedtls_x509_crt_parse(&chainX_req->clicert, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0)
 	{
 		DBG_ER_LN("mbedtls_x509_crt_parse error !!! (clicert)");
 		return ret;
 	}
 
-	if(mbedtls_pk_parse_key(&chainX_req->pkey, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size, NULL, 0) != 0)
+	if (mbedtls_pk_parse_key(&chainX_req->pkey, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size, NULL, 0) != 0)
 	{
 		DBG_ER_LN("mbedtls_pk_parse_key error !!!");
 		return ret;
 	}
 
-	if(mbedtls_x509_crt_parse(&chainX_req->cacert, chainX_req->ca_txt, chainX_req->ca_txt_size) < 0)
+	if (mbedtls_x509_crt_parse(&chainX_req->cacert, chainX_req->ca_txt, chainX_req->ca_txt_size) < 0)
 	{
 		DBG_ER_LN("mbedtls_x509_crt_parse error !!! (cacert)");
 		return ret;
@@ -1806,31 +1806,31 @@ static int chainXssl_create(ChainX_t *chainX_req)
 	DBG_TR_LN("enter");
 
 	int ret = -1;
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return ret;
 	}
 
-	if((chainX_req->seed) &&
+	if ((chainX_req->seed) &&
 			((mbedtls_ctr_drbg_seed(&chainX_req->ctr_drbg, mbedtls_entropy_func, &chainX_req->entropy, (const unsigned char *) chainX_req->seed, strlen(chainX_req->seed))) != 0)
-	  )
+	   )
 	{
 		DBG_ER_LN("mbedtls_ctr_drbg_seed error !!!");
 		return ret;
 	}
-	else if(mbedtls_ctr_drbg_seed(&chainX_req->ctr_drbg, chainXssl_myrand, NULL, NULL, 0) != 0)
+	else if (mbedtls_ctr_drbg_seed(&chainX_req->ctr_drbg, chainXssl_myrand, NULL, NULL, 0) != 0)
 	{
 		DBG_ER_LN("mbedtls_ctr_drbg_seed error !!!");
 		return ret;
 	}
 
-	if(chainXssl_cert(chainX_req) != 0)
+	if (chainXssl_cert(chainX_req) != 0)
 	{
 		return ret;
 	}
 
-	if(mbedtls_ssl_config_defaults(&chainX_req->conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT) != 0)
+	if (mbedtls_ssl_config_defaults(&chainX_req->conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT) != 0)
 	{
 		DBG_ER_LN("mbedtls_ssl_config_defaults error !!!");
 		return ret;
@@ -1842,19 +1842,19 @@ static int chainXssl_create(ChainX_t *chainX_req)
 	mbedtls_ssl_conf_ca_chain(&chainX_req->conf, &chainX_req->cacert, NULL);
 	mbedtls_ssl_conf_rng(&chainX_req->conf, mbedtls_ctr_drbg_random, &chainX_req->ctr_drbg);
 
-	if(mbedtls_ssl_conf_own_cert(&chainX_req->conf, &chainX_req->clicert, &chainX_req->pkey) != 0)
+	if (mbedtls_ssl_conf_own_cert(&chainX_req->conf, &chainX_req->clicert, &chainX_req->pkey) != 0)
 	{
 		DBG_ER_LN("mbedtls_ssl_conf_own_cert error !!!");
 		return ret;
 	}
 
-	if(mbedtls_ssl_setup(&chainX_req->ssl, &chainX_req->conf) != 0)
+	if (mbedtls_ssl_setup(&chainX_req->ssl, &chainX_req->conf) != 0)
 	{
 		DBG_ER_LN("mbedtls_ssl_setup error !!!");
 		return ret;
 	}
 
-	if(mbedtls_ssl_set_hostname(&chainX_req->ssl, chainX_req->netinfo.addr.hostname) != 0)
+	if (mbedtls_ssl_set_hostname(&chainX_req->ssl, chainX_req->netinfo.addr.hostname) != 0)
 	{
 		DBG_ER_LN(" mbedtls_ssl_set_hostname error !!!");
 		return ret;
@@ -1869,7 +1869,7 @@ static int chainXssl_certs_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return -1;
@@ -1877,7 +1877,7 @@ static int chainXssl_certs_check(ChainX_t *chainX_req)
 
 	DBG_IF_LN("(SSL_get_cipher : %s)", mbedtls_ssl_get_ciphersuite(&chainX_req->ssl));
 	unsigned long flags;
-	if((flags = mbedtls_ssl_get_verify_result(&chainX_req->ssl)) != 0)
+	if ((flags = mbedtls_ssl_get_verify_result(&chainX_req->ssl)) != 0)
 	{
 		char vrfy_buf[512];
 
@@ -1904,7 +1904,7 @@ static int chainXssl_certs_check(ChainX_t *chainX_req)
 static int chainXssl_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if(chainX_req)
+	if (chainX_req)
 	{
 		ret = chainXssl_certs_check(chainX_req);
 	}
@@ -1917,7 +1917,7 @@ int chainXssl_link(ChainX_t *chainX_req)
 	int retry = RETRY_OF_SSL;
 	//DBG_TR_LN("enter");
 
-	if((chainX_req) && (chainXssl_create(chainX_req) != 0))
+	if ((chainX_req) && (chainXssl_create(chainX_req) != 0))
 	{
 		DBG_ER_LN("SSL_setup error !!!");
 		return ret;
@@ -1932,7 +1932,7 @@ do_handshake:
 	DBG_TR_LN("call SSL_connect ...");
 	FREE_HEAP_INFO;
 	int handshake = mbedtls_ssl_handshake(&chainX_req->ssl);
-	switch(handshake)
+	switch (handshake)
 	{
 		case 0:
 			DBG_TR_LN("SSL_connect ok !!!");
@@ -1942,7 +1942,7 @@ do_handshake:
 		case MBEDTLS_ERR_SSL_WANT_READ:
 		{
 			int sel = chainX_socket_select(chainX_req, TIMEOUT_OF_SSL, 0);
-			if((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
+			if ((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
 			{
 				DBG_TR_LN("retry ... (handshake: %d MBEDTLS_ERR_SSL_WANT_READ, sel: %d, retry: %d)", handshake, sel, retry);
 				goto do_handshake;
@@ -1958,7 +1958,7 @@ do_handshake:
 		case MBEDTLS_ERR_SSL_WANT_WRITE:
 		{
 			int sel = chainX_socket_select(chainX_req, TIMEOUT_OF_SSL, 1);
-			if((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
+			if ((sel>=0) && (chainX_quit_check(chainX_req)==0) && (retry>=0))
 			{
 				DBG_TR_LN("retry ... (handshake: %d MBEDTLS_ERR_SSL_WANT_WRITE, sel: %d, retry: %d)", handshake, sel, retry);
 				goto do_handshake;
@@ -1971,7 +1971,7 @@ do_handshake:
 		}
 		break;
 		// -0x4300-0x0010
-		case(MBEDTLS_ERR_RSA_PRIVATE_FAILED + MBEDTLS_ERR_MPI_ALLOC_FAILED):
+		case (MBEDTLS_ERR_RSA_PRIVATE_FAILED + MBEDTLS_ERR_MPI_ALLOC_FAILED):
 		default:
 			DBG_ER_LN("SSL_connect error !!! (handshake: 0x%04x, retry: %d)", (-handshake), retry);
 			ret = -1;
@@ -1979,7 +1979,7 @@ do_handshake:
 	}
 	FREE_HEAP_INFO;
 
-	if(ret==0)
+	if (ret==0)
 	{
 		ret = chainXssl_check(chainX_req);
 	}
@@ -2008,11 +2008,11 @@ int chainXssl_link(ChainX_t *chainX_req)
 
 static void chainXssl_close(ChainX_t *chainX_req)
 {
-	if((chainX_req) && (chainX_security_get(chainX_req) == 1))
+	if ((chainX_req) && (chainX_security_get(chainX_req) == 1))
 	{
 		//DBG_TR_LN("enter");
 #ifdef UTIL_EX_SOCKET_OPENSSL
-		if(chainX_req->cSSL)
+		if (chainX_req->cSSL)
 		{
 			DBG_TR_LN("call SSL_shutdown ...");
 			SSL_shutdown(chainX_req->cSSL);
@@ -2020,13 +2020,13 @@ static void chainXssl_close(ChainX_t *chainX_req)
 			chainX_req->cSSL = NULL;
 		}
 
-		if(chainX_req->ctxSSL)
+		if (chainX_req->ctxSSL)
 		{
 			SSL_CTX_free(chainX_req->ctxSSL);
 			chainX_req->ctxSSL  = NULL;
 		}
 #elif defined (UTIL_EX_SOCKET_MBEDTLS)
-		if(chainX_req->server_fd.fd >=0)
+		if (chainX_req->server_fd.fd >=0)
 		{
 			mbedtls_net_free(&chainX_req->server_fd);
 			mbedtls_x509_crt_free(&chainX_req->cacert);
@@ -2045,19 +2045,19 @@ static void chainXssl_close(ChainX_t *chainX_req)
 
 void chainX_close(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		//DBG_TR_LN("enter");
-		if(0 == threadx_lock(&chainX_req->tidx))
+		if (0 == threadx_lock(&chainX_req->tidx))
 		{
 			chainXssl_close(chainX_req);
 
-			if(chainX_fd_get(chainX_req) >=0)
+			if (chainX_fd_get(chainX_req) >=0)
 			{
 				chainX_status_set(chainX_req, 0);
 
 #ifdef UTIL_EX_TTY
-				if(chainX_req->mode == CHAINX_MODE_ID_TTY)
+				if (chainX_req->mode == CHAINX_MODE_ID_TTY)
 				{
 					SAFE_SCLOSE(chainX_req->ttyfd);
 				}
@@ -2077,7 +2077,7 @@ static int chainX_netlink_bind(ChainX_t *chainX_req, int multi)
 {
 	int ret = -1;
 
-	if(chainX_fd_get(chainX_req)>=0)
+	if (chainX_fd_get(chainX_req)>=0)
 	{
 		//chainX_fcntl_socket(chainX_req);
 
@@ -2091,7 +2091,7 @@ static int chainX_netlink_bind(ChainX_t *chainX_req, int multi)
 
 		ret = 0;
 		/* bind to receive address */
-		if(SAFE_BIND(chainX_fd_get(chainX_req), (struct sockaddr *)&local_addr, sizeof(local_addr)) < 0)
+		if (SAFE_BIND(chainX_fd_get(chainX_req), (struct sockaddr *)&local_addr, sizeof(local_addr)) < 0)
 		{
 			DBG_ER_LN("bind error !!!");
 			ret = -1;
@@ -2099,7 +2099,7 @@ static int chainX_netlink_bind(ChainX_t *chainX_req, int multi)
 
 		//netlink_recv( chainX_fd_get(chainX_req) );
 
-		if(ret != 0)
+		if (ret != 0)
 		{
 			chainX_close(chainX_req);
 		}
@@ -2120,7 +2120,7 @@ static int chainX_udp_bind(ChainX_t *chainX_req, int multi)
 {
 	int ret = -1;
 
-	if(chainX_fd_get(chainX_req)>=0)
+	if (chainX_fd_get(chainX_req)>=0)
 	{
 		chainX_fcntl_socket(chainX_req);
 
@@ -2134,13 +2134,13 @@ static int chainX_udp_bind(ChainX_t *chainX_req, int multi)
 		DBG_IF_LN("bind ... (%s:%u)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
 
 		/* bind to receive address */
-		if(SAFE_BIND(chainX_fd_get(chainX_req), (struct sockaddr *)&local_addr, sizeof(local_addr)) < 0)
+		if (SAFE_BIND(chainX_fd_get(chainX_req), (struct sockaddr *)&local_addr, sizeof(local_addr)) < 0)
 		{
 			DBG_ER_LN("bind error !!!");
 			ret = -1;
 		}
 
-		if(multi)
+		if (multi)
 		{
 			struct ip_mreq seMember;
 
@@ -2148,7 +2148,7 @@ static int chainX_udp_bind(ChainX_t *chainX_req, int multi)
 			SAFE_MEMSET((unsigned char *)&seMember, 0x00, sizeof(seMember));
 			seMember.imr_multiaddr.s_addr = inet_addr(chainX_req->netinfo.addr.ipv4);
 			seMember.imr_interface.s_addr = htonl(INADDR_ANY);
-			if(SAFE_SSETOPT(chainX_fd_get(chainX_req), IPPROTO_IP, IP_ADD_MEMBERSHIP, &seMember, sizeof(seMember)) < 0)
+			if (SAFE_SSETOPT(chainX_fd_get(chainX_req), IPPROTO_IP, IP_ADD_MEMBERSHIP, &seMember, sizeof(seMember)) < 0)
 			{
 				DBG_ER_LN("SAFE_SSETOPT IP_ADD_MEMBERSHIP error !!!");
 				ret = -1;
@@ -2165,7 +2165,7 @@ static int chainX_udp_bind(ChainX_t *chainX_req, int multi)
 			ret = 0;
 		}
 
-		if(ret != 0)
+		if (ret != 0)
 		{
 			chainX_close(chainX_req);
 		}
@@ -2178,14 +2178,14 @@ static int chainX_tcp_connect(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
-	if(chainX_fd_get(chainX_req)>=0)
+	if (chainX_fd_get(chainX_req)>=0)
 	{
 		chainX_fcntl_socket(chainX_req);
 
 #ifdef UTIL_EX_SOCKET_BIND_DEV
 		{
 			char bind_dev[] = "ra0";//"eth2.2";
-			if(SAFE_SSETOPT(chainX_fd_get(chainX_req), SOL_SOCKET, SO_BINDTODEVICE, bind_dev, strlen(bind_dev)+1))
+			if (SAFE_SSETOPT(chainX_fd_get(chainX_req), SOL_SOCKET, SO_BINDTODEVICE, bind_dev, strlen(bind_dev)+1))
 			{
 				DBG_ER_LN("SAFE_SSETOPT SO_BINDTODEVICE error !!! (errno: %d %s)", errno, strerror(errno));
 			}
@@ -2205,9 +2205,9 @@ static int chainX_tcp_connect(ChainX_t *chainX_req)
 		errno = 0;
 		int result = SAFE_CONNECT(chainX_fd_get(chainX_req), (struct sockaddr *)&address, sizeof(struct sockaddr));
 		//DBG_ER_LN("after connect (result: %d, errno: %d %s)", result, errno, strerror(errno));
-		if(result==0)
+		if (result==0)
 		{
-			if(chainX_security_get(chainX_req) == 1)
+			if (chainX_security_get(chainX_req) == 1)
 			{
 			}
 			else
@@ -2216,9 +2216,9 @@ static int chainX_tcp_connect(ChainX_t *chainX_req)
 			}
 			ret = 0;
 		}
-		else if(errno == EINPROGRESS)
+		else if (errno == EINPROGRESS)
 		{
-			if(chainX_security_get(chainX_req) == 1)
+			if (chainX_security_get(chainX_req) == 1)
 			{
 				// wait for SSL_connect
 				ret = 0;
@@ -2226,7 +2226,7 @@ static int chainX_tcp_connect(ChainX_t *chainX_req)
 			else
 			{
 				int sel = chainX_socket_select(chainX_req, TIMEOUT_OF_SOCKET, 0);
-				if(sel==0)
+				if (sel==0)
 				{
 					chainX_status_set(chainX_req, 1);
 					ret = 0;
@@ -2238,7 +2238,7 @@ static int chainX_tcp_connect(ChainX_t *chainX_req)
 			DBG_ER_LN("connect error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 		}
 
-		if(ret != 0)
+		if (ret != 0)
 		{
 			chainX_close(chainX_req);
 		}
@@ -2284,7 +2284,7 @@ char *chainX_tty_getname(ChainX_t *chainX_req)
 
 void chainX_tty_setname(ChainX_t *chainX_req, char *ttyname)
 {
-	if((chainX_req) && (ttyname))
+	if ((chainX_req) && (ttyname))
 	{
 		SAFE_SPRINTF_EX(chainX_req->ttyinfo.ttyname, "%s", ttyname);
 	}
@@ -2294,11 +2294,11 @@ void chainX_tty_setbaudrate(ChainX_t *chainX_req, int baudrate)
 {
 	int idx = 0;
 
-	if((chainX_req))
+	if ((chainX_req))
 	{
-		for(idx= 0; idx < sizeof(name_arr) / sizeof(int);	idx++)
+		for (idx= 0; idx < sizeof(name_arr) / sizeof(int);	idx++)
 		{
-			if(baudrate == name_arr[idx])
+			if (baudrate == name_arr[idx])
 			{
 				chainX_req->ttyinfo.speed = baudrate;
 				return;
@@ -2309,7 +2309,7 @@ void chainX_tty_setbaudrate(ChainX_t *chainX_req, int baudrate)
 
 void chainX_tty_setparity(ChainX_t *chainX_req, char parity)
 {
-	if((chainX_req))
+	if ((chainX_req))
 	{
 		chainX_req->ttyinfo.parity = parity;
 	}
@@ -2317,7 +2317,7 @@ void chainX_tty_setparity(ChainX_t *chainX_req, char parity)
 
 void chainX_tty_setdatabits(ChainX_t *chainX_req, char databits)
 {
-	if((chainX_req))
+	if ((chainX_req))
 	{
 		chainX_req->ttyinfo.databits = databits;
 	}
@@ -2326,7 +2326,7 @@ void chainX_tty_setdatabits(ChainX_t *chainX_req, char databits)
 static int chainX_tty_check(ChainX_t *chainX_req)
 {
 	int ret = 0;
-	if(strlen(chainX_tty_getname(chainX_req)) > 0)
+	if (strlen(chainX_tty_getname(chainX_req)) > 0)
 	{
 	}
 	else
@@ -2342,7 +2342,7 @@ static int chainX_tty_parity(ChainX_t *chainX_req)
 	int ret = -1;
 
 	chainX_req->ttyinfo.options.c_cflag &= ~CSIZE;
-	switch(chainX_req->ttyinfo.databits)  /*設置數據位元數 */
+	switch (chainX_req->ttyinfo.databits) /*設置數據位元數 */
 	{
 		case 7:
 			chainX_req->ttyinfo.options.c_cflag |= CS7;
@@ -2355,7 +2355,7 @@ static int chainX_tty_parity(ChainX_t *chainX_req)
 			return ret;
 	}
 
-	switch(chainX_req->ttyinfo.parity)
+	switch (chainX_req->ttyinfo.parity)
 	{
 		case 'n':
 		case 'N':
@@ -2388,7 +2388,7 @@ static int chainX_tty_parity(ChainX_t *chainX_req)
 	}
 
 	/* 設置停止位 */
-	switch(chainX_req->ttyinfo.stopbits)
+	switch (chainX_req->ttyinfo.stopbits)
 	{
 		case 1:
 			chainX_req->ttyinfo.options.c_cflag &= ~CSTOPB;
@@ -2405,7 +2405,7 @@ static int chainX_tty_parity(ChainX_t *chainX_req)
 
 	tcflush(chainX_req->ttyfd, TCIFLUSH); /* Update the options and do it NOW */
 
-	if(tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
+	if (tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
 	{
 		DBG_ER_LN("tcsetattr error !!!");
 		return ret;
@@ -2418,14 +2418,14 @@ static int chainX_tty_speed(ChainX_t *chainX_req)
 {
 	int idx = 0;
 
-	for(idx= 0; idx < sizeof(speed_arr) / sizeof(int); idx++)
+	for (idx= 0; idx < sizeof(speed_arr) / sizeof(int); idx++)
 	{
-		if(chainX_req->ttyinfo.speed == name_arr[idx])
+		if (chainX_req->ttyinfo.speed == name_arr[idx])
 		{
 			tcflush(chainX_req->ttyfd, TCIOFLUSH);
 			cfsetispeed(&chainX_req->ttyinfo.options, speed_arr[idx]);
 			cfsetospeed(&chainX_req->ttyinfo.options, speed_arr[idx]);
-			if(tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
+			if (tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
 			{
 				DBG_ER_LN("tcsetattr error !!!");
 				return -1;
@@ -2440,7 +2440,7 @@ static int chainX_tty_speed(ChainX_t *chainX_req)
 static int chainX_tty_option(ChainX_t *chainX_req)
 {
 	int ret = 0;
-	if(chainX_req->ttyinfo.isset)
+	if (chainX_req->ttyinfo.isset)
 	{
 	}
 	else
@@ -2466,7 +2466,7 @@ static int chainX_tty_option(ChainX_t *chainX_req)
 	}
 
 	tcflush(chainX_req->ttyfd, TCIOFLUSH);
-	if(tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
+	if (tcsetattr(chainX_req->ttyfd, TCSANOW, &chainX_req->ttyinfo.options) != 0)
 	{
 		DBG_ER_LN("tcsetattr error !!!");
 		return -1;
@@ -2508,34 +2508,34 @@ static int chainX_tty_connect(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
-	if(chainX_fd_get(chainX_req)>=0)
+	if (chainX_fd_get(chainX_req)>=0)
 	{
 		DBG_IF_LN("connecting ... (%s)", chainX_req->ttyinfo.ttyname);
 
 		tcgetattr(chainX_req->ttyfd, &chainX_req->ttyinfo.options_bak);
 
-		if(chainX_req->ttyinfo.isset)
+		if (chainX_req->ttyinfo.isset)
 		{
 			// use the new conf
 		}
-		else if(tcgetattr(chainX_req->ttyfd, &chainX_req->ttyinfo.options) != 0)
+		else if (tcgetattr(chainX_req->ttyfd, &chainX_req->ttyinfo.options) != 0)
 		{
 			DBG_ER_LN("tcgetattr error !!!");
 			return ret;
 		}
 
-		if(chainX_tty_option(chainX_req) == 0)
+		if (chainX_tty_option(chainX_req) == 0)
 		{
-			if(chainX_tty_speed(chainX_req) == 0)
+			if (chainX_tty_speed(chainX_req) == 0)
 			{
-				if(chainX_tty_parity(chainX_req) == 0)
+				if (chainX_tty_parity(chainX_req) == 0)
 				{
 					ret = 0;
 				}
 			}
 		}
 
-		if(ret == 0)
+		if (ret == 0)
 		{
 			chainX_status_set(chainX_req, 1);
 		}
@@ -2548,15 +2548,15 @@ static int chainX_tty_connect(ChainX_t *chainX_req)
 static int chainX_netinfo_scan(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if((chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
+	if ((chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
 	{
 		// Got IPv4 !!!
 		ret = 0;
 	}
-	else if((chainX_req->netinfo.addr.hostname) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
+	else if ((chainX_req->netinfo.addr.hostname) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
 	{
 		// Got hostname -> IPv4 !!!
-		if(chainX_nslookup(chainX_req->netinfo.addr.hostname, chainX_req->netinfo.addr.ipv4, sizeof(chainX_req->netinfo.addr.ipv4)) != 0)
+		if (chainX_nslookup(chainX_req->netinfo.addr.hostname, chainX_req->netinfo.addr.ipv4, sizeof(chainX_req->netinfo.addr.ipv4)) != 0)
 		{
 			DBG_ER_LN("chainX_nslookup error !!! (hostname: %s)", chainX_req->netinfo.addr.hostname);
 			return -1;
@@ -2569,12 +2569,12 @@ static int chainX_netinfo_scan(ChainX_t *chainX_req)
 static int chainX_netinfo_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if((chainX_req->netinfo.addr.hostname) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
+	if ((chainX_req->netinfo.addr.hostname) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
 	{
 		// Got hostname !!!
 		ret = 0;
 	}
-	else if((chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
+	else if ((chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
 	{
 		// Got IPv4 !!!
 		ret = 0;
@@ -2586,13 +2586,13 @@ static int chainX_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		return ret;
 	}
 
 	/*  Create a socket for the client.  */
-	switch(chainX_req->mode)
+	switch (chainX_req->mode)
 	{
 		case CHAINX_MODE_ID_TCP_CLIENT:
 			ret = chainX_netinfo_check(chainX_req);
@@ -2621,17 +2621,17 @@ static int chainX_init(ChainX_t *chainX_req)
 {
 	int ret = -1;
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		return ret;
 	}
 
 	/*  Create a socket for the client.  */
-	switch(chainX_req->mode)
+	switch (chainX_req->mode)
 	{
 		case CHAINX_MODE_ID_TCP_CLIENT:
 		{
-			if(0 == chainX_netinfo_scan(chainX_req))
+			if (0 == chainX_netinfo_scan(chainX_req))
 			{
 				chainX_req->sockfd = chainX_tcp_socket();
 				ret = chainX_tcp_connect(chainX_req);
@@ -2640,7 +2640,7 @@ static int chainX_init(ChainX_t *chainX_req)
 		break;
 		case CHAINX_MODE_ID_UDP_SERVER:
 		{
-			if(0 == chainX_netinfo_scan(chainX_req))
+			if (0 == chainX_netinfo_scan(chainX_req))
 			{
 				chainX_req->sockfd = chainX_udp_socket();
 				ret = chainX_udp_bind(chainX_req, 0);
@@ -2649,7 +2649,7 @@ static int chainX_init(ChainX_t *chainX_req)
 		break;
 		case CHAINX_MODE_ID_MULTI_RECEIVER:
 		{
-			if(0 == chainX_netinfo_scan(chainX_req))
+			if (0 == chainX_netinfo_scan(chainX_req))
 			{
 				chainX_req->sockfd = chainX_udp_socket();
 				ret = chainX_udp_bind(chainX_req, 1);
@@ -2680,7 +2680,7 @@ static int chainX_init(ChainX_t *chainX_req)
 
 void chainX_linked_register(ChainX_t *chainX_req, chainX_linked_fn cb)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		chainX_req->linked_cb = cb;
 	}
@@ -2695,17 +2695,17 @@ void chainX_serial_register(ChainX_t *chainX_req, chainX_serial_fn cb)
 
 static void chainX_loop_serial(ChainX_t *chainX_req)
 {
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		return;
 	}
 
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
+	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
 			((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)))
 	{
 		int result = 0;
@@ -2714,7 +2714,7 @@ static void chainX_loop_serial(ChainX_t *chainX_req)
 		chainX_fdset_clear(chainX_req);
 		chainX_fdset_setall(chainX_req);
 
-		if(chainX_infinite_get(chainX_req) == 0)
+		if (chainX_infinite_get(chainX_req) == 0)
 		{
 			chainX_recycle_dec(chainX_req);
 		}
@@ -2722,21 +2722,21 @@ static void chainX_loop_serial(ChainX_t *chainX_req)
 		//tcflush(chainX_fd_get(chainX_req), TCIOFLUSH);
 
 		result = chainX_RW_select(chainX_req);
-		if(result == -1)
+		if (result == -1)
 		{
-			if(errno==EINTR)
+			if (errno==EINTR)
 			{
 				continue;
 			}
 			DBG_TR_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 			break;
 		}
-		else if(result==0)
+		else if (result==0)
 		{
 		}
-		else if(CHAINX_FD_ISSET_R(chainX_req) || CHAINX_FD_ISSET_E(chainX_req))
+		else if (CHAINX_FD_ISSET_R(chainX_req) || CHAINX_FD_ISSET_E(chainX_req))
 		{
-			if(1)
+			if (1)
 			{
 				//nread = LEN_OF_SSL_BUFFER;
 				SAFE_IOCTL(chainX_fd_get(chainX_req), FIONREAD, &nread);
@@ -2746,29 +2746,29 @@ static void chainX_loop_serial(ChainX_t *chainX_req)
 				nread = LEN_OF_BUF1024;
 			}
 
-			if(nread>0)
+			if (nread>0)
 			{
 				size_t read_pos = 0;
 				int read_len = 0;
 				size_t left_len = nread;
 				char *buff = SAFE_CALLOC(1, nread+1);
-				if(buff)
+				if (buff)
 				{
 					char *buff_cur = buff;
 
-					while((buff_cur) && (left_len>0) && ((read_len=SOCKETX_READ(chainX_req, buff_cur, left_len)) > 0))
+					while ((buff_cur) && (left_len>0) && ((read_len=SOCKETX_READ(chainX_req, buff_cur, left_len)) > 0))
 					{
 						//DBG_DB_LN("read_len: %d [%s]", read_len, buff_cur);
 						read_pos += read_len;
 						left_len -= read_len;
-						if(left_len<=0)
+						if (left_len<=0)
 						{
 							break;
 						}
 						buff_cur += read_len;
 					}
 
-					if((chainX_req->serial_cb) && (read_pos>0))
+					if ((chainX_req->serial_cb) && (read_pos>0))
 					{
 						//DBG_DB_LN("(buff %d/%d: %s)", read_pos, nread, buff);
 						chainX_req->serial_cb(chainX_req, buff, read_pos);
@@ -2785,7 +2785,7 @@ static void chainX_loop_serial(ChainX_t *chainX_req)
 	}
 
 	chainX_status_set(chainX_req, 0);
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
@@ -2796,7 +2796,7 @@ static void chainX_loop_serial(ChainX_t *chainX_req)
 // for udp
 void chainX_post_register(ChainX_t *chainX_req, chainX_post_fn cb)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		chainX_req->post_cb = cb;
 	}
@@ -2804,17 +2804,17 @@ void chainX_post_register(ChainX_t *chainX_req, chainX_post_fn cb)
 
 static void chainX_loop_post(ChainX_t *chainX_req)
 {
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		return;
 	}
 
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
+	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
 			((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)))
 	{
 		int result = 0;
@@ -2823,26 +2823,26 @@ static void chainX_loop_post(ChainX_t *chainX_req)
 		chainX_fdset_clear(chainX_req);
 		chainX_fdset_setall(chainX_req);
 
-		if(chainX_infinite_get(chainX_req) == 0)
+		if (chainX_infinite_get(chainX_req) == 0)
 		{
 			chainX_recycle_dec(chainX_req);
 		}
 
 		result = chainX_RW_select(chainX_req);
-		if(result == -1)
+		if (result == -1)
 		{
-			if(errno==EINTR)
+			if (errno==EINTR)
 			{
 				continue;
 			}
 			DBG_TR_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 			break;
 		}
-		else if(result==0)
+		else if (result==0)
 		{
 			// no isset
 		}
-		else if(CHAINX_FD_ISSET_R(chainX_req))
+		else if (CHAINX_FD_ISSET_R(chainX_req))
 		{
 			{
 				//nread = LEN_OF_SSL_BUFFER;
@@ -2850,30 +2850,30 @@ static void chainX_loop_post(ChainX_t *chainX_req)
 				SAFE_MEMSET(&chainX_req->addr_frm, 0, sizeof(struct sockaddr));
 			}
 
-			if(nread>0)
+			if (nread>0)
 			{
 				size_t read_pos = 0;
 				int read_len = 0;
 				size_t left_len = nread;
 				char *buff = SAFE_CALLOC(1, nread+1);
-				if(buff)
+				if (buff)
 				{
 					char *buff_cur = buff;
 
-					while((buff_cur) && (left_len>0) && ((read_len=SOCKETX_RECV_FROM(chainX_req, buff_cur, left_len)) > 0))
+					while ((buff_cur) && (left_len>0) && ((read_len=SOCKETX_RECV_FROM(chainX_req, buff_cur, left_len)) > 0))
 					{
 						//DBG_DB_LN("read_len: %d [%s]", read_len, buff_cur);
 						//DBG_DB_LN("(read_len: %d, read_pos: %zd)", read_len, read_pos);
 						read_pos += read_len;
 						left_len -= read_len;
-						if(left_len<=0)
+						if (left_len<=0)
 						{
 							break;
 						}
 						buff_cur += read_len;
 					}
 
-					if((chainX_req->post_cb) && (read_pos>0))
+					if ((chainX_req->post_cb) && (read_pos>0))
 					{
 						//DBG_DB_LN("(buff %d/%d: %s)", read_pos, nread, buff);
 						chainX_req->post_cb(chainX_req, buff, read_pos);
@@ -2892,7 +2892,7 @@ static void chainX_loop_post(ChainX_t *chainX_req)
 	DBG_TR_LN("out !!! (%s:%u, quit: %d, status: %d)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port, chainX_quit_check(chainX_req), chainX_linked_check(chainX_req));
 
 	chainX_status_set(chainX_req, 0);
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
@@ -2907,17 +2907,17 @@ void chainX_pipe_register(ChainX_t *chainX_req, chainX_pipe_fn cb)
 
 static void chainX_loop_pipe(ChainX_t *chainX_req)
 {
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		return;
 	}
 
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0))
+	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0))
 	{
 		int result = 0;
 		int nread = 0;
@@ -2926,23 +2926,23 @@ static void chainX_loop_pipe(ChainX_t *chainX_req)
 		chainX_fdset_setall(chainX_req);
 
 		result = chainX_RW_select(chainX_req);
-		if(result == -1)
+		if (result == -1)
 		{
-			if(errno==EINTR)
+			if (errno==EINTR)
 			{
 				continue;
 			}
 			DBG_TR_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 			break;
 		}
-		else if(result==0)
+		else if (result==0)
 		{
 			// no isset
 		}
 		else
 		{
 			int so_error = chainX_socket_error(chainX_req);
-			switch(so_error)
+			switch (so_error)
 			{
 				// GCC 32
 				case EPIPE:
@@ -2962,14 +2962,14 @@ static void chainX_loop_pipe(ChainX_t *chainX_req)
 				// GCC 115, ? 119
 				case EINPROGRESS:
 				default:
-					if(CHAINX_FD_ISSET_E(chainX_req))
+					if (CHAINX_FD_ISSET_E(chainX_req))
 					{
 						DBG_ER_LN("FD_ISSET - fdeset");
 						goto disconnected;
 					}
-					else if(CHAINX_FD_ISSET_R(chainX_req))
+					else if (CHAINX_FD_ISSET_R(chainX_req))
 					{
-						if(chainX_security_get(chainX_req) == 1)
+						if (chainX_security_get(chainX_req) == 1)
 						{
 							nread = LEN_OF_SSL_BUFFER;
 						}
@@ -2979,7 +2979,7 @@ static void chainX_loop_pipe(ChainX_t *chainX_req)
 							//DBG_TR_LN("(nread: %d)", nread);
 						}
 
-						if(nread == 0)
+						if (nread == 0)
 						{
 							DBG_ER_LN("ioctl error !!! (nread: %d, errno: %d %s)", nread, errno, strerror(errno));
 							goto disconnected;
@@ -2990,21 +2990,21 @@ static void chainX_loop_pipe(ChainX_t *chainX_req)
 							int read_len = 0;
 							size_t left_len = nread;
 							char *buff = SAFE_CALLOC(1, nread+1);
-							if(buff)
+							if (buff)
 							{
 								char *buff_cur = buff;
 
-								while((buff_cur) && (left_len>0) && ((read_len=SOCKETX_READ(chainX_req, buff_cur, left_len)) > 0))
+								while ((buff_cur) && (left_len>0) && ((read_len=SOCKETX_READ(chainX_req, buff_cur, left_len)) > 0))
 								{
 									//DBG_DB_LN("read_len: %d [%s]", read_len, buff_cur);
 									read_pos += read_len;
 									left_len -= read_len;
-									if((left_len<=0) && (chainX_req->noblock>0))
+									if ((left_len<=0) && (chainX_req->noblock>0))
 									{
 										size_t new_len = read_pos + LEN_OF_SSL_BUFFER;
 										//DBG_TR_LN("(left_len: %zd, new_len: %zd, nread: %d, read_pos: %zd)", left_len, new_len, nread, read_pos);
 										char *new_buff = SAFE_REALLOC(buff, new_len + 1);
-										if(new_buff == NULL)
+										if (new_buff == NULL)
 										{
 											DBG_ER_LN("SAFE_REALLOC error !!! (size: %zd -> %zd)", read_pos, new_len);
 											break;
@@ -3016,7 +3016,7 @@ static void chainX_loop_pipe(ChainX_t *chainX_req)
 									buff_cur += read_len;
 								}
 
-								if((chainX_req->pipe_cb) && (read_pos>0))
+								if ((chainX_req->pipe_cb) && (read_pos>0))
 								{
 									//DBG_DB_LN("(buff %d/%d: %s)", read_pos, nread, buff);
 									chainX_req->pipe_cb(chainX_req, buff, read_pos);
@@ -3035,7 +3035,7 @@ static void chainX_loop_pipe(ChainX_t *chainX_req)
 
 disconnected:
 	chainX_status_set(chainX_req, 0);
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
@@ -3049,18 +3049,18 @@ static void *chainX_thread_handler_tcp(void *arg)
 
 	threadx_detach(tidx_req);
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		goto tcp_exit;
 	}
 
-	while(chainX_quit_check(chainX_req) == 0)
+	while (chainX_quit_check(chainX_req) == 0)
 	{
 		int net_last = 0;
 		{
 			chainX_close(chainX_req);
 
-			if((chainX_init(chainX_req) == 0) && ((chainX_security_get(chainX_req)==0) || (chainXssl_link(chainX_req)==0)))
+			if ((chainX_init(chainX_req) == 0) && ((chainX_security_get(chainX_req)==0) || (chainXssl_link(chainX_req)==0)))
 			{
 				net_last = 1;
 				DBG_IF_LN("tcp-client ok !!! (%s:%u, dbg: %d, net_status: %d, sockfd: %d, net_security: %d)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port, dbg_lvl_get(), chainX_req->status, chainX_fd_get(chainX_req), chainX_security_get(chainX_req));
@@ -3069,7 +3069,7 @@ static void *chainX_thread_handler_tcp(void *arg)
 			DBG_WN_LN("tcp-client broken !!! (%s:%u, dbg: %d, net_last: %d)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port, dbg_lvl_get(), net_last);
 		}
 
-		if(net_last == 0)
+		if (net_last == 0)
 		{
 			chainX_retry_wait(chainX_req);
 		}
@@ -3086,7 +3086,7 @@ int chainX_multi_sender(ChainX_t *chainX_req, char *buffer, int nbufs)
 {
 	int ret = 0;
 
-	if(chainX_req == NULL)
+	if (chainX_req == NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return -1;
@@ -3095,7 +3095,7 @@ int chainX_multi_sender(ChainX_t *chainX_req, char *buffer, int nbufs)
 	chainX_addr_to_set(chainX_req, chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
 
 	DBG_TR_LN("SOCKETX_SENDTO ... (%s:%u)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
-	if(SOCKETX_SENDTO(chainX_req, buffer, nbufs) < 0)
+	if (SOCKETX_SENDTO(chainX_req, buffer, nbufs) < 0)
 	{
 		DBG_ER_LN("SOCKETX_SENDTO error !!!");
 		ret = -1;
@@ -3108,14 +3108,14 @@ int chainX_multi_sender_and_post(ChainX_t *chainX_req, char *buffer, int nbufs)
 {
 	int ret = 0;
 
-	if(chainX_req == NULL)
+	if (chainX_req == NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return -1;
 	}
 
 	/* create what looks like an ordinary UDP socket */
-	if((chainX_req->sockfd=chainX_udp_socket()) < 0)
+	if ((chainX_req->sockfd=chainX_udp_socket()) < 0)
 	{
 		DBG_ER_LN("sockfd error !!!");
 		return -1;
@@ -3128,7 +3128,7 @@ int chainX_multi_sender_and_post(ChainX_t *chainX_req, char *buffer, int nbufs)
 	chainX_addr_to_set(chainX_req, chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
 
 	DBG_TR_LN("SOCKETX_SENDTO ... (%s:%u)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port);
-	if(SOCKETX_SENDTO(chainX_req, buffer, nbufs) < 0)
+	if (SOCKETX_SENDTO(chainX_req, buffer, nbufs) < 0)
 	{
 		DBG_ER_LN("SOCKETX_SENDTO error !!!");
 		ret = -1;
@@ -3150,7 +3150,7 @@ static void *chainX_thread_handler_udp(void *arg)
 
 	threadx_detach(tidx_req);
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		goto udp_exit;
 	}
@@ -3159,13 +3159,13 @@ static void *chainX_thread_handler_udp(void *arg)
 	chainX_infinite_set(chainX_req, 1);
 	chainX_recycle_set(chainX_req, 0);
 
-	while(chainX_quit_check(chainX_req) == 0)
+	while (chainX_quit_check(chainX_req) == 0)
 	{
 		int net_last = 0;
 		{
 			chainX_close(chainX_req);
 
-			if(chainX_init(chainX_req) == 0)
+			if (chainX_init(chainX_req) == 0)
 			{
 				net_last = 1;
 				DBG_IF_LN("udp-bind ok !!! (%s:%u, dbg: %d, net_status: %d, sockfd: %d, net_security: %d)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port, dbg_lvl_get(), chainX_req->status, chainX_fd_get(chainX_req), chainX_security_get(chainX_req));
@@ -3175,7 +3175,7 @@ static void *chainX_thread_handler_udp(void *arg)
 			chainX_status_set(chainX_req, 0);
 		}
 
-		if(net_last == 0)
+		if (net_last == 0)
 		{
 			chainX_retry_wait(chainX_req);
 		}
@@ -3190,9 +3190,9 @@ udp_exit:
 
 static void chainX_netlink_parse_rtattr(struct rtattr **tb, int max, struct rtattr *rta, int len)
 {
-	while(RTA_OK(rta, len))
+	while (RTA_OK(rta, len))
 	{
-		if(rta->rta_type <= max)
+		if (rta->rta_type <= max)
 		{
 			tb[rta->rta_type] = rta;
 		}
@@ -3218,31 +3218,31 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 	struct ifinfomsg *ifi;
 
 	int status = recvmsg(chainX_fd_get(chainX_req), &msg, 0);
-	if(status < 0)
+	if (status < 0)
 	{
 		DBG_ER_LN("recvmsg error !!!");
 		return;
 	}
-	else if(status == 0)
+	else if (status == 0)
 	{
 		DBG_WN_LN("recvmsg warning (status: %d)", status);
 		return;
 	}
 
-	if(msg.msg_namelen != sizeof(snl))
+	if (msg.msg_namelen != sizeof(snl))
 	{
 		DBG_ER_LN("recvmsg error - received invalid netlink message !!! ");
 		return;
 	}
 
-	if(msg.msg_flags & MSG_TRUNC)
+	if (msg.msg_flags & MSG_TRUNC)
 	{
 		DBG_ER_LN("recvmsg error - MSG_TRUNC !!! ");
 		return;
 	}
-	for(h = (struct nlmsghdr *) buf; NLMSG_OK(h, status); h = NLMSG_NEXT(h, status))
+	for (h = (struct nlmsghdr *) buf; NLMSG_OK(h, status); h = NLMSG_NEXT(h, status))
 	{
-		switch(h->nlmsg_type)
+		switch (h->nlmsg_type)
 		{
 			case NLMSG_DONE:
 				return;
@@ -3250,7 +3250,7 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 			case NLMSG_ERROR:
 				NLMSG_DATA(h);
 
-				if(h->nlmsg_len < NLMSG_LENGTH(sizeof(struct nlmsgerr)))
+				if (h->nlmsg_len < NLMSG_LENGTH(sizeof(struct nlmsgerr)))
 				{
 					DBG_ER_LN("recvmsg error - received invalid netlink message !!! ");
 					return;
@@ -3263,7 +3263,7 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 				int len = h->nlmsg_len - NLMSG_LENGTH(sizeof(struct ifinfomsg));
 				char ifname[IF_NAMESIZE + 1];
 
-				if(len < 0)
+				if (len < 0)
 				{
 					continue;
 				}
@@ -3271,19 +3271,19 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 				memset(tb, 0, sizeof(tb));
 				chainX_netlink_parse_rtattr(tb, IFLA_MAX, IFLA_RTA(ifi), len);
 
-				if(tb[IFLA_IFNAME] == NULL)
+				if (tb[IFLA_IFNAME] == NULL)
 				{
 					continue;
 				}
 
 				strncpy(ifname, (char *) RTA_DATA(tb[IFLA_IFNAME]), IF_NAMESIZE);
 
-				switch(h->nlmsg_type)
+				switch (h->nlmsg_type)
 				{
 					case RTM_NEWLINK:
-						if(ifi->ifi_flags & IFF_RUNNING)
+						if (ifi->ifi_flags & IFF_RUNNING)
 						{
-							if(chainX_req->netlink_cb)
+							if (chainX_req->netlink_cb)
 							{
 								chainX_req->netlink_cb(chainX_req, ifname, ifi->ifi_index, "UP");
 							}
@@ -3291,7 +3291,7 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 						}
 						else
 						{
-							if(chainX_req->netlink_cb)
+							if (chainX_req->netlink_cb)
 							{
 								chainX_req->netlink_cb(chainX_req, ifname, ifi->ifi_index, "DOWN");
 							}
@@ -3300,7 +3300,7 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 						break;
 
 					case RTM_DELLINK:
-						if(chainX_req->netlink_cb)
+						if (chainX_req->netlink_cb)
 						{
 							chainX_req->netlink_cb(chainX_req, ifname, ifi->ifi_index, "REMOVED");
 						}
@@ -3318,17 +3318,17 @@ void chainX_netlink_recv(ChainX_t * chainX_req)
 
 static void chainX_loop_netlink(ChainX_t *chainX_req)
 {
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		return;
 	}
 
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
 
-	while((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
+	while ((chainX_quit_check(chainX_req)== 0) && (chainX_linked_check(chainX_req) == 0) &&
 			((chainX_infinite_get(chainX_req)) || (chainX_recycle_get(chainX_req) > 0)))
 	{
 		int result = 0;
@@ -3337,26 +3337,26 @@ static void chainX_loop_netlink(ChainX_t *chainX_req)
 		chainX_fdset_clear(chainX_req);
 		chainX_fdset_setall(chainX_req);
 
-		if(chainX_infinite_get(chainX_req) == 0)
+		if (chainX_infinite_get(chainX_req) == 0)
 		{
 			chainX_recycle_dec(chainX_req);
 		}
 
 		result = chainX_RW_select(chainX_req);
-		if(result == -1)
+		if (result == -1)
 		{
-			if(errno==EINTR)
+			if (errno==EINTR)
 			{
 				continue;
 			}
 			DBG_TR_LN("select error !!! (result: %d, errno: %d %s)", result, errno, strerror(errno));
 			break;
 		}
-		else if(result==0)
+		else if (result==0)
 		{
 			// no isset
 		}
-		else if(CHAINX_FD_ISSET_R(chainX_req))
+		else if (CHAINX_FD_ISSET_R(chainX_req))
 		{
 			chainX_netlink_recv(chainX_req);
 		}
@@ -3370,7 +3370,7 @@ static void chainX_loop_netlink(ChainX_t *chainX_req)
 	DBG_TR_LN("out !!! (%s:%u, quit: %d, status: %d)", chainX_req->netinfo.addr.ipv4, chainX_req->netinfo.port, chainX_quit_check(chainX_req), chainX_linked_check(chainX_req));
 
 	chainX_status_set(chainX_req, 0);
-	if(chainX_req->linked_cb)
+	if (chainX_req->linked_cb)
 	{
 		chainX_req->linked_cb(chainX_req);
 	}
@@ -3384,7 +3384,7 @@ static void *chainX_thread_handler_netlink(void *arg)
 
 	threadx_detach(tidx_req);
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		goto udp_exit;
 	}
@@ -3393,13 +3393,13 @@ static void *chainX_thread_handler_netlink(void *arg)
 	chainX_infinite_set(chainX_req, 1);
 	chainX_recycle_set(chainX_req, 0);
 
-	while(chainX_quit_check(chainX_req) == 0)
+	while (chainX_quit_check(chainX_req) == 0)
 	{
 		int net_last = 0;
 		{
 			chainX_close(chainX_req);
 
-			if(chainX_init(chainX_req) == 0)
+			if (chainX_init(chainX_req) == 0)
 			{
 				net_last = 1;
 				DBG_IF_LN("netlink-bind ok !!! (netlink, dbg: %d, net_status: %d, sockfd: %d, net_security: %d)", dbg_lvl_get(), chainX_req->status, chainX_fd_get(chainX_req), chainX_security_get(chainX_req));
@@ -3409,7 +3409,7 @@ static void *chainX_thread_handler_netlink(void *arg)
 			chainX_status_set(chainX_req, 0);
 		}
 
-		if(net_last == 0)
+		if (net_last == 0)
 		{
 			chainX_retry_wait(chainX_req);
 		}
@@ -3430,7 +3430,7 @@ static void *chainX_thread_handler_tty(void *arg)
 
 	threadx_detach(tidx_req);
 
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		goto tty_exit;
 	}
@@ -3439,13 +3439,13 @@ static void *chainX_thread_handler_tty(void *arg)
 	chainX_infinite_set(chainX_req, 1);
 	chainX_recycle_set(chainX_req, 0);
 
-	while(chainX_quit_check(chainX_req) == 0)
+	while (chainX_quit_check(chainX_req) == 0)
 	{
 		int net_last = 0;
 		{
 			chainX_close(chainX_req);
 
-			if(chainX_init(chainX_req) == 0)
+			if (chainX_init(chainX_req) == 0)
 			{
 				net_last = 1;
 				DBG_IF_LN("tty ok !!! (%s, dbg: %d, tty_status: %d, sockfd: %d)", chainX_req->ttyinfo.ttyname, dbg_lvl_get(), chainX_req->status, chainX_fd_get(chainX_req));
@@ -3457,7 +3457,7 @@ static void *chainX_thread_handler_tty(void *arg)
 			chainX_status_set(chainX_req, 0);
 		}
 
-		if(net_last == 0)
+		if (net_last == 0)
 		{
 			chainX_retry_wait(chainX_req);
 		}
@@ -3473,7 +3473,7 @@ tty_exit:
 
 void chainX_thread_stop(ChainX_t *chainX_req)
 {
-	if(chainX_req)
+	if (chainX_req)
 	{
 		threadx_stop(&chainX_req->tidx);
 	}
@@ -3481,7 +3481,7 @@ void chainX_thread_stop(ChainX_t *chainX_req)
 
 void chainX_thread_close(ChainX_t *chainX_req)
 {
-	if((chainX_req) && (chainX_req->isfree==0))
+	if ((chainX_req) && (chainX_req->isfree==0))
 	{
 		chainX_req->isfree++;
 
@@ -3492,31 +3492,31 @@ void chainX_thread_close(ChainX_t *chainX_req)
 
 int chainX_thread_init(ChainX_t *chainX_req)
 {
-	if(chainX_req==NULL)
+	if (chainX_req==NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return -1;
 	}
 	ThreadX_t *tidx_req = &chainX_req->tidx;
 
-	if(chainX_security_get(chainX_req) == 1)
+	if (chainX_security_get(chainX_req) == 1)
 	{
 		chainXssl_init(chainX_req);
 	}
 
-	if(chainX_check(chainX_req) == -1)
+	if (chainX_check(chainX_req) == -1)
 	{
 		DBG_ER_LN("chainX_check error !!! (chainX_req->mode: %d)", chainX_req->mode);
 		return -1;
 	}
 
-	switch(chainX_req->mode)
+	switch (chainX_req->mode)
 	{
 		case CHAINX_MODE_ID_TCP_CLIENT:
 		{
 			tidx_req->thread_cb = chainX_thread_handler_tcp;
 			tidx_req->data = chainX_req;
-			if(threadx_init(tidx_req, "chainX_api - TCP") != 0)
+			if (threadx_init(tidx_req, "chainX_api - TCP") != 0)
 			{
 				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 				return -1;
@@ -3528,7 +3528,7 @@ int chainX_thread_init(ChainX_t *chainX_req)
 		{
 			tidx_req->thread_cb = chainX_thread_handler_udp;
 			tidx_req->data = chainX_req;
-			if(threadx_init(tidx_req, "chainX_api - UDP") != 0)
+			if (threadx_init(tidx_req, "chainX_api - UDP") != 0)
 			{
 				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 				return -1;
@@ -3539,7 +3539,7 @@ int chainX_thread_init(ChainX_t *chainX_req)
 		{
 			tidx_req->thread_cb = chainX_thread_handler_netlink;
 			tidx_req->data = chainX_req;
-			if(threadx_init(tidx_req, "chainX_api - netlink") != 0)
+			if (threadx_init(tidx_req, "chainX_api - netlink") != 0)
 			{
 				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 				return -1;
@@ -3551,7 +3551,7 @@ int chainX_thread_init(ChainX_t *chainX_req)
 		{
 			tidx_req->thread_cb = chainX_thread_handler_tty;
 			tidx_req->data = chainX_req;
-			if(threadx_init(tidx_req, "chainX_api - TTY") != 0)
+			if (threadx_init(tidx_req, "chainX_api - TTY") != 0)
 			{
 				DBG_ER_LN("SAFE_THREAD_CREATE error !!!");
 				return -1;
@@ -3629,7 +3629,7 @@ static int chainX_icmp(ChainX_t *chainX_req)
 	long double rtt_msec = 0, total_msec = 0;
 
 	struct timeval tv_out;
-	if(chainX_req->select_wait > 0)
+	if (chainX_req->select_wait > 0)
 	{
 		tv_out.tv_sec = chainX_req->select_wait;
 	}
@@ -3643,7 +3643,7 @@ static int chainX_icmp(ChainX_t *chainX_req)
 
 	// set socket options at ip to TTL and value to 64,
 	// change to what you want by setting ttl_val
-	if(SAFE_SSETOPT(chainX_fd_get(chainX_req), IPPROTO_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) != 0)
+	if (SAFE_SSETOPT(chainX_fd_get(chainX_req), IPPROTO_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) != 0)
 	{
 		DBG_ER_LN("SAFE_SSETOPT IP_TTL error !!! (errno: %d %s)", errno, strerror(errno));
 		return 0;
@@ -3652,13 +3652,13 @@ static int chainX_icmp(ChainX_t *chainX_req)
 	// setting timeout of recv setting
 	SAFE_SSETOPT(chainX_fd_get(chainX_req), SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv_out, sizeof tv_out);
 
-	if(chainX_req->verbose)
+	if (chainX_req->verbose)
 	{
 		DBG_IF_LN("PING %s (%s): %d bytes of data", chainX_hostname_get(chainX_req), chainX_ip_get(chainX_req), PING_PKT_S);
 	}
 
 	// send icmp packet in an infinite loop
-	while(pingloop--)
+	while (pingloop--)
 	{
 		// flag is whether packet was sent or not
 		int recv_flag=0;
@@ -3678,9 +3678,9 @@ static int chainX_icmp(ChainX_t *chainX_req)
 
 		//send packet
 		clock_gettime(CLOCK_MONOTONIC, &time_start);
-		if(SOCKETX_SENDTO(chainX_req, pkt, PING_PKT_S) <= 0)
+		if (SOCKETX_SENDTO(chainX_req, pkt, PING_PKT_S) <= 0)
 		{
-			if(chainX_req->verbose)
+			if (chainX_req->verbose)
 			{
 				DBG_ER_LN("SOCKETX_SENDTO error !!!");
 			}
@@ -3692,9 +3692,9 @@ static int chainX_icmp(ChainX_t *chainX_req)
 			SAFE_MEMSET(&chainX_req->addr_frm, 0, sizeof(struct sockaddr));
 
 			memset(packet, 0, sizeof(packet));
-			if((rlen=SOCKETX_RECV_FROM(chainX_req, packet, sizeof(packet))) <= 0)
+			if ((rlen=SOCKETX_RECV_FROM(chainX_req, packet, sizeof(packet))) <= 0)
 			{
-				if(chainX_req->verbose)
+				if (chainX_req->verbose)
 				{
 					DBG_ER_LN("SOCKETX_RECV_FROM error !!!");
 				}
@@ -3710,22 +3710,22 @@ static int chainX_icmp(ChainX_t *chainX_req)
 				double timeElapsed = ((double)(time_end.tv_nsec - time_start.tv_nsec))/1000000.0;
 				rtt_msec = (time_end.tv_sec- time_start.tv_sec) * 1000.0 + timeElapsed;
 
-				if(chainX_req->verbose)
+				if (chainX_req->verbose)
 				{
 					DBG_TR_LN("(type: %d, code: %d, icmp_seq: %d, icmp_id: %d/%d)", pkt->icmp_type, pkt->icmp_code, pkt->icmp_seq, pkt->icmp_id, getpid());
 				}
 
 				//DBG_ER_LN("(rlen: %d, hlen: %d, sizeof(struct icmp): %d)", rlen, hlen, sizeof(struct icmp));
-				if((pkt->icmp_id == getpid()) && (pkt->icmp_seq == msg_seq) && (rlen > (hlen+ICMP_MINLEN)))          // we need to check this !!!
+				if ((pkt->icmp_id == getpid()) && (pkt->icmp_seq == msg_seq) && (rlen > (hlen+ICMP_MINLEN)))         // we need to check this !!!
 				{
-					switch(pkt->icmp_type)
+					switch (pkt->icmp_type)
 					{
 						case ICMP_ECHO_REPLY: // 0
-							if(pkt->icmp_code==0)
+							if (pkt->icmp_code==0)
 							{
 								recv_flag ++;
 								msg_received_count++;
-								if(chainX_req->verbose)
+								if (chainX_req->verbose)
 								{
 									DBG_IF_LN("%d bytes from %s (%s): icmp_seq=%d ttl=%d time=%.02Lf ms",
 											  rlen - hlen,
@@ -3745,15 +3745,15 @@ static int chainX_icmp(ChainX_t *chainX_req)
 				}
 			}
 
-			if(recv_flag == 0)
+			if (recv_flag == 0)
 			{
-				if(chainX_req->verbose)
+				if (chainX_req->verbose)
 				{
 					DBG_ER_LN("Packet received with ICMP error !!! (type: %d, code: %d, pingloop: %d)", pkt->icmp_type, pkt->icmp_code, pingloop);
 				}
 			}
 		}
-		if((pingloop>1) && (chainX_req->retry_hold > 0))
+		if ((pingloop>1) && (chainX_req->retry_hold > 0))
 		{
 			sleep(chainX_req->retry_hold);
 		}
@@ -3763,7 +3763,7 @@ static int chainX_icmp(ChainX_t *chainX_req)
 
 	total_msec = (tfe.tv_sec-tfs.tv_sec)*1000.0 + timeElapsed;
 
-	if(chainX_req->verbose)
+	if (chainX_req->verbose)
 	{
 		DBG_IF_LN("--- %s ping statistics ---", chainX_hostname_get(chainX_req));
 		DBG_IF_LN("%d packets transmitted, %d received, %.0f%% packet loss, time: %.0Lf ms.",
@@ -3780,39 +3780,39 @@ int chainX_ping(ChainX_t *chainX_req)
 {
 	int ret = 0;
 
-	if(chainX_req == NULL)
+	if (chainX_req == NULL)
 	{
 		DBG_ER_LN("chainX_req is NULL !!!");
 		return ret;
 	}
 
-	if((chainX_req->sockfd=chainX_icmp_open()) < 0)
+	if ((chainX_req->sockfd=chainX_icmp_open()) < 0)
 	{
 		DBG_ER_LN("sockfd error !!! (errno: %d %s)", errno, strerror(errno));
 		return ret;
 	}
 
-	if((strlen(chainX_ip_get(chainX_req)) > 0) || (strlen(chainX_hostname_get(chainX_req)) > 0))
+	if ((strlen(chainX_ip_get(chainX_req)) > 0) || (strlen(chainX_hostname_get(chainX_req)) > 0))
 	{
 		int addr_set = -1;
 		char *ip_addr = strlen(chainX_ip_get(chainX_req)) > 0 ? chainX_ip_get(chainX_req): chainX_hostname_get(chainX_req);
 
 		addr_set = chainX_addr_to_set(chainX_req, ip_addr, chainX_port_get(chainX_req));
-		if(addr_set == 0)
+		if (addr_set == 0)
 		{
 			// IP -> addr
 		}
-		else if(strlen(chainX_hostname_get(chainX_req)) > 0)
+		else if (strlen(chainX_hostname_get(chainX_req)) > 0)
 		{
 			// Hostname -> addr
 			ip_addr = chainX_ip_get(chainX_req);
-			if((chainX_nslookup(chainX_hostname_get(chainX_req), chainX_ip_get(chainX_req), chainX_ip_len(chainX_req)) == 0) &&	(chainX_nslookup_reverse(chainX_ip_get(chainX_req), chainX_reversename_get(chainX_req), chainX_reversename_len(chainX_req)) == 0))
+			if ((chainX_nslookup(chainX_hostname_get(chainX_req), chainX_ip_get(chainX_req), chainX_ip_len(chainX_req)) == 0) &&	(chainX_nslookup_reverse(chainX_ip_get(chainX_req), chainX_reversename_get(chainX_req), chainX_reversename_len(chainX_req)) == 0))
 			{
 				addr_set = chainX_addr_to_set(chainX_req, ip_addr, chainX_port_get(chainX_req));
 			}
 		}
 
-		if(addr_set == 0)
+		if (addr_set == 0)
 		{
 			ret= chainX_icmp(chainX_req);
 		}

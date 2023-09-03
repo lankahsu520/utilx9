@@ -102,7 +102,7 @@ static void mqtt123_init(MQTTX_t *mqtt_req)
 {
 	MQTTSession_t *session = mqtt_session_get(mqtt_req);
 
-	if(session->topic_id == MQTT_TOPIC_ID_USER)
+	if (session->topic_id == MQTT_TOPIC_ID_USER)
 	{
 		SAFE_SPRINTF_EX(session->topic_root, MQTT_TOPIC_SUB_ROOT_MASK, session->user, "/");
 	}
@@ -134,13 +134,13 @@ void timer_1sec_loop(uv_timer_t *handle)
 	struct tm *now_tm = localtime(&now_t);
 	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
-	if(app_quit()==1)
+	if (app_quit()==1)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
 		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
 	}
-	else if(mqtt_session_isconnect(&mqtt123_data))
+	else if (mqtt_session_isconnect(&mqtt123_data))
 	{
 		char topic[LEN_OF_TOPIC] = "";
 
@@ -149,7 +149,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 		int epid = 0;
 		int issueid = JKEY_ISSUEID_MOTION;
 
-		if(mqtt123_session.topic_id == MQTT_TOPIC_ID_USER)
+		if (mqtt123_session.topic_id == MQTT_TOPIC_ID_USER)
 		{
 			SAFE_SPRINTF_EX(topic, MQTT_TOPIC_SUB_ROOT_MASK_METHODID_MACID_NODEID_EPID_ISSUEID, mqtt123_session.user, "/", JVAL_METHODID_EVENT, iface_mac, c_uuid, nodeid, epid, issueid);
 		}
@@ -167,21 +167,21 @@ void timer_1sec_loop(uv_timer_t *handle)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if((is_free==0) && (app_quit()==1))
+	if ((is_free==0) && (app_quit()==1))
 	{
 		is_free = 1;
-		if(uv_loop)
+		if (uv_loop)
 		{
 #ifdef USE_TIMER_CREATE
 			SAFE_UV_TIMER_CLOSE(&uv_timer_1sec_fd, NULL);
 #endif
 
-			if(handle)
+			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			if(force)
+			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
@@ -207,7 +207,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -259,7 +259,7 @@ static void app_loop(void)
 		SAFE_UV_LOOP_CLOSE(uv_loop);
 	}
 #else
-	while(app_quit()==0)
+	while (app_quit()==0)
 	{
 		sleep(1);
 	}
@@ -286,7 +286,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -359,13 +359,13 @@ static void app_ParseArguments(int argc, char **argv)
 
 	MQTTSession_t *session = mqtt_session_get(&mqtt123_data);
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'f':
 #ifdef USE_MQTT_DEMO
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(session->hostname, "%s", optarg);
 				}
@@ -373,27 +373,27 @@ static void app_ParseArguments(int argc, char **argv)
 				break;
 			case 'p':
 #ifdef USE_MQTT_DEMO
-				if(optarg)
+				if (optarg)
 				{
 					session->port = atoi(optarg);
 				}
 #endif
 				break;
 			case 'i':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(iface_dev, "%s", optarg);
 				}
 				break;
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 			case 'u':
 #ifdef USE_MQTT_DEMO
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(session->user, "%s", optarg);
 				}
@@ -401,7 +401,7 @@ static void app_ParseArguments(int argc, char **argv)
 				break;
 			case 'w':
 #ifdef USE_MQTT_DEMO
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(session->pass, "%s", optarg);
 				}
@@ -425,7 +425,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 
 	SAFE_STDOUT_NONE();
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

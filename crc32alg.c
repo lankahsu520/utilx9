@@ -94,7 +94,7 @@ unsigned long buff_crc32(const void *buf, unsigned long size,unsigned long crc)
 	p = buf;
 	crc = crc ^ ~0U;
 
-	while(size--)
+	while (size--)
 	{
 		crc = buff_crc32_tab[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
 	}

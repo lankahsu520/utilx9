@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
 	{
 		UCIX_t *uci_req = &uci_wireless_req;
-		if(0 == UCI_OPEN(uci_req))
+		if (0 == UCI_OPEN(uci_req))
 		{
 			DBG_IF_LN("(ssid: %s)", UCI_OPTION_GET_STR(uci_req, "ap", "ssid"));
 			UCI_CLOSE(uci_req);
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 	{
 		UCIX_t *uci_req = &uci_demo_req;
-		if(0 == UCI_OPEN(uci_req))
+		if (0 == UCI_OPEN(uci_req))
 		{
 #if (1)
 			//DBG_IF_LN("(uci_pkg: %p)", uci_req->uci_pkg);
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 			char u_type[LEN_OF_BUF128] = "";
 			char u_name[LEN_OF_BUF128] = "";
 
-			for(s_num = 0; s_num < 5; s_num++)
+			for (s_num = 0; s_num < 5; s_num++)
 			{
 				SAFE_SPRINTF_EX(u_type, "type_%02d", s_num);
 				SAFE_SPRINTF_EX(u_name, "name_%02d", s_num);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 					int idx = 0;
 					char u_key[LEN_OF_BUF128] = "";
 					char u_val[LEN_OF_BUF128] = "";
-					for(idx = 0; idx < s_num+1; idx++)
+					for (idx = 0; idx < s_num+1; idx++)
 					{
 						SAFE_SPRINTF_EX(u_key, "key_%02d", idx);
 						SAFE_SPRINTF_EX(u_val, "%02d", idx);
@@ -94,12 +94,12 @@ int main(int argc, char* argv[])
 				char u_key[LEN_OF_BUF128] = "";
 				char u_val[LEN_OF_BUF128] = "";
 				SAFE_SPRINTF_EX(u_key, "key_%02d", 1);
-				for(idx = 0; idx < 5; idx++)
+				for (idx = 0; idx < 5; idx++)
 				{
 					SAFE_SPRINTF_EX(u_val, "%02d", idx);
 					UCI_LIST_ADD(uci_req, "name_04", "list_01", u_val);
 				}
-				for(idx = 0; idx < 5; idx++)
+				for (idx = 0; idx < 5; idx++)
 				{
 					SAFE_SPRINTF_EX(u_val, "%02d", idx);
 					UCI_LIST_ADD(uci_req, "name_04", "list_02", u_val);

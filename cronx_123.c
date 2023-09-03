@@ -50,17 +50,17 @@ void timer_1sec_loop(uv_timer_t *handle)
 	struct tm *now_tm = localtime(&now_t);
 	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
-	if(app_quit()==1)
+	if (app_quit()==1)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
 		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
 	}
-	else if(now_tm->tm_sec==0)
+	else if (now_tm->tm_sec==0)
 	{
 		//cronx_validate("*/3 0,9,10-13,21-23 * * * ", now_tm);
 		//cronx_validate("* 0,9,10-13,21-23 * * * 2021 ", now_tm);
-		if(0 < cronx_validate(clock_alarm, now_tm))
+		if (0 < cronx_validate(clock_alarm, now_tm))
 		{
 			DBG_WN_LN("Alarm !!! (%s)", clock_alarm);
 		}
@@ -77,7 +77,7 @@ void timer_60secs_loop(uv_timer_t *handle)
 	struct tm *now_tm = localtime(&now_t);
 	DBG_DB_LN("(%02d:%02d:%02d)", now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
 
-	if(app_quit()==1)
+	if (app_quit()==1)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
@@ -89,7 +89,7 @@ void timer_30mins_loop(uv_timer_t *handle)
 {
 	//app_save();
 
-	if(app_quit()==1)
+	if (app_quit()==1)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
@@ -100,21 +100,21 @@ void timer_30mins_loop(uv_timer_t *handle)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if((is_free==0) && (app_quit()==1))
+	if ((is_free==0) && (app_quit()==1))
 	{
 		is_free = 1;
-		if(uv_loop)
+		if (uv_loop)
 		{
 			SAFE_UV_TIMER_CLOSE(&uv_timer_1sec_fd, NULL);
 			SAFE_UV_TIMER_CLOSE(&uv_timer_60secs_fd, NULL);
 			SAFE_UV_TIMER_CLOSE(&uv_timer_30mins_fd, NULL);
 
-			if(handle)
+			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			if(force)
+			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);
 			}
@@ -144,7 +144,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		app_set_quit(1);
 
@@ -183,7 +183,7 @@ static void app_loop(void)
 		SAFE_UV_LOOP_CLOSE(uv_loop);
 	}
 #else
-	while(app_quit()==0)
+	while (app_quit()==0)
 	{
 		sleep(1);
 	}
@@ -210,7 +210,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -268,18 +268,18 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 			case 'a':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(clock_alarm, "%s", optarg);
 				}
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 
 	SAFE_STDOUT_NONE();
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

@@ -90,7 +90,7 @@ void ubus_invoke_echo_cb(struct ubus_request *req, int type, struct blob_attr *m
 
 	const char *cResponse = NULL;
 
-	if(tb[UBUS_P_ECHO_ID_MSG] != NULL)
+	if (tb[UBUS_P_ECHO_ID_MSG] != NULL)
 	{
 		cResponse = blobmsg_data(tb[UBUS_P_ECHO_ID_MSG]);
 	}
@@ -106,7 +106,7 @@ static int ubus_srv_handler_echo(struct ubus_context *ubus_req, struct ubus_obje
 	blobmsg_parse(ubus_p_echo, ARRAY_SIZE(ubus_p_echo), tb, blob_data(msg), blob_len(msg));
 
 	const char *cRequest = NULL;
-	if(tb[UBUS_P_ECHO_ID_MSG] != NULL)
+	if (tb[UBUS_P_ECHO_ID_MSG] != NULL)
 	{
 		cRequest = blobmsg_data(tb[UBUS_P_ECHO_ID_MSG]);
 	}
@@ -141,7 +141,7 @@ static int ubus_cli_subscribe_cb(struct ubus_context *ubus_req, struct ubus_obje
 {
 	char *cMsg = blobmsg_format_json_indent(msg, true, -1);
 
-	if(SAFE_STRCMP((char *)method, UBUS_M_ECHO) == 0)
+	if (SAFE_STRCMP((char *)method, UBUS_M_ECHO) == 0)
 	{
 		DBG_DB_LN("%s (method: %s, cMsg: %s)", DBG_TXT_GOT, method, cMsg);
 	}
@@ -157,10 +157,10 @@ static int ubus_cli_subscribe_cb(struct ubus_context *ubus_req, struct ubus_obje
 
 static void ubus_cli_remove_cb(struct ubus_context *ubus_req, struct ubus_subscriber *obj_s, uint32_t id)
 {
-	if(obj_s)
+	if (obj_s)
 	{
 		struct ubus_object *obj_u = &obj_s->obj;
-		if(obj_u)
+		if (obj_u)
 		{
 			DBG_ER_LN("(obj_name: %s, id: 0x%08X)", obj_u->name, id);
 		}
@@ -193,9 +193,9 @@ void ubus_srv_event(void)
 
 static void ubus_cli_event_cb(struct ubus_context *ctx, struct ubus_event_handler *ev, const char *type, struct blob_attr *msg)
 {
-	if(msg)
+	if (msg)
 	{
-		if(SAFE_STRCMP((char*)type, UBUS_B_O_ECHO) == 0)
+		if (SAFE_STRCMP((char*)type, UBUS_B_O_ECHO) == 0)
 		{
 			char *cMsg = blobmsg_format_json_indent(msg, true, -1);
 			DBG_DB_LN("%s (type: %s, cMsg: %s)", DBG_TXT_GOT, type, cMsg);
@@ -223,17 +223,17 @@ static int app_quit(void)
 
 static void app_loop(void)
 {
-	if(is_list)
+	if (is_list)
 	{
-		if(ubus_conn_init())
+		if (ubus_conn_init())
 		{
 			ubus_cli_list_register(NULL, NULL);
 		}
 	}
-	else if(is_service)
+	else if (is_service)
 	{
 		struct ubus_context *ubus_req = NULL;
-		if((ubus_req = ubus_srv_init()))
+		if ((ubus_req = ubus_srv_init()))
 		{
 #ifdef USE_UBUS_UNICAST
 			ubus_srv_add_object_ex(ubus_req, &ubus_srv_u_obj);
@@ -257,9 +257,9 @@ static void app_loop(void)
 				uloop_done();
 			}
 #else
-			if(0 == ubus_thread_init())
+			if (0 == ubus_thread_init())
 			{
-				while(app_quit()==0)
+				while (app_quit()==0)
 				{
 					static int pub = 0;
 
@@ -268,7 +268,7 @@ static void app_loop(void)
 
 #ifdef USE_UBUS_DEMO_AND_TIMER
 #else
-					if((pub%3) == 0)
+					if ((pub%3) == 0)
 					{
 #ifdef USE_UBUS_NOTIFY
 						ubus_srv_publish();
@@ -284,13 +284,13 @@ static void app_loop(void)
 #endif
 		}
 	}
-	else if(is_notify)
+	else if (is_notify)
 	{
 #ifdef USE_UBUS_NOTIFY
 		struct ubus_context *ubus_req = NULL;
-		if((ubus_req = ubus_conn_init()))
+		if ((ubus_req = ubus_conn_init()))
 		{
-			if(0 == ubus_cli_subscribe(UBUS_M_O_ECHO, ubus_cli_subscribe_cb, ubus_cli_remove_cb))
+			if (0 == ubus_cli_subscribe(UBUS_M_O_ECHO, ubus_cli_subscribe_cb, ubus_cli_remove_cb))
 			{
 				DBG_IF_LN("ubus client/notify ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_req->local_id);
 #ifdef USE_UBUS_ULOOP
@@ -299,9 +299,9 @@ static void app_loop(void)
 				uloop_run();
 				uloop_done();
 #else
-				if(0 == ubus_thread_init())
+				if (0 == ubus_thread_init())
 				{
-					while(app_quit()==0)
+					while (app_quit()==0)
 					{
 						sleep(1);
 					}
@@ -313,13 +313,13 @@ static void app_loop(void)
 		DBG_ER_LN("%s", DBG_TXT_NO_SUPPORT);
 #endif
 	}
-	else if(is_event)
+	else if (is_event)
 	{
 #ifdef USE_UBUS_EVENT
 		struct ubus_context *ubus_req = NULL;
-		if((ubus_req = ubus_conn_init()))
+		if ((ubus_req = ubus_conn_init()))
 		{
-			if(0 == ubus_cli_register_event(UBUS_B_O_ECHO, ubus_cli_event_cb))
+			if (0 == ubus_cli_register_event(UBUS_B_O_ECHO, ubus_cli_event_cb))
 			{
 				DBG_IF_LN("ubus client/event ... (ubus_root: %s, local_id: 0x%08X)", ubus_root_get(), ubus_req->local_id);
 				uloop_init();
@@ -332,11 +332,11 @@ static void app_loop(void)
 		DBG_ER_LN("%s", DBG_TXT_NO_SUPPORT);
 #endif
 	}
-	else if(SAFE_STRLEN(msg) > 0)
+	else if (SAFE_STRLEN(msg) > 0)
 	{
 #ifdef USE_UBUS_UNICAST
 		struct ubus_context *ubus_req = NULL;
-		if((ubus_req = ubus_conn_init()))
+		if ((ubus_req = ubus_conn_init()))
 		{
 			struct blob_buf bbuf = {};
 			blob_buf_init(&bbuf, 0);
@@ -368,7 +368,7 @@ static void app_set_quit(int mode)
 
 static void app_stop(void)
 {
-	if(app_quit()==0)
+	if (app_quit()==0)
 	{
 		DBG_DB_LN("call app_set_quit ...");
 		app_set_quit(1);
@@ -391,7 +391,7 @@ static void app_exit(void)
 static void app_signal_handler(int signum)
 {
 	DBG_ER_LN("(signum: %d)", signum);
-	switch(signum)
+	switch (signum)
 	{
 		case SIGINT:
 		case SIGTERM:
@@ -456,18 +456,18 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'd':
-				if(optarg)
+				if (optarg)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
 				break;
 			case 'm':
-				if(optarg)
+				if (optarg)
 				{
 					SAFE_SPRINTF_EX(msg, "%s", optarg);
 				}
@@ -502,7 +502,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if(app_init() == -1)
+	if (app_init() == -1)
 	{
 		return -1;
 	}

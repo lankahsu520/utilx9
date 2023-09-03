@@ -25,43 +25,43 @@ static void cronx_item2range(char *cron_sub, char *range_ary, int start, int min
 
 		char *saveptr = cron_line;
 		char *token = NULL;
-		while((token = SAFE_STRTOK_R(NULL, ",", &saveptr)))
+		while ((token = SAFE_STRTOK_R(NULL, ",", &saveptr)))
 		{
 			int i = SAFE_ATOI(token);
-			if(SAFE_STRCHR(token, '-'))
+			if (SAFE_STRCHR(token, '-'))
 			{
 				int idx_b = 0;
 				int idx_e = -1;
-				if(SAFE_SSCANF(token, "%d-%d", &idx_b, &idx_e) >= 2)
+				if (SAFE_SSCANF(token, "%d-%d", &idx_b, &idx_e) >= 2)
 				{
 					idx_b -= start;
 					idx_e -= start;
 					DBG_TR_LN("(cron_sub: %s, token: %s, idx_b: %d, idx_e: %d)", cron_sub, token, idx_b, idx_e);
-					for(i = idx_b; i <= idx_e && i <= max; i++)
+					for (i = idx_b; i <= idx_e && i <= max; i++)
 					{
 						range_ary[i] = 1;
 					}
 				}
 			}
-			else if(SAFE_STRCHR(token, '/'))
+			else if (SAFE_STRCHR(token, '/'))
 			{
 				int interval = 0;
-				if(SAFE_SSCANF(token, "*/%d", &interval) >= 1)
+				if (SAFE_SSCANF(token, "*/%d", &interval) >= 1)
 				{
 					int idx_b = min;
 					int idx_e = max;
 					DBG_TR_LN("(cron_sub: %s, token: %s, interval: %d)", cron_sub, token, interval);
-					for(i = idx_b; i <= idx_e; i+=interval)
+					for (i = idx_b; i <= idx_e; i+=interval)
 					{
 						range_ary[i] = 1;
 					}
 				}
 			}
-			else if(SAFE_STRCMP(token, "*") == 0)
+			else if (SAFE_STRCMP(token, "*") == 0)
 			{
 				int idx_b = min;
 				int idx_e = max;
-				for(i = idx_b; i <= idx_e; i++)
+				for (i = idx_b; i <= idx_e; i++)
 				{
 					range_ary[i] = 1;
 				}
@@ -104,15 +104,15 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 
 		char *saveptr = cron_line;
 		char *token = NULL;
-		while((token = SAFE_STRTOK_R(NULL, " ", &saveptr)))
+		while ((token = SAFE_STRTOK_R(NULL, " ", &saveptr)))
 		{
 			char range_ary[MAX_OF_CRON_RANGE]= {0};
-			switch(idx)
+			switch (idx)
 			{
 				case CRON_ID_MINUTE:
 					cronx_item2range(token, range_ary, 0, 0, 59);
 					DBG_TR_DUMP(range_ary, 60, " ", "range_ary (%s):", token);
-					if(range_ary[tm_min] == 1)
+					if (range_ary[tm_min] == 1)
 					{
 						// fit
 						fit ++;
@@ -126,7 +126,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_HOUR:
 					cronx_item2range(token, range_ary, 0, 0, 23);
 					DBG_TR_DUMP(range_ary, 24, " ", "range_ary (%s):", token);
-					if(range_ary[tm_hour] == 1)
+					if (range_ary[tm_hour] == 1)
 					{
 						// fit
 						fit ++;
@@ -140,7 +140,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_MDAY:
 					cronx_item2range(token, range_ary, 0, 1, 31);
 					DBG_TR_DUMP(range_ary, 32, " ", "range_ary (%s):", token);
-					if(range_ary[tm_mday] == 1)
+					if (range_ary[tm_mday] == 1)
 					{
 						// fit
 						fit ++;
@@ -154,7 +154,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_MONTH:
 					cronx_item2range(token, range_ary, 0, 1, 12);
 					DBG_TR_DUMP(range_ary, 13, " ", "range_ary (%s):", token);
-					if(range_ary[tm_mon] == 1)
+					if (range_ary[tm_mon] == 1)
 					{
 						// fit
 						fit ++;
@@ -168,7 +168,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_WDAY:
 					cronx_item2range(token, range_ary, 0, 0, 6);
 					DBG_TR_DUMP(range_ary, 7, " ", "range_ary (%s):", token);
-					if(range_ary[tm_wday] == 1)
+					if (range_ary[tm_wday] == 1)
 					{
 						// fit
 						fit ++;
@@ -183,10 +183,10 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				{
 					cronx_item2range(token, range_ary, CRON_YEAR_START_2020, CRON_YEAR_START_2020-CRON_YEAR_START_2020, CRON_YEAR_END_2120-CRON_YEAR_START_2020);
 					DBG_TR_DUMP(range_ary, CRON_YEAR_END_2120-CRON_YEAR_START_2020+1, " ", "range_ary (%s):", token);
-					if(tm_year>CRON_YEAR_START_2020)
+					if (tm_year>CRON_YEAR_START_2020)
 					{
 						tm_year -= CRON_YEAR_START_2020;
-						if(range_ary[tm_year] == 1)
+						if (range_ary[tm_year] == 1)
 						{
 							// fit
 							fit ++;
@@ -213,7 +213,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 
 exit_parser:
 		SAFE_FREE(cron_line);
-		if(fit>0)
+		if (fit>0)
 		{
 			DBG_IF_LN("%s (cron_txt: [%s], [%d %d %d %d %d %d], fit: %d)", DBG_TXT_GOT, cron_txt, tm_min, tm_hour, tm_mday, tm_mon, tm_wday, tm_year, fit);
 		}

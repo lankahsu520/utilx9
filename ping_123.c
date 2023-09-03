@@ -64,18 +64,18 @@ static void app_ParseArguments(int argc, char **argv)
 {
 	int opt;
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
 	{
-		switch(opt)
+		switch (opt)
 		{
 			case 'c':
-				if(optarg)
+				if (optarg)
 				{
 					chainX_recycle_set(&chainX_i, atoi(optarg));
 				}
 				break;
 			case 'i':
-				if(optarg)
+				if (optarg)
 				{
 					chainX_i.select_wait = atoi(optarg);
 				}
@@ -89,11 +89,11 @@ static void app_ParseArguments(int argc, char **argv)
 		}
 	}
 
-	if(argc > optind)
+	if (argc > optind)
 	{
 		int i = 0;
 		//for (i = optind; i < argc; i++)
-		for(i = optind; i < optind+1; i++)
+		for (i = optind; i < optind+1; i++)
 		{
 			chainX_hostname_set(&chainX_i, argv[i]);
 		}
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
 {
 	app_ParseArguments(argc, argv);
 
-	if((strlen(chainX_ip_get(&chainX_i)) > 0) ||
+	if ((strlen(chainX_ip_get(&chainX_i)) > 0) ||
 			(strlen(chainX_hostname_get(&chainX_i)) > 0))
 	{
 		int count = chainX_ping(&chainX_i);

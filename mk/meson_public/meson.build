@@ -166,6 +166,10 @@ LIB_ARY += dep_websockets
 dep_websockets_uv = cc.find_library('websockets-evlib_uv', required : LIB_REQUIRE_FULL)
 LIB_ARY += dep_websockets_uv
 
+#dependency('sqlite')
+dep_sqlite = cc.find_library('sqlite3', required : LIB_REQUIRE_FULL)
+LIB_ARY += dep_sqlite
+
 #dependency('curl')
 dep_curl = cc.find_library('curl', required : LIB_REQUIRE_FULL)
 LIB_ARY += dep_curl

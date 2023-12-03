@@ -69,7 +69,7 @@ ChainX_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb)
 		chainX_req->sockfd = -1;
 		chainX_req->c_data = (void*)userdata;
 		chainX_req->select_wait = TIMEOUT_OF_SELECT_1;
-		chainX_req->retry_hold = TIMEOUT_OF_RETRY_HOLD,
+		chainX_req->retry_hold = TIMEOUT_OF_RETRY_HOLD;
 					chainX_req->noblock =  1;
 		chainX_req->isfree = 0;
 

@@ -115,7 +115,7 @@ endif
 .configured: .patched
 	$(call generate_expiration, $(PJ_EXPIRATION_DATE))
 
-	[ -f $(CONFIG_CUSTOMER) ] || ($(PJ_ROOT)/confs/customer2def.sh; touch .customer; )
+	[ -f $(CONFIG_CUSTOMER) ] || ($(PJ_SH_CUSTOMER2DEF); touch .customer; )
 	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] || ($(PJ_SH_MKDIR) $(SDK_INC_DIR); $(PJ_SH_CP) include/* $(SDK_INC_DIR); )
 
 	touch $@

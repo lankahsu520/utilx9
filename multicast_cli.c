@@ -46,7 +46,6 @@ int main(int argc, char* argv[])
 			sendto(sockfd, buff, strlen(buff), 0, (struct sockaddr *)&srv, sizeof(srv));
 			printf("sendto (buff: %s)\n", buff);
 
-
 			sleep(1);
 		}
 	}

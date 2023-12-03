@@ -153,10 +153,8 @@ int URLEncode(const char *str, const int strsz, char *result, const int resultsz
 			if (j + 3 <= resultsz)
 			{
 				result[j++] = '%';
-				result[j++] = hexchars[(unsigned char)
-						ch >> 4];
-				result[j++] = hexchars[(unsigned char)
-						ch & 0xF];
+				result[j++] = hexchars[(unsigned char)ch >> 4];
+				result[j++] = hexchars[(unsigned char)ch & 0xF];
 			}
 			else
 			{

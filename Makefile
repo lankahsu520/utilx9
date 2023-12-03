@@ -91,6 +91,8 @@ CLEAN_BINS += \
 							proc_watch \
 							queuex_123 \
 							demo_123 \
+							multicast_cli \
+							multicast_srv \
 							demo_000
 
 # cpp

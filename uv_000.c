@@ -122,7 +122,8 @@ static void app_loop(void)
 #endif
 
 	SAFE_UV_LOOP_RUN(uv_loop);
-	SAFE_UV_LOOP_CLOSE(uv_loop);
+	//SAFE_UV_LOOP_CLOSE(uv_loop);
+	SAFE_UV_LOOP_CLOSE_VALGRIND(uv_loop);
 
 	goto exit_loop;
 

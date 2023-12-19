@@ -33,6 +33,11 @@
 static int is_quit = 0;
 static uv_loop_t *uv_loop = NULL;
 
+static int app_quit(void)
+{
+	return is_quit;
+}
+
 #ifdef USE_TIMER_CREATE
 uv_timer_t uv_timer_1_fd;
 uv_timer_t uv_timer_2_fd;
@@ -107,13 +112,16 @@ void queue_work_finisher(uv_work_t *req, int status)
 void queue_work_handler(uv_work_t *req)
 {
 	int count = 0;
-	while (count < MAX_OF_TEST)
+	while ( (count < MAX_OF_TEST) && (app_quit()==0) )
 	{
 		count++;
 		int id = *((int*) req->data);
 		DBG_IF_LN("(id: %d, count: %d)", id, count);
 
-		usleep((11-id)*1000*1000);
+		while ( (id>0) && (app_quit()==0) )
+		{
+			id --;
+		}
 	}
 }
 
@@ -230,11 +238,6 @@ UvEvent_t fs_event_req =
 
 #endif
 
-static int app_quit(void)
-{
-	return is_quit;
-}
-
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
@@ -253,6 +256,7 @@ void app_stop_uv(uv_async_t *handle, int force)
 
 			for (i=0; i<MAX_OF_QUEUE; i++)
 			{
+				DBG_IF_LN("(SAFE_UV_CANCEL: %d)", i);
 				SAFE_UV_CANCEL(&uv_work_req[i]);
 			}
 #endif
@@ -379,7 +383,8 @@ static void app_loop(void)
 #endif
 
 	SAFE_UV_LOOP_RUN(uv_loop);
-	SAFE_UV_LOOP_CLOSE(uv_loop);
+	//SAFE_UV_LOOP_CLOSE(uv_loop);
+	SAFE_UV_LOOP_CLOSE_VALGRIND(uv_loop);
 
 	goto exit_loop;
 

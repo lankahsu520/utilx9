@@ -2480,17 +2480,17 @@ typedef struct JSON_TopicX_STRUCT
 } JSON_TopicX_t;
 
 #define JSON_UTF8(X) \
-	({ json_t *__jobj = NULL; \
-		if (X) __jobj = json_stringn(X, strlen(X)); \
-		__jobj; \
+	({ json_t *__ret = NULL; \
+		if (X) __ret = json_stringn(X, strlen(X)); \
+		__ret; \
 	})
 
 #define JSON_REFCOUNT(X) \
-		({ long int ret = -1; \
+		({ long int __ret = -1; \
 			if (X) { \
-				ret = X->refcount;  \
+				__ret = X->refcount;  \
 			} \
-			ret; \
+			__ret; \
 		})
 
 #define JSON_FREE(X) \
@@ -2578,7 +2578,10 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_OBJ_FIND_RECURSIVE(jroot, key, jval, deepth, topic_parent, jfound_ary) json_object_lookup(jroot, key, jval, deepth, topic_parent, jfound_ary)
 #define JSON_OBJ_FIND_REUSE(jroot, key) \
 	({ json_t *__ret = NULL; \
-		do { if ( (JSON_CHECK_OBJ(jroot)) && ((__ret=JSON_OBJ_GET_OBJ(jroot, key))) ) json_incref(__ret);} while(0); \
+		do { \
+			if ( (JSON_CHECK_OBJ(jroot)) && ((__ret=JSON_OBJ_GET_OBJ(jroot, key))) ) \
+				json_incref(__ret); \
+		} while(0); \
 		__ret; \
 	})
 
@@ -2727,9 +2730,9 @@ typedef struct JSON_TopicX_STRUCT
 		__ret; \
 	})
 
-#define JSON_ARY_APPEND_STR(jary, val) JSON_ARY_APPEND_OBJ(jary, JSON_JSTR(val))
-#define JSON_ARY_APPEND_INT(jary, val) JSON_ARY_APPEND_OBJ(jary, JSON_JINT(val))
-#define JSON_ARY_APPEND_REAL(jary, val) JSON_ARY_APPEND_OBJ(jary, JSON_JREAL(val))
+#define JSON_ARY_APPEND_STR(jary, val) ({ json_t *__jval = JSON_JSTR(val); JSON_ARY_APPEND_OBJ(jary, __jval); __jval; })
+#define JSON_ARY_APPEND_INT(jary, val) ({ json_t *__jval = JSON_JINT(val); JSON_ARY_APPEND_OBJ(jary, __jval); __jval; })
+#define JSON_ARY_APPEND_REAL(jary, val) ({ json_t *__jval = JSON_JREAL(val); JSON_ARY_APPEND_OBJ(jary, __jval); __jval; })
 
 #define JSON_ARY_SET_NEW(jary, idx, jval) json_array_set_new(jary, idx, jval)
 
@@ -2957,6 +2960,15 @@ typedef struct SWLinkX_STRUCT
 		{ \
 			uv_stop((uv_loop_t*)loop); \
 			uv_loop_close((uv_loop_t*)loop); \
+			loop=NULL; \
+		} \
+	} while(0)
+
+#define SAFE_UV_LOOP_CLOSE_VALGRIND(loop) \
+	do { \
+		if (pcheck(loop)) \
+		{ \
+			uv_loop_close_ex((uv_loop_t*)loop); \
 			loop=NULL; \
 		} \
 	} while(0)

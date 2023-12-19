@@ -401,26 +401,34 @@ do_write:
 
 void usbX_dev_path(struct libusb_device *usb_dev, char *usb_path, int len)
 {
-	uint8_t bus_number = libusb_get_bus_number(usb_dev);
-	//uint8_t port_number = libusb_get_port_number(usb_dev);
-	SAFE_SNPRINTF(usb_path, len, "%d", bus_number);
-
-	uint8_t port_number_ary[LEN_OF_VAL32] = {0};
-	uint8_t port_numbers_count = libusb_get_port_numbers(usb_dev, port_number_ary, LEN_OF_VAL32);
-	if (port_numbers_count)
+	if (usb_dev)
 	{
-		int idx = 0;
-		SAFE_STRCAT(usb_path, "-");
-		for (idx = 0; idx < port_numbers_count; ++idx)
+		uint8_t bus_number = libusb_get_bus_number(usb_dev);
+		//uint8_t port_number = libusb_get_port_number(usb_dev);
+		DBG_WN_LN("(bus_number: %u)", bus_number);
+		SAFE_SNPRINTF(usb_path, len, "%d", bus_number);
+
+		uint8_t port_number_ary[LEN_OF_VAL32] = {0};
+		uint8_t port_numbers_count = libusb_get_port_numbers(usb_dev, port_number_ary, LEN_OF_VAL32);
+		if (port_numbers_count)
 		{
-			char port_number[LEN_OF_VAL16] = "";
-			SAFE_SPRINTF_EX(port_number, "%d", port_number_ary[idx]);
-			SAFE_STRCAT(usb_path, port_number);
-			if (idx+1 < port_numbers_count)
+			int idx = 0;
+			SAFE_STRCAT(usb_path, "-");
+			for (idx = 0; idx < port_numbers_count; ++idx)
 			{
-				SAFE_STRCAT(usb_path, ".");
+				char port_number[LEN_OF_VAL16] = "";
+				SAFE_SPRINTF_EX(port_number, "%d", port_number_ary[idx]);
+				SAFE_STRCAT(usb_path, port_number);
+				if (idx+1 < port_numbers_count)
+				{
+					SAFE_STRCAT(usb_path, ".");
+				}
 			}
 		}
+	}
+	else
+	{
+		DBG_ER_LN("usb_dev is NULL !!!");
 	}
 }
 
@@ -453,6 +461,7 @@ int usbX_dev_open(UsbX_t *usbX_req, struct libusb_device *usb_dev)
 		}
 
 		usbX_req->usb_dev_handle = libusb_open_device_with_vid_pid(usbX_req->usb_req, usbX_req->vendor_id, usbX_req->product_id);
+		usb_dev = libusb_get_device(usbX_req->usb_dev_handle);
 	}
 
 	if (usbX_req->usb_dev_handle == NULL)
@@ -502,7 +511,7 @@ int usbX_dev_open(UsbX_t *usbX_req, struct libusb_device *usb_dev)
 	}
 	else
 	{
-		DBG_DB_LN("Claimed Interface (usb_iface_idx: %d)", usbX_req->usb_iface_idx);
+		DBG_IF_LN("Claimed Interface (usb_iface_idx: %d)", usbX_req->usb_iface_idx);
 	}
 
 	usbX_dev_path(usb_dev, usbX_req->usb_path, LEN_OF_VAL32);

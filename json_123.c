@@ -78,6 +78,26 @@ int main(int argc, char* argv[])
 #if (1)
 	json_dump_simple(jroot, "jroot");
 
+	// JSON_ARY_DEL
+	{
+		json_t *jA_new = JSON_ARY_NEW();
+		int i = 0;
+		json_t *jA_item = NULL;
+		// copy all items of jA -> jA_new
+		JSON_ARY_FOREACH(jA, i, jA_item) {
+			json_t *jA_item_cpy = JSON_COPY(jA_item);
+			JSON_ARY_APPEND_OBJ(jA_new, jA_item_cpy);
+		}
+
+		// replace "jA": jA_new
+		JSON_OBJ_SET_OBJ(jroot, "jA", jA_new);
+		jA = JSON_OBJ_GET_OBJ(jroot, "jA");
+		DBG_WN_LN(">> (jA: %p, jA_new: %p)", jA, jA_new);
+		jA1 = JSON_ARY_GET(jA, 0);
+		jA2 = JSON_ARY_GET(jA, 1);
+		jA3 = JSON_ARY_GET(jA, 2);
+	}
+
 	{
 		DBG_WN_LN(">> update jB1->jA1");
 		// update jB1->jA1

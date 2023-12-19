@@ -23,17 +23,18 @@ void on_uv_close(uv_handle_t *handle)
 
 void on_uv_walk(uv_handle_t *handle, void *arg)
 {
-	SAFE_UV_CLOSE(handle, on_uv_close);
+	//SAFE_UV_CLOSE(handle, on_uv_close);
+	if (!uv_is_closing(handle))
+	{
+		uv_close(handle, NULL);
+	}
 }
 
 void uv_loop_close_ex(uv_loop_t *loop)
 {
-	uv_stop(loop);
-	int result = uv_loop_close(loop);
-	if (result == UV_EBUSY)
-	{
-		uv_walk(loop, on_uv_walk, NULL);
-	}
+	uv_walk(loop, on_uv_walk, NULL);
+	SAFE_UV_LOOP_RUN(loop);
+	uv_loop_close(loop);
 }
 
 static void uv_write_ex_cb(uv_write_t *req, int status)

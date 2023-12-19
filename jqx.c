@@ -262,7 +262,8 @@ void filter_parser_helper(int deep_s, json_t *jparent, char *saveptr, json_t *js
 
 	if (jslicing)
 	{
-		JSON_ARY_APPEND_OBJ(jslicing, JSON_COPY(jresult));
+		json_t *jresult_cpy = JSON_COPY(jresult);
+		JSON_ARY_APPEND_OBJ(jslicing, jresult_cpy);
 	}
 	else if (jslicing_root)
 	{

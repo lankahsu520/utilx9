@@ -2524,12 +2524,28 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_OBJ_FOREACH(jroot, key, jobj) json_object_foreach(jroot, key, jobj)
 
 // json_object_set_new will replace the old one
+// if fail, it will free jval
 #define JSON_OBJ_SET_OBJ(jroot, key, jval) \
 	({ int __ret = -1; \
 		do { \
-			if (jroot) \
+			if ((jroot) && (key) && (jval) && ((__ret = json_object_set_new(jroot, key, jval ))==0) ) \
 			{ \
-				__ret = json_object_set_new(jroot, key, jval ); \
+			} \
+			else \
+			{ \
+				JSON_FREE(jval); \
+				DBG_ER_LN("%s %p, %p or %p is NULL !!!", #jroot, jroot, key, jval);\
+			} \
+		} while(0); \
+		__ret; \
+	})
+
+// if fail, it will free jval
+#define JSON_OBJ_SET_OBJ_LINK(jroot, key, jval) \
+	({ int __ret = -1; \
+		do { \
+			if ( (jroot) && (key) && (jval) && ((__ret = json_object_set(jroot, key, jval ))==0) ) \
+			{ \
 			} \
 			else \
 			{ \
@@ -2539,22 +2555,6 @@ typedef struct JSON_TopicX_STRUCT
 		} while(0); \
 		__ret; \
 	})
-
-#define JSON_OBJ_SET_OBJ_LINK(jroot, key, jval) \
-		({ int __ret = -1; \
-			do { \
-				if (jroot) \
-				{ \
-					__ret = json_object_set(jroot, key, jval ); \
-				} \
-				else \
-				{ \
-					JSON_FREE(jval); \
-					DBG_ER_LN("%s is NULL !!!", #jroot);\
-				} \
-			} while(0); \
-			__ret; \
-		})
 
 #define JSON_OBJ_GET_OBJ(jroot, key) \
 	({ json_t *__jobj = NULL; \
@@ -2724,9 +2724,19 @@ typedef struct JSON_TopicX_STRUCT
 
 #define JSON_ARY_FOREACH(jary, idx, jval) json_array_foreach(jary, idx, jval)
 
+// if fail, it will free jval
 #define JSON_ARY_APPEND_OBJ(jary, jval) \
 	({ int __ret = -1; \
-		do { if ((jary) && (jval)) __ret = json_array_append_new(jary, jval ); else DBG_ER_LN("%p or %p is NULL !!!", jary, jval); } while(0); \
+		do { \
+			if ( (jary) && (jval) && ((__ret = json_array_append_new(jary, jval))==0) ) \
+			{ \
+			} \
+			else \
+			{ \
+				JSON_FREE(jval); \
+				DBG_ER_LN("%s %p or %p is NULL !!!", #jary, jary, jval); \
+			} \
+		} while(0); \
 		__ret; \
 	})
 

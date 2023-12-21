@@ -2528,7 +2528,7 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_OBJ_SET_OBJ(jroot, key, jval) \
 	({ int __ret = -1; \
 		do { \
-			if ((jroot) && (key) && (jval) && ((__ret = json_object_set_new(jroot, key, jval ))==0) ) \
+			if ((jroot) && (key) && (jval) && ((__ret = json_object_set_new(jroot, key, jval))==0) ) \
 			{ \
 			} \
 			else \
@@ -2544,7 +2544,7 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_OBJ_SET_OBJ_LINK(jroot, key, jval) \
 	({ int __ret = -1; \
 		do { \
-			if ( (jroot) && (key) && (jval) && ((__ret = json_object_set(jroot, key, jval ))==0) ) \
+			if ( (jroot) && (key) && (jval) && ((__ret = json_object_set(jroot, key, jval))==0) ) \
 			{ \
 			} \
 			else \
@@ -2964,16 +2964,28 @@ typedef struct SWLinkX_STRUCT
 
 #define SAFE_UV_LOOP_INIT(loop) do { if (loop==NULL) {loop=uv_default_loop();} } while(0)
 
-#define SAFE_UV_LOOP_CLOSE(loop) \
+#define SAFE_UV_LOOP_STOP(loop) \
 	do { \
 		if (pcheck(loop)) \
 		{ \
 			uv_stop((uv_loop_t*)loop); \
+		} \
+	} while(0)
+
+#define SAFE_UV_LOOP_CLOSE(loop) \
+	do { \
+		if (pcheck(loop)) \
+		{ \
+			SAFE_UV_LOOP_STOP((uv_loop_t*)loop); \
 			uv_loop_close((uv_loop_t*)loop); \
 			loop=NULL; \
 		} \
 	} while(0)
 
+// https://raw.githubusercontent.com/libuv/libuv/v1.x/test/task.h
+/* This macro cleans up the event loop. This is used to avoid valgrind
+ * warnings about memory being "leaked" by the event loop.
+ */
 #define SAFE_UV_LOOP_CLOSE_VALGRIND(loop) \
 	do { \
 		if (pcheck(loop)) \

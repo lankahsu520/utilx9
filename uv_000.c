@@ -34,9 +34,23 @@ uv_async_t uv_async_fd;
 uv_timer_t uv_timer_1sec_fd;
 void timer_1sec_loop(uv_timer_t *handle)
 {
-	DBG_IF_LN("kick async every 1 second.");
+	static int countdown = 3;
 
-	SAFE_UV_ASYNC(&uv_async_fd);
+	countdown--;
+	DBG_IF_LN("kick async every 1 second. (countdown: %d)", countdown);
+	if (countdown > 0)
+	{
+		SAFE_UV_ASYNC(&uv_async_fd);
+	}
+	else
+	{
+		SAFE_UV_TIMER_STOP(handle);
+		SAFE_UV_TIMER_CLOSE(handle, NULL);
+
+		SAFE_UV_CLOSE(&uv_async_fd, NULL);
+
+		//SAFE_UV_LOOP_STOP(uv_loop);
+	}
 }
 #endif
 
@@ -70,6 +84,11 @@ void app_stop_uv(uv_async_t *handle, int force)
 	}
 }
 
+static void app_set_quit(int mode)
+{
+	is_quit = mode;
+}
+
 #ifdef USE_ASYNC_CREATE
 //uv_async_t uv_async_fd;
 int async_count = 0;
@@ -78,14 +97,15 @@ void async_loop(uv_async_t *handle)
 {
 	DBG_IF_LN(DBG_TXT_ENTER);
 
-	app_stop_uv(handle, 0);
+	int *data = handle->data;
+	*data += 1;
+
+	{
+		DBG_IF_LN("(*data: %d)", *data);
+		app_stop_uv(handle, 0);
+	}
 }
 #endif
-
-static void app_set_quit(int mode)
-{
-	is_quit = mode;
-}
 
 static void app_stop(void)
 {
@@ -122,8 +142,8 @@ static void app_loop(void)
 #endif
 
 	SAFE_UV_LOOP_RUN(uv_loop);
-	//SAFE_UV_LOOP_CLOSE(uv_loop);
-	SAFE_UV_LOOP_CLOSE_VALGRIND(uv_loop);
+	SAFE_UV_LOOP_CLOSE(uv_loop);
+	//SAFE_UV_LOOP_CLOSE_VALGRIND(uv_loop);
 
 	goto exit_loop;
 

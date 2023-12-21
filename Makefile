@@ -95,6 +95,8 @@ CLEAN_BINS += \
 							multicast_srv \
 							demo_000
 
+CLEAN_BINS += demo_valgrind
+
 # cpp
 CLEAN_BINS += \
 

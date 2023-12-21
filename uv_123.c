@@ -52,7 +52,7 @@ void timer_1_loop(uv_timer_t *handle)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
-		DBG_IF_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
+		DBG_IF_LN("%s", DBG_TXT_BYE_BYE);
 	}
 }
 
@@ -65,7 +65,7 @@ void timer_2_loop(uv_timer_t *handle)
 	{
 		//SAFE_UV_TIMER_STOP(handle);
 		SAFE_UV_TIMER_CLOSE(handle, NULL);
-		DBG_IF_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
+		DBG_IF_LN("%s", DBG_TXT_BYE_BYE);
 	}
 }
 #endif
@@ -106,7 +106,7 @@ uv_work_t uv_work_req[MAX_OF_QUEUE];
 void queue_work_finisher(uv_work_t *req, int status)
 {
 	int id = *((int*) req->data);
-	DBG_IF_LN("%s (%s, id: %d, status: %d)", DBG_TXT_BYE_BYE, TAG, id, status);
+	DBG_IF_LN("%s (id: %d, status: %d)", DBG_TXT_BYE_BYE, id, status);
 }
 
 void queue_work_handler(uv_work_t *req)

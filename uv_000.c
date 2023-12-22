@@ -62,7 +62,7 @@ static int app_quit(void)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if ((is_free==0) && (app_quit()==1))
+	if ( (is_free==0) && (app_quit()==1) )
 	{
 		is_free = 1;
 		if (uv_loop)
@@ -209,12 +209,12 @@ static struct option long_options[] =
 
 static void app_showusage(int exit_code)
 {
-	printf("Usage: %s\n"
-		"  -d, --debug       debug level\n"
-		"  -h, --help\n", TAG);
-	printf("Version: %s\n", version_show());
-	printf("Example:\n"
-		"  %s -d 4\n", TAG);
+	printf( "Usage: %s\n"
+					"  -d, --debug       debug level\n"
+					"  -h, --help\n", TAG);
+	printf( "Version: %s\n", version_show());
+	printf( "Example:\n"
+					"  %s -d 4\n", TAG);
 	exit(exit_code);
 }
 
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if (app_init() == -1)
+	if ( app_init() == -1 )
 	{
 		return -1;
 	}

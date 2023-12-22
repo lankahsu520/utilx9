@@ -207,12 +207,12 @@ static struct option long_options[] =
 
 static void app_showusage(int exit_code)
 {
-	printf("Usage: %s\n"
-		"  -d, --debug       debug level\n"
-		"  -h, --help\n", TAG);
-	printf("Version: %s\n", version_show());
-	printf("Example:\n"
-		"  %s -d 4\n", TAG);
+	printf( "Usage: %s\n"
+					"  -d, --debug       debug level\n"
+					"  -h, --help\n", TAG);
+	printf( "Version: %s\n", version_show());
+	printf( "Example:\n"
+					"  %s -d 4\n", TAG);
 	exit(exit_code);
 }
 
@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
 #if (1)
 	ws_entry_init();
 
-	if (wsdiscovery_open())
+	if ( wsdiscovery_open() )
 	{
 		wsdiscovery_probematches_register(wsd_ProbeMatches_cb);
 		wsdiscovery_probe_register(wsd_Probe_cb);

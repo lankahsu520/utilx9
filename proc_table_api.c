@@ -137,7 +137,7 @@ void proc_entry_scan(clist_t head)
 				char *saveptr = NULL;
 				char *first = SAFE_STRTOK_R(cmdline, " ", &saveptr);
 				ProcList_t *proc_entry = proc_entry_search(head, first);
-				if (proc_entry)
+				if ( proc_entry )
 				{
 					proc_entry->procinfo.pid = pid;
 					ProcInfo_t *procinfo_req = &proc_entry->procinfo;

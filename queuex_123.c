@@ -33,7 +33,7 @@ static int test_q_exec_cb(void *arg)
 {
 	TestX_t *data_pop = (TestX_t *)arg;
 
-	if ((data_pop))
+	if ( (data_pop) )
 	{
 		DBG_IF_LN("(data_pop->idx: %d)", data_pop->idx);
 		idx--;
@@ -91,7 +91,7 @@ static void app_loop(void)
 	test_q->dbg_more = DBG_LVL_INFO;
 	queuex_isready(test_q, 5);
 
-	while ((idx < 5) && (is_quit==0))
+	while ( ( idx < 5 ) && (is_quit==0) )
 	{
 #if (0)
 		idx++;
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 	app_signal_register();
 	atexit(app_exit);
 
-	if (app_init() == -1)
+	if ( app_init() == -1 )
 	{
 		return -1;
 	}

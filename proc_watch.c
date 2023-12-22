@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 
 	SAFE_STDOUT_NONE();
-	if (app_init() == -1)
+	if ( app_init() == -1 )
 	{
 		return -1;
 	}

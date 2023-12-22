@@ -137,7 +137,7 @@ int URLEncode(const char *str, const int strsz, char *result, const int resultsz
 	for (i = 0, j = 0; i < strsz && j < resultsz; i++)
 	{
 		ch = * (str + i);
-		if ((ch >= 'A' && ch <= 'Z')
+		if ( (ch >= 'A' && ch <= 'Z')
 			|| (ch >= 'a' && ch <= 'z')
 			|| (ch >= '0' && ch <= '9')
 			|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?')
@@ -200,7 +200,7 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 	{
 		return - 1;
 	}
-	while ((i < strsz) && (j < resultsz))
+	while ( (i < strsz) && (j < resultsz) )
 	{
 		ch = * (str + i);
 		if (ch == '+')
@@ -249,7 +249,7 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 					return - 2;
 				}
 
-				if ((a == '"') || (a == '\''))
+				if ( (a == '"') || (a == '\'') )
 				{
 					// to remove " or ' from the uri
 				}
@@ -282,7 +282,7 @@ int URLDecode(const char *str, const int strsz, char *result, const int resultsz
 #if (1)
 		else if (isascii(ch))
 #else
-		else if ((ch >= 'A' && ch <= 'Z')
+		else if ( (ch >= 'A' && ch <= 'Z')
 			|| (ch >= 'a' && ch <= 'z')
 			|| (ch >= '0' && ch <= '9')
 			|| ch == '.' || ch == '-' || ch == '*' || ch == '_' || ch == '?' || ch == '=' || ch == '&' || ch == '[' || ch == ']')

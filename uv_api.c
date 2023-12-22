@@ -110,7 +110,7 @@ static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv
 	else if (nread > 0)
 	{
 		SpawnX_t *spawn_req = (SpawnX_t *)stream->data;
-		if ((spawn_req) && (spawn_req->pipe_out_cb))
+		if ( (spawn_req) && (spawn_req->pipe_out_cb) )
 		{
 			spawn_req->pipe_out_cb(stream, nread, buf);
 		}
@@ -129,13 +129,13 @@ static void uv_spawn_pipe_stdout_cb(uv_stream_t *stream, ssize_t nread, const uv
 
 void uv_spawn_close_ex(SpawnX_t *spawn_req)
 {
-	if ((spawn_req) && (spawn_req->quit==0))
+	if ( (spawn_req) && (spawn_req->quit==0) )
 	{
 		SAFE_UV_PROCESS_KILL(&spawn_req->child_req, SIGTERM);
 		//SAFE_UV_PROCESS_KILL(&spawn_req->child_req, SIGQUIT);
 		//SAFE_UV_KILL(spawn_req->child_req.pid, SIGTERM);
 
-		if ((spawn_req->options.flags & UV_PROCESS_DETACHED) == UV_PROCESS_DETACHED)
+		if ( (spawn_req->options.flags & UV_PROCESS_DETACHED) == UV_PROCESS_DETACHED )
 		{
 			SAFE_UV_UNREF(&spawn_req->child_req);
 		}
@@ -155,7 +155,7 @@ void uv_spawn_open_ex(SpawnX_t *spawn_req)
 
 		spawn_req->child_req.data = (void *)spawn_req;
 		int r = uv_spawn(spawn_req->loop, &spawn_req->child_req, &spawn_req->options);
-		if (r == 0)
+		if ( r == 0 )
 		{
 			spawn_req->pipe_out.data = (void *)spawn_req;
 			SAFE_UV_READ_START((uv_stream_t*)&spawn_req->pipe_out, uv_alloc_ex_cb, uv_spawn_pipe_stdout_cb);
@@ -183,7 +183,7 @@ void uv_spawn_on_exit(uv_process_t *req, int64_t exit_status, int term_signal)
 
 void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...)
 {
-	if ((spawn_req) && (spawn_req->loop) && (num < MAX_OF_SPAWN_ARGS))
+	if ( (spawn_req) && (spawn_req->loop) && (num < MAX_OF_SPAWN_ARGS) )
 	{
 		int i = 0;
 
@@ -242,7 +242,7 @@ static void uv_event_cb(uv_fs_event_t *handle, const char *filename, int events,
 
 void uv_event_close_ex(UvEvent_t *event_req)
 {
-	if ((event_req) && (event_req->isquit==0))
+	if ( (event_req) && (event_req->isquit==0) )
 	{
 		event_req->isquit = 1;
 		uv_fs_event_stop(&event_req->req);
@@ -252,7 +252,7 @@ void uv_event_close_ex(UvEvent_t *event_req)
 
 void uv_event_open_ex(UvEvent_t *event_req)
 {
-	if ((event_req) && (event_req->loop))
+	if ( (event_req) && (event_req->loop) )
 	{
 		event_req->req.data = (void *)event_req;
 		uv_fs_event_init(event_req->loop, &event_req->req);

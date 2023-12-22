@@ -25,14 +25,14 @@ static void cronx_item2range(char *cron_sub, char *range_ary, int start, int min
 
 		char *saveptr = cron_line;
 		char *token = NULL;
-		while ((token = SAFE_STRTOK_R(NULL, ",", &saveptr)))
+		while ( (token = SAFE_STRTOK_R(NULL, ",", &saveptr)) )
 		{
 			int i = SAFE_ATOI(token);
-			if (SAFE_STRCHR(token, '-'))
+			if ( SAFE_STRCHR(token, '-') )
 			{
 				int idx_b = 0;
 				int idx_e = -1;
-				if (SAFE_SSCANF(token, "%d-%d", &idx_b, &idx_e) >= 2)
+				if ( SAFE_SSCANF(token, "%d-%d", &idx_b, &idx_e) >= 2 )
 				{
 					idx_b -= start;
 					idx_e -= start;
@@ -43,10 +43,10 @@ static void cronx_item2range(char *cron_sub, char *range_ary, int start, int min
 					}
 				}
 			}
-			else if (SAFE_STRCHR(token, '/'))
+			else if ( SAFE_STRCHR(token, '/') )
 			{
 				int interval = 0;
-				if (SAFE_SSCANF(token, "*/%d", &interval) >= 1)
+				if ( SAFE_SSCANF(token, "*/%d", &interval) >= 1 )
 				{
 					int idx_b = min;
 					int idx_e = max;
@@ -57,7 +57,7 @@ static void cronx_item2range(char *cron_sub, char *range_ary, int start, int min
 					}
 				}
 			}
-			else if (SAFE_STRCMP(token, "*") == 0)
+			else if ( SAFE_STRCMP(token, "*") == 0 )
 			{
 				int idx_b = min;
 				int idx_e = max;
@@ -104,15 +104,15 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 
 		char *saveptr = cron_line;
 		char *token = NULL;
-		while ((token = SAFE_STRTOK_R(NULL, " ", &saveptr)))
+		while ( (token = SAFE_STRTOK_R(NULL, " ", &saveptr)) )
 		{
-			char range_ary[MAX_OF_CRON_RANGE]= {0};
+			char range_ary[MAX_OF_CRON_RANGE]={0};
 			switch (idx)
 			{
 				case CRON_ID_MINUTE:
 					cronx_item2range(token, range_ary, 0, 0, 59);
 					DBG_TR_DUMP(range_ary, 60, " ", "range_ary (%s):", token);
-					if (range_ary[tm_min] == 1)
+					if ( range_ary[tm_min] == 1 )
 					{
 						// fit
 						fit ++;
@@ -126,7 +126,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_HOUR:
 					cronx_item2range(token, range_ary, 0, 0, 23);
 					DBG_TR_DUMP(range_ary, 24, " ", "range_ary (%s):", token);
-					if (range_ary[tm_hour] == 1)
+					if ( range_ary[tm_hour] == 1 )
 					{
 						// fit
 						fit ++;
@@ -140,7 +140,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_MDAY:
 					cronx_item2range(token, range_ary, 0, 1, 31);
 					DBG_TR_DUMP(range_ary, 32, " ", "range_ary (%s):", token);
-					if (range_ary[tm_mday] == 1)
+					if ( range_ary[tm_mday] == 1 )
 					{
 						// fit
 						fit ++;
@@ -154,7 +154,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_MONTH:
 					cronx_item2range(token, range_ary, 0, 1, 12);
 					DBG_TR_DUMP(range_ary, 13, " ", "range_ary (%s):", token);
-					if (range_ary[tm_mon] == 1)
+					if ( range_ary[tm_mon] == 1 )
 					{
 						// fit
 						fit ++;
@@ -168,7 +168,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 				case CRON_ID_WDAY:
 					cronx_item2range(token, range_ary, 0, 0, 6);
 					DBG_TR_DUMP(range_ary, 7, " ", "range_ary (%s):", token);
-					if (range_ary[tm_wday] == 1)
+					if ( range_ary[tm_wday] == 1 )
 					{
 						// fit
 						fit ++;
@@ -180,16 +180,22 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 					}
 					break;
 				case CRON_ID_YEAR:
-				{
-					cronx_item2range(token, range_ary, CRON_YEAR_START_2020, CRON_YEAR_START_2020-CRON_YEAR_START_2020, CRON_YEAR_END_2120-CRON_YEAR_START_2020);
-					DBG_TR_DUMP(range_ary, CRON_YEAR_END_2120-CRON_YEAR_START_2020+1, " ", "range_ary (%s):", token);
-					if (tm_year>CRON_YEAR_START_2020)
 					{
-						tm_year -= CRON_YEAR_START_2020;
-						if (range_ary[tm_year] == 1)
+						cronx_item2range(token, range_ary, CRON_YEAR_START_2020, CRON_YEAR_START_2020-CRON_YEAR_START_2020, CRON_YEAR_END_2120-CRON_YEAR_START_2020);
+						DBG_TR_DUMP(range_ary, CRON_YEAR_END_2120-CRON_YEAR_START_2020+1, " ", "range_ary (%s):", token);
+						if (tm_year>CRON_YEAR_START_2020)
 						{
-							// fit
-							fit ++;
+							tm_year -= CRON_YEAR_START_2020;
+							if ( range_ary[tm_year] == 1)
+							{
+								// fit
+								fit ++;
+							}
+							else
+							{
+								fit = -1;
+								goto exit_parser;
+							}
 						}
 						else
 						{
@@ -197,13 +203,7 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm)
 							goto exit_parser;
 						}
 					}
-					else
-					{
-						fit = -1;
-						goto exit_parser;
-					}
-				}
-				break;
+					break;
 				default:
 					break;
 			}

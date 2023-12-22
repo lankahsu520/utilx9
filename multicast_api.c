@@ -32,7 +32,7 @@ void mctt_publish(ChainX_t *chainX_req, char *payload, int payload_len)
 
 static void mctt_response(ChainX_t *chainX_req, char *buff, int buff_len)
 {
-	if ((chainX_req) && (buff) && (buff_len > (4+sizeof(int))))
+	if ( (chainX_req) && (buff) && (buff_len > (4+sizeof(int))) )
 	{
 		MCTT_t *packet_rcv = (MCTT_t *)buff;
 		if (packet_rcv->bom == MCTT_BOM)
@@ -51,7 +51,7 @@ static void mctt_response(ChainX_t *chainX_req, char *buff, int buff_len)
 
 void mctt_thread_close(ChainX_t *chainX_req)
 {
-	if ((chainX_req) && (chainX_req->isfree == 0))
+	if ( (chainX_req) && ( chainX_req->isfree == 0 ) )
 	{
 		chainX_thread_stop(chainX_req);
 		chainX_thread_close(chainX_req);
@@ -70,7 +70,7 @@ ChainX_t *mctt_thread_init(void *userdata, char *ip, int port, mctt_recv_fn cb)
 		chainX_req->c_data = (void*)userdata;
 		chainX_req->select_wait = TIMEOUT_OF_SELECT_1;
 		chainX_req->retry_hold = TIMEOUT_OF_RETRY_HOLD;
-					chainX_req->noblock =  1;
+		chainX_req->noblock = 1;
 		chainX_req->isfree = 0;
 
 		chainX_ip_set(chainX_req, ip);

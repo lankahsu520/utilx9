@@ -100,7 +100,7 @@ void timer_30mins_loop(uv_timer_t *handle)
 void app_stop_uv(uv_async_t *handle, int force)
 {
 	static int is_free = 0;
-	if ((is_free==0) && (app_quit()==1))
+	if ( (is_free==0) && (app_quit()==1) )
 	{
 		is_free = 1;
 		if (uv_loop)
@@ -183,7 +183,7 @@ static void app_loop(void)
 		SAFE_UV_LOOP_CLOSE(uv_loop);
 	}
 #else
-	while (app_quit()==0)
+	while ( app_quit()==0 )
 	{
 		sleep(1);
 	}
@@ -254,13 +254,13 @@ static struct option long_options[] =
 
 static void app_showusage(int exit_code)
 {
-	printf("Usage: %s\n"
-		"  -d, --debug       debug level\n"
-		"  -a, --alarm       alarm\n"
-		"  -h, --help\n", TAG);
-	printf("Version: %s\n", version_show());
-	printf("Example:\n"
-		"  %s -a \"*/1 * * * * 2022 \" -d 2\n", TAG);
+	printf( "Usage: %s\n"
+					"  -d, --debug       debug level\n"
+					"  -a, --alarm       alarm\n"
+					"  -h, --help\n", TAG);
+	printf( "Version: %s\n", version_show());
+	printf( "Example:\n"
+					"  %s -a \"*/1 * * * * 2022 \" -d 2\n", TAG);
 	exit(exit_code);
 }
 
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 	atexit(app_exit);
 
 	SAFE_STDOUT_NONE();
-	if (app_init() == -1)
+	if ( app_init() == -1 )
 	{
 		return -1;
 	}

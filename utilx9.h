@@ -294,7 +294,7 @@ void* pcheck(void* a);
 	({ char *__ret = NULL; do { if (pcheck(str)) { __ret = strrchr(str, c); } } while(0); __ret; })
 
 #define SAFE_STRSEP(str, delim) \
-		({ char *__ret = NULL; do { if (pcheck(str)) { __ret = strsep(&str, delim); } } while(0); __ret; })
+	({ char *__ret = NULL; do { if (pcheck(str)) { __ret = strsep(&str, delim); } } while(0); __ret; })
 
 #define SAFE_SSCANF(str, args...) \
 	({ int __ret =0; do { if (pcheck(str)) { __ret = sscanf(str, ## args); } } while(0); __ret; })
@@ -327,9 +327,9 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 
 /** read/write **/
 #define SAFE_WRITE(fd, buf, count) \
-		({ size_t __ret = 0; do { if (pcheck(buf)) { __ret = write(fd, buf, count); } } while(0); __ret; })
+	({ size_t __ret = 0; do { if (pcheck(buf)) { __ret = write(fd, buf, count); } } while(0); __ret; })
 #define SAFE_READ(fd, buf, count) \
-		({ size_t __ret = 0; do { if (pcheck(buf)) { __ret = read(fd, buf, count); } } while(0); __ret; })
+	({ size_t __ret = 0; do { if (pcheck(buf)) { __ret = read(fd, buf, count); } } while(0); __ret; })
 
 #define SAFE_FWRITE(ptr, count, num, stream) \
 	({ size_t __ret = 0; do { if ((stream) && (pcheck(ptr))) { __ret = fwrite(ptr, count, num, stream); } } while(0); __ret; })
@@ -394,7 +394,7 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 #define SAFE_STRTOLL(str) \
 	({ long long  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2) && (strncasecmp(str, "0x", 2)==0)) { __ret = strtoll(str, NULL, 16); } else { __ret=strtoll(str, NULL, 10); } } while(0); __ret; })
 #define SAFE_STRTOD(str) \
-		({ double  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2) && (strncasecmp(str, "0x", 2)==0)) { __ret = strtod(str, NULL, 16); } else { __ret=strtod(str, NULL, 10); } } while(0); __ret; })
+	({ double  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2) && (strncasecmp(str, "0x", 2)==0)) { __ret = strtod(str, NULL, 16); } else { __ret=strtod(str, NULL, 10); } } while(0); __ret; })
 
 #define SAFE_STRTOL_EX(str, endptr) \
 	({ long  __ret =0; do { if ((pcheck(str)) && (strlen((const char *)str)>2) && (strncasecmp(str, "0x", 2)==0)) { __ret = strtol(str, &endptr, 16); } else { __ret=strtol(str, &endptr, 10); } } while(0); __ret; })
@@ -480,12 +480,12 @@ int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int 
 #define SAFE_SEMAPHORE_GETVALUE(ptr, val) sem_getvalue(&ptr->semaphore, val)
 
 #define SAFE_MUTEX_DESTROY(in_mtx_p) \
-		({ int __ret = EINVAL; \
-			do { \
-				__ret = pthread_mutex_destroy(in_mtx_p); \
-			} while(0); \
-			__ret; \
-		})
+	({ int __ret = EINVAL; \
+		do { \
+			__ret = pthread_mutex_destroy(in_mtx_p); \
+		} while(0); \
+		__ret; \
+	})
 
 #define SAFE_MUTEX_DESTROY_EX(ptr) SAFE_MUTEX_DESTROY(&ptr->in_mtx)
 
@@ -2486,12 +2486,12 @@ typedef struct JSON_TopicX_STRUCT
 	})
 
 #define JSON_REFCOUNT(X) \
-		({ long int __ret = -1; \
-			if (X) { \
-				__ret = X->refcount;  \
-			} \
-			__ret; \
-		})
+	({ long int __ret = -1; \
+		if (X) { \
+			__ret = X->refcount;  \
+		} \
+		__ret; \
+	})
 
 #define JSON_FREE(X) \
 	do { \
@@ -2563,10 +2563,10 @@ typedef struct JSON_TopicX_STRUCT
 	})
 
 #define JSON_OBJ_GET_ARY_EX(jroot, key) \
-		({ json_t *__jobj = NULL; \
-			if (jroot) __jobj = json_ary_create(jroot, key); \
-			__jobj; \
-		})
+	({ json_t *__jobj = NULL; \
+		if (jroot) __jobj = json_ary_create(jroot, key); \
+		__jobj; \
+	})
 
 #define JSON_OBJ_GET_OBJ_EX(jroot, key) \
 	({ json_t *__jobj = NULL; \
@@ -2751,12 +2751,12 @@ typedef struct JSON_TopicX_STRUCT
 #define JSON_FLAGS_EASY JSON_COMPACT|JSON_ENSURE_ASCII|JSON_SORT_KEYS|JSON_PRESERVE_ORDER
 
 #define JSON_DUMP_FILE_FLAGS(x, filename, y) \
-		({ int __ret = 0; \
-			do { \
-				if ( (x) && (pcheck(filename)) && (strlen(filename)>0) ) __ret = json_dump_file(x, filename, y); \
-			} while(0); \
-			__ret; \
-		})
+	({ int __ret = 0; \
+		do { \
+			if ( (x) && (pcheck(filename)) && (strlen(filename)>0) ) __ret = json_dump_file(x, filename, y); \
+		} while(0); \
+		__ret; \
+	})
 
 #define JSON_DUMP_FILE_EASY(x, filename) \
 	({ int __ret = 0; \
@@ -2767,12 +2767,12 @@ typedef struct JSON_TopicX_STRUCT
 	})
 
 #define JSON_DUMPS_FLAGS(x,y) \
-		({ char *__ret = NULL; \
-			do { \
-				if (x) __ret = json_dumps( x, y ); \
-			} while(0); \
-			__ret; \
-		})
+	({ char *__ret = NULL; \
+		do { \
+			if (x) __ret = json_dumps( x, y ); \
+		} while(0); \
+		__ret; \
+	})
 
 #define JSON_DUMPS_EASY(x) \
 	({ char *__ret = NULL; \
@@ -2996,12 +2996,12 @@ typedef struct SWLinkX_STRUCT
 	} while(0)
 
 #define SAFE_UV_READ_STOP(stream) \
-		({ int __ret = 0;\
-			do { \
-				__ret = uv_read_stop((uv_stream_t*)stream); \
-			} while(0); \
-			__ret; \
-		})
+	({ int __ret = 0;\
+		do { \
+			__ret = uv_read_stop((uv_stream_t*)stream); \
+		} while(0); \
+		__ret; \
+	})
 
 #define SAFE_UV_CLOSE(handle, close_cb) \
 	({ int __ret = 0;\
@@ -3104,15 +3104,15 @@ typedef struct SWLinkX_STRUCT
 	})
 
 #define SAFE_UV_FS_CLOSE(loop, req, file, cb) \
-		({ int __ret = 0;\
-			do { \
-				if (pcheck(loop)) \
-				{ \
-					__ret = uv_fs_close(loop, req, file, cb); \
-				} \
-			} while(0); \
-			__ret; \
-		})
+	({ int __ret = 0;\
+		do { \
+			if (pcheck(loop)) \
+			{ \
+				__ret = uv_fs_close(loop, req, file, cb); \
+			} \
+		} while(0); \
+		__ret; \
+	})
 
 #define SAFE_UV_FS_READ(loop, req, file, bufs, nbufs, off, cb) \
 	({ int __ret = 0;\
@@ -3167,15 +3167,15 @@ typedef struct SWLinkX_STRUCT
 		__ret; \
 	})
 #define SAFE_UV_TIMER_GET_DUE_IN(handle) \
-		({ uint64_t  __ret = 0;\
-			do { \
-				if (pcheck(handle)) \
-				{ \
-					__ret = uv_timer_get_due_in((const uv_timer_t*)handle); \
-				} \
-			} while(0); \
-			__ret; \
-		})
+	({ uint64_t  __ret = 0;\
+		do { \
+			if (pcheck(handle)) \
+			{ \
+				__ret = uv_timer_get_due_in((const uv_timer_t*)handle); \
+			} \
+		} while(0); \
+		__ret; \
+	})
 
 #define SAFE_UV_TIMER_STOP(handle) \
 	({ int __ret = 0;\

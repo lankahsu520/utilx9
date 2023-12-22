@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 	{
 		char path[] = "/etc/passwd";
 		char actualpath [PATH_MAX+1] = "";
-		if (file_path(path, actualpath))
+		if ( file_path(path, actualpath) )
 		{
 			DBG_IF_LN("(actualpath: %s)", actualpath);
 		}

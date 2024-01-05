@@ -873,14 +873,21 @@ void pfile_lookup(char *cmdline, newline_lookup_fn lookup_cb, void *arg);
 char *os_random_uuid(char *buf, int buf_len);
 char *os_urandom(int byte_count);
 #ifdef UTIL_EX_SSL
+#define EVP_KEY_LEN 16
+//#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if (1)
+// https://www.openssl.org/docs/manmaster/man7/migration_guide.html#Deprecated-low-level-encryption-functions
+int sec_aes_cbc_encX(char *in, int in_len, char *out, unsigned char *evp_key, unsigned char*iv_key, int pad);
+int sec_aes_cbc_decX(char *in, int in_len, char *out, unsigned char *evp_key, unsigned char*iv_key, int pad);
+#endif
 char *sec_base64_enc(char *input, int length, int *enc_len);
 char *sec_base64_dec(char *input, int length, int *dec_len);
 
-int sec_aes_cbc_enc(char *in, char *out, char *aes_key);
-char *sec_aes_cbc_enc_ascii(char *in, int in_len, char *aes_key);
-char *sec_aes_cbc_enc_base(char *in, int in_len, char *aes_key);
-int sec_aes_cbc_dec(char *in, char *out, int out_len, char *aes_key);
-int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key);
+int sec_aes_cbc_enc(char *in, int in_len, char *out, unsigned char *evp_key, unsigned char*iv_key);
+char *sec_aes_cbc_enc_ascii(char *in, int in_len, unsigned char *evp_key, unsigned char*iv_key);
+char *sec_aes_cbc_enc_base(char *in, int in_len, unsigned char *evp_key, unsigned char*iv_key);
+int sec_aes_cbc_dec(char *in, int in_len, char *out, int out_len, unsigned char *evp_key, unsigned char*iv_key);
+int sec_aes_cbc_dec_base(char *in, int in_len, char *out, int out_len, unsigned char *evp_key, unsigned char*iv_key);
 #endif
 
 #define UTIL_EX_BASIC_QBUF

@@ -916,35 +916,152 @@ char *os_urandom(int byte_count)
 
 
 #ifdef UTIL_EX_SSL
-int sec_aes_cbc_enc(char *in, char *out, char *aes_key)
+//#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if (1)
+// https://www.openssl.org/docs/manmaster/man7/migration_guide.html#Deprecated-low-level-encryption-functions
+int sec_aes_cbc_encX(char *in, int in_len, char *out, unsigned char *evp_key, unsigned char*iv_key, int pad)
 {
-	int ret = 0;
-	AES_KEY aes;
-	int out_len;
-	unsigned char iv[AES_BLOCK_SIZE];
+	int ret = -1;
+	EVP_CIPHER_CTX *evp_ctx = NULL;
 
 	if (!in || !out)
 	{
-		return 0;
+		goto exit_enc;
 	}
+	DBG_DB_LN("(evp_key: %s, iv_key: %s, pad: %d)", evp_key, iv_key, pad);
 
-	memcpy(iv, aes_key, AES_BLOCK_SIZE);
+	evp_ctx = EVP_CIPHER_CTX_new();
+	//EVP_CIPHER_CTX_set_key_length(evp_ctx, 16);
+	EVP_CIPHER_CTX_set_padding(evp_ctx, pad);
 
-	if (AES_set_encrypt_key((unsigned char*)iv, 128, &aes) < 0)
+	if ( EVP_EncryptInit_ex(evp_ctx, EVP_aes_128_cbc(), NULL, evp_key, iv_key) <= 0 )
 	{
-		return -1;
+		DBG_ER_LN("EVP_EncryptInit_ex error !!!");
+		goto exit_enc;
 	}
-	out_len = ((SAFE_STRLEN(in)/AES_BLOCK_SIZE) + 1) * AES_BLOCK_SIZE; //strlen(in);
 
-	AES_cbc_encrypt((unsigned char*)in, (unsigned char*)out, out_len, &aes, iv, AES_ENCRYPT);
+	int out_idx = 0;
+	if ( EVP_EncryptUpdate(evp_ctx, (unsigned char *)out, &out_idx, (unsigned char *)in, in_len) <=  0)
+	{
+		DBG_ER_LN("EVP_EncryptUpdate error !!!");
+		goto exit_enc;
+	}
+
+	int fin_len = 0;
+	if ( EVP_EncryptFinal_ex(evp_ctx, (unsigned char *)out + out_idx, &fin_len) <=  0)
+	{
+		DBG_ER_LN("EVP_EncryptFinal_ex error !!!");
+		goto exit_enc;
+	}
+	ret = out_idx+fin_len;
+
+exit_enc:
+	if (evp_ctx)
+	{
+		EVP_CIPHER_CTX_free(evp_ctx);
+	}
+
 	return ret;
 }
 
-char *sec_aes_cbc_enc_ascii(char *in, int in_len, char *aes_key)
+int sec_aes_cbc_decX(char *in, int in_len, char *out, unsigned char *evp_key, unsigned char*iv_key, int pad)
+{
+	int ret = -1;
+	EVP_CIPHER_CTX *evp_ctx = NULL;
+
+	if (!in || !out)
+	{
+		goto exit_enc;
+	}
+	DBG_DB_LN("(evp_key: %s, iv_key: %s, pad: %d)", evp_key, iv_key, pad);
+
+	evp_ctx = EVP_CIPHER_CTX_new();
+	//EVP_CIPHER_CTX_set_key_length(evp_ctx, 16);
+	EVP_CIPHER_CTX_set_padding(evp_ctx, pad);
+
+	if ( EVP_DecryptInit_ex(evp_ctx, EVP_aes_128_cbc(), NULL, evp_key, iv_key) <= 0 )
+	{
+		DBG_ER_LN("EVP_DecryptInit_ex error !!!");
+		goto exit_enc;
+	}
+
+	int out_idx = 0;
+	if ( EVP_DecryptUpdate(evp_ctx, (unsigned char *)out, &out_idx, (unsigned char *)in, in_len) <=  0)
+	{
+		DBG_ER_LN("EVP_DecryptUpdate error !!!");
+		goto exit_enc;
+	}
+
+	int fin_len = 0;
+	if ( EVP_DecryptFinal_ex(evp_ctx, (unsigned char *)out + out_idx, &fin_len) <=  0)
+	{
+		DBG_ER_LN("EVP_DecryptFinal_ex error !!!");
+		goto exit_enc;
+	}
+	ret = out_idx+fin_len;
+
+exit_enc:
+	if (evp_ctx)
+	{
+		EVP_CIPHER_CTX_free(evp_ctx);
+	}
+
+	return ret;
+}
+#endif
+
+int sec_aes_cbc_enc(char *in, int in_len, char *out, unsigned char *evp_key, unsigned char*iv_key)
+{
+	int ret = 0;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	int pad = 1;
+	ret = sec_aes_cbc_encX(in, in_len, out, evp_key, iv_key, pad);
+#else
+	char *in_pad = NULL;
+	AES_KEY aes;
+	int out_len = ((SAFE_STRLEN(in)/AES_BLOCK_SIZE) + 1) * AES_BLOCK_SIZE;
+	int pad_num = out_len-in_len;
+
+	unsigned char evp_save[AES_BLOCK_SIZE];
+	unsigned char iv_save[AES_BLOCK_SIZE];
+
+	if (!in || !out)
+	{
+		ret = -1;
+		goto exit_enc;
+	}
+
+	SAFE_MEMCPY(evp_save, evp_key, AES_BLOCK_SIZE, sizeof(evp_save));
+	SAFE_MEMCPY(iv_save, iv_key, AES_BLOCK_SIZE, sizeof(iv_save));
+
+	// KCS5Padding
+	in_pad = SAFE_CALLOC(1, out_len);
+	SAFE_MEMSET(in_pad, pad_num, out_len);
+	SAFE_MEMCPY(in_pad, in, in_len, out_len);
+
+	if (AES_set_encrypt_key(evp_save, 128, &aes) < 0)
+	{
+		ret = -1;
+		goto exit_enc;
+	}
+	DBG_DB_LN("(in: %s, evp_key: %s, iv_key: %s, out_len: %d, pad_num: %d)", in, evp_key, iv_key, out_len, pad_num);
+
+	AES_cbc_encrypt((unsigned char*)in_pad, (unsigned char*)out, out_len, &aes, evp_save, AES_ENCRYPT);
+	ret = out_len;
+
+exit_enc:
+	SAFE_FREE(in_pad);
+
+#endif
+
+	return ret;
+}
+
+char *sec_aes_cbc_enc_ascii(char *in, int in_len, unsigned char *evp_key, unsigned char*iv_key)
 {
 	int enc_len = ((in_len/AES_BLOCK_SIZE) + 1) * AES_BLOCK_SIZE;
 	char *in_enc = SAFE_CALLOC(1, enc_len + 1);
-	sec_aes_cbc_enc(in, in_enc, aes_key);
+	sec_aes_cbc_enc(in, in_len, in_enc, evp_key, iv_key);
 
 	char *out_ascii = bin2hex((const unsigned char *)in_enc, enc_len);
 	SAFE_FREE(in_enc);
@@ -952,11 +1069,11 @@ char *sec_aes_cbc_enc_ascii(char *in, int in_len, char *aes_key)
 	return out_ascii;
 }
 
-char *sec_aes_cbc_enc_base(char *in, int in_len, char *aes_key)
+char *sec_aes_cbc_enc_base(char *in, int in_len, unsigned char *evp_key, unsigned char*iv_key)
 {
 	int enc_len = ((in_len/AES_BLOCK_SIZE) + 1) * AES_BLOCK_SIZE;
 	char *in_enc = SAFE_CALLOC(1, enc_len + 1);
-	sec_aes_cbc_enc(in, in_enc, aes_key);
+	sec_aes_cbc_enc(in, in_len, in_enc, evp_key, iv_key);
 
 	int out_base_len = 0;
 	char *out_base = sec_base64_enc(in_enc, enc_len, &out_base_len);
@@ -966,36 +1083,43 @@ char *sec_aes_cbc_enc_base(char *in, int in_len, char *aes_key)
 	return out_base;
 }
 
-
-int sec_aes_cbc_dec(char *in, char *out, int out_len, char *aes_key)
+int sec_aes_cbc_dec(char *in, int in_len, char *out, int out_len, unsigned char *evp_key, unsigned char*iv_key)
 {
 	int ret = 0;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	int pad = 1;
+	ret = sec_aes_cbc_decX(in, in_len, out, evp_key, iv_key, pad);
+#else
+	// https://blog.csdn.net/q610098308/article/details/93480212
 	AES_KEY aes;
-	unsigned char iv[AES_BLOCK_SIZE];
+	unsigned char evp_save[AES_BLOCK_SIZE];
+	unsigned char iv_save[AES_BLOCK_SIZE];
 
 	if (!in || !out)
-	{
-		return 0;
-	}
-
-	memcpy(iv, aes_key, AES_BLOCK_SIZE);
-
-	if (AES_set_decrypt_key((unsigned char*)iv, 128, &aes) < 0)
 	{
 		return -1;
 	}
 
-	AES_cbc_encrypt((unsigned char*)in, (unsigned char*)out, out_len, &aes, iv, AES_DECRYPT);
+	SAFE_MEMCPY(evp_save, evp_key, AES_BLOCK_SIZE, sizeof(evp_save));
+	SAFE_MEMCPY(iv_save, iv_key, AES_BLOCK_SIZE, sizeof(iv_save));
+
+	if (AES_set_decrypt_key(evp_save, 128, &aes) < 0)
+	{
+		return -1;
+	}
+
+	AES_cbc_encrypt((unsigned char*)in, (unsigned char*)out, out_len, &aes, evp_save, AES_DECRYPT);
+#endif
 	return ret;
 }
 
-int sec_aes_cbc_dec_base(char *in, char *out, int out_len, char *aes_key)
+int sec_aes_cbc_dec_base(char *in, int in_len, char *out, int out_len, unsigned char *evp_key, unsigned char*iv_key)
 {
 	int ret = 0;
 	int in_base_len = 0;
 	char *in_base = sec_base64_dec(in, SAFE_STRLEN(in), &in_base_len);
 
-	if (sec_aes_cbc_dec((char*)in_base, out, out_len, aes_key) < 0)
+	if (sec_aes_cbc_dec((char*)in_base, in_len, out, out_len, evp_key, iv_key) < 0)
 	{
 		ret = -1;
 	}

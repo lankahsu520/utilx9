@@ -23,7 +23,7 @@ extern "C" {
 #define _GNU_SOURCE
 #endif
 
-#define LIBUTILX9_VERSION 0x02000001
+#define LIBUTILX9_VERSION 0x03000000
 
 
 //******************************************************************************

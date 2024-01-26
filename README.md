@@ -76,7 +76,7 @@
 
 # 4. Build
 ```bash
-$ . confs/github.conf
+$ . confs/simple_x86.conf
 #$ . confs/sh/customer2def.sh
 # to create
 # include/customer_def.h

@@ -10,7 +10,7 @@ SBIN_PATH=`dirname $0`
 [ -d "$SBIN_PATH" ] || SBIN_PATH="/work/rootfs/sbin"
 SUDO_EX=$(which sudo 2>&1) && SUDO_B="sudo -E -b" && SUDO="sudo -E"
 WHOAMI_EX=$(which whoami 2>&1) && WHO=`whoami`
-[ ! -z "$WHO" ] || WHO="admin"
+[ ! -z "$WHO" ] || WHO="root"
 export DBUS_SYSTEM_BUS_ADDRESS=""
 [ ! -z "$DBUS_SYSTEM_BUS_ADDRESS" ] || unset DBUS_SYSTEM_BUS_ADDRESS
 

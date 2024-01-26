@@ -1,17 +1,17 @@
 # 1. Overview
-utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
-
-主要訴求是 -
-  應用簡單化！
-  強化常用、有用的功能！
-
-大家都知道 Open-source 功能強大，貢獻非凡！提供前所未有的視野，讓開發者們省去大半的研究時間，開發更有效率嗎？也因此我們不是要深究 Open-source 是如此高深，而是要知悉如何應用。
-
-經過多年的工作經驗，心想只是為了糊口飯吃，為什麼還要浪費在這些 Open-source 的文件裏打轉，於是一點一滴才整理出這些.
-
-It is hard to read any usages of Open-source. They are lengthy. 
-utilx9 is the utility api. 
-Here giving small api packages and easily to use. We can also get  the ideals from the demo programs
+> utilx9 是一個集合常用的 Open-source 而後衍生出來的 library.
+>
+> 主要訴求是 -
+>   應用簡單化！
+>   強化常用、有用的功能！
+>
+> 大家都知道 Open-source 功能強大，貢獻非凡！提供前所未有的視野，讓開發者們省去大半的研究時間，開發更有效率嗎？也因此我們不是要深究 Open-source 是如此高深，而是要知悉如何應用。
+>
+> 經過多年的工作經驗，心想只是為了糊口飯吃，為什麼還要浪費在這些 Open-source 的文件裏打轉，於是一點一滴才整理出這些.
+>
+> It is hard to read any usages of Open-source. They are lengthy. 
+> utilx9 is the utility api. 
+> Here giving small api packages and easily to use. We can also get  the ideals from the demo programs
 
 # 2. Depend on
 
@@ -71,7 +71,7 @@ Here giving small api packages and easily to use. We can also get  the ideals fr
 
 # 3. Current Status
 
-因為這是多年工作下的成果，一定還有發展空間.如果有 bug 請多多包函.
+> 因為這是多年工作下的成果，一定還有發展空間.如果有 bug 請多多包函.
 
 
 # 4. Build
@@ -389,8 +389,8 @@ $ ./uv_123
 
 
 # 6. License
-utilx9 is under the New BSD License (BSD-3-Clause).
+> utilx9 is under the New BSD License (BSD-3-Clause).
 
 
 # 7. Documentation
-Run an example and read it.
+> Run an example and read it.

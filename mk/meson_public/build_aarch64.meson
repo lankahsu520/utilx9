@@ -1,3 +1,6 @@
+[binaries]
+pkgconfig = 'pkg-config'
+
 [built-in]
 #c = 'aarch64-poky-linux-gcc'
 #cpp = 'aarch64-poky-linux-g++'

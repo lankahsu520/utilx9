@@ -33,7 +33,7 @@ now_fn()
 	return $NOW_t
 }
 
-datetimeX_fn()
+datetime_fn()
 {
 	PROMPT=$1
 
@@ -52,7 +52,7 @@ do_commandX_fn()
 	FUNCX=$1
 	LINEX=$2
 	DO_COMMAND=$3
-	datetimeX_fn "${FUNCX}:${LINEX}- [$DO_COMMAND]"
+	datetime_fn "${FUNCX}:${LINEX}- [$DO_COMMAND]"
 	sh -c "$DO_COMMAND"
 }
 
@@ -64,7 +64,7 @@ do_env_fn()
 
 die_fn()
 {
-	datetimeX_fn "$@"; datetimeX_fn ""
+	datetime_fn "$@"; datetime_fn ""
 	exit 1
 }
 
@@ -95,88 +95,88 @@ distclean_install_fn()
 
 distclean_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	DO_COMMAND="(make distclean)"
 	do_commandX_fn "${FUNCNAME[0]}" "${LINENO}" "${DO_COMMAND}"
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
 	return 0
 }
 
 cfg_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	#** customer_def.h **
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
-	datetimeX_fn
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn
 	return 0
 }
 
 showusage_fn()
 {
-	#datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
-	printf "$HINT"; datetimeX_fn ""; exit 1
+	#datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	printf "$HINT"; datetime_fn ""; exit 1
 
 	return 0
 }
 
 build_setup_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	#** build setup **
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
-	datetimeX_fn
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn
 }
 
 build_run_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	DO_COMMAND="(make ${PJ_MAKE_VERBOSE})"
 	do_commandX_fn "${FUNCNAME[0]}" "${LINENO}" "${DO_COMMAND}"
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
-	datetimeX_fn
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn
 }
 
 build_install_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	DO_COMMAND="(make install)"
 	do_commandX_fn "${FUNCNAME[0]}" "${LINENO}" "${DO_COMMAND}"
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
-	datetimeX_fn
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn
 }
 
 build_clean_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	DO_COMMAND="(make clean)"
 	do_commandX_fn "${FUNCNAME[0]}" "${LINENO}" "${DO_COMMAND}"
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
-	datetimeX_fn
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn
 }
 
 build_cpack_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
-	datetimeX_fn
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
+	datetime_fn
 }
 
 build_fn()
 {
-	datetimeX_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
+	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ..."
 
 	distclean_fn
 

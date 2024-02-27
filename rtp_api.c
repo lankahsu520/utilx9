@@ -505,7 +505,7 @@ void rtp_body_parse(RTPX_t *rtp_req, char *buff, int buff_len)
 	if (rtp_req)
 	{
 		DBG_TMP_DUMP(buff, 32, " ", "(len: %d)", 32);
-		rtp_pkt	*pkt = rtp_header_parse(buff, buff_len);
+		rtp_pkt *pkt = rtp_header_parse(buff, buff_len);
 
 		if (pkt)
 		{

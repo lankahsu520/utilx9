@@ -277,7 +277,7 @@ int usbX_dev_read_poll(UsbX_t *usbX_req, libusb_transfer_cb_fn callback)
 			libusb_fill_bulk_transfer(usbX_req->usb_dev_transfer, usbX_req->usb_dev_handle, endpoint_in, response, length, callback, usbX_req, 0);
 			break;
 		case LIBUSB_TRANSFER_TYPE_INTERRUPT:
-			DBG_IF_LN("call libusb_fill_interrupt_transfer ... (usb_dev_transfer: %p, usb_dev_handle: %p)", usbX_req->usb_dev_transfer, usbX_req->usb_dev_handle);
+			DBG_IF_LN("call libusb_fill_interrupt_transfer ~~~ (usb_dev_transfer: %p, usb_dev_handle: %p)", usbX_req->usb_dev_transfer, usbX_req->usb_dev_handle);
 			libusb_fill_interrupt_transfer(usbX_req->usb_dev_transfer, usbX_req->usb_dev_handle, endpoint_in, response, length, callback, usbX_req, 0);
 			break;
 		default:
@@ -323,13 +323,13 @@ do_read:
 			DBG_ER_LN("%s (LIBUSB_TRANSFER_TYPE_BULK)", DBG_TXT_NO_SUPPORT);
 			break;
 		case LIBUSB_TRANSFER_TYPE_INTERRUPT:
-			DBG_TR_LN("call libusb_interrupt_transfer ... (retry: %d, endpoint_in: 0x%02X, wMaxPacketSize: %d, usb_timeout: %d)", retry, endpoint_in, usbX_req->wMaxPacketSize, usb_timeout);
+			DBG_TR_LN("call libusb_interrupt_transfer ~~~ (retry: %d, endpoint_in: 0x%02X, wMaxPacketSize: %d, usb_timeout: %d)", retry, endpoint_in, usbX_req->wMaxPacketSize, usb_timeout);
 			ret = libusb_interrupt_transfer(usbX_req->usb_dev_handle, endpoint_in, response, usbX_req->wMaxPacketSize, &nread, usb_timeout);
 			if (((LIBUSB_ERROR_TIMEOUT == ret)  || (nread<=0)) && (retry >= 0))
 			{
 				if (LIBUSB_SUCCESS != ret)
 				{
-					DBG_WN_LN("call libusb_interrupt_transfer ... (retry: %d, ret: %d-%s, nread: %d)", retry, ret, libusb_strerror(ret), nread);
+					DBG_WN_LN("libusb_interrupt_transfer error !!! (retry: %d, ret: %d-%s, nread: %d)", retry, ret, libusb_strerror(ret), nread);
 					usleep(200*1000);
 				}
 				goto do_read;
@@ -371,7 +371,7 @@ do_write:
 			ret = libusb_bulk_transfer(usbX_req->usb_dev_handle, endpoint_out, (unsigned char *)usbX_req->request, usbX_req->req_size, nwrite, usb_timeout);
 			if ((LIBUSB_ERROR_TIMEOUT == ret) && (retry >= 0))
 			{
-				DBG_WN_LN("call libusb_interrupt_transfer ... (retry: %d)", retry);
+				DBG_WN_LN("libusb_bulk_transfer - LIBUSB_ERROR_TIMEOUT !!! (retry: %d)", retry);
 				usleep(200*1000);
 				goto do_write;
 			}
@@ -383,7 +383,7 @@ do_write:
 			ret = libusb_interrupt_transfer(usbX_req->usb_dev_handle, endpoint_out, (unsigned char *)usbX_req->request, usbX_req->req_size, nwrite, usb_timeout);
 			if ((LIBUSB_ERROR_TIMEOUT == ret) && (retry >= 0))
 			{
-				DBG_WN_LN("call libusb_interrupt_transfer ... (retry: %d)", retry);
+				DBG_WN_LN("libusb_interrupt_transfer - LIBUSB_ERROR_TIMEOUT !!! (retry: %d)", retry);
 				usleep(200*1000);
 				goto do_write;
 			}

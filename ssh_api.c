@@ -249,7 +249,7 @@ int sshX_authenticate(SSH_t *ssh_req)
 {
 	int rc = SSH_AUTH_SUCCESS;
 
-	DBG_TR_LN("call ssh_userauth_none ...");
+	DBG_TR_LN("call ssh_userauth_none ~~~");
 	rc = ssh_userauth_none(ssh_req->session, NULL);
 	if (rc == SSH_AUTH_ERROR)
 	{
@@ -411,7 +411,7 @@ ssh_session sshX_client(SSH_t *ssh_req)
 
 		ssh_options_parse_config(ssh_req->session, NULL);
 
-		DBG_TR_LN("call ssh_connect ...");
+		DBG_TR_LN("call ssh_connect ~~~");
 		if (ssh_connect(ssh_req->session))
 		{
 			DBG_ER_LN("ssh_new error !!! (%s)", ssh_get_error(ssh_req->session));

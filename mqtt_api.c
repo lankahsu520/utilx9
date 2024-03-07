@@ -310,7 +310,7 @@ static struct mosquitto *mqtt_srv_open(MQTTX_t *mqtt_req)
 	if (mqtt_req->isinit == 0)
 	{
 		mqtt_req->isinit = 1;
-		DBG_DB_LN("call mosquitto_lib_init ...");
+		DBG_DB_LN("call mosquitto_lib_init ~~~");
 		mosquitto_lib_init();
 	}
 
@@ -424,7 +424,7 @@ static void *mqtt_thread_handler(void *user)
 		{
 #if (1)
 			int rc = 0;
-			DBG_IF_LN("call mosquitto_connect_async ... (%s:%d, keepalive: %d, topic: %s)", session->hostname,  session->port, session->keepalive, session->topic_root);
+			DBG_IF_LN("call mosquitto_connect_async ~~~ (%s:%d, keepalive: %d, topic: %s)", session->hostname,  session->port, session->keepalive, session->topic_root);
 			rc = mosquitto_connect_async(mosq, session->hostname, session->port, session->keepalive);
 			//rc = mosquitto_connect(mosq, session->hostname, session->port, session->keepalive);
 			if (rc)

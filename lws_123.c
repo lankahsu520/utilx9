@@ -133,7 +133,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 			{
 				char tmpbuf[LEN_OF_WEBSOCKET] = "";
 				SAFE_SPRINTF_EX(tmpbuf, "(count: %d)", count);
-				DBG_IF_LN("call lws2_session_write_q_broadcast ... (tmpbuf: %s)", tmpbuf);
+				DBG_IF_LN("call lws2_session_write_q_broadcast ~~~ (tmpbuf: %s)", tmpbuf);
 				lws2_session_write_q_broadcast(&lws_req, tmpbuf, SAFE_STRLEN(tmpbuf));
 			}
 		}
@@ -270,7 +270,7 @@ static void app_loop(void)
 				{
 					char tmpbuf[LEN_OF_WEBSOCKET] = "";
 					SAFE_SPRINTF_EX(tmpbuf, "[%d]", count);
-					DBG_IF_LN("call lws2_session_write_q_broadcast ... (tmpbuf: %s)", tmpbuf);
+					DBG_IF_LN("call lws2_session_write_q_broadcast ~~~ (tmpbuf: %s)", tmpbuf);
 					lws2_session_write_q_broadcast(&lws_req, tmpbuf, SAFE_STRLEN(tmpbuf));
 				}
 			}

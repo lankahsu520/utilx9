@@ -13,6 +13,10 @@ BINS_CHECK_$(PJ_HAS_DBUS_DEMO) +=$(SDK_BIN_DIR)/dbus_demo
 CUSTOMERDIRS_$(PJ_HAS_FCM_DEMO) += $(PJ_ROOT)/user/customer/common/fcm_demo
 BINS_CHECK_$(PJ_HAS_FCM_DEMO) +=$(SDK_BIN_DIR)/fcm_demo
 
+CUSTOMERDIRS_$(PJ_HAS_AWS_KVSMARIO) += $(PJ_ROOT)/user/customer/common/kvsMario
+BINS_CHECK_$(PJ_HAS_AWS_KVSMARIO) += $(SDK_BIN_DIR)/kvsMario
+#BINS_CHECK_$(PJ_HAS_AWS_KVSMARIO) += $(SDK_BIN_DIR)/kvsWebrtcRTSP $(SDK_BIN_DIR)/kvsWebrtcUDP
+
 #** customer (common) - MQTT & MCTT **
 CUSTOMERDIRS_$(PJ_HAS_MASTER) += $(PJ_ROOT)/user/customer/common/master
 BINS_CHECK_$(PJ_HAS_MASTER) += $(SDK_BIN_DIR)/master

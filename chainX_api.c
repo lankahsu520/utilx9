@@ -1444,10 +1444,10 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 	{
 		/* Load the client certificate into the SSL_CTX structure */
 #ifdef UTIL_EX_SOCKET_CERT_TXT
-		DBG_TR_LN("call SSL_CTX_use_certificate ... ");
+		DBG_TR_LN("call SSL_CTX_use_certificate ~~~");
 		if (chainXssl_cert_readbuf(chainX_req->ctxSSL, chainX_req->certificate_txt, chainX_req->certificate_txt_size) != 0)
 #else
-		DBG_TR_LN("call SSL_CTX_use_certificate_file ... (%s)", chainX_req->certificate_file);
+		DBG_TR_LN("call SSL_CTX_use_certificate_file ~~~ (%s)", chainX_req->certificate_file);
 		if (SSL_CTX_use_certificate_file(chainX_req->ctxSSL, chainX_req->certificate_file,  SSL_FILETYPE_PEM) <= 0)
 #endif
 		{
@@ -1458,10 +1458,10 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 
 		/* Load the private-key corresponding to the client certificate */
 #ifdef UTIL_EX_SOCKET_CERT_TXT
-		DBG_TR_LN("call SSL_CTX_use_PrivateKey ...");
+		DBG_TR_LN("call SSL_CTX_use_PrivateKey ~~~");
 		if (chainXssl_key_readbuf(chainX_req->ctxSSL, chainX_req->privatekey_txt, chainX_req->privatekey_txt_size) != 0)
 #else
-		DBG_TR_LN("call SSL_CTX_use_PrivateKey_file ... (%s)", chainX_req->privatekey_file);
+		DBG_TR_LN("call SSL_CTX_use_PrivateKey_file ~~~ (%s)", chainX_req->privatekey_file);
 		if (SSL_CTX_use_PrivateKey_file(chainX_req->ctxSSL, chainX_req->privatekey_file, SSL_FILETYPE_PEM) <= 0)
 #endif
 		{
@@ -1470,7 +1470,7 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 			goto CERT_EXIT;
 		}
 
-		DBG_TR_LN("call SSL_CTX_check_private_key ...");
+		DBG_TR_LN("call SSL_CTX_check_private_key ~~~");
 		/* Check if the client certificate and private-key matches */
 		if (!SSL_CTX_check_private_key(chainX_req->ctxSSL))
 		{
@@ -1490,7 +1490,7 @@ static int chainXssl_cert(ChainX_t *chainX_req)
 				&& (X509_STORE_add_cert(store, ca_cert) != 1)
 			)
 #else
-			DBG_TR_LN("call SSL_CTX_load_verify_locations ... (%s)", chainX_req->ca_file);
+			DBG_TR_LN("call SSL_CTX_load_verify_locations ~~~ (%s)", chainX_req->ca_file);
 			if (!SSL_CTX_load_verify_locations(chainX_req->ctxSSL, chainX_req->ca_file, NULL))
 #endif
 			{
@@ -1642,14 +1642,14 @@ int chainXssl_link(ChainX_t *chainX_req)
 
 do_handshake:
 	retry --;
-	DBG_TR_LN("call SSL_connect ...");
 	if (chainX_req->cSSL)
 	{
+		DBG_TR_LN("call SSL_connect ...");
 		int handshake = SSL_connect(chainX_req->cSSL);
 		switch (handshake)
 		{
 			case 1:
-				DBG_TR_LN("SSL_connect ok !!!");
+				DBG_TR_LN("call SSL_connect <ok> (handshake: %d)", handshake);
 				ret = 0;
 				break;
 			default:
@@ -1933,13 +1933,13 @@ int chainXssl_link(ChainX_t *chainX_req)
 
 do_handshake:
 	retry --;
-	DBG_TR_LN("call SSL_connect ...");
+	DBG_TR_LN("call mbedtls_ssl_handshake ...");
 	FREE_HEAP_INFO;
 	int handshake = mbedtls_ssl_handshake(&chainX_req->ssl);
 	switch (handshake)
 	{
 		case 0:
-			DBG_TR_LN("SSL_connect ok !!!");
+			DBG_TR_LN("call mbedtls_ssl_handshake <ok> (handshake: %d)", handshake);
 			ret = 0;
 			break;
 		// -0x6900
@@ -2018,7 +2018,7 @@ static void chainXssl_close(ChainX_t *chainX_req)
 #ifdef UTIL_EX_SOCKET_OPENSSL
 		if (chainX_req->cSSL)
 		{
-			DBG_TR_LN("call SSL_shutdown ...");
+			DBG_TR_LN("call SSL_shutdown ~~~");
 			SSL_shutdown(chainX_req->cSSL);
 			SSL_free(chainX_req->cSSL);
 			chainX_req->cSSL = NULL;

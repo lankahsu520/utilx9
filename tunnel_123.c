@@ -260,7 +260,7 @@ static void tunnel_listen(Tunnel_t *tunnel_req)
 	// listen
 	while ((tunnel_req->retry > 0) && (rc!=SSH_OK))
 	{
-		DBG_DB_LN("call ssh_channel_listen_forward ... (open_port: %d, retry: %d)", tunnel_req->open_port, tunnel_req->retry);
+		DBG_DB_LN("call ssh_channel_listen_forward ~~~ (open_port: %d, retry: %d)", tunnel_req->open_port, tunnel_req->retry);
 		int bound_port = 0;
 		rc = ssh_channel_listen_forward(session, NULL, tunnel_req->open_port, &bound_port);
 		if (rc == SSH_OK)
@@ -303,7 +303,7 @@ wait_channel:
 		}
 		else
 		{
-			DBG_DB_LN("a new channel !!! (dport: %d)", dport);
+			DBG_DB_LN("call ssh_channel_accept_forward <ok> (dport: %d)", dport);
 
 			switch (tunnel_req->mode)
 			{
@@ -330,7 +330,7 @@ static void tunnel_create(Tunnel_t *tunnel_req)
 	ssh_init();
 	SSH_t *ssh_req = &tunnel_req->ssh_req;
 
-	DBG_TR_LN("call ssh_new ... (mode: %d)", tunnel_req->mode);
+	DBG_TR_LN("call sshX_client ~~~ (mode: %d)", tunnel_req->mode);
 	if (sshX_client(ssh_req) == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");

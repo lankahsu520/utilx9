@@ -139,23 +139,23 @@ void app_stop_uv(uv_async_t *handle, int force)
 		is_free = 1;
 		if (uv_loop)
 		{
-			DBG_IF_LN("call SAFE_UV_TIMER_CLOSE ...");
+			DBG_IF_LN("call SAFE_UV_TIMER_CLOSE ~~~");
 #ifdef USE_TIMER_CREATE
 			SAFE_UV_TIMER_CLOSE(&uv_timer_1sec_fd, NULL);
 #endif
 
-			DBG_IF_LN("call uv_spawn_close_ex ...");
+			DBG_IF_LN("call uv_spawn_close_ex ~~~");
 #ifdef USE_SPAWN_CREATE
 			uv_spawn_close_ex(&spawn_info);
 #endif
 
-			DBG_IF_LN("call SAFE_UV_CLOSE ...");
+			DBG_IF_LN("call SAFE_UV_CLOSE ~~~");
 			if (handle)
 			{
 				SAFE_UV_CLOSE(handle, NULL);
 			}
 
-			DBG_IF_LN("call SAFE_UV_LOOP_CLOSE ...");
+			DBG_IF_LN("call SAFE_UV_LOOP_CLOSE ~~~");
 			if (force)
 			{
 				SAFE_UV_LOOP_CLOSE(uv_loop);

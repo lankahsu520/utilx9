@@ -57,7 +57,7 @@ static void app_loop(void)
 {
 	DBG_TR_LN("enter");
 
-	DBG_TR_LN("call ssh_new ...");
+	DBG_TR_LN("call ssh_new ~~~");
 	if (sshX_client(&ssh_data) == NULL)
 	{
 		DBG_ER_LN("ssh_new error !!!");

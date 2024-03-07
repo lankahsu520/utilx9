@@ -370,7 +370,7 @@ static void app_stop(void)
 {
 	if (app_quit()==0)
 	{
-		DBG_DB_LN("call app_set_quit ...");
+		DBG_DB_LN("call app_set_quit ~~~");
 		app_set_quit(1);
 
 #ifdef USE_UBUS_ULOOP

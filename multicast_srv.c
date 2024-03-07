@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 		FD_ZERO(&fdeset);
 		FD_SET(sockfd, &fdeset);
 
-		//printf("call select ...\n");
+		//printf("call select ~~~\n");
 		struct timeval tv;
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;

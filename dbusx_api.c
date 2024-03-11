@@ -121,7 +121,7 @@ done:
 	return handled;
 }
 
-int dbusx_signal_simple(DBusConnection *dbus_conn, char *dbus_path, const char *ifac,char *cmd, int itype, void *arg)
+int dbusx_signal_helper_simple(DBusConnection *dbus_conn, char *dbus_path, const char *ifac,char *cmd, int itype, void *arg)
 {
 	int ret = -1;
 	DBusMessage *dbus_msg_req = NULL;
@@ -190,18 +190,18 @@ exit_send:
 	return ret;
 }
 
-int dbusx_signal_str(DbusX_t *dbusx_req, const char *ifac, char *cmd, char *arg)
+int dbusx_signal_simple_str(DbusX_t *dbusx_req, const char *ifac, char *cmd, char *arg)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
 	char *dbus_path = dbusx_path_get(dbusx_req);
-	return dbusx_signal_simple(dbus_conn, dbus_path, ifac, cmd, DBUS_TYPE_STRING, (void*)arg);
+	return dbusx_signal_helper_simple(dbus_conn, dbus_path, ifac, cmd, DBUS_TYPE_STRING, (void*)arg);
 }
 
-int dbusx_signal_helper(DbusX_t *dbusx_req, const char *ifac, char *cmd, int itype, void *arg)
+int dbusx_signal_simple_itype(DbusX_t *dbusx_req, const char *ifac, char *cmd, int itype, void *arg)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
 	char *dbus_path = dbusx_path_get(dbusx_req);
-	return dbusx_signal_simple(dbus_conn, dbus_path, ifac, cmd, itype, arg);
+	return dbusx_signal_helper_simple(dbus_conn, dbus_path, ifac, cmd, itype, arg);
 }
 
 DBusHandlerResult dbusx_method_echo_cb(DBusConnection *connection, DBusMessage *message, void *usr_data)
@@ -248,7 +248,7 @@ done:
 	return handled;
 }
 
-char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *key, const char *val, int timeout)
+char *dbusx_method_helper_key_val(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *key, const char *val, int timeout)
 {
 	DBusError dbus_err;
 	DBusMessage *dbus_msg_req = NULL;
@@ -258,7 +258,6 @@ char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const cha
 
 	SAFE_DBUS_ERR_INIT(&dbus_err);
 
-	//LOGE_EX(TAG,"(cmd: %s, key: %s, val: %s)", cmd, key, val);
 	if (dbus_conn == NULL)
 	{
 		DBG_ER_LN("dbus_conn is NULL !!!");
@@ -276,10 +275,9 @@ char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const cha
 	}
 
 	dbus_msg_req = dbus_message_new_method_call(dest, dbus_path, ifac, cmd);
-
-	if (dbus_msg_req == NULL)
+	if (NULL == dbus_msg_req)
 	{
-		DBG_ER_LN("dbus_msg_req is NULL !!!");
+		DBG_ER_LN("dbus_message_new_method_call error !!!");
 		goto exit_send;
 	}
 
@@ -291,7 +289,7 @@ char *dbusx_method_key_val(DBusConnection *dbus_conn, char *dbus_path, const cha
 	dbus_msg_res = dbus_connection_send_with_reply_and_block(dbus_conn, dbus_msg_req, timeout, &dbus_err);
 	if (dbus_msg_res == NULL)
 	{
-		DBG_ER_LN("dbus_connection_send_with_reply_and_block error !!! (message: %s)", dbus_err.message);
+			DBG_ER_LN("dbus_connection_send_with_reply_and_block error !!! (message: %s, timeout: %d)", dbus_err.message, timeout);
 	}
 	else
 	{
@@ -323,7 +321,7 @@ exit_send:
 	return retStr;
 }
 
-char *dbusx_method_simple(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, int itype, void *arg, int otype, int timeout)
+char *dbusx_method_helper_simple(DBusConnection *dbus_conn, char *dbus_path, const char *dest, const char *ifac, char *cmd, int itype, void *arg, int otype, int timeout)
 {
 	DBusError dbus_err;
 	DBusMessage *dbus_msg_req = NULL;
@@ -471,33 +469,49 @@ exit_send:
 	return retStr;
 }
 
-char *dbusx_method_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+char *dbusx_method_simple_path_str2str(DbusX_t *dbusx_req, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
-	char *dbus_path = dbusx_path_get(dbusx_req);
-	return dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_STRING, timeout);
+	//char *dbus_path = dbusx_path_get(dbusx_req);
+	return dbusx_method_helper_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_STRING, timeout);
 }
 
-char *dbusx_method_str2int(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+char *dbusx_method_simple_str2str(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
 	char *dbus_path = dbusx_path_get(dbusx_req);
-	char *retStr = dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INT32, timeout);
+	return dbusx_method_helper_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_STRING, timeout);
+}
+
+char *dbusx_method_simple_path_str2int(DbusX_t *dbusx_req, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+{
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	//char *dbus_path = dbusx_path_get(dbusx_req);
+	char *retStr = dbusx_method_helper_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INT32, timeout);
 	return retStr;
 }
 
-char *dbusx_method_xint2uint(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, int itype, unsigned int *arg, int timeout)
+char *dbusx_method_simple_str2int(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
 	char *dbus_path = dbusx_path_get(dbusx_req);
-	return dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, itype, (void*)arg, DBUS_TYPE_UINT32, timeout);
+	char *retStr = dbusx_method_helper_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INT32, timeout);
+	return retStr;
 }
 
-void dbusx_method_str2null(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+void dbusx_method_simple_path_str2null(DbusX_t *dbusx_req, char *dbus_path, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
+{
+	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
+	//char *dbus_path = dbusx_path_get(dbusx_req);
+	char *retStr = dbusx_method_helper_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INVALID, timeout);
+	SAFE_FREE(retStr);
+}
+
+void dbusx_method_simple_str2null(DbusX_t *dbusx_req, const char *dest, const char *ifac, char *cmd, char *arg, int timeout)
 {
 	DBusConnection *dbus_conn = dbusx_conn_get(dbusx_req);
 	char *dbus_path = dbusx_path_get(dbusx_req);
-	char *retStr = dbusx_method_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INVALID, timeout);
+	char *retStr = dbusx_method_helper_simple(dbus_conn, dbus_path, dest, ifac, cmd, DBUS_TYPE_STRING, (void*)arg, DBUS_TYPE_INVALID, timeout);
 	SAFE_FREE(retStr);
 }
 

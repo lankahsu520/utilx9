@@ -140,13 +140,13 @@ static void app_loop(void)
 
 		{
 			// signal - send string
-			dbusx_signal_str(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, DBUS_S_NAME_COMMAND, msg);
+			dbusx_signal_simple_str(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, DBUS_S_NAME_COMMAND, msg);
 		}
 
 		if (1)
 		{
 			// method - send string
-			char *retStr = dbusx_method_str2str(&dbusx_456, DBUS_DEST_LANKAHSU520, DBUS_M_IFAC_LANKAHSU520_DEMO, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
+			char *retStr = dbusx_method_simple_str2str(&dbusx_456, DBUS_DEST_LANKAHSU520, DBUS_M_IFAC_LANKAHSU520_DEMO, DBUS_METHOD_COMMAND, msg, TIMEOUT_OF_DBUS_REPLY);
 			DBG_IF_LN("(retStr: %s)", retStr);
 			SAFE_FREE(retStr);
 		}
@@ -154,13 +154,13 @@ static void app_loop(void)
 #if (1)
 		{
 			int16_t demo_16 = 16;
-			dbusx_signal_helper(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT16", DBUS_TYPE_INT16, (void *)&demo_16);
+			dbusx_signal_simple_itype(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT16", DBUS_TYPE_INT16, (void *)&demo_16);
 
 			int32_t demo_32 = 32;
-			dbusx_signal_helper(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT32", DBUS_TYPE_INT32, (void *)&demo_32);
+			dbusx_signal_simple_itype(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT32", DBUS_TYPE_INT32, (void *)&demo_32);
 
 			int64_t demo_64 = 64;
-			dbusx_signal_helper(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT64", DBUS_TYPE_INT64, (void *)&demo_64);
+			dbusx_signal_simple_itype(&dbusx_456, DBUS_S_IFAC_LANKAHSU520_DEMO, "DBUS_TYPE_INT64", DBUS_TYPE_INT64, (void *)&demo_64);
 		}
 #endif
 

@@ -234,9 +234,12 @@ static void app_loop(void)
 {
 #ifdef USE_MQTT_DEMO
 	{
-		SAFE_SPRINTF(mqtt123_session.certificate_file, "%s/mqtt_beex.crt", mqtt_cert_path);
-		SAFE_SPRINTF(mqtt123_session.privatekey_file, "%s/mqtt_beex.key", mqtt_cert_path);
-		SAFE_SPRINTF(mqtt123_session.ca_file, "%s/mqtt.ca", mqtt_cert_path);
+		if ( SAFE_STRLEN(mqtt_cert_path) > 0 )
+		{
+			SAFE_SPRINTF(mqtt123_session.certificate_file, "%s/mqtt_beex.crt", mqtt_cert_path);
+			SAFE_SPRINTF(mqtt123_session.privatekey_file, "%s/mqtt_beex.key", mqtt_cert_path);
+			SAFE_SPRINTF(mqtt123_session.ca_file, "%s/mqtt.ca", mqtt_cert_path);
+		}
 
 		mqtt123_init(&mqtt123_data);
 	}

@@ -65,6 +65,7 @@ static void definitely_lost_fn(void)
 
 static void indirectly_lost_fn(void)
 {
+#ifdef UTIL_EX_JSON
 	json_t *jroot = JSON_ARY_NEW();
 	if (jroot)
 	{
@@ -74,6 +75,7 @@ static void indirectly_lost_fn(void)
 		JSON_ARY_APPEND_OBJ_INDIRECTLY(jroot, JSON_JSTR(DATA_OF_INDIRECTLY_LOST));
 		JSON_FREE(jroot);
 	}
+#endif
 }
 #endif
 

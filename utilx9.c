@@ -118,7 +118,6 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 
 #ifdef UTIL_EX_BASIC
 #include <fcntl.h>
-#include <stdarg.h>
 
 #if (0)
 int str_isspace(char *str)

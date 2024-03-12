@@ -352,9 +352,10 @@ static struct mosquitto *mqtt_srv_open(MQTTX_t *mqtt_req)
 			}
 
 			//
-			if ((session->ca_file)
-				|| (session->certificate_file)
-				|| (session->privatekey_file))
+			if ((session->ca_file) && (SAFE_STRLEN(session->ca_file)>0)
+				&& (session->certificate_file) && (SAFE_STRLEN(session->certificate_file)>0)
+				&& (session->privatekey_file) && (SAFE_STRLEN(session->privatekey_file)>0)
+				)
 			{
 				//--tls-version : TLS protocol version, can be one of tlsv1.3 tlsv1.2 or tlsv1.1.
 				//								Defaults to tlsv1.2 if available.
@@ -365,6 +366,7 @@ static struct mosquitto *mqtt_srv_open(MQTTX_t *mqtt_req)
 				mosquitto_tls_opts_set(mosq, 1, session->tls_version, NULL);
 				mosquitto_tls_insecure_set(mosq, 1);
 				mosquitto_tls_set(mosq, session->ca_file, NULL, session->certificate_file, session->privatekey_file, NULL);
+				DBG_IF_LN("(ca_file: %s, certificate_file: %s, privatekey_file: %s, tls_version: %s)", session->ca_file, session->certificate_file, session->privatekey_file, session->tls_version);
 			}
 
 			if (mqtt_req->dbg_more < DBG_LVL_MAX)

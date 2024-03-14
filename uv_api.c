@@ -207,7 +207,7 @@ void uv_spawn_simple_detached(SpawnX_t *spawn_req, int num, ...)
 		int r;
 		if ((r = uv_spawn(spawn_req->loop, &spawn_req->child_req, &spawn_req->options)))
 		{
-			DBG_IF_LN("uv_spawn error !!! (%s)", uv_strerror(r));
+			DBG_IF_LN("uv_spawn error !!! (%s, file: %s)", uv_strerror(r), spawn_req->options.file);
 		}
 		else
 		{

@@ -1211,6 +1211,7 @@ typedef enum
 	LED_ID_6,
 	LED_ID_7,
 	LED_ID_8,
+	LED_ID_9,
 	LED_ID_MAX,
 } LED_ID;
 

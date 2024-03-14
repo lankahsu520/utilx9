@@ -1,0 +1,109 @@
+{
+	"Items": [{
+			"AlbumTitle": {
+				"S": "Somewhat Famous"
+			},
+			"Awards": {
+				"S": "1"
+			},
+			"Artist": {
+				"S": "No One You Know"
+			},
+			"SongTitle": {
+				"S": "Call Me Today"
+			}
+		}, {
+			"AlbumTitle": {
+				"S": "Somewhat Famous"
+			},
+			"Awards": {
+				"S": "2"
+			},
+			"Artist": {
+				"S": "No One You Know"
+			},
+			"SongTitle": {
+				"S": "Howdy"
+			}
+		}, {
+			"AlbumTitle": {
+				"S": "Album123"
+			},
+			"Awards": {
+				"S": "1"
+			},
+			"Sponsor": {
+				"L": [{
+						"S": "dog"
+					}, {
+						"S": "mouse"
+					}, {
+						"S": "tiger"
+					}
+				]
+			},
+			"Artist": {
+				"S": "Lanka"
+			},
+			"SongTitle": {
+				"S": "Lanka"
+			}
+		}, {
+			"AlbumTitle": {
+				"S": "Lanka520"
+			},
+			"Awards": {
+				"S": "1"
+			},
+			"Sponsor": {
+				"L": [{
+						"S": "dog"
+					}, {
+						"S": "cat"
+					}, {
+						"S": "mouse"
+					}, {
+						"S": "stoat"
+					}, {
+						"S": "snake"
+					}
+				]
+			},
+			"Artist": {
+				"S": "Lanka"
+			},
+			"SongTitle": {
+				"S": "Lanka520520"
+			}
+		}, {
+			"AlbumTitle": {
+				"S": "Songs About Life"
+			},
+			"Awards": {
+				"S": "10"
+			},
+			"Artist": {
+				"S": "Acme Band"
+			},
+			"SongTitle": {
+				"S": "Happy Day"
+			}
+		}, {
+			"AlbumTitle": {
+				"S": "Another Album Title"
+			},
+			"Awards": {
+				"S": "8"
+			},
+			"Artist": {
+				"S": "Acme Band"
+			},
+			"SongTitle": {
+				"S": "PartiQL Rocks"
+			}
+		}
+	],
+	"Count": 6,
+	"ScannedCount": 6,
+	"ConsumedCapacity": null
+}

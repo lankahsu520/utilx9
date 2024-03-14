@@ -59,6 +59,7 @@ void test_push(int idx)
 	TestX_t data_new = { .idx = 0 };
 
 	data_new.idx = idx;
+	DBG_IF_LN("(idx: %d)", idx);
 	queuex_push(test_q, (void*)&data_new);
 }
 

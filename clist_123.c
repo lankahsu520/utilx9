@@ -39,10 +39,12 @@ int main(int argc, char* argv[])
 
 		if (item->num%4==0)
 		{
+			DBG_IF_LN("clist_add ~~~ (num: %d)", item->num);
 			clist_add(demo_list, item);
 		}
 		else
 		{
+			DBG_IF_LN("clist_push ~~~ (num: %d)", item->num);
 			clist_push(demo_list, item);
 		}
 	}
@@ -50,7 +52,7 @@ int main(int argc, char* argv[])
 	while ( clist_length(demo_list) > 0 )
 	{
 		item = (DemoList_t*)clist_pop(demo_list);
-		DBG_IF_LN("(num: %d)", item->num);
+		DBG_IF_LN("clist_pop ~~~ (num: %d)", item->num);
 	}
 
 	clist_free(demo_list);

@@ -24,7 +24,7 @@ static void *thread_handler(void *user)
 	threadx_detach(tidx_req);
 
 	int count = 0;
-	DBG_IF_LN("(count: %d)", count++);
+	DBG_IF_LN("%s (name: %s, count: %d)", DBG_TXT_RUN_LOOP, tidx_req->name, count);
 
 	while (threadx_isquit(tidx_req)==0)
 	{

@@ -119,7 +119,7 @@ $ sudo apt-get --yes install libjson-c-dev
 ## 4.2. libmxml
 
 ```bash
-$ vi conf/github.conf
+$ vi conf/simple_x86.conf
 export PJ_HAS_MXML=yes
 
 $ vi utilx9.h
@@ -131,7 +131,7 @@ $ vi utilx9.h
 ## 4.3. libyuarel
 
 ```bash
-$ vi conf/github.conf
+$ vi conf/simple_x86.conf
 export PJ_HAS_LIBYUAREL=yes
 
 $ vi utilx9.h
@@ -146,80 +146,105 @@ $ vi utilx9.h
 
 ```bash
 $ ./clist_123
-[30864/30864] main:53 - (num: 8)
-[30864/30864] main:53 - (num: 4)
-[30864/30864] main:53 - (num: 0)
-[30864/30864] main:53 - (num: 1)
-[30864/30864] main:53 - (num: 2)
-[30864/30864] main:53 - (num: 3)
-[30864/30864] main:53 - (num: 5)
-[30864/30864] main:53 - (num: 6)
-[30864/30864] main:53 - (num: 7)
-[30864/30864] main:53 - (num: 9)
+[8338/8338] main:42 - clist_add ~~~ (num: 0)
+[8338/8338] main:47 - clist_push ~~~ (num: 1)
+[8338/8338] main:47 - clist_push ~~~ (num: 2)
+[8338/8338] main:47 - clist_push ~~~ (num: 3)
+[8338/8338] main:42 - clist_add ~~~ (num: 4)
+[8338/8338] main:47 - clist_push ~~~ (num: 5)
+[8338/8338] main:47 - clist_push ~~~ (num: 6)
+[8338/8338] main:47 - clist_push ~~~ (num: 7)
+[8338/8338] main:42 - clist_add ~~~ (num: 8)
+[8338/8338] main:47 - clist_push ~~~ (num: 9)
+[8338/8338] main:55 - clist_pop ~~~ (num: 8)
+[8338/8338] main:55 - clist_pop ~~~ (num: 4)
+[8338/8338] main:55 - clist_pop ~~~ (num: 0)
+[8338/8338] main:55 - clist_pop ~~~ (num: 1)
+[8338/8338] main:55 - clist_pop ~~~ (num: 2)
+[8338/8338] main:55 - clist_pop ~~~ (num: 3)
+[8338/8338] main:55 - clist_pop ~~~ (num: 5)
+[8338/8338] main:55 - clist_pop ~~~ (num: 6)
+[8338/8338] main:55 - clist_pop ~~~ (num: 7)
+[8338/8338] main:55 - clist_pop ~~~ (num: 9)
 ```
 
 - cronx_123 - parse crontab string ("minute" "hour" "day of month" "month" "day of week" "year, 2020+"), similar to crontab, to use cronx_api.c
 
 ```bash
-$ cronx_123 -a "*/1 * * * * 2022 " -d 2
-[30859/30859] app_loop:164 - Run loop ... (clock_alarm: [*/1 * * * * 2022 ])
-[30859/30859] timer_1sec_loop:51 - (21:31:58)
-[30859/30859] timer_1sec_loop:51 - (21:31:59)
-[30859/30859] timer_1sec_loop:51 - (21:32:00)
-[30859/30859] cronx_validate:98 - (cron_txt: [*/1 * * * * 2022 ], [32 21 26 10 6 2022])
-[30859/30859] cronx_validate:218 - Got !!! (cron_txt: [*/1 * * * * 2022 ], [32 21 26 10 6 2], fit: 6)
-[30859/30859] timer_1sec_loop:65 - Alarm !!! (*/1 * * * * 2022 )
-[30859/30859] timer_1sec_loop:51 - (21:32:01)
+$ ./cronx_123 -a "*/1 * * * * 2024 " -d 3
+[8985/8985] app_loop:164 - Run loop ... (clock_alarm: [*/1 * * * * 2024 ])
+[8985/8985] timer_1sec_loop:51 - (09:30:56)
+[8985/8985] timer_1sec_loop:51 - (09:30:57)
+[8985/8985] timer_1sec_loop:51 - (09:30:58)
+[8985/8985] timer_1sec_loop:51 - (09:30:59)
+[8985/8985] timer_1sec_loop:51 - (09:31:00)
+[8985/8985] cronx_validate:98 - (cron_txt: [*/1 * * * * 2024 ], [31 9 14 2 4 2024])
+[8985/8985] cronx_validate:218 - Got !!! (cron_txt: [*/1 * * * * 2024 ], [31 9 14 2 4 4], fit: 6)
+[8985/8985] timer_1sec_loop:65 - Alarm !!! (*/1 * * * * 2024 )
+[8985/8985] timer_1sec_loop:51 - (09:31:01)
+[8985/8985] timer_1sec_loop:51 - (09:31:02)
+^C[8985/8985] app_signal_handler:212 - (signum: 2)
+[8985/8985] app_stop:158 - Bye-Bye !!! (cronx_123)
+[8985/8985] async_loop:128 - __________ Enter __________
+[8985/8985] main:310 - Bye-Bye !!!
 ```
 
 - dbusx_456 - dbus example.
+
+> pleae make sure [dbusX.conf](https://github.com/lankahsu520/HelperX/blob/master/DBus/dbusX.conf) in /etc/dbus-1/system.d
 
 ```bash
 $ ./dbusx_456 -s &
 [30642/30643] dbusx_thread_handler:516 - dbus listen ...
 $ ./dbusx_456 -e 123
-[30644/30644] app_loop:124 - (retStr: 123)
-[30644/30644] main:244 - Bye-Bye !!!
+[3003/3004] demo_signal_name_cb:113 - Got !!! (signal_name: command, reqStr: 123)
+[3005/3005] app_loop:150 - (retStr: 123)
+[3005/3005] main:284 - Bye-Bye !!!
+[3003/3004] demo_signal_name_cb:113 - Got !!! (signal_name: DBUS_TYPE_INT16, reqStr: 16)
+[3003/3004] demo_signal_name_cb:113 - Got !!! (signal_name: DBUS_TYPE_INT32, reqStr: 32)
+[3003/3004] demo_signal_name_cb:113 - Got !!! (signal_name: DBUS_TYPE_INT64, reqStr: 64)
 ```
 
 - demo_000 - c template.
 
 ```bash
 $ ./demo_000
-[30636/30636] app_loop:46 - (pid: 30636)
-[30636/30636] app_loop:50 - (cksum: 1398)
-[30636/30636] app_loop:52 - (cksum: 22044)
-[30636/30636] main:156 - Bye-Bye !!!
+[3011/3011] app_loop:46 - (pid: 3011)
+[3011/3011] app_loop:50 - (cksum: 1398)
+[3011/3011] app_loop:52 - (cksum: 22044)
+[3011/3011] main:156 - Bye-Bye !!!
 ```
 - demo_123 - a example.
 ```bash
 $ ./demo_123
-[30635/30635] main:41 - (1<<3: 0x00000008, 1<<14: 0x00004000, 1<<15: 0x00008000, 1<<16: 0x00010000, 1<<17: 0x00020000)
-[30635/30635] main:44 - (hello_trim: Hello World !!!    )
-[30635/30635] main:47 - (hello_trim: Hello World !!!)
-[30635/30635] main:55 - SAFE_STRCAT_EX - lankahsu520/1234
+[3013/3013] main:44 - String testing ...
+[3013/3013] main:45 - (1<<3: 0x00000008, 1<<14: 0x00004000, 1<<15: 0x00008000, 1<<16: 0x00010000, 1<<17: 0x00020000)
+[3013/3013] main:48 - (hello org: Hello World !!!    )
+[3013/3013] main:50 - (hello_trim: Hello World !!!)
+[3013/3013] main:58 - SAFE_STRCAT_EX - lankahsu520/1234
 
-[30635/30635] main:152 - (mode: 4)
-[30635/30635] main:153 - (curl: 8)
-[30635/30635] main:154 - (url: 2048)
-[30635/30635] main:155 - (port: 4)
-[30635/30635] main:156 - (user: 8)
-[30635/30635] main:157 - (log: 3072)
-[30635/30635] main:159 - ------------
-[30635/30635] main:160 - (res_size: 8)
-[30635/30635] main:161 - (response: 8)
-[30635/30635] main:162 - (method: 4)
-[30635/30635] main:163 - (curl_slist: 8)
-[30635/30635] main:165 - ------------
-[30635/30635] main:166 - (max_size: 8)
-[30635/30635] main:167 - (filename: 1024)
-[30635/30635] main:168 - (fp: 8)
-[30635/30635] main:169 - (qbuf: 24)
-[30635/30635] main:170 - (boundary: 32)
-[30635/30635] main:171 - (state: 4)
-[30635/30635] main:173 - ------------
-[30635/30635] main:175 - (track: 64)
-[30635/30635] main:176 - (track[0]: 32)
+[3013/3013] main:83 - BASE64, abc -> abc_enc -> abc_dec
+[3013/3013] main:87 - (sec_base64_enc: cnRzcDovLzE5Mi4xNjguNTAuMjM4OjU1NC9saXZlMS5zZHA=)
+[3013/3013] main:90 - (sec_base64_dec: rtsp://192.168.50.238:554/live1.sdp)
+
+[3013/3013] main:111 - aes_128_cbc, intlen: 15, plaintext: 123456789012345 -> plaintext_enc -> plaintext_dec
+[3013/3013] main:112 - (evp_key: 1234567890abcdef, iv_key: 1234567890abcdef)
+[3013/3013] main:117 - sec_aes_cbc_enc - plaintext_enc: {
+    93 EE E4 5D 7F 89 2D 25 CE 24 F1 BD 78 40 67 62
+}
+▒7▒#x/30▒▒p▒=S▒"▒▒w▒▒#x(▒▒p▒=S▒"▒▒w▒▒#x ▒▒p▒=S▒"▒▒w▒▒#x:▒▒p▒=S▒"▒▒w▒▒#x5▒▒p▒=S▒"▒▒w▒▒#x ▒▒p▒=S▒"▒▒w▒▒)
+
+[3013/3013] main:127 - sec_aes_cbc_encX - enc_len: 16, plaintext_enc: {
+    93 EE E4 5D 7F 89 2D 25 CE 24 F1 BD 78 40 67 62
+}
+[3013/3013] main:129 - (sec_aes_cbc_decX - dec_len: 15, plaintext_dec: 123456789012345)
+
+[3013/3013] main:147 - hostname ...
+[3013/3013] main:150 - (gethostname: build20-vbx)
+[3013/3013] main:154 - (getdomainname: (none), res: 0)
+
+[3013/3013] main:189 - datetime ...
+[3013/3013] main:190 - (time_now_full: 2024-03-14 09:43:34)
 ```
 - http_client_123 - http client example. use curl.
 - jqx - it is similar to jq. jqx only support reads from pipe. 
@@ -232,39 +257,77 @@ $ cat Music.json | ./jqx .Items[3].Sponsor.L[].S
 "mouse"
 "stoat"
 "snake"
-
 ```
 
 - json_123 - json example.
 
 ```bash
-./json_123
-[30867/30867] main:26 - enter
-[30867/30867] uuid_test:21 - (guid: 72594E89-CFC6-4B86-b25F-AAE48DDCF1BD)
-[30867/30867] main:59 - (jdemo1: 0x55d4cd20c7a0, refcount: 1)
-[30867/30867] main:61 - (jdemo2: 0x55d4cd20c810, refcount: 1)
-[30867/30867] main:62 - (jdemo1: 0x55d4cd20c7a0, refcount: 94372462784528)
-[30867/30867] json_dump_simple:22 - (jroot: {"demo":"HelloWorld 1 !!!","j1":{"j2":{"j3":{"logo":"helloworld!!!"}}},"jA":[{"name":"A1","val":1},{"name":"A2","val":2},{"name":"A3","val":3}]})
-[30867/30867] main:69 - (idx: 2)
-[30867/30867] main:79 - (logo: helloworld!!!)
-[30867/30867] json_dump_simple:26 - (Not Found - j1/j2/j4: (nil))
-[30867/30867] json_dump_simple:22 - (APPEND - j1/j2/j4: {})
-[30867/30867] json_dump_simple:26 - (DEL - j1/j2/j3: (nil))
-[30867/30867] json_dump_simple:22 - (j1/j2: {"j4":{}})
-[30867/30867] main:140 - (sunrise: 3:22:56 AM)
-[30867/30867] main:141 - (sunset: 5:10:20 PM)
-[30867/30867] main:142 - (utc: 1652853043)
-[30867/30867] main:160 - (cJson: {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043})
-
+$ ./json_123
+[3032/3032] main:32 - enter
+[3032/3032] uuid_test:21 - (guid: 7CE07D29-CFA5-417B-a4BF-51AD96BFCB3C)
+[3032/3032] uuid_test:24 - (guid: 059D6F66-9537-4B6E-bCD7-48B204C59381)
+[3032/3032] uuid_test:27 - (guid: 6E632715-5EEE-449E-8CB4-8049F0856661)
+[3032/3032] json_dump_simple:22 - (jroot: {"j1":{"j2":{"j3":{"logo":"helloworld!!!"}}}})
+[3032/3032] main:52 - >> update j4->j1
+[3032/3032] json_dump_simple:22 - (jroot: {"j1":{"j4":"child !!!"}})
+[3032/3032] json_dump_simple:22 - (jroot: {"j1":{"j4":"child !!!"},"jA":[{"name":"A1","val":1},{"name":"A2","val":2},{"name":"A3","val":3}]})
+[3032/3032] main:95 - >> (jA: 0x55a05def06e0, jA_new: 0x55a05def06e0)
+[3032/3032] main:102 - >> update jB1->jA1
+[3032/3032] json_dump_simple:22 - (jroot: {"j1":{"j4":"child !!!"},"jA":[{"name":"A1","nameB":"B4","val":1,"valB":4},{"name":"A2","val":2},{"name":"A3","val":3}]})
+[3032/3032] json_dump_simple:22 - (jroot: {"demo":"HelloWorld 1 !!!","j1":{"j4":"child !!!"},"jA":[{"name":"A1","nameB":"B4","val":1,"valB":4},{"name":"A2","val":2},{"name":"A3","val":3}]})
+[3032/3032] main:120 - >> set demo as jdemo1 (jdemo1: 0x55a05def04c0, refcount: 1)
+[3032/3032] json_dump_simple:22 - (jroot: {"demo":"HelloWorld 2 !!!","j1":{"j4":"child !!!"},"jA":[{"name":"A1","nameB":"B4","val":1,"valB":4},{"name":"A2","val":2},{"name":"A3","val":3}]})
+[3032/3032] main:125 - >> set demo as jdemo2; jdemo1 will be free and we can't access jdemo1 !!! !!! (jdemo2: 0x55a05def0860, refcount: 1)
+[3032/3032] json_dump_simple:22 - (jroot: {"demo":"HelloWorld 2 !!!","j1":{"j4":"child !!!"},"jA":[{"name":"A1","nameB":"B4","val":1,"valB":4},{"name":"A2","val":2},{"name":"A3","val":3}]})
+[3032/3032] main:135 - (idx: 2)
+[3032/3032] json_dump_simple:26 - (Not Found - j1/j2/j4: (nil))
+[3032/3032] json_dump_simple:22 - (APPEND - j1/j2/j4: {})
+[3032/3032] json_dump_simple:26 - (DEL - j1/j2/j3: (nil))
+[3032/3032] json_dump_simple:22 - (j1/j2: {"j4":{}})
+[3032/3032] main:208 - (sunrise: 3:22:56 AM)
+[3032/3032] main:209 - (sunset: 5:10:20 PM)
+[3032/3032] main:210 - (utc: 1652853043)
+[3032/3032] main:228 - (cJson: {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043})
 ```
 
 - led_123 - led controller example.
 - lws_123 - a websocket example.
+
+> export PJ_HAS_LIBWEBSOCKETS=yes
+
 - mqtt_123 - a mqtt example.
+
+> export PJ_HAS_MOSQUITTO=yes
+
 - multicast_cli & multicast_srv - multicast example.
+
+```bash
+$ ./multicast_srv
+listen ... (239.255.255.250:3618)
+setsockopt IP_ADD_MEMBERSHIP
+10.0.2.15 - 0
+10.0.2.15 - 1
+10.0.2.15 - 2
+10.0.2.15 - 3
+10.0.2.15 - 4
+```
+
+```bash
+$ ./multicast_cli
+link ... (239.255.255.250:3618, argc: 1)
+sendto (buff: 0)
+sendto (buff: 1)
+sendto (buff: 2)
+sendto (buff: 3)
+sendto (buff: 4)
+```
+
 - ~~nlink_123 & nlink_456 - netlink example. got from internet.~~
 - nlink_789 netlink example. use chainX_api.c (CHAINX_MODE_ID_NETLINK).
 - onvif_client_123 - onvif client example.
+
+> export PJ_HAS_MXML=yes
+
 - ping_123 - ping example.
 
 ```bash
@@ -288,23 +351,21 @@ $ sudo ./ping_123 -i 1 -c 3 google.com
 
 ```bash
 $ ./queuex_123
-[12746/12747] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
-[12746/12746] queuex_push:287 - (name: test, length: 0/30, ishold: 0, isloop: 1)
-[12746/12746] queuex_push:287 - (name: test, length: 1/30, ishold: 0, isloop: 1)
-[12746/12746] queuex_push:287 - (name: test, length: 2/30, ishold: 0, isloop: 1)
-[12746/12746] queuex_push:287 - (name: test, length: 3/30, ishold: 0, isloop: 1)
-[12746/12746] queuex_push:287 - (name: test, length: 4/30, ishold: 0, isloop: 1)
-[12746/12747] queue_pop:325 - (name: test, length: 5/30, ishold: 0, isloop: 1)
-[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 0)
-[12746/12747] queue_pop:325 - (name: test, length: 4/30, ishold: 0, isloop: 1)
-[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 1)
-[12746/12747] queue_pop:325 - (name: test, length: 3/30, ishold: 0, isloop: 1)
-[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 2)
-[12746/12747] queue_pop:325 - (name: test, length: 2/30, ishold: 0, isloop: 1)
-[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 3)
-[12746/12747] queue_pop:325 - (name: test, length: 1/30, ishold: 0, isloop: 1)
-[12746/12747] test_q_exec_cb:38 - (data_pop->idx: 4)
-[12746/12747] queue_pop:325 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[8651/8651] test_push:62 - (idx: 0)
+[8651/8651] queuex_push:311 - (name: test, length: 0/30, ishold: 0, isloop: 1)
+[8651/8651] test_push:62 - (idx: 1)
+[8651/8651] queuex_push:311 - (name: test, length: 1/30, ishold: 0, isloop: 1)
+[8651/8651] test_push:62 - (idx: 2)
+[8651/8651] queuex_push:311 - (name: test, length: 2/30, ishold: 0, isloop: 1)
+[8651/8651] test_push:62 - (idx: 3)
+[8651/8651] queuex_push:311 - (name: test, length: 3/30, ishold: 0, isloop: 1)
+[8651/8651] test_push:62 - (idx: 4)
+[8651/8651] queuex_push:311 - (name: test, length: 4/30, ishold: 0, isloop: 1)
+[8651/8652] test_q_exec_cb:38 - (data_pop->idx: 0)
+[8651/8652] test_q_exec_cb:38 - (data_pop->idx: 1)
+[8651/8652] test_q_exec_cb:38 - (data_pop->idx: 2)
+[8651/8652] test_q_exec_cb:38 - (data_pop->idx: 3)
+[8651/8652] test_q_exec_cb:38 - (data_pop->idx: 4)
 ```
 
 - sshX_123 - ssh example.
@@ -314,22 +375,20 @@ $ ./queuex_123
 
 ```bash
 $ ./thread_123
-[16594/16595] thread_handler:27 - (count: 0)
-[16594/16595] thread_handler:33 - (name: thread_A, count: 1)
-[16594/16595] thread_handler:33 - (name: thread_A, count: 2)
-[16594/16595] thread_handler:36 - wait 3 seconds ...
-[16594/16596] thread_handler:27 - (count: 0)
-[16594/16596] thread_handler:33 - (name: thread_B, count: 1)
-[16594/16596] thread_handler:33 - (name: thread_B, count: 2)
-[16594/16596] thread_handler:36 - wait 3 seconds ...
-[16594/16595] thread_handler:33 - (name: thread_A, count: 3)
-[16594/16595] thread_handler:33 - (name: thread_A, count: 4)
-[16594/16595] thread_handler:33 - (name: thread_A, count: 5)
-[16594/16595] thread_handler:36 - wait 3 seconds ...
-[16594/16596] thread_handler:33 - (name: thread_B, count: 3)
-[16594/16596] thread_handler:33 - (name: thread_B, count: 4)
-[16594/16596] thread_handler:33 - (name: thread_B, count: 5)
-[16594/16596] thread_handler:36 - wait 3 seconds ...
+[8935/8936] thread_handler:27 - Run loop ... (name: thread_A, count: 0)
+[8935/8936] thread_handler:33 - (name: thread_A, count: 0)
+[8935/8936] thread_handler:33 - (name: thread_A, count: 1)
+[8935/8936] thread_handler:33 - (name: thread_A, count: 2)
+[8935/8936] thread_handler:36 - wait 3 seconds ...
+[8935/8937] thread_handler:27 - Run loop ... (name: thread_B, count: 0)
+[8935/8937] thread_handler:33 - (name: thread_B, count: 0)
+[8935/8937] thread_handler:33 - (name: thread_B, count: 1)
+[8935/8937] thread_handler:33 - (name: thread_B, count: 2)
+[8935/8937] thread_handler:36 - wait 3 seconds ...
+[8935/8936] thread_handler:33 - (name: thread_A, count: 3)
+[8935/8936] thread_handler:33 - (name: thread_A, count: 4)
+[8935/8936] thread_handler:33 - (name: thread_A, count: 5)
+[8935/8936] thread_handler:36 - wait 3 seconds ...
 ```
 
 - tty_123 - a tty example. use chainX_api.c.
@@ -339,52 +398,120 @@ $ ./thread_123
 - uci_123 - uci example.
 - usb_123 - usb example.
 - util_123 - example.
+
+```bash
+$ ./util_123
+[8946/8946] main:23 - (Version: 0x03000000, 2922, 1710208772, lanka, 1710379668)
+[8946/8946] main:26 - (Debug LVL: 2, Expiration: 1861919999=20290101 075959, Time Diff: 1753.94)
+[8946/8946] main:27 - (Toolchain: , Path: , Build Path: /work/codebase/lankahsu520/utilx9)
+[8946/8946] main:28 - (Name: github, Platform: linux, Save: /work/IoT, Work: /tmp/IoT)
+[8946/8946] main:29 - (ICLOUD: 192.168.50.148:9000-0, IFACE: enp0s8)
+[8946/8946] main:30 - (MCTT: 229.255.255.250:6288)
+[8946/8946] main:34 - BIT_SET(num,0) (num: 0x00000001)
+[8946/8946] main:36 - BIT_SET(num,2) (num: 0x00000005)
+[8946/8946] main:38 - BIT_SET(num,4) (num: 0x00000015)
+[8946/8946] main:40 - BIT_SET(num,6) (num: 0x00000055)
+[8946/8946] main:42 - BIT_SET(num,8) (num: 0x00000155)
+[8946/8946] main:44 - BIT_INVERSE(num,3) (num: 0x0000015D, num.bit2: 1, num.bit3: 1)
+```
+
 - uv_000 - uv template.
 
 ```bash
 $ ./uv_000
-[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
-[20044/20044] async_loop:79 - __________ Enter __________
-[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
-[20044/20044] async_loop:79 - __________ Enter __________
-[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
-[20044/20044] async_loop:79 - __________ Enter __________
-[20044/20044] timer_1sec_loop:37 - kick async every 1 second.
-[20044/20044] async_loop:79 - __________ Enter __________
+[8948/8948] timer_1sec_loop:40 - kick async every 1 second. (countdown: 2)
+[8948/8948] async_loop:98 - __________ Enter __________
+[8948/8948] async_loop:104 - (*data: 1)
+[8948/8948] timer_1sec_loop:40 - kick async every 1 second. (countdown: 1)
+[8948/8948] async_loop:98 - __________ Enter __________
+[8948/8948] async_loop:104 - (*data: 2)
+[8948/8948] timer_1sec_loop:40 - kick async every 1 second. (countdown: 0)
+[8948/8948] main:255 - Bye-Bye !!!
 ```
 
 - uv_123 - uv example.
 
 ```bash
 $ ./uv_123
-[30884/30885] queue_work_handler:114 - (id: 2, count: 1)
-[30884/30888] queue_work_handler:114 - (id: 1, count: 1)
-[30884/30887] queue_work_handler:114 - (id: 3, count: 1)
-[30884/30886] queue_work_handler:114 - (id: 4, count: 1)
-[30884/30884] timer_1_loop:44 - (count: 1)
-[30884/30884] timer_1_loop:50 - Bye-Bye !!! (uv_123)
-[30884/30884] timer_2_loop:58 - (count: 1)
-[30884/30884] timer_2_loop:63 - Bye-Bye !!! (uv_123)
-[30884/30886] queue_work_handler:114 - (id: 5, count: 1)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 4, status: 0)
-[30884/30887] queue_work_handler:114 - (id: 6, count: 1)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 3, status: 0)
-[30884/30885] queue_work_handler:114 - (id: 7, count: 1)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 2, status: 0)
-[30884/30888] queue_work_handler:114 - (id: 8, count: 1)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 1, status: 0)
-[30884/30887] queue_work_handler:114 - (id: 9, count: 1)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 6, status: 0)
-[30884/30886] queue_work_handler:114 - (id: 10, count: 1)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 5, status: 0)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 8, status: 0)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 7, status: 0)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 10, status: 0)
-[30884/30884] queue_work_finisher:104 - Bye-Bye !!! (uv_123, id: 9, status: 0)
+[3334/3335] queue_work_handler:119 - (id: 1, count: 1)
+[3334/3335] queue_work_handler:119 - (id: 4, count: 1)
+[3334/3335] queue_work_handler:119 - (id: 5, count: 1)
+[3334/3335] queue_work_handler:119 - (id: 6, count: 1)
+[3334/3335] queue_work_handler:119 - (id: 7, count: 1)
+[3334/3336] queue_work_handler:119 - (id: 2, count: 1)
+[3334/3336] queue_work_handler:119 - (id: 10, count: 1)
+[3334/3337] queue_work_handler:119 - (id: 3, count: 1)
+[3334/3335] queue_work_handler:119 - (id: 8, count: 1)
+[3334/3338] queue_work_handler:119 - (id: 9, count: 1)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 1, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 4, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 5, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 6, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 7, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 2, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 10, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 3, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 8, status: 0)
+[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 9, status: 0)
+[3334/3334] timer_1_loop:49 - (count: 1)
+[3334/3334] timer_1_loop:55 - Bye-Bye !!!
+[3334/3334] timer_2_loop:63 - (count: 1)
+[3334/3334] timer_2_loop:68 - Bye-Bye !!!
+
+^C[3334/3334] app_signal_handler:409 - (signum: 2)
+[3334/3334] async_loop:300 - (percentage: 0)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 0)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 1)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 2)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 3)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 4)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 5)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 6)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 7)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 8)
+[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 9)
+[3334/3334] uv_event_close_ex:249 - Bye-Bye !!! (uv_123)
+[3334/3334] main:510 - Bye-Bye !!!
 ```
 
 - uv_spawn_123 - uv spawn example.
+
+```bash
+$ ./uv_spawn_123
+[5051/5051] timer_1sec_loop:94 - (count: 1)
+[5051/5051] timer_1sec_loop:94 - (count: 2)
+[5051/5051] uv_spawn_open_ex:163 - Launch a new thread !!! (spawn_req: 0x55d43bc5c0e0, pid: 5052)
+[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base: PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=113 time=5.19 ms
+)
+[5051/5051] timer_1sec_loop:94 - (count: 3)
+[5051/5051] uv_spawn_simple_detached:210 - uv_spawn error !!! (no such file or directory, file: /work/rootfs/sbin/iot_kvsWebrtc.sh)
+[5051/5051] uv_spawn_simple_detached:210 - uv_spawn error !!! (no such file or directory, file: /work/rootfs/sbin/baresip_123.sh)
+[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=2 ttl=113 time=4.86 ms
+)
+[5051/5051] timer_1sec_loop:94 - (count: 4)
+[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=3 ttl=113 time=4.68 ms
+)
+^C[5051/5051] app_signal_handler:239 - (signum: 2)
+[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base:
+--- 8.8.8.8 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2002ms
+rtt min/avg/max/mdev = 4.679/4.910/5.187/0.209 ms
+)
+[5051/5051] async_loop:176 - (async_count: 1)
+[5051/5051] app_stop_uv:142 - call SAFE_UV_TIMER_CLOSE ~~~
+[5051/5051] app_stop_uv:147 - call uv_spawn_close_ex ~~~
+[5051/5051] app_stop_uv:152 - call SAFE_UV_CLOSE ~~~
+[5051/5051] app_stop_uv:158 - call SAFE_UV_LOOP_CLOSE ~~~
+[5051/5051] app_stop_uv:165 - exit
+[5051/5051] uv_spawn_exit_cb:79 - Bye-Bye !!! (ping)
+[5051/5051] main:326 - Bye-Bye !!!
+```
+
 - wsdiscovery_123 - WS-Discovery example.
+
+> export PJ_HAS_MXML=yes
+
 - ~~gbusx_123 - a  example. use gbusx_api.c.~~
 
 

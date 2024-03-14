@@ -19,7 +19,7 @@
 
 #define USE_ASYNC_CREATE
 #define USE_TIMER_CREATE
-//#define USE_SPAWN_CREATE
+#define USE_SPAWN_CREATE
 #define USE_SPAWN_SIMPLE_CREATE
 
 #define TAG "uv_spawn_123"
@@ -99,7 +99,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 		uv_spawn_ping();
 #endif
 	}
-	else if ((count%5) == 0)
+	else if ((count%3) == 0)
 	{
 #ifdef USE_SPAWN_SIMPLE_CREATE
 		//uv_spawn_simple_test("192.168.50.72");
@@ -109,14 +109,14 @@ void timer_1sec_loop(uv_timer_t *handle)
 			SpawnX_t *spawn_req = (SpawnX_t *)SAFE_CALLOC(1, sizeof(SpawnX_t));
 			spawn_req->loop = uv_loop;
 			spawn_req->child_req.data = spawn_req;
-			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs_intercom/sbin/iot_kvsWebrtc.sh", "restart", "1");
+			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs/sbin/iot_kvsWebrtc.sh", "restart", "1");
 		}
 
 		{
 			SpawnX_t *spawn_req = (SpawnX_t *)SAFE_CALLOC(1, sizeof(SpawnX_t));
 			spawn_req->loop = uv_loop;
 			spawn_req->child_req.data = spawn_req;
-			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs_intercom/sbin/baresip_123.sh", "restart", "1");
+			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs/sbin/baresip_123.sh", "restart", "1");
 		}
 
 		//uv_spawn_simple_test("192.168.50.1");

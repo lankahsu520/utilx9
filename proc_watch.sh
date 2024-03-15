@@ -170,7 +170,7 @@ wait_fn()
 			[ -z "$PID" ] && break;
 		fi
 		count=$(($count+1))
-		sleep 1
+		sleep 0.1
 	done
 
 	return 0
@@ -193,7 +193,7 @@ start_fn()
 	datetime_fn "${FUNCNAME[0]}:${LINENO}- [$DO_COMMAND]"
 	sh -c "$DO_COMMAND"
 
-	wait_fn 1 1
+	wait_fn 1 10
 
 	datetime_fn "${FUNCNAME[0]}:${LINENO}- ($PID) ok."
 

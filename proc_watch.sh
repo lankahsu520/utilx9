@@ -78,6 +78,13 @@ datetime_fn()
 	return 0
 }
 
+eval_fn()
+{
+	DO_COMMAND="$2"
+	datetime_fn "$1- [$DO_COMMAND]"
+	eval ${DO_COMMAND}
+}
+
 die_fn()
 {
 	datetime_fn "$@"; datetime_fn ""
@@ -190,8 +197,7 @@ start_fn()
 	else
 		DO_COMMAND="$SUDO $BIN_FILE $DO_COMMAND_ARG"
 	fi
-	datetime_fn "${FUNCNAME[0]}:${LINENO}- [$DO_COMMAND]"
-	sh -c "$DO_COMMAND"
+	eval_fn "${FUNCNAME[0]}:${LINENO}" "$DO_COMMAND"
 
 	wait_fn 1 10
 
@@ -250,9 +256,7 @@ logger_fn()
 	LOGREAD=`which logread`
 	LOGREAD_ARG=" [ ! -z '$LOGREAD' ] "
 	[ -z "$LOGREAD" ] || LOGREAD_ARG="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f $LOGGER_COLOR | grep $LOGGER_TAG 2>/dev/null; )"
-	DO_COMMAND="$LOGREAD_ARG || (tail -f /var/log/syslog $LOGGER_COLOR | grep $LOGGER_TAG;)"
-	datetime_fn "${FUNCNAME[0]}:${LINENO}- [$DO_COMMAND]"
-	sh -c "$DO_COMMAND"
+	eval_fn "${FUNCNAME[0]}:${LINENO}" "$LOGREAD_ARG || (tail -f /var/log/syslog $LOGGER_COLOR | grep $LOGGER_TAG;)"
 
 	return 0
 }

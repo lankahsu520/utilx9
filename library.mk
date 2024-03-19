@@ -154,6 +154,11 @@ LIBS_yes += -lnl-tiny
 CFLAGS += -I$(SDK_INC_DIR)/libnl-tiny
 endif
 
+ifeq ("$(PJ_HAS_BACKTRACE)", "yes")
+CLEAN_BINS += 	\
+							backtrace_123
+endif
+
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 LIBS_yes += -lssl -lcrypto
 endif

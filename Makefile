@@ -122,7 +122,6 @@ CONFS = \
 
 #** Target (AUTO_GENERATEDS) **
 AUTO_GENERATEDS = \
-									util_expiration.h
 
 TO_FOLDER =
 

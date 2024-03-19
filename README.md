@@ -58,6 +58,7 @@
 - internet-collect.c - [Hex Encode and Decode in C](https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/)
 - internet-collect.c - [Linux C语言实现urlencode和urldecode](https://ivanzz1001.github.io/records/post/cplusplus/2018/03/13/cpluscplus_urlencode)
 - internet-collect.c - [Howto base64 encode and decode with C and OpenSSL](https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/)
+- internet-collect.c - [34.1 Backtraces](https://www.gnu.org/software/libc/manual/html_node/Backtraces.html)
 - clist_api.c - http://www.contiki-os.org
 - crc16.c - http://www.contiki-os.org
 - crc32alg.c - CRC32 code derived from work by Gary S. Brown.
@@ -140,9 +141,43 @@ $ vi utilx9.h
 ```
 
 # 5. Example or Usage
-- chainX_123 - socket example. use chainX_api.c.
-- client_123 - socket client. use chainX_api.c.
-- clist_123 - link list example. use clist_api.c , use contiki\core\lib\list.*.
+#### - backtrace_123 - backtrace example.
+
+```bash
+$ ./backtrace_123
+*** stack smashing detected ***: terminated
+[20143/20143] app_signal_handler:88 - (signum: 6)
+[20143/20143] backtrace_alert:373 - ===== Obtained 10 stack frames =====
+/work/codebase/lankahsu520/utilx9/libutilx9.so.3(backtrace_alert+0x2e) [0x7f24e60030ce]
+/lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f24e5c88090]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xcb) [0x7f24e5c8800b]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0x12b) [0x7f24e5c67859]
+/lib/x86_64-linux-gnu/libc.so.6(+0x8d26e) [0x7f24e5cd226e]
+/lib/x86_64-linux-gnu/libc.so.6(__fortify_fail+0x2a) [0x7f24e5d74cda]
+/lib/x86_64-linux-gnu/libc.so.6(+0x12fca6) [0x7f24e5d74ca6]
+./backtrace_123(+0x16a8) [0x5562fcd6e6a8]
+./backtrace_123(+0x12e5) [0x5562fcd6e2e5]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f24e5c69083]
+[20143/20143] backtrace_alert:380 - ====================================
+Aborted (core dumped)
+
+$ addr2line -Cfie backtrace_123 +0x16a8
+function_deep_2
+/work/codebase/lankahsu520/utilx9/backtrace_123.c:62
+
+$ addr2line -Cfie backtrace_123 +0x12e5
+main
+/work/codebase/lankahsu520/utilx9/backtrace_123.c:187
+```
+
+#### - chainX_123 - socket example.
+
+> use chainX_api.c.
+
+#### - client_123 - socket client.
+> use chainX_api.c.
+#### - clist_123 - link list example.
+> use clist_api.c , use contiki\core\lib\list.*.
 
 ```bash
 $ ./clist_123
@@ -168,7 +203,9 @@ $ ./clist_123
 [8338/8338] main:55 - clist_pop ~~~ (num: 9)
 ```
 
-- cronx_123 - parse crontab string ("minute" "hour" "day of month" "month" "day of week" "year, 2020+"), similar to crontab, to use cronx_api.c
+#### - cronx_123 - crontab example.
+
+> parse crontab string ("minute" "hour" "day of month" "month" "day of week" "year, 2020+"), similar to crontab, to use cronx_api.c
 
 ```bash
 $ ./cronx_123 -a "*/1 * * * * 2024 " -d 3
@@ -189,7 +226,7 @@ $ ./cronx_123 -a "*/1 * * * * 2024 " -d 3
 [8985/8985] main:310 - Bye-Bye !!!
 ```
 
-- dbusx_456 - dbus example.
+#### - dbusx_456 - dbus example.
 
 > pleae make sure [dbusX.conf](https://github.com/lankahsu520/HelperX/blob/master/DBus/dbusX.conf) in /etc/dbus-1/system.d
 
@@ -205,7 +242,7 @@ $ ./dbusx_456 -e 123
 [3003/3004] demo_signal_name_cb:113 - Got !!! (signal_name: DBUS_TYPE_INT64, reqStr: 64)
 ```
 
-- demo_000 - c template.
+#### - demo_000 - c template.
 
 ```bash
 $ ./demo_000
@@ -214,7 +251,7 @@ $ ./demo_000
 [3011/3011] app_loop:52 - (cksum: 22044)
 [3011/3011] main:156 - Bye-Bye !!!
 ```
-- demo_123 - a example.
+#### - demo_123 - a example.
 ```bash
 $ ./demo_123
 [3013/3013] main:44 - String testing ...
@@ -246,8 +283,10 @@ $ ./demo_123
 [3013/3013] main:189 - datetime ...
 [3013/3013] main:190 - (time_now_full: 2024-03-14 09:43:34)
 ```
-- http_client_123 - http client example. use curl.
-- jqx - it is similar to jq. jqx only support reads from pipe. 
+#### - http_client_123 - http client example.
+>use curl.
+#### - jqx - it is similar to jq.
+> jqx only support reads from pipe. 
 
 ```bash
 # please download Music.json (https://github.com/lankahsu520/HelperX/blob/master/AWS/Music.json)
@@ -259,7 +298,7 @@ $ cat Music.json | ./jqx .Items[3].Sponsor.L[].S
 "snake"
 ```
 
-- json_123 - json example.
+#### - json_123 - json example.
 
 ```bash
 $ ./json_123
@@ -290,16 +329,16 @@ $ ./json_123
 [3032/3032] main:228 - (cJson: {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043})
 ```
 
-- led_123 - led controller example.
-- lws_123 - a websocket example.
+#### - led_123 - led controller example.
+#### - lws_123 - a websocket example.
 
 > export PJ_HAS_LIBWEBSOCKETS=yes
 
-- mqtt_123 - a mqtt example.
+#### - mqtt_123 - a mqtt example.
 
 > export PJ_HAS_MOSQUITTO=yes
 
-- multicast_cli & multicast_srv - multicast example.
+#### - multicast_cli & multicast_srv - multicast example.
 
 ```bash
 $ ./multicast_srv
@@ -328,7 +367,7 @@ sendto (buff: 4)
 
 > export PJ_HAS_MXML=yes
 
-- ping_123 - ping example.
+#### - ping_123 - ping example.
 
 ```bash
 $ ./ping_123 -i 1 -c 3 google.com
@@ -346,8 +385,8 @@ $ sudo ./ping_123 -i 1 -c 3 google.com
 [35735/35735] main:109 - (count: 3/3)
 ```
 
-- proc_list_123 & proc_watch - a system and proc information example.
-- queuex_123 - a queue example.
+#### - proc_list_123 & proc_watch - a system and proc information example.
+#### - queuex_123 - a queue example.
 
 ```bash
 $ ./queuex_123
@@ -368,10 +407,11 @@ $ ./queuex_123
 [8651/8652] test_q_exec_cb:38 - (data_pop->idx: 4)
 ```
 
-- sshX_123 - ssh example.
-- statex_123 - state machine example. use statex_api.c.
-- ~~swlink_123 - swconfig example. (depend on linux kernel)~~
-- thread_123 - thread example.
+#### - sshX_123 - ssh example.
+#### - statex_123 - state machine example.
+> use statex_api.c.
+#### - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
+#### - thread_123 - thread example.
 
 ```bash
 $ ./thread_123
@@ -391,13 +431,14 @@ $ ./thread_123
 [8935/8936] thread_handler:36 - wait 3 seconds ...
 ```
 
-- tty_123 - a tty example. use chainX_api.c.
-- tunnel_123 - ssh tunnel example.
-- ubox_123 - ubox example.
-- ubus_123 - ubus example.
-- uci_123 - uci example.
-- usb_123 - usb example.
-- util_123 - example.
+#### - tty_123 - a tty example. 
+> use chainX_api.c.
+#### - tunnel_123 - ssh tunnel example.
+#### - ubox_123 - ubox example.
+#### - ubus_123 - ubus example.
+#### - uci_123 - uci example.
+#### - usb_123 - usb example.
+#### - util_123 - example.
 
 ```bash
 $ ./util_123
@@ -415,7 +456,7 @@ $ ./util_123
 [8946/8946] main:44 - BIT_INVERSE(num,3) (num: 0x0000015D, num.bit2: 1, num.bit3: 1)
 ```
 
-- uv_000 - uv template.
+#### - uv_000 - uv template.
 
 ```bash
 $ ./uv_000
@@ -429,7 +470,7 @@ $ ./uv_000
 [8948/8948] main:255 - Bye-Bye !!!
 ```
 
-- uv_123 - uv example.
+#### - uv_123 - uv example.
 
 ```bash
 $ ./uv_123
@@ -474,7 +515,7 @@ $ ./uv_123
 [3334/3334] main:510 - Bye-Bye !!!
 ```
 
-- uv_spawn_123 - uv spawn example.
+#### - uv_spawn_123 - uv spawn example.
 
 ```bash
 $ ./uv_spawn_123
@@ -508,11 +549,12 @@ rtt min/avg/max/mdev = 4.679/4.910/5.187/0.209 ms
 [5051/5051] main:326 - Bye-Bye !!!
 ```
 
-- wsdiscovery_123 - WS-Discovery example.
+#### - wsdiscovery_123 - WS-Discovery example.
 
 > export PJ_HAS_MXML=yes
 
-- ~~gbusx_123 - a  example. use gbusx_api.c.~~
+#### - ~~gbusx_123 - a  example.~~
+> use gbusx_api.c.
 
 
 # 6. License

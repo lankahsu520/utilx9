@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef USE_TEST_COMPRESS
-	DBG_LN_LN();
+	DBG_X_LN("");
 	{
 		int hello_org_len = SAFE_STRLEN(hello);
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 #ifdef USE_TEST_SEC_ENC_AND_DEC
 #ifdef UTIL_EX_SSL
 #if (1)
-	DBG_LN_LN();
+	DBG_X_LN("");
 	DBG_WN_LN("BASE64, abc -> abc_enc -> abc_dec");
 	char abc[]="rtsp://192.168.50.238:554/live1.sdp";
 	int abc_enc_len = 0;
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 	unsigned char evp_key[EVP_KEY_LEN+1]= "1234567890abcdef";
 	unsigned char iv_key[EVP_KEY_LEN+1]= "1234567890abcdef";
 
-	DBG_LN_LN();
+	DBG_X_LN("");
 
 	DBG_WN_LN("aes_128_cbc, intlen: %d, plaintext: %s -> plaintext_enc -> plaintext_dec", in_len, plaintext);
 	DBG_ER_LN("(evp_key: %s, iv_key: %s)", evp_key, iv_key);
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 #endif
 
 #if (1)
-	DBG_LN_LN();
+	DBG_X_LN("");
 	SAFE_MEMSET(plaintext_enc, 0, sizeof(plaintext_enc));
 	SAFE_MEMSET(plaintext_dec, 0, sizeof(plaintext_dec));
 	enc_len = sec_aes_cbc_encX(plaintext, SAFE_STRLEN(plaintext), plaintext_enc, evp_key, iv_key, pad);
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
 #ifdef USE_TEST_BIN_CHECK
 	{
-		DBG_LN_LN();
+		DBG_X_LN("");
 		DBG_WN_LN("bin check ...");
 		DBG_IF_LN("(/usr/bin/7z: %d)", file_exe_chk("/usr/bin/7z"));
 		DBG_IF_LN("(/bin/7za: %d)", file_exe_chk("/bin/7za"));
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
 #ifdef USE_TEST_HOSTNAME
 	{
-		DBG_LN_LN();
+		DBG_X_LN("");
 		DBG_WN_LN("hostname ...");
 		char myhostname[LEN_OF_HOSTNAME]="";
 		gethostname(myhostname, sizeof(myhostname));
@@ -185,14 +185,14 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef USE_TIME_TEST
-	DBG_LN_LN();
+	DBG_X_LN("");
 	DBG_WN_LN("datetime ...");
 	DBG_IF_LN("(time_now_full: %s)", time_now_full(time(NULL)));
 #endif
 
 #ifdef USE_CURL_TEST
 #ifdef UTIL_EX_CURL
-	DBG_LN_LN();
+	DBG_X_LN("");
 	DBG_WN_LN("http_req ...");
 	HttpX_t http_req;
 	DBG_IF_LN("(mode: %zd)", sizeof(http_req.mode));

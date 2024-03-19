@@ -352,3 +352,35 @@ char *sec_base64_dec(char *input, int length, int *dec_len)
 	return buffer;
 }
 #endif
+
+#ifdef UTIL_EX_BACKTRACE
+// https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
+void backtrace_alert(void)
+{
+	void* array[10];
+	size_t size;
+	char** strings;
+	size_t i;
+
+	size = backtrace(array, 10);
+	strings = backtrace_symbols(array, size);
+
+	if (NULL == strings)
+	{
+		exit(EXIT_FAILURE);
+	}
+
+	DBG_ER_LN("===== Obtained %02zd stack frames =====", size);
+
+	for (i = 0; i < size; i++)
+	{
+		DBG_X_LN("%s", strings[i]);
+	}
+
+	DBG_ER_LN("====================================");
+
+	SAFE_FREE(strings);
+}
+
+#endif
+

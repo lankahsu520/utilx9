@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
 #ifdef USE_NETLIST
 	{
 		chainX_if_list(NULL);
-		DBG_LN_LN();
+		DBG_X_LN("");
 	}
 #endif
 

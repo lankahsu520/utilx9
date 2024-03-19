@@ -1,17 +1,6 @@
 
 CONFIGURED = .configured
 
-define generate_expiration
-	@echo "#ifndef __UTIL_EXPIRATION_H__" > util_expiration.h
-	@echo "#define __UTIL_EXPIRATION_H__" >> util_expiration.h
-	@if [ "$(strip $(1))" = "" ]; then \
-		echo "#define UTIL_EX_EXPIRATION_DATE 0" >> util_expiration.h; \
-	else \
-		echo "#define UTIL_EX_EXPIRATION_DATE $(1)" >> util_expiration.h; \
-	fi
-	@echo "#endif" >> util_expiration.h
-endef
-
 .patched:
 	$(PJ_SH_SED) "s|#define LIBUTILX9_VERSION.*|#define LIBUTILX9_VERSION $(LIBUTILX9_VERSION)|g" utilx9.h
 
@@ -109,6 +98,12 @@ ifeq ("$(PJ_HAS_MOSQUITTO)", "yes")
 	$(PJ_SH_SED) "s|#undef UTIL_EX_MQTT.*|#define UTIL_EX_MQTT|g" utilx9.h
 else
 	$(PJ_SH_SED) "s|#define UTIL_EX_MQTT.*|#undef UTIL_EX_MQTT|g" utilx9.h
+endif
+
+ifeq ("$(PJ_HAS_BACKTRACE)", "yes")
+	$(PJ_SH_SED) "s|#undef UTIL_EX_BACKTRACE.*|#define UTIL_EX_BACKTRACE|g" utilx9.h
+else
+	$(PJ_SH_SED) "s|#define UTIL_EX_BACKTRACE.*|#undef UTIL_EX_BACKTRACE|g" utilx9.h
 endif
 	touch $@
 

@@ -52,43 +52,10 @@ int dbg_lvl_get(void)
 
 
 #ifdef UTIL_EX_SAFE
-#include "util_expiration.h"
-
-time_t expiration_date(void)
-{
-#ifdef UTIL_EX_EXPIRATION_DATE
-	return UTIL_EX_EXPIRATION_DATE;
-#else
-	return 0;
-#endif
-}
-
-#if (1)
 void* pcheck(void* a)
 {
-	return a;
-}
-#else
-void* pcheck(void* a)
-{
-	static double diff_t = 1;
-	time_t run_t = time(NULL);
-	time_t expired_t = expiration_date();
-	if (expired_t == 0)
-	{
-		diff_t++;
-		//sleep(diff_t);
-		printf("%ld==0\n",expired_t);
-	}
-	else if (run_t > expired_t)
-	{
-		diff_t = time_diff_days(run_t, expired_t);
-		//sleep(diff_t);
-		printf("%ld>%ld\n", run_t, expired_t);
-	}
 	return a ;
 }
-#endif
 
 int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr, int msec)
 {

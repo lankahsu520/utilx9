@@ -91,6 +91,7 @@ extern "C" {
 #undef UTIL_EX_YUAREL
 #define UTIL_EX_WEBSOCKETS
 #define UTIL_EX_MQTT
+#define UTIL_EX_BACKTRACE
 
 #define UTIL_EX_CRON
 
@@ -174,7 +175,7 @@ extern int dbg_more;
 		((uint8_t *)addr)[0], ((uint8_t *)addr)[1], ((uint8_t *)addr)[2], ((uint8_t *)addr)[3], ((uint8_t *)addr)[4], ((uint8_t *)addr)[5], ((uint8_t *)addr)[6], ((uint8_t *)addr)[7], ((uint8_t *)addr)[8], ((uint8_t *)addr)[9], ((uint8_t *)addr)[10], ((uint8_t *)addr)[11], ((uint8_t *)addr)[12], ((uint8_t *)addr)[13], ((uint8_t *)addr)[14], ((uint8_t *)addr)[15], port, \
 		((uint8_t *)addr2)[0], ((uint8_t *)addr2)[1], ((uint8_t *)addr2)[2], ((uint8_t *)addr2)[3], ((uint8_t *)addr2)[4], ((uint8_t *)addr2)[5], ((uint8_t *)addr2)[6], ((uint8_t *)addr2)[7], ((uint8_t *)addr2)[8], ((uint8_t *)addr2)[9], ((uint8_t *)addr2)[10], ((uint8_t *)addr2)[11], ((uint8_t *)addr2)[12], ((uint8_t *)addr2)[13], ((uint8_t *)addr2)[14], ((uint8_t *)addr2)[15], port2)
 
-#define DBG_LN_LN() printf("\n")
+#define DBG_X_LN(format,args...) printf(format "\n", ## args)
 
 int dbg_lvl_round(void);
 int dbg_lvl_set(int lvl);
@@ -192,7 +193,6 @@ int dbg_lvl_get(void);
 #include <assert.h>
 #define ASSERT assert
 
-time_t expiration_date(void);
 void* pcheck(void* a);
 
 #define POINTER_CHECK(x) \
@@ -4126,6 +4126,13 @@ typedef enum
 #define CRON_YEAR_END_2120 2120
 #define MAX_OF_CRON_RANGE 200 // > (CRON_YEAR_END_2020-CRON_YEAR_START_2020)
 int cronx_validate(char *cron_txt, struct tm *kick_tm);
+
+#endif
+
+#ifdef UTIL_EX_BACKTRACE
+#include <execinfo.h>
+// https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
+void backtrace_alert(void);
 
 #endif
 

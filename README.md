@@ -17,41 +17,44 @@
 
 ## 2.1. Open-source
 
-- curl (PJ_HAS_CURL) - https://curl.haxx.se
+- [curl](https://curl.haxx.se) (PJ_HAS_CURL)
 
-- dbus (PJ_HAS_DBUS) - https://www.freedesktop.org/wiki/Software/dbus/
+- [dbus](https://www.freedesktop.org/wiki/Software/dbus/) (PJ_HAS_DBUS)
 
-- fcgi2 (PJ_HAS_FASTCGI) - http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm
+- [fcgi2](http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm) (PJ_HAS_FASTCGI)
 
-- jansson (PJ_HAS_JANSSON) - https://digip.org/jansson/
+- [jansson](https://github.com/akheron/jansson) (PJ_HAS_JANSSON)
 
-- json-c (PJ_HAS_JSONC) - https://github.com/json-c/json-c
+- [json-c](https://github.com/json-c/json-c) (PJ_HAS_JSONC)
 
-- libnl-tiny (PJ_HAS_LIBNL_TINY) - https://git.openwrt.org/project/libnl-tiny.git
+- [libbacktrace](https://github.com/ianlancetaylor/libbacktrace) (PJ_HAS_LIBBACKTRACE)
 
-- libssh (PJ_HAS_LIBSSH) - http://www.libssh.org
+- [libnl-tiny](https://git.openwrt.org/project/libnl-tiny.git) (PJ_HAS_LIBNL_TINY)
 
-- libubox (PJ_HAS_LIBUBOX) - https://openwrt.org/docs/techref/libubox
+- [libssh](http://www.libssh.org) (PJ_HAS_LIBSSH)
 
-- libusb (PJ_HAS_LIBUSB) - https://github.com/libusb/libusb
+- [libubox](https://openwrt.org/docs/techref/libubox) (PJ_HAS_LIBUBOX)
 
-- libuv (PJ_HAS_LIBUV) - https://github.com/libuv/libuv
+- [libusb](https://github.com/libusb/libusb) (PJ_HAS_LIBUSB)
 
-- libwebsockets (PJ_HAS_LIBWEBSOCKETS) - https://libwebsockets.org
+- [libuv](https://github.com/libuv/libuv) (PJ_HAS_LIBUV) 
 
-- libyuarel (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL) - https://github.com/jacketizer/libyuarel
+- [libwebsockets](https://libwebsockets.org) (PJ_HAS_LIBWEBSOCKETS)
 
-- mosquitto (PJ_HAS_MOSQUITTO) - https://mosquitto.org
+- [libyuarel](https://github.com/jacketizer/libyuarel) (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL)
 
-- mxml (PJ_HAS_MXML / UTIL_EX_MXML) - https://www.msweet.org/mxml/ (need to patch, please check patches/mxml-2.11)
+- [mosquitto](https://mosquitto.org) (PJ_HAS_MOSQUITTO)
 
-- openssl (PJ_HAS_OPENSSL) - https://www.openssl.org
+- [mxml](https://www.msweet.org/mxml/) (PJ_HAS_MXML / UTIL_EX_MXML)
+> (need to patch, please check patches/mxml-2.11)
+
+- [openssl](https://www.openssl.org) (PJ_HAS_OPENSSL)
 
 - ~~swconfig (PJ_HAS_SWCONFIG) - openwrt/package/network/config/swconfig~~
 
-- ubus (PJ_HAS_UBUS) - https://openwrt.org/docs/techref/ubus
+- [ubus](https://openwrt.org/docs/techref/ubus) (PJ_HAS_UBUS)
 
-- uci (PJ_HAS_UCI) - https://openwrt.org/docs/techref/uci
+- [uci](https://openwrt.org/docs/techref/uci) (PJ_HAS_UCI)
 
 ## 2.2. Internet Notes
 
@@ -117,7 +120,9 @@ $ sudo apt-get --yes install libjson-c-dev
 
 ```
 
-## 4.2. libmxml
+## 4.2. Other Libraries
+
+#### A. libmxml
 
 ```bash
 $ vi conf/simple_x86.conf
@@ -129,7 +134,7 @@ $ vi utilx9.h
 #please patch mxml-2.11 with patches/mxml-2.11
 ```
 
-## 4.3. libyuarel
+#### B. libyuarel
 
 ```bash
 $ vi conf/simple_x86.conf
@@ -137,10 +142,20 @@ export PJ_HAS_LIBYUAREL=yes
 
 $ vi utilx9.h
 #define UTIL_EX_YUAREL
+```
 
+#### C. libbacktrace
+
+```bash
+$ vi conf/simple_x86.conf
+export PJ_HAS_LIBBACKTRACE=yes
+
+$ vi utilx9.h
+#define UTIL_EX_BACKTRACE
 ```
 
 # 5. Example or Usage
+
 #### - backtrace_123 - backtrace example.
 
 ```bash
@@ -170,12 +185,95 @@ main
 /work/codebase/lankahsu520/utilx9/backtrace_123.c:187
 ```
 
+#### - backtrace_456 - libbacktrace example.
+
+>export PJ_HAS_LIBBACKTRACE=yes, use backtrace_api.c.
+
+```bash
+$ ./backtrace_456
+*** stack smashing detected ***: terminated
+[37049/37049] app_signal_handler:88 - (signum: 6)
+0x7ff0d25ee7b0 backtraceX_alert
+        /work/codebase/lankahsu520/utilx9/backtrace_api.c:69
+0x7ff0d224d08f ???
+        /build/glibc-wuryBv/glibc-2.31/signal/../sysdeps/unix/sysv/linux/x86_64/sigaction.c:0
+0x7ff0d224d00b __GI_raise
+        ../sysdeps/unix/sysv/linux/raise.c:51
+0x7ff0d222c858 __GI_abort
+        /build/glibc-wuryBv/glibc-2.31/stdlib/abort.c:79
+0x7ff0d229726d __libc_message
+        ../sysdeps/posix/libc_fatal.c:155
+0x7ff0d2339cd9 __GI___fortify_fail
+        /build/glibc-wuryBv/glibc-2.31/debug/fortify_fail.c:26
+0x7ff0d2339ca5 __stack_chk_fail
+        /build/glibc-wuryBv/glibc-2.31/debug/stack_chk_fail.c:24
+0x55d40d6ed6c7 function_deep_2
+        /work/codebase/lankahsu520/utilx9/backtrace_456.c:62
+0x55d40d6ed30e app_loop
+        /work/codebase/lankahsu520/utilx9/backtrace_456.c:71
+0x55d40d6ed30e main
+        /work/codebase/lankahsu520/utilx9/backtrace_456.c:187
+0x7ff0d222e082 __libc_start_main
+        ../csu/libc-start.c:308
+0x55d40d6ed3fd ???
+        ???:0
+0xffffffffffffffff ???
+        ???:0
+7ff0d224d08f ?? ??:0
+7ff0d224d00b __GI_raise ../sysdeps/unix/sysv/linux/raise.c:51
+7ff0d222c858 __GI_abort /build/glibc-wuryBv/glibc-2.31/stdlib/abort.c:79
+7ff0d229726d __libc_message ../sysdeps/posix/libc_fatal.c:155
+7ff0d2339cd9 __GI___fortify_fail /build/glibc-wuryBv/glibc-2.31/debug/fortify_fail.c:26
+7ff0d2339ca5 __stack_chk_fail /build/glibc-wuryBv/glibc-2.31/debug/stack_chk_fail.c:24
+55d40d6ed6c7 function_deep_2 /work/codebase/lankahsu520/utilx9/backtrace_456.c:62
+55d40d6ed30e app_loop /work/codebase/lankahsu520/utilx9/backtrace_456.c:71
+55d40d6ed30e main /work/codebase/lankahsu520/utilx9/backtrace_456.c:187
+7ff0d222e082 __libc_start_main ../csu/libc-start.c:308
+55d40d6ed3fd _start ??:0
+ffffffffffffffff ?? ??:0
+Aborted (core dumped)
+```
+
 #### - chainX_123 - socket example.
 
 > use chainX_api.c.
 
 #### - client_123 - socket client.
 > use chainX_api.c.
+```bash
+$ ./chainX_123
+[40677/40677] main:131 - dns: 127.0.0.53
+[40677/40677] chainX_if_list:364 - (name: lo, flags: 0x10049, family: 2, host: 127.0.0.1, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s3, flags: 0x11043, family: 2, host: 10.0.2.15, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s8, flags: 0x11043, family: 2, host: 192.168.50.52, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s9, flags: 0x11043, family: 2, host: 192.168.56.104, netmask: )
+[40677/40677] chainX_if_list:364 - (name: docker0, flags: 0x1003, family: 2, host: 172.17.0.1, netmask: )
+[40677/40677] chainX_if_list:364 - (name: lo, flags: 0x10049, family: 10, host: ::1, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s3, flags: 0x11043, family: 10, host: fe80::7549:bd5f:d0ed:32cf%enp0s3, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s8, flags: 0x11043, family: 10, host: fd69:1ac8:5719:2e98:ca8d:19d4:cc66:458f, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s8, flags: 0x11043, family: 10, host: fd69:1ac8:5719:2e98:634d:a07f:2840:758d, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s8, flags: 0x11043, family: 10, host: fe80::d49:8acb:9f1b:c4cf%enp0s8, netmask: )
+[40677/40677] chainX_if_list:364 - (name: enp0s9, flags: 0x11043, family: 10, host: fe80::e6d1:c758:6c5c:4cbd%enp0s9, netmask: )
+
+[40677/40677] main:145 - **************************************************
+[40677/40677] main:146 - ** enp0s3 **
+[40677/40677] main:150 - ip: 10.0.2.15
+[40677/40677] main:154 - netmask: 255.255.255.0
+[40677/40677] main:158 - broadcast: 10.0.2.255
+[40677/40677] main:162 - gateway: 10.0.2.2
+[40677/40677] main:166 - ethmac: 08:00:27:33:73:52
+[40677/40677] main:169 - ethmac: 080027337352
+[40677/40677] main:174 - **************************************************
+[40677/40677] main:175 - ** ra0 **
+[40677/40677] main:179 - ip:
+[40677/40677] main:183 - netmask:
+[40677/40677] main:187 - broadcast:
+[40677/40677] main:191 - gateway:
+[40677/40677] main:195 - ethmac:
+[40677/40677] main:198 - ethmac:
+[40677/40677] main:202 - ssid:
+```
+
 #### - clist_123 - link list example.
 > use clist_api.c , use contiki\core\lib\list.*.
 
@@ -228,6 +326,8 @@ $ ./cronx_123 -a "*/1 * * * * 2024 " -d 3
 
 #### - dbusx_456 - dbus example.
 
+> export PJ_HAS_DBUS=yes, use dbusx_api.c.
+>
 > pleae make sure [dbusX.conf](https://github.com/lankahsu520/HelperX/blob/master/DBus/dbusX.conf) in /etc/dbus-1/system.d
 
 ```bash
@@ -284,7 +384,7 @@ $ ./demo_123
 [3013/3013] main:190 - (time_now_full: 2024-03-14 09:43:34)
 ```
 #### - http_client_123 - http client example.
->use curl.
+>export PJ_HAS_CURL=yes, use curl_api.c.
 #### - jqx - it is similar to jq.
 > jqx only support reads from pipe. 
 
@@ -299,6 +399,8 @@ $ cat Music.json | ./jqx .Items[3].Sponsor.L[].S
 ```
 
 #### - json_123 - json example.
+
+> export PJ_HAS_JANSSON=yes, use json_api.c.
 
 ```bash
 $ ./json_123
@@ -332,13 +434,15 @@ $ ./json_123
 #### - led_123 - led controller example.
 #### - lws_123 - a websocket example.
 
-> export PJ_HAS_LIBWEBSOCKETS=yes
+> export PJ_HAS_LIBWEBSOCKETS=yes, use lws_api.c.
 
 #### - mqtt_123 - a mqtt example.
 
-> export PJ_HAS_MOSQUITTO=yes
+> export PJ_HAS_MOSQUITTO=yes, use mqtt_api.c.
 
 #### - multicast_cli & multicast_srv - multicast example.
+
+> use multicast_api.c.
 
 ```bash
 $ ./multicast_srv
@@ -361,13 +465,17 @@ sendto (buff: 3)
 sendto (buff: 4)
 ```
 
-- ~~nlink_123 & nlink_456 - netlink example. got from internet.~~
-- nlink_789 netlink example. use chainX_api.c (CHAINX_MODE_ID_NETLINK).
-- onvif_client_123 - onvif client example.
+#### - ~~nlink_123 & nlink_456 - netlink example. got from internet.~~
+#### - nlink_789 netlink example
+> use chainX_api.c (CHAINX_MODE_ID_NETLINK).
 
-> export PJ_HAS_MXML=yes
+#### - onvif_client_123 - onvif client example.
+
+> export PJ_HAS_MXML=yes, use onvif_api.c.
 
 #### - ping_123 - ping example.
+
+>use chainX_api.c.
 
 ```bash
 $ ./ping_123 -i 1 -c 3 google.com
@@ -387,6 +495,8 @@ $ sudo ./ping_123 -i 1 -c 3 google.com
 
 #### - proc_list_123 & proc_watch - a system and proc information example.
 #### - queuex_123 - a queue example.
+
+> use queuex_api.c.
 
 ```bash
 $ ./queuex_123
@@ -408,10 +518,15 @@ $ ./queuex_123
 ```
 
 #### - sshX_123 - ssh example.
+
+> export PJ_HAS_LIBSSH=yes, use ssh_api.c.
+
 #### - statex_123 - state machine example.
 > use statex_api.c.
 #### - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
 #### - thread_123 - thread example.
+
+> use thread_api.c.
 
 ```bash
 $ ./thread_123
@@ -434,10 +549,25 @@ $ ./thread_123
 #### - tty_123 - a tty example. 
 > use chainX_api.c.
 #### - tunnel_123 - ssh tunnel example.
+
+> export PJ_HAS_LIBSSH=yes, use ssh_api.c.
+
 #### - ubox_123 - ubox example.
+
+> export PJ_HAS_LIBUBOX=yes,.
+
 #### - ubus_123 - ubus example.
+
+> export PJ_HAS_UBUS=yes, use ubus_api.c.
+
 #### - uci_123 - uci example.
+
+> export PJ_HAS_UCI=yes, use uci_api.c.
+
 #### - usb_123 - usb example.
+
+> export PJ_HAS_LIBUSB=yes, use usbX_api.c.
+
 #### - util_123 - example.
 
 ```bash
@@ -458,6 +588,8 @@ $ ./util_123
 
 #### - uv_000 - uv template.
 
+> export PJ_HAS_LIBUV=yes, use uv_api.c.
+
 ```bash
 $ ./uv_000
 [8948/8948] timer_1sec_loop:40 - kick async every 1 second. (countdown: 2)
@@ -471,6 +603,8 @@ $ ./uv_000
 ```
 
 #### - uv_123 - uv example.
+
+> export PJ_HAS_LIBUV=yes, use uv_api.c.
 
 ```bash
 $ ./uv_123
@@ -517,6 +651,8 @@ $ ./uv_123
 
 #### - uv_spawn_123 - uv spawn example.
 
+> export PJ_HAS_LIBUV=yes, use uv_api.c.
+
 ```bash
 $ ./uv_spawn_123
 [5051/5051] timer_1sec_loop:94 - (count: 1)
@@ -551,7 +687,7 @@ rtt min/avg/max/mdev = 4.679/4.910/5.187/0.209 ms
 
 #### - wsdiscovery_123 - WS-Discovery example.
 
-> export PJ_HAS_MXML=yes
+> export PJ_HAS_MXML=yes, use wsdiscovery_api.c.
 
 #### - ~~gbusx_123 - a  example.~~
 > use gbusx_api.c.

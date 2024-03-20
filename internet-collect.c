@@ -353,7 +353,6 @@ char *sec_base64_dec(char *input, int length, int *dec_len)
 }
 #endif
 
-#ifdef UTIL_EX_BACKTRACE
 // https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
 void backtrace_alert(void)
 {
@@ -381,6 +380,4 @@ void backtrace_alert(void)
 
 	SAFE_FREE(strings);
 }
-
-#endif
 

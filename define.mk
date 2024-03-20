@@ -100,7 +100,7 @@ else
 	$(PJ_SH_SED) "s|#define UTIL_EX_MQTT.*|#undef UTIL_EX_MQTT|g" utilx9.h
 endif
 
-ifeq ("$(PJ_HAS_BACKTRACE)", "yes")
+ifeq ("$(PJ_HAS_LIBBACKTRACE)", "yes")
 	$(PJ_SH_SED) "s|#undef UTIL_EX_BACKTRACE.*|#define UTIL_EX_BACKTRACE|g" utilx9.h
 else
 	$(PJ_SH_SED) "s|#define UTIL_EX_BACKTRACE.*|#undef UTIL_EX_BACKTRACE|g" utilx9.h

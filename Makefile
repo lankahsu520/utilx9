@@ -93,6 +93,7 @@ CLEAN_BINS += \
 							demo_123 \
 							multicast_cli \
 							multicast_srv \
+							backtrace_123 \
 							demo_000
 
 CLEAN_BINS += demo_valgrind

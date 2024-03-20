@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
 
 #ifdef USE_IFACE_INFO
 	{
-		char iface[] = "eth2.2";
+		char iface[] = "enp0s3";
 		DBG_LN_Y("**************************************************");
 		DBG_LN_Y("** %s **", iface);
 

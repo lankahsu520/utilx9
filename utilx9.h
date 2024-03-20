@@ -91,7 +91,7 @@ extern "C" {
 #undef UTIL_EX_YUAREL
 #define UTIL_EX_WEBSOCKETS
 #define UTIL_EX_MQTT
-#define UTIL_EX_BACKTRACE
+#undef UTIL_EX_BACKTRACE
 
 #define UTIL_EX_CRON
 
@@ -4129,10 +4129,22 @@ int cronx_validate(char *cron_txt, struct tm *kick_tm);
 
 #endif
 
-#ifdef UTIL_EX_BACKTRACE
 #include <execinfo.h>
 // https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
 void backtrace_alert(void);
+
+#ifdef UTIL_EX_BACKTRACE
+#include <backtrace.h>
+#include <backtrace-supported.h>
+
+typedef struct BackTraceX_Struct
+{
+	struct backtrace_state *state;
+	void *data;
+} BackTraceX_t;
+
+void backtraceX_alert(BackTraceX_t *backtraceX_req);
+void backtraceX_init(int argc, char **argv);
 
 #endif
 

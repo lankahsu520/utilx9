@@ -517,6 +517,19 @@ $ ./queuex_123
 [8651/8652] test_q_exec_cb:38 - (data_pop->idx: 4)
 ```
 
+#### - select_123 - select example.
+
+> Call select instead of sleep
+>
+> SAFE_SELECT_EX(0, NULL, NULL, NULL, interval/1000, interval%1000);
+
+```bash
+$ ./select_123
+[373204/373204] app_loop:49 - (TAG: select_123, pid: 373204)
+[373204/373204] app_loop:56 - duration: 60, usleep(1000) ...
+[373204/373204] main:182 - Bye-Bye !!!
+```
+
 #### - sshX_123 - ssh example.
 
 > export PJ_HAS_LIBSSH=yes, use ssh_api.c.
@@ -530,20 +543,35 @@ $ ./queuex_123
 
 ```bash
 $ ./thread_123
-[8935/8936] thread_handler:27 - Run loop ... (name: thread_A, count: 0)
-[8935/8936] thread_handler:33 - (name: thread_A, count: 0)
-[8935/8936] thread_handler:33 - (name: thread_A, count: 1)
-[8935/8936] thread_handler:33 - (name: thread_A, count: 2)
-[8935/8936] thread_handler:36 - wait 3 seconds ...
-[8935/8937] thread_handler:27 - Run loop ... (name: thread_B, count: 0)
-[8935/8937] thread_handler:33 - (name: thread_B, count: 0)
-[8935/8937] thread_handler:33 - (name: thread_B, count: 1)
-[8935/8937] thread_handler:33 - (name: thread_B, count: 2)
-[8935/8937] thread_handler:36 - wait 3 seconds ...
-[8935/8936] thread_handler:33 - (name: thread_A, count: 3)
-[8935/8936] thread_handler:33 - (name: thread_A, count: 4)
-[8935/8936] thread_handler:33 - (name: thread_A, count: 5)
-[8935/8936] thread_handler:36 - wait 3 seconds ...
+[372895/372897] thread_handler:29 - Run loop ... (name: thread_B, count: 0)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 0/15)
+[372895/372896] thread_handler:29 - Run loop ... (name: thread_A, count: 0)
+[372895/372896] thread_handler:37 - (name: thread_A, count: 0/5)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 1/15)
+[372895/372896] thread_handler:37 - (name: thread_A, count: 1/5)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 2/15)
+[372895/372896] thread_handler:37 - (name: thread_A, count: 2/5)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 3/15)
+[372895/372896] thread_handler:37 - (name: thread_A, count: 3/5)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 4/15)
+[372895/372896] thread_handler:37 - (name: thread_A, count: 4/5)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 5/15)
+[372895/372896] thread_handler:37 - (name: thread_A, count: 5/5)
+[372895/372896] thread_handler:40 - (tidx_req: 0x560cfbf0f120, &tidx_data_A: 0x560cfbf0f120)
+[372895/372896] thread_handler:68 - Bye-Bye !!! (name: thread_A)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 6/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 7/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 8/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 9/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 10/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 11/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 12/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 13/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 14/15)
+[372895/372897] thread_handler:46 - (name: thread_B, count: 15/15)
+[372895/372897] thread_handler:49 - (tidx_req: 0x560cfbf0f040, &tidx_data_B: 0x560cfbf0f040)
+[372895/372897] thread_handler:68 - Bye-Bye !!! (name: thread_B)
+[372895/372895] main:93 - Bye-Bye !!!
 ```
 
 #### - tty_123 - a tty example. 

@@ -16,6 +16,8 @@
 
 ThreadX_t tidx_data_A;
 ThreadX_t tidx_data_B;
+#define MAX_OF_A 5
+#define MAX_OF_B 15
 
 static void *thread_handler(void *user)
 {
@@ -30,11 +32,29 @@ static void *thread_handler(void *user)
 	{
 		if (threadx_ispause(tidx_req)==0)
 		{
-			DBG_IF_LN("(name: %s, count: %d)", tidx_req->name, count++);
-			if ((count % 3) == 0)
+			if (tidx_req == &tidx_data_A)
 			{
-				DBG_IF_LN("wait 3 seconds ...");
-				threadx_timewait_simple(tidx_req, 3*1000);
+				DBG_IF_LN("(name: %s, count: %d/%d)", tidx_req->name, count++, MAX_OF_A);
+				if (count > MAX_OF_A)
+				{
+					DBG_IF_LN("(tidx_req: %p, &tidx_data_A: %p)", tidx_req, &tidx_data_A);
+					break;
+				}
+			}
+			else if (tidx_req == &tidx_data_B)
+			{
+				DBG_IF_LN("(name: %s, count: %d/%d)", tidx_req->name, count++, MAX_OF_B);
+				if (count > MAX_OF_B)
+				{
+					DBG_IF_LN("(tidx_req: %p, &tidx_data_B: %p)", tidx_req, &tidx_data_B);
+					break;
+				}
+			}
+
+			//if ((count % 3) == 0)
+			{
+				//DBG_IF_LN("wait 3 seconds ...");
+				threadx_timewait_simple(tidx_req, 1*1000);
 				//break;
 			}
 		}
@@ -45,7 +65,7 @@ static void *thread_handler(void *user)
 	}
 
 	threadx_leave(tidx_req);
-	DBG_IF_LN(DBG_TXT_BYE_BYE);
+	DBG_IF_LN("%s (name: %s)", DBG_TXT_BYE_BYE, tidx_req->name);
 
 	return NULL;
 }
@@ -64,7 +84,7 @@ int main(int argc, char* argv[])
 
 	threadx_init(&tidx_data_B, "thread_B");
 
-	while ((threadx_isquit(&tidx_data_A)==0) && (threadx_isquit(&tidx_data_B)==0))
+	while ((threadx_isquit(&tidx_data_A)==0) || (threadx_isquit(&tidx_data_B)==0))
 	{
 		// busy loop
 		sleep(1);

@@ -17,10 +17,13 @@
 
 #include "utilx9.h"
 
-#define TAG "demo_000"
+#define TAG "select_123"
 
 // ** app **
 static int is_quit = 0;
+// 1s=1000ms=1000000us
+int interval = 1000; //us
+int duration = 60; //s
 
 static int app_quit(void)
 {
@@ -45,11 +48,24 @@ static void app_loop(void)
 	int pid = pidof(TAG);
 	DBG_ER_LN("(TAG: %s, pid: %d)", TAG, pid);
 
-	char payload[] = { 0xFF,0xFE,0x7B,0x22,0x75,0x73,0x65,0x72,0x22,0x3A,0x22,0x6C,0x61,0x6E,0x6B,0x61,0x22,0x7D,0xFF,0xFF};
-	unsigned short cksum = buf_cksum((unsigned short *)payload, 20);
-	DBG_ER_LN("(cksum: %d)", cksum);
-	cksum = buff_crc16((const unsigned char *)payload, 20, 0xFFFF);
-	DBG_ER_LN("(cksum: %d)", cksum);
+	{
+		double hold_t = 0;
+		time_t run_t = time(NULL);
+		time_t last_t = time(NULL);
+
+		DBG_ER_LN("duration: %d, usleep(%d) ...", duration, interval);
+		hold_t = 0;
+		run_t = time(NULL);
+		while ( (hold_t< duration) && (app_quit()<1) )
+		{
+			last_t = time(NULL);
+			hold_t = time_diff_secs(last_t, run_t);
+
+			SAFE_SELECT_EX(0, NULL, NULL, NULL, interval/1000, interval%1000);
+			//usleep(timeout);
+			//DBG_ER_LN("(hold_t: %f, last_t: %zd)", hold_t, last_t);
+		}
+	}
 }
 
 static int app_init(void)
@@ -100,10 +116,12 @@ static void app_signal_register(void)
 }
 
 int option_index = 0;
-const char* short_options = "d:h";
+const char* short_options = "d:u:i:h";
 static struct option long_options[] =
 {
 	{ "debug",       required_argument,   NULL,    'd'  },
+	{ "duration",    required_argument,   NULL,    'u'  },
+	{ "interval",    required_argument,   NULL,    'i'  },
 	{ "help",        no_argument,         NULL,    'h'  },
 	{ 0,             0,                      0,    0    }
 };
@@ -111,11 +129,13 @@ static struct option long_options[] =
 static void app_showusage(int exit_code)
 {
 	printf( "Usage: %s\n"
-					"  -d, --debug       debug level\n"
+					"  -d, --debug        debug level\n"
+					"  -u, --duration     duration(s)\n"
+					"  -i, --interval     interval(us)\n"
 					"  -h, --help\n", TAG);
 	printf( "Version: %s\n", version_show());
 	printf( "Example:\n"
-					"  %s -d 4\n", TAG);
+					"  %s -d 3 -u 60 -i 1000\n", TAG);
 	exit(exit_code);
 }
 
@@ -132,6 +152,12 @@ static void app_ParseArguments(int argc, char **argv)
 				{
 					dbg_lvl_set(atoi(optarg));
 				}
+				break;
+			case 'u':
+				duration = atoi(optarg);
+				break;
+			case 'i':
+				interval = atoi(optarg);
 				break;
 			default:
 				app_showusage(-1);

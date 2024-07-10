@@ -57,7 +57,7 @@ void* pcheck(void* a)
 	return a ;
 }
 
-int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr, int msec)
+int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr, int msec, int usec)
 {
 	int maxfd = fd+1;
 
@@ -68,10 +68,11 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 	SAFE_FD_SET_EX(fd, fdwset_ptr);
 	SAFE_FD_SET_EX(fd, fdeset_ptr);
 
-	if (msec>0)
+	if ((msec>0) || (usec>0))
 	{
 		timeout.tv_sec = msec /1000;
-		timeout.tv_usec = (msec % 1000) * 1000;
+		timeout.tv_usec = (msec % 1000) * 1000 + usec;
+		//DBG_ER_LN("(tv_sec: %ld, tv_usec: %ld)", timeout.tv_sec , timeout.tv_usec);
 		tv_ptr = &timeout;
 	}
 	else

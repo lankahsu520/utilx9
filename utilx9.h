@@ -323,9 +323,11 @@ void* pcheck(void* a);
 #include <sys/select.h>
 
 #define SAFE_SELECT(nfds, fdrset_p, fdwset_p, fdeset_p, timeout) select(nfds, fdrset_p, fdwset_p, fdeset_p, timeout)
-#define SAFE_SELECT_EX(fd, fdrset_p, fdwset_p, fdeset_p, msec) select_ex(fd, fdrset_p, fdwset_p, fdeset_p, msec)
+#define SAFE_SELECT_EX(fd, fdrset_p, fdwset_p, fdeset_p, msec, usec) select_ex(fd, fdrset_p, fdwset_p, fdeset_p, msec, usec)
+#define SAFE_SELECT_MS(fd, fdrset_p, fdwset_p, fdeset_p, msec) SAFE_SELECT_EX(fd, fdrset_p, fdwset_p, fdeset_p, msec, 0)
+#define SAFE_SELECT_US(fd, fdrset_p, fdwset_p, fdeset_p, usec) SAFE_SELECT_EX(fd, fdrset_p, fdwset_p, fdeset_p, 0, usec)
 
-int select_ex(int fd, fd_set *fdrset_p, fd_set *fdwset_p, fd_set *fdeset_p, int msec);
+int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr, int msec, int usec);
 
 /** read/write **/
 #define SAFE_WRITE(fd, buf, count) \

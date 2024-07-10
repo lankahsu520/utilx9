@@ -12,22 +12,22 @@ endif
 		--libdir $(SDK_LIB_DIR) \
 		--pkg-config-path "$(PJ_PKG_CONFIG)" \
 		--cross-file build.meson \
-		build_xxx
+		$(PJ_BUILD_DIR)
 	touch $@
 
 meson: .meson_config
-	cd build_xxx \
+	cd $(PJ_BUILD_DIR) \
 	&& ninja #-v
 
 meson_install: meson
-	cd build_xxx \
+	cd $(PJ_BUILD_DIR) \
 	&& ninja install
 
 meson_clean:
-	cd build_xxx \
+	cd $(PJ_BUILD_DIR) \
 	&& ninja clean
 
 meson_distclean:
 	[ -L meson_public ] && ($(PJ_SH_RMDIR) meson_public; ) || true
 	[ -d ./subprojects ] && [ -f meson.build ] && (meson subprojects purge --confirm;) || true
-	rm -rf build_xxx
+	rm -rf $(PJ_BUILD_DIR)

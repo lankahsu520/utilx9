@@ -94,6 +94,7 @@ CLEAN_BINS += \
 							multicast_cli \
 							multicast_srv \
 							backtrace_123 \
+							select_123 \
 							demo_000
 
 CLEAN_BINS += demo_valgrind
@@ -177,7 +178,7 @@ clean:
 distclean: clean
 	[ -L meson_public ] && ($(PJ_SH_RMDIR) meson_public; ) || true
 	[ -d ./subprojects ] && [ -f meson.build ] && (meson subprojects purge --confirm;) || true
-	$(PJ_SH_RMDIR) build_xxx .meson_config build.meson meson_options.txt
+	$(PJ_SH_RMDIR) $(PJ_BUILD_DIR) .meson_config build.meson meson_options.txt
 	$(PJ_SH_RM) $(CONFIGURED) .patched .unpack
 	[ -f ".customer" ] && ($(PJ_SH_RM) .customer $(CONFIG_CUSTOMER) $(CONFIG_CUSTOMER).export $(CONFIG_CUSTOMER_DEF_H) $(CONFIG_MESON); ) || true
 	[ -d "install" ] && ($(PJ_SH_RMDIR) install; ) || true

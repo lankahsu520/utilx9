@@ -7,7 +7,7 @@ ROOTFS_PATH_ARG=""
 NOW_t=`date +"%Y%m%d%H%M%S"`
 PWD=`pwd`
 SBIN_PATH=`dirname $0`
-[ -d "$SBIN_PATH" ] || SBIN_PATH="/work/rootfs/sbin"
+[ -d "$SBIN_PATH" ] || SBIN_PATH="${ROOTFS_PATH}/sbin"
 SUDO_EX=$(which sudo 2>&1) && SUDO_B="sudo -E -b" && SUDO="sudo -E"
 WHOAMI_EX=$(which whoami 2>&1) && WHO=`whoami`
 [ ! -z "$WHO" ] || WHO="root"

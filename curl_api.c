@@ -210,6 +210,18 @@ static int http_request_simple(HttpX_t *http_req)
 					case HTTP_METHOD_ID_PUT:
 						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
 						break;
+					case HTTP_METHOD_ID_DELETE:
+						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+						break;
+					case HTTP_METHOD_ID_PATCH:
+						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
+						break;
+					case HTTP_METHOD_ID_OPTIONS:
+						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "OPTIONS");
+						break;
+					case HTTP_METHOD_ID_HEAD:
+						curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "HEAD");
+						break;
 					default:
 						break;
 				}

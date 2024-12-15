@@ -352,9 +352,9 @@ static struct mosquitto *mqtt_srv_open(MQTTX_t *mqtt_req)
 			}
 
 			//
-			if ((session->ca_file) && (SAFE_STRLEN(session->ca_file)>0)
-				&& (session->certificate_file) && (SAFE_STRLEN(session->certificate_file)>0)
-				&& (session->privatekey_file) && (SAFE_STRLEN(session->privatekey_file)>0)
+			if ((pcheck(session->ca_file)) && (SAFE_STRLEN(session->ca_file)>0)
+				&& (pcheck(session->certificate_file)) && (SAFE_STRLEN(session->certificate_file)>0)
+				&& (pcheck(session->privatekey_file)) && (SAFE_STRLEN(session->privatekey_file)>0)
 				)
 			{
 				//--tls-version : TLS protocol version, can be one of tlsv1.3 tlsv1.2 or tlsv1.1.

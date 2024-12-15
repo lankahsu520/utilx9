@@ -24,6 +24,7 @@
 //#define USE_TEST_COPY_FILE
 #define USE_TIME_TEST
 //#define USE_CURL_TEST
+#define USE_REALLOC
 
 int newline_lookupokup_cb(char *newline, void *arg)
 {
@@ -221,6 +222,24 @@ int main(int argc, char* argv[])
 	DBG_IF_LN("(track: %zd)", sizeof(rtsp_req.track));
 	DBG_IF_LN("(track[0]: %zd)", sizeof(rtsp_req.track[0]));
 #endif
+#endif
+
+#ifdef USE_REALLOC
+	char *newp = NULL;
+	char *oldp = (char *)malloc(16);
+	DBG_IF_LN("(newp: %p, oldp: %p)", newp, oldp);
+	newp = (char *)realloc(oldp, 32*1024);
+	if (newp==NULL)
+	{
+		SAFE_FREE(oldp);
+		DBG_IF_LN("(newp: %p %zd, oldp: %p %zd)", newp, sizeof(newp), oldp, sizeof(oldp));
+	}
+	else
+	{
+		oldp = newp; // warning: pointer ‘oldp’ may be used after ‘realloc’
+		DBG_IF_LN("(newp: %p %zd, oldp: %p %zd)", newp, sizeof(newp), oldp, sizeof(oldp));
+		SAFE_FREE(newp);
+	}
 #endif
 
 	exit(0);

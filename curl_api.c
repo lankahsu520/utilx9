@@ -237,7 +237,7 @@ static int http_request_simple(HttpX_t *http_req)
 			}
 			else
 			{
-
+				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_req->response_code);
 				ret = 0;
 			}
 			/* always cleanup */
@@ -324,6 +324,7 @@ static int http_request_soap(HttpX_t *http_req)
 			}
 			else
 			{
+				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_req->response_code);
 				ret = 0;
 			}
 			/* always cleanup */
@@ -424,13 +425,14 @@ static int http_request_uploadfile(HttpX_t *http_req)
 			}
 			else
 			{
-				double size_upload;
-				double speed_upload, total_time;
-				curl_easy_getinfo(curl, CURLINFO_SIZE_UPLOAD, &size_upload);
-				curl_easy_getinfo(curl, CURLINFO_SPEED_UPLOAD, &speed_upload);
+				CURL_OFF_X size_upload, speed_upload;
+				double total_time;
+				curl_easy_getinfo(curl, CURLINFO_SIZE_UPLOAD_X, &size_upload);
+				curl_easy_getinfo(curl, CURLINFO_SPEED_UPLOAD_X, &speed_upload);
 				curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &total_time);
 
-				SAFE_SNPRINTF(http_req->log, sizeof(http_req->log), "Upload Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", file_req->filename, size_upload, speed_upload, total_time);
+				SAFE_SNPRINTF(http_req->log, sizeof(http_req->log), "Upload Ok !!! (%s, %ld bytes, %ld bytes/sec, total: %.3f secs)", file_req->filename, size_upload, speed_upload, total_time);
+				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_req->response_code);
 				ret = 0;
 			}
 			/* always cleanup */
@@ -1084,13 +1086,14 @@ static int http_request_downloadfile_normal(HttpX_t *http_req)
 			}
 			else
 			{
-				double size_download;
-				double speed_download, total_time;
-				curl_easy_getinfo(curl, CURLINFO_SIZE_DOWNLOAD, &size_download);
-				curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD, &speed_download);
+				CURL_OFF_X size_download, speed_download;
+				double total_time;
+				curl_easy_getinfo(curl, CURLINFO_SIZE_DOWNLOAD_X, &size_download);
+				curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD_X, &speed_download);
 				curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &total_time);
 
-				SAFE_SPRINTF_EX(http_req->log, "Download Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", file_req->filename, size_download, speed_download, total_time);
+				SAFE_SPRINTF_EX(http_req->log, "Download Ok !!! (%s, %ld bytes, %ld bytes/sec, total: %.3f secs)", file_req->filename, size_download, speed_download, total_time);
+				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_req->response_code);
 				ret = 0;
 			}
 			/* always cleanup */
@@ -1412,13 +1415,14 @@ static int http_request_downloadfile_mjpeg(HttpX_t *http_req)
 			}
 			else
 			{
-				double size_download;
-				double speed_download, total_time;
-				curl_easy_getinfo(curl, CURLINFO_SIZE_DOWNLOAD, &size_download);
-				curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD, &speed_download);
+				CURL_OFF_X size_download, speed_download;
+				double total_time;
+				curl_easy_getinfo(curl, CURLINFO_SIZE_DOWNLOAD_X, &size_download);
+				curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD_X, &speed_download);
 				curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &total_time);
 
-				SAFE_SPRINTF_EX(http_req->log, "Download Ok !!! (%s, %.0f bytes, %.3f bytes/sec, total: %.3f secs)", mjpeg_req->filename, size_download, speed_download, total_time);
+				SAFE_SPRINTF_EX(http_req->log, "Download Ok !!! (%s, %ld bytes, %ld bytes/sec, total: %.3f secs)", mjpeg_req->filename, size_download, speed_download, total_time);
+				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_req->response_code);
 				ret = 0;
 			}
 			/* always cleanup */
@@ -1493,7 +1497,7 @@ int http_request(HttpX_t *http_req)
 {
 	int ret = -1;
 	http_req->result = 0;
-	if ((http_req->url) && (strlen(http_req->url) >= 7))   // "http://" or "https://"
+	if ((pcheck(http_req->url)) && (strlen(http_req->url) >= 7))   // "http://" or "https://"
 	{
 		switch (http_req->mode)
 		{
@@ -1537,6 +1541,7 @@ int http_upload(const char *url, const char *filename)
 			.mode = HTTP_MODE_ID_UPLOADFILE,
 			.url = "",
 			.log = "",
+			.response_code = 0,
 			.file_req.filename = "",
 			.file_req.fp = NULL,
 			.file_req.method = HTTP_METHOD_ID_PUT,
@@ -1560,6 +1565,7 @@ int http_upload_with_response(const char *url, const char *filename, void *userd
 			.mode = HTTP_MODE_ID_UPLOADFILE,
 			.url = "",
 			.log = "",
+			.response_code = 0,
 			.file_req.filename = "",
 			.file_req.fp = NULL,
 			.file_req.method = HTTP_METHOD_ID_POST,
@@ -1572,7 +1578,7 @@ int http_upload_with_response(const char *url, const char *filename, void *userd
 
 		if (cb)
 		{
-			cb(userdata, http_req.simple_req.res_size, http_req.simple_req.response);
+			cb(&http_req, userdata);
 		}
 		http_request_free(&http_req);
 	}
@@ -1589,6 +1595,7 @@ int http_simple(const char *url, HTTP_METHOD_ID method, struct curl_slist *heade
 			.mode = HTTP_MODE_ID_SIMPLE,
 			.url = "",
 			.log = "",
+			.response_code = 0,
 			.simple_req.method = method,
 			.simple_req.headers = headers,
 			.simple_req.req_size = req_size,
@@ -1601,7 +1608,7 @@ int http_simple(const char *url, HTTP_METHOD_ID method, struct curl_slist *heade
 
 		if (cb)
 		{
-			cb(userdata, http_req.simple_req.res_size, http_req.simple_req.response);
+			cb(&http_req, userdata);
 		}
 		http_request_free(&http_req);
 	}

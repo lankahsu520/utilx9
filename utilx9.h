@@ -1281,6 +1281,29 @@ LedRequest_t *led_thread_init(char *name, int infinite, LedOn_t *ledon_ary, led_
 #define MAX_OF_CURL_CONNECTTIMEOUT 20L
 #define MAX_OF_CURL_TIMEOUT 300L
 
+#ifdef curl_off_t 
+#define CURL_OFF_X curl_off_t
+#else
+#define CURL_OFF_X int64_t
+#endif
+
+// /usr/include/x86_64-linux-gnu/curl/curl.h
+#if LIBCURL_VERSION_NUM >= 0x073700L
+#define CURLINFO_SIZE_UPLOAD_X CURLINFO_SIZE_UPLOAD_T
+#define CURLINFO_SIZE_DOWNLOAD_X CURLINFO_SIZE_DOWNLOAD_T
+#define CURLINFO_SPEED_DOWNLOAD_X CURLINFO_SPEED_DOWNLOAD_T
+#define CURLINFO_SPEED_UPLOAD_X CURLINFO_SPEED_UPLOAD_T
+#define CURLINFO_CONTENT_LENGTH_DOWNLOAD_X CURLINFO_CONTENT_LENGTH_DOWNLOAD_T
+#define CURLINFO_CONTENT_LENGTH_UPLOAD_X CURLINFO_CONTENT_LENGTH_UPLOAD_T
+#else
+#define CURLINFO_SIZE_UPLOAD_X CURLINFO_SIZE_UPLOAD
+#define CURLINFO_SIZE_DOWNLOAD_X CURLINFO_SIZE_DOWNLOAD
+#define CURLINFO_SPEED_DOWNLOAD_X CURLINFO_SPEED_DOWNLOAD
+#define CURLINFO_SPEED_UPLOAD_X CURLINFO_SPEED_UPLOAD
+#define CURLINFO_CONTENT_LENGTH_DOWNLOAD_X CURLINFO_CONTENT_LENGTH_DOWNLOAD
+#define CURLINFO_CONTENT_LENGTH_UPLOAD_X CURLINFO_CONTENT_LENGTH_UPLOAD
+#endif
+
 typedef enum
 {
 	HTTP_METHOD_ID_POST = 0,
@@ -1424,6 +1447,7 @@ typedef struct HttpX_STRUCT
 
 	int result;
 	char log[LEN_OF_LOG];
+	long response_code;
 
 	union
 	{
@@ -1436,7 +1460,7 @@ typedef struct HttpX_STRUCT
 	};
 } HttpX_t;
 
-typedef void (*http_response_fn)(void *userdata, size_t res_size, char *response);
+typedef void (*http_response_fn)(HttpX_t *http_req, void *userdata);
 
 void http_connect_timeout_set(HttpX_t *http_req, int timeout);
 void http_timeout_set(HttpX_t *http_req, int timeout);

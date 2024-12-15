@@ -2552,12 +2552,12 @@ static int chainX_tty_connect(ChainX_t *chainX_req)
 static int chainX_netinfo_scan(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if ((chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
+	if ((pcheck(chainX_req->netinfo.addr.ipv4)) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
 	{
 		// Got IPv4 !!!
 		ret = 0;
 	}
-	else if ((chainX_req->netinfo.addr.hostname) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
+	else if ((pcheck(chainX_req->netinfo.addr.hostname)) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
 	{
 		// Got hostname -> IPv4 !!!
 		if (chainX_nslookup(chainX_req->netinfo.addr.hostname, chainX_req->netinfo.addr.ipv4, sizeof(chainX_req->netinfo.addr.ipv4)) != 0)
@@ -2573,12 +2573,12 @@ static int chainX_netinfo_scan(ChainX_t *chainX_req)
 static int chainX_netinfo_check(ChainX_t *chainX_req)
 {
 	int ret = -1;
-	if ((chainX_req->netinfo.addr.hostname) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
+	if ((pcheck(chainX_req->netinfo.addr.hostname)) && (strlen(chainX_req->netinfo.addr.hostname) > 0))
 	{
 		// Got hostname !!!
 		ret = 0;
 	}
-	else if ((chainX_req->netinfo.addr.ipv4) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
+	else if ((pcheck(chainX_req->netinfo.addr.ipv4)) && (strlen(chainX_req->netinfo.addr.ipv4) > 0))
 	{
 		// Got IPv4 !!!
 		ret = 0;

@@ -1768,9 +1768,10 @@ void proc_fdsize_info(ProcInfo_t *procinfo_req)
 			char vals[32]="";
 
 			SAFE_SSCANF(newline,"%s %s", key, vals);
-			if (key[SAFE_STRLEN(key)-1]==':')
+			int ikey = SAFE_STRLEN(key);
+			if ((ikey>0) && (key[ikey-1]==':'))
 			{
-				key[SAFE_STRLEN(key)-1] ='\0';
+				key[ikey-1] ='\0';
 			}
 			DBG_TR_LN("(key: %s, vals: %s)", key, vals);
 

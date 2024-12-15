@@ -21,9 +21,17 @@
 
 - [dbus](https://www.freedesktop.org/wiki/Software/dbus/) (PJ_HAS_DBUS)
 
+  > ```bash
+  > $ sudo apt -y install libdbus-1-dev
+  > ```
+
 - [fcgi2](http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm) (PJ_HAS_FASTCGI)
 
 - [jansson](https://github.com/akheron/jansson) (PJ_HAS_JANSSON)
+
+  > ```bash
+  > $ sudo apt -y install libjansson-dev
+  > ```
 
 - [json-c](https://github.com/json-c/json-c) (PJ_HAS_JSONC)
 
@@ -41,11 +49,20 @@
 
 - [libwebsockets](https://libwebsockets.org) (PJ_HAS_LIBWEBSOCKETS)
 
+  > ```bash
+  > $ sudo apt -y install libwebsockets-dev
+  > ```
+
 - [libyuarel](https://github.com/jacketizer/libyuarel) (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL)
 
 - [mosquitto](https://mosquitto.org) (PJ_HAS_MOSQUITTO)
 
+  > ```bash
+  > $ sudo apt -y install libmosquitto-dev
+  > ```
+
 - [mxml](https://www.msweet.org/mxml/) (PJ_HAS_MXML / UTIL_EX_MXML)
+
 > (need to patch, please check patches/mxml-2.11)
 
 - [openssl](https://www.openssl.org) (PJ_HAS_OPENSSL)

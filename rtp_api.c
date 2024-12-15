@@ -352,6 +352,8 @@ static int h264_write(RTPX_t *rtp_req, char *buf, size_t count)
 	return -1;
 }
 
+// RTP Payload Format for H.264 Video
+// https://datatracker.ietf.org/doc/html/rfc6184
 static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 {
 	int ret = -1;
@@ -371,6 +373,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 
 			if ((nal_type>= NAL_TYPE_SINGLE_NAL_MIN) && (nal_type <= NAL_TYPE_SINGLE_NAL_MAX))
 			{
+				// 1 ~ 23
 				/* Write NAL header */
 				ret = h264_write_nal(rtp_req);
 
@@ -379,6 +382,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 			}
 			else if ((nal_type >= NAL_TYPE_STAP_A) && (nal_type <= NAL_TYPE_MTAP24))
 			{
+				// 24 ~ 27
 				unsigned char *q;
 				unsigned short nalu_size;
 
@@ -412,6 +416,22 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 			}
 			else if ((nal_type == NAL_TYPE_FU_A) || (nal_type == NAL_TYPE_FU_B))
 			{
+				// 28 ~ 29
+				// 5.8. Fragmentation Units (FUs) (p29)
+				/*
+				 0							 1							 2							 3
+				 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+				+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+				|  FU indicator | 	FU header 	| 						 DON							|
+				+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
+				| 																															|
+				| 												 FU payload 													|
+				| 																															|
+				| 															+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+				| 															: 	...OPTIONAL RTP padding 		|
+				+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+				*/
+				int fu_b = (nal_type == NAL_TYPE_FU_B) ? 4:2;
 				unsigned char *q = (unsigned char *)payload;
 
 				unsigned char h264_key       = (q[0] & 0xE0);
@@ -431,7 +451,7 @@ static int rtp_h264(RTPX_t *rtp_req, char *payload, long payload_len)
 					/* write NAL unit code */
 					ret = h264_write(rtp_req, (char *)&h264_key, sizeof(h264_key));
 				}
-				ret = h264_write(rtp_req, (char *)q + 2, payload_len - 2);
+				ret = h264_write(rtp_req, (char *)q + fu_b, payload_len - fu_b);
 
 				if (h264_end_bit)
 				{

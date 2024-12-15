@@ -256,7 +256,7 @@ logger_fn()
 	LOGREAD=`which logread`
 	LOGREAD_ARG=" [ ! -z '$LOGREAD' ] "
 	[ -z "$LOGREAD" ] || LOGREAD_ARG="(logread -f -e $LOGGER_TAG 2>/dev/null;) || (logread -f $LOGGER_COLOR | grep $LOGGER_TAG 2>/dev/null; )"
-	eval_fn "${FUNCNAME[0]}:${LINENO}" "$LOGREAD_ARG || (tail -f /var/log/syslog $LOGGER_COLOR | grep $LOGGER_TAG;)"
+	eval_fn "${FUNCNAME[0]}:${LINENO}" "$LOGREAD_ARG || (tail -f /var/log/syslog $LOGGER_COLOR | grep '${LOGGER_TAG}:';)"
 
 	return 0
 }

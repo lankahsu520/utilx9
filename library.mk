@@ -120,7 +120,11 @@ CLEAN_BINS += \
 LIBXXX_OBJS += \
 							dbusx_api.o
 LIBS_yes += -lexpat -ldbus-1
+ifneq (,$(wildcard $(SDK_LIB_DIR)/libdbus-1.so))
 CFLAGS += -I$(SDK_INC_DIR)/dbus-1.0/dbus -I$(SDK_INC_DIR)/dbus-1.0 -I$(SDK_LIB_DIR)/dbus-1.0/include
+else
+CFLAGS += $(shell pkg-config --cflags dbus-1)
+endif
 endif
 
 ifeq ("$(PJ_HAS_UBUS)", "yes")

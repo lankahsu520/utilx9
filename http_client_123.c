@@ -106,9 +106,9 @@ int http_download_normal(char *url, char *filename)
 	return ret;
 }
 
-void http_response_cb(void *userdata, size_t res_size, char *response)
+void http_response_cb(HttpX_t *http_req, void *userdata)
 {
-	DBG_ER_LN("%s", response);
+	DBG_ER_LN("(response_code: %ld, response: %s)", http_req->response_code, http_req->simple_req.response);
 }
 
 
@@ -131,6 +131,10 @@ int main(int argc, char* argv[])
 
 	//http_simple("http://192.168.50.206:8089/test.jpg", HTTP_METHOD_ID_PUT, headers, strlen(request), request, NULL, http_response_cb);
 	http_simple("http://192.168.50.206:8089/test.jpg", HTTP_METHOD_ID_GET, headers, strlen(request), request, NULL, http_response_cb);
+#endif
+
+#if (1)
+	http_simple("https://www.google.com.tw", HTTP_METHOD_ID_POST, NULL, 0, NULL, NULL, http_response_cb);
 #endif
 
 #if (0)
@@ -159,7 +163,7 @@ int main(int argc, char* argv[])
 	//http_download_mjpeg("http://d.5857.com/4keu_180119/001.jpg", "./9012");
 #endif
 
-#if (1)
+#if (0)
 	//http_download_rtsp("rtsp://192.168.50.237:554/live1.sdp",  "./video.h264");
 	http_download_rtsp("rtsp://192.168.10.195:8554/live",  "./video.h264");
 	//http_download_rtsp("rtsp://192.168.50.242/video.pro1",  "./video.h264");

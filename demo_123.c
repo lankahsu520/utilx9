@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		oldp = newp; // warning: pointer ‘oldp’ may be used after ‘realloc’
+		oldp = newp; // gcc 12 up, warning: pointer 'oldp' may be used after 'realloc'
 		DBG_IF_LN("(newp: %p %zd, oldp: %p %zd)", newp, sizeof(newp), oldp, sizeof(oldp));
 		SAFE_FREE(newp);
 	}

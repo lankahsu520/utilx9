@@ -17,78 +17,79 @@
 
 ## 2.1. Open-source
 
-- [curl](https://curl.haxx.se) (PJ_HAS_CURL)
+#### - [curl](https://curl.haxx.se) (PJ_HAS_CURL / UTIL_EX_CURL)
 
-- [dbus](https://www.freedesktop.org/wiki/Software/dbus/) (PJ_HAS_DBUS)
+#### - [dbus](https://www.freedesktop.org/wiki/Software/dbus/) (PJ_HAS_DBUS / UTIL_EX_DBUS)
 
   > ```bash
   > $ sudo apt -y install libdbus-1-dev
   > ```
 
-- [fcgi2](http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm) (PJ_HAS_FASTCGI)
+#### - [fcgi2](http://fastcgi-archives.github.io/fcgi2/doc/fcgi-devel-kit.htm) (PJ_HAS_FASTCGI / UTIL_EX_FASTCGI)
 
-- [jansson](https://github.com/akheron/jansson) (PJ_HAS_JANSSON)
+#### - [jansson](https://github.com/akheron/jansson) (PJ_HAS_JANSSON / UTIL_EX_JSON)
 
   > ```bash
   > $ sudo apt -y install libjansson-dev
   > ```
 
-- [json-c](https://github.com/json-c/json-c) (PJ_HAS_JSONC)
+#### - [json-c](https://github.com/json-c/json-c) (PJ_HAS_JSONC)
 
-- [libbacktrace](https://github.com/ianlancetaylor/libbacktrace) (PJ_HAS_LIBBACKTRACE)
+#### - [libbacktrace](https://github.com/ianlancetaylor/libbacktrace) (PJ_HAS_LIBBACKTRACE / UTIL_EX_BACKTRACE)
 
-- [libnl-tiny](https://git.openwrt.org/project/libnl-tiny.git) (PJ_HAS_LIBNL_TINY)
+#### - [libnl-tiny](https://git.openwrt.org/project/libnl-tiny.git) (PJ_HAS_LIBNL_TINY)
 
-- [libssh](http://www.libssh.org) (PJ_HAS_LIBSSH)
+#### - [libssh](http://www.libssh.org) (PJ_HAS_LIBSSH / UTIL_EX_SSH)
 
-- [libubox](https://openwrt.org/docs/techref/libubox) (PJ_HAS_LIBUBOX)
+#### - [libubox](https://openwrt.org/docs/techref/libubox) (PJ_HAS_LIBUBOX / UTIL_EX_UBOX)
 
-- [libusb](https://github.com/libusb/libusb) (PJ_HAS_LIBUSB)
+#### - [libusb](https://github.com/libusb/libusb) (PJ_HAS_LIBUSB / UTIL_EX_USB)
 
-- [libuv](https://github.com/libuv/libuv) (PJ_HAS_LIBUV) 
+#### - [libuv](https://github.com/libuv/libuv) (PJ_HAS_LIBUV / UTIL_EX_UV) 
 
-- [libwebsockets](https://libwebsockets.org) (PJ_HAS_LIBWEBSOCKETS)
+#### - [libwebsockets](https://libwebsockets.org) (PJ_HAS_LIBWEBSOCKETS / UTIL_EX_WEBSOCKETS)
 
   > ```bash
   > $ sudo apt -y install libwebsockets-dev
   > ```
 
-- [libyuarel](https://github.com/jacketizer/libyuarel) (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL)
+#### - [libyuarel](https://github.com/jacketizer/libyuarel) (PJ_HAS_LIBYUAREL / UTIL_EX_YUAREL)
 
-- [mosquitto](https://mosquitto.org) (PJ_HAS_MOSQUITTO)
+#### - [mosquitto](https://mosquitto.org) (PJ_HAS_MOSQUITTO / UTIL_EX_MQTT)
 
   > ```bash
   > $ sudo apt -y install libmosquitto-dev
   > ```
 
-- [mxml](https://www.msweet.org/mxml/) (PJ_HAS_MXML / UTIL_EX_MXML)
+#### - [mxml](https://www.msweet.org/mxml/) (PJ_HAS_MXML / UTIL_EX_MXML)
 
 > (need to patch, please check patches/mxml-2.11)
 
-- [openssl](https://www.openssl.org) (PJ_HAS_OPENSSL)
+#### - [openssl](https://www.openssl.org) (PJ_HAS_OPENSSL / UTIL_EX_SSL)
 
-- ~~swconfig (PJ_HAS_SWCONFIG) - openwrt/package/network/config/swconfig~~
+#### - ~~swconfig (PJ_HAS_SWCONFIG / UTIL_EX_SWCONFIG)~~
+> ~~openwrt/package/network/config/swconfig~~
 
-- [ubus](https://openwrt.org/docs/techref/ubus) (PJ_HAS_UBUS)
+#### - [ubus](https://openwrt.org/docs/techref/ubus) (PJ_HAS_UBUS)
 
-- [uci](https://openwrt.org/docs/techref/uci) (PJ_HAS_UCI)
+#### - [uci](https://openwrt.org/docs/techref/uci) (PJ_HAS_UCI / UTIL_EX_UCI)
 
 ## 2.2. Internet Notes
 
-- internet-collect.c - [Hex Encode and Decode in C](https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/)
-- internet-collect.c - [Linux C语言实现urlencode和urldecode](https://ivanzz1001.github.io/records/post/cplusplus/2018/03/13/cpluscplus_urlencode)
-- internet-collect.c - [Howto base64 encode and decode with C and OpenSSL](https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/)
-- internet-collect.c - [34.1 Backtraces](https://www.gnu.org/software/libc/manual/html_node/Backtraces.html)
-- clist_api.c - http://www.contiki-os.org
-- crc16.c - http://www.contiki-os.org
-- crc32alg.c - CRC32 code derived from work by Gary S. Brown.
-- chainX_api.c - [Linux RS-232 程式設計](http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html)
-- lws_123.c - [simple-libwebsockets-example](https://github.com/iamscottmoyers/simple-libwebsockets-example)
-- lws_api.c - [multithread call lws_callback_on_writable to send data ASAP](https://codesti.com/issue/warmcat/libwebsockets/2358)
-- nlink_123.c - [Monitoring Linux networking state using netlink](https://olegkutkov.me/2018/02/14/monitoring-linux-networking-state-using-netlink/)
-- nlink_456.c - [Port status polling via swconfig kernel module](http://centaur.sch.bme.hu/~leait/projects/openwrt/)
-- utilx9.h - [解读 /proc/$PID/status 中各种参数](https://my.oschina.net/aiguozhe/blog/125477)
-- utilx9.h - [RTP Library in C](https://sourceforge.net/projects/rtp-lib/)
+#### - internet-collect.c - [Hex Encode and Decode in C](https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/)
+#### - internet-collect.c - [Linux C语言实现urlencode和urldecode](https://ivanzz1001.github.io/records/post/cplusplus/2018/03/13/cpluscplus_urlencode)
+#### - internet-collect.c - [Howto base64 encode and decode with C and OpenSSL](https://devenix.wordpress.com/2008/01/18/howto-base64-encode-and-decode-with-c-and-openssl-2/)
+#### - internet-collect.c - [34.1 Backtraces](https://www.gnu.org/software/libc/manual/html_node/Backtraces.html)
+#### - clist_api.c - http://www.contiki-os.org
+#### - crc16.c - http://www.contiki-os.org
+#### - crc32alg.c - CRC32 code derived from work by Gary S. Brown.
+#### - chainX_api.c - [Linux RS-232 程式設計](http://shyuanliang.blogspot.com/2010/09/linux-rs-232.html)
+#### - lws_123.c - [simple-libwebsockets-example](https://github.com/iamscottmoyers/simple-libwebsockets-example)
+#### - lws_api.c - [multithread call lws_callback_on_writable to send data ASAP](https://codesti.com/issue/warmcat/libwebsockets/2358)
+#### - nlink_123.c - [Monitoring Linux networking state using netlink](https://olegkutkov.me/2018/02/14/monitoring-linux-networking-state-using-netlink/)
+#### - nlink_456.c - [Port status polling via swconfig kernel module](http://centaur.sch.bme.hu/~leait/projects/openwrt/)
+#### - utilx9.h - [解读 /proc/$PID/status 中各种参数](https://my.oschina.net/aiguozhe/blog/125477)
+#### - utilx9.h - [RTP Library in C](https://sourceforge.net/projects/rtp-lib/)
 
 # 3. Current Status
 

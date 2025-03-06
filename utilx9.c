@@ -523,11 +523,23 @@ double time_diff_weeks(time_t end_t, time_t start_t)
 
 #include <libgen.h>
 
+int dir_chk(char *filename)
+{
+	int ret = -1;
+	struct stat file_stat= {0};
+	if ((SAFE_STAT(filename, file_stat) == 0) && (file_stat.st_mode & S_IFDIR))
+	{
+		ret = 0;
+	}
+
+	return ret;
+}
+
 int file_exe_chk(char *filename)
 {
 	int ret = -1;
-	struct stat sb;
-	if ((stat(filename, &sb) == 0) && (sb.st_mode & S_IXUSR))
+	struct stat file_stat;
+	if ((SAFE_STAT(filename, file_stat) == 0) && (file_stat.st_mode & S_IXUSR))
 	{
 		ret = 0;
 	}
@@ -538,8 +550,7 @@ int file_exe_chk(char *filename)
 int file_slink(char *filename)
 {
 	struct stat file_stat= {0};
-
-	if (lstat(filename, &file_stat) == -1)
+	if (SAFE_LSTAT(filename, file_stat) == -1)
 	{
 		return 0;
 	}
@@ -553,7 +564,7 @@ int file_spath(char *filename, char *spath, int length)
 	if (file_slink(filename))
 	{
 		DBG_DB_LN("S_ISLNK !!!(filename: %s)", filename);
-		ret = readlink(filename, spath, length);
+		ret = SAFE_READLINK(filename, spath, length);
 	}
 	else
 	{
@@ -579,7 +590,7 @@ char *file_path(char *filename, char *actualpath)
 	SAFE_FREE(basec);
 #endif
 
-	char *ptr = realpath(filename, actualpath);
+	char *ptr = SAFE_REALPATH(filename, actualpath);
 	if (ptr)
 	{
 		DBG_IF_LN("(actualpath: %s)", actualpath);

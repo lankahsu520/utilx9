@@ -201,6 +201,8 @@ typedef enum
 #define DBG_TXT_ENTER "__________ Enter __________"
 #define DBG_TXT_BYE_BYE "Bye-Bye !!!"
 #define DBG_TXT_CRC_ERROR "CRC error !!!"
+#define DBG_TXT_FILE_NOT_FOUND "File not found !!!"
+#define DBG_TXT_FOLDER_NOT_FOUND "Folder not found !!!"
 #define DBG_TXT_FOUND "Found !!!"
 #define DBG_TXT_GOT "Got !!!"
 #define DBG_TXT_LAUNCH_THREAD "Launch a new thread !!!"

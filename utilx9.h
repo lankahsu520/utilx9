@@ -364,7 +364,7 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 
 /** open/close **/
 #define SAFE_OPEN(path, args...) \
-	({ int __ret =0; do { if (pcheck(path)) { __ret = open(path, ## args); } } while(0); __ret; })
+	({ int __ret = -1; do { if (pcheck(path)) { __ret = open(path, ## args); } } while(0); __ret; })
 #define SAFE_CLOSE(x) \
 	do { if (x>=0) { close(x); x=-1;} } while(0)
 
@@ -377,7 +377,20 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 #define SAFE_PCLOSE(x) do { if ((x) != NULL) {pclose(x); x=NULL;} } while(0)
 
 #define SAFE_FILENO(fp) \
-	({ int __ret =0; do { if (pcheck(fp)) { __ret = fileno(fp); } } while(0); __ret; })
+	({ int __ret = -1; do { if (pcheck(fp)) { __ret = fileno(fp); } } while(0); __ret; })
+
+#define SAFE_READLINK(path, x, y) \
+	({ int __ret = -1; do { if ((pcheck(path)) && (pcheck(x)) && (y>0)) { __ret = readlink(path, x, y); } } while(0); __ret; })
+
+#define SAFE_REALPATH(path, x) \
+	({ char *__ret = NULL; do { if ((pcheck(path)) && (pcheck(x))) { __ret = realpath(path, x); } } while(0); __ret; })
+
+#define SAFE_STAT(path, x) \
+	({ int __ret =-1; do { if (pcheck(path)) { __ret = stat(path, &x); } } while(0); __ret; })
+
+#define SAFE_LSTAT(path, x) \
+	({ int __ret =-1; do { if (pcheck(path)) { __ret = lstat(path, &x); } } while(0); __ret; })
+
 
 #if (0)
 #define SAFE_SYSTEM(FMT, args...) \
@@ -860,6 +873,7 @@ double time_diff_weeks(time_t end_t, time_t start_t);
 #define SAFE_ACCESS(filename, mode) \
 	({ int __ret =0; do { if (pcheck(filename)) { __ret = access(filename, mode); } } while(0); __ret; })
 
+int dir_chk(char *filename);
 int file_exe_chk(char *filename);
 int file_slink(char *filename);
 int file_spath(char *filename, char *spath, int length);
@@ -2842,6 +2856,16 @@ typedef struct JSON_TopicX_STRUCT
 		__ret; \
 	})
 
+#define JSON_LOADFILE_EASY_OR_NEW_ARY(filename) \
+	({ json_t *__ret = NULL; \
+		do { \
+			json_error_t jerror = {0}; \
+			if ( ( (pcheck(filename)) && (strlen(filename)>0) && (__ret = json_load_file(filename, 0, &jerror))) || (__ret = JSON_ARY_NEW()) ) {} \
+			else DBG_ER_LN("json_load_file error !!! (error: %d %s)", jerror.line, jerror.text); \
+		} while(0); \
+		__ret; \
+	})
+
 #define JSON_LOADS_EASY(x) \
 	({ json_t *__ret = NULL; \
 		do { \
@@ -2857,6 +2881,16 @@ typedef struct JSON_TopicX_STRUCT
 		do { \
 			json_error_t jerror = {0}; \
 			if ( ((pcheck(x)) && (__ret = json_loads(x, JSON_DISABLE_EOF_CHECK, &jerror))) || (__ret = JSON_OBJ_NEW()) ) {} \
+			else DBG_ER_LN("json_loads error !!! (error: %d %s)", jerror.line, jerror.text); \
+		} while(0); \
+		__ret; \
+	})
+
+#define JSON_LOADS_EASY_OR_NEW_ARY(x) \
+	({ json_t *__ret = NULL; \
+		do { \
+			json_error_t jerror = {0}; \
+			if ( ((pcheck(x)) && (__ret = json_loads(x, JSON_DISABLE_EOF_CHECK, &jerror))) || (__ret = JSON_ARY_NEW()) ) {} \
 			else DBG_ER_LN("json_loads error !!! (error: %d %s)", jerror.line, jerror.text); \
 		} while(0); \
 		__ret; \

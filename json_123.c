@@ -169,8 +169,9 @@ int main(int argc, char* argv[])
 
 	JSON_FREE(jroot);
 
+#if (1)
 	{
-		jroot = JSON_LOADFILE_EASY("./json/urmet.json");
+		jroot = JSON_LOADFILE_EASY("./json/demo.json");
 		if (jroot)
 		{
 			json_t *jfound_ary = JSON_ARY_NEW();
@@ -194,7 +195,33 @@ int main(int argc, char* argv[])
 			JSON_FREE(jroot);
 		}
 	}
+#endif
 
+#if (1)
+	if ( dir_chk("./json") == 0 )
+	{
+		json_t *jroot_ary = JSON_LOADFILE_EASY_OR_NEW_ARY("./json/demo-ary.json");
+		if (jroot_ary)
+		{
+			int idx =0;
+			json_t *jitem = NULL;
+			JSON_ARY_FOREACH(jroot_ary, idx, jitem)
+			{
+				DBG_IF_LN("(idx: %d %s)", idx, JSON_STR(jitem));
+			}
+
+			JSON_ARY_APPEND_STR(jroot_ary, time_now_full(time(NULL)));
+			JSON_DUMP_FILE_EASY(jroot_ary, "./json/demo-ary.json");
+			JSON_FREE(jroot_ary);
+		}
+	}
+	else
+	{
+		DBG_ER_LN("%s (./json)", DBG_TXT_FOLDER_NOT_FOUND);
+	}
+#endif
+
+#if (1)
 	{
 		// {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043}
 		json_t *jsunrise_sunset = JSON_LOADS_EASY("{\"sunrise\":\"3:22:56 AM\",\"sunset\":\"5:10:20 PM\",\"time_utc\":1652853043}");
@@ -212,7 +239,9 @@ int main(int argc, char* argv[])
 			JSON_FREE(jsunrise_sunset);
 		}
 	}
+#endif
 
+#if (1)
 	{
 		// {"sunrise":"3:22:56 AM","sunset":"5:10:20 PM","time_utc":1652853043}
 		json_t *jsunrise_sunset = JSON_OBJ_NEW();
@@ -232,6 +261,8 @@ int main(int argc, char* argv[])
 			JSON_FREE(jsunrise_sunset);
 		}
 	}
+#endif
+
 #endif
 
 	exit(0);

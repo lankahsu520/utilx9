@@ -3633,7 +3633,7 @@ typedef struct UsbX_STRUCT
 
 	unsigned int usb_timeout;
 
-	int dbg_lvl;
+	int dbg_lvl; // libusb, must ENABLE_DEBUG_LOGGING
 
 	void *user_data;
 } UsbX_t;

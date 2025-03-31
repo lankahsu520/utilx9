@@ -674,7 +674,7 @@ static void *usbX_thread_handler(void *arg)
 
 	threadx_detach(tidx_req);
 
-	DBG_IF_LN("usbX listen ...");
+	DBG_IF_LN("usbX listen ... (vendor_id: 0x%08X, product_id: 0x%08X)", usbX_req->vendor_id, usbX_req->product_id);
 
 	if (LIBUSB_SUCCESS != usbX_hotplug_register(usbX_req))
 	{

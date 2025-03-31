@@ -112,9 +112,14 @@ $ make romfs
 # will be installed ${HOMEX_ROOT_DIR} - ./install/github_rootfs
 $ make target_install 
 # will be installed ${PJ_INSTALL_TARGET} - /work/rootfs
-
 ```
+```bash
+# 上面過於複雜，簡單化
+$ ./build-make.sh build
+```
+
 ## 4.1. environment (without libmxml and libyuarel)
+
 ```bash
 $ sudo apt-get --yes install libjansson-dev
 $ sudo apt-get --yes install libuv1-dev

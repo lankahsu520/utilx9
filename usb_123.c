@@ -12,7 +12,14 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
+#include <signal.h>
+#include <getopt.h>
 #include "utilx9.h"
+
+#define TAG "usb_123"
+
+// ** app **
+static int is_quit = 0;
 
 #if (0) // ID 0658:0200 Sigma Designs, Inc. Aeotec Z-Stick Gen5 (ZW090) - UZB
 #define VENDOR_ID 0x0658
@@ -64,6 +71,11 @@ UsbX_t usbx_main =
 	//.dbg_lvl = LIBUSB_LOG_LEVEL_DEBUG,
 };
 
+static void LIBUSB_CALL usb_read_cb(struct libusb_transfer *transfer)
+{
+	DBG_WN_LN(">>>>> (status: %d-%s, type: %c, timeout: %d)", transfer->status, libusb_error_name(transfer->status), transfer->type, transfer->timeout);
+}
+
 int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, libusb_hotplug_event event, void *user_data)
 {
 	UsbX_t *usbX_req = (UsbX_t *)user_data;
@@ -75,6 +87,8 @@ int usb_hotplug_cb(struct libusb_context *ctx, struct libusb_device *usb_dev, li
 			DBG_WN_LN("LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED");
 			usbX_dev_open(usbX_req, usb_dev);
 			usbX_dev_print_ex(usbX_req);
+
+			usbX_dev_read_poll(&usbx_main, usb_read_cb);
 			break;
 		case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
 		default:
@@ -174,19 +188,34 @@ void usb_hotplug_loop(void)
 	}
 }
 
-
-int main(int argc, char* argv[])
+static int app_quit(void)
 {
-	DBG_TR_LN("enter");
+	return is_quit;
+}
 
-	dbg_lvl_set(DBG_LVL_DEBUG);
+static void app_set_quit(int mode)
+{
+	is_quit = mode;
+}
 
+static void app_stop(void)
+{
+	if (app_quit()==0)
+	{
+		app_set_quit(1);
+
+		DBG_WN_LN("%s (%s)", DBG_TXT_BYE_BYE, TAG);
+	}
+}
+
+static void app_loop(void)
+{
 #if (1)
 	if (usbX_listen_open(&usbx_main, NULL) >= 0)
 	{
 		usbX_dev_print_ex(&usbx_main);
 
-		while (1)
+		while ( app_quit() == 0 )
 		{
 			sleep(1);
 		}
@@ -201,6 +230,122 @@ int main(int argc, char* argv[])
 	usb_hotplug_loop();
 #endif
 
-	DBG_IF_LN(DBG_TXT_BYE_BYE);
-	exit(0);
+	goto exit_loop;
+
+exit_loop:
+	app_stop();
+}
+
+static int app_init(void)
+{
+	int ret = 0;
+
+	//dbg_lvl_set(DBG_LVL_DEBUG);
+	if (dbg_lvl_get() == DBG_LVL_TRACE)
+	{
+		if (putenv("LIBUSB_DEBUG=4") != 0)	// LIBUSB_LOG_LEVEL_DEBUG
+			printf("Unable to set debug level");
+	}
+
+	return ret;
+}
+
+static void app_exit(void)
+{
+	app_stop();
+}
+
+static void app_signal_handler(int signum)
+{
+	DBG_ER_LN("(signum: %d)", signum);
+	switch (signum)
+	{
+		case SIGINT:
+		case SIGTERM:
+		case SIGHUP:
+			app_stop();
+			break;
+		case SIGPIPE:
+			break;
+
+		case SIGUSR1:
+			break;
+
+		case SIGUSR2:
+			dbg_lvl_round();
+			DBG_ER_LN("dbg_lvl_get(): %d", dbg_lvl_get());
+			DBG_ER_LN("(Version: %s)", version_show());
+			break;
+	}
+}
+
+static void app_signal_register(void)
+{
+	signal(SIGINT, app_signal_handler );
+	signal(SIGTERM, app_signal_handler );
+	signal(SIGHUP, app_signal_handler );
+	signal(SIGUSR1, app_signal_handler );
+	signal(SIGUSR2, app_signal_handler );
+
+	signal(SIGPIPE, SIG_IGN );
+}
+
+int option_index = 0;
+const char* short_options = "d:h";
+static struct option long_options[] =
+{
+	{ "debug",       required_argument,   NULL,    'd'  },
+	{ "help",        no_argument,         NULL,    'h'  },
+	{ 0,             0,                      0,    0    }
+};
+
+static void app_showusage(int exit_code)
+{
+	printf( "Usage: %s\n"
+					"  -d, --debug       debug level\n"
+					"  -h, --help\n", TAG);
+	printf( "Version: %s\n", version_show());
+	printf( "Example:\n"
+					"  %s -d 2\n", TAG);
+	exit(exit_code);
+}
+
+static void app_ParseArguments(int argc, char **argv)
+{
+	int opt;
+
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1)
+	{
+		switch (opt)
+		{
+			case 'd':
+				if (optarg)
+				{
+					dbg_lvl_set(atoi(optarg));
+				}
+				break;
+			default:
+				app_showusage(-1);
+				break;
+		}
+	}
+}
+
+// sudo usb_123 -d 2
+int main(int argc, char* argv[])
+{
+	app_ParseArguments(argc, argv);
+	app_signal_register();
+	atexit(app_exit);
+
+	SAFE_STDOUT_NONE();
+	if ( app_init() == -1 )
+	{
+		return -1;
+	}
+
+	app_loop();
+
+	DBG_WN_LN(DBG_TXT_BYE_BYE);
+	return 0;
 }

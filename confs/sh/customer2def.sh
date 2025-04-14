@@ -77,9 +77,6 @@ rm -f env.tmp
 echo "export CFLAGS_COMMON=\"${CFLAGS_COMMON}\"" >> ${CONFIG_CUSTOMER}.export
 	echo "CFLAGS_COMMON=${CFLAGS_COMMON}" >> ${CONFIG_CUSTOMER}
 	echo "option('CFLAGS_COMMON', type: 'string', value: '${CFLAGS_COMMON}')" >> ${CONFIG_MESON}
-echo "export CFLAGS_OPENSSL_INCLUDES=\"${CFLAGS_OPENSSL_INCLUDES}\"" >> ${CONFIG_CUSTOMER}.export
-	echo "CFLAGS_OPENSSL_INCLUDES=${CFLAGS_OPENSSL_INCLUDES}" >> ${CONFIG_CUSTOMER}
-	echo "option('CFLAGS_OPENSSL_INCLUDES', type: 'string', value: '${CFLAGS_OPENSSL_INCLUDES}')" >> ${CONFIG_MESON}
 echo "export CFLAGS_CUSTOMER=\"${CFLAGS_CUSTOMER}\"" >> ${CONFIG_CUSTOMER}.export
 	echo "CFLAGS_CUSTOMER=${CFLAGS_CUSTOMER}" >> ${CONFIG_CUSTOMER}
 	echo "option('CFLAGS_CUSTOMER', type: 'string', value: '${CFLAGS_CUSTOMER}')" >> ${CONFIG_MESON}
@@ -88,9 +85,6 @@ echo "export CFLAGS=\"${CFLAGS}\"" >> ${CONFIG_CUSTOMER}.export
 	echo "option('CFLAGS', type: 'string', value: '${CFLAGS}')" >> ${CONFIG_MESON}
 
 #** LDFLAGS_XXX **
-echo "export LDFLAGS_OPENSSL_LIBS=\"${LDFLAGS_OPENSSL_LIBS}\"" >> ${CONFIG_CUSTOMER}.export
-	echo "LDFLAGS_OPENSSL_LIBS=${LDFLAGS_OPENSSL_LIBS}" >> ${CONFIG_CUSTOMER}
-	echo "option('LDFLAGS_OPENSSL_LIBS', type: 'string', value: '${LDFLAGS_OPENSSL_LIBS}')" >> ${CONFIG_MESON}
 echo "export LIBS=\"${LIBS}\"" >> ${CONFIG_CUSTOMER}.export
 	echo "LIBS=${LIBS}" >> ${CONFIG_CUSTOMER}
 	echo "option('LIBS', type: 'string', value: '${LIBS}')" >> ${CONFIG_MESON}

@@ -21,18 +21,28 @@
 //******************************************************************************
 #define QUERY_KEY_ACTION "action"
 #define QUERY_KEY_ALIVE "alive"
+#define QUERY_KEY_CHANNEL "channel"
 #define QUERY_KEY_EXT1 "ext1"
 #define QUERY_KEY_EXT2 "ext2"
 #define QUERY_KEY_FAKE "fake"
+#define QUERY_KEY_FREQ "freq"
+#define QUERY_KEY_FROM "from"
 #define QUERY_KEY_FUNCTION "function"
+#define QUERY_KEY_GAIN "gain"
+#define QUERY_KEY_GETINFO "getinfo"
+#define QUERY_KEY_GETROOTINFO "getrootinfo"
 #define QUERY_KEY_GROUP "group"
 #define QUERY_KEY_ID "id"
 #define QUERY_KEY_LEVEL "level"
 #define QUERY_KEY_LOCALTIME "localtime"
+#define QUERY_KEY_MODE "mode"
+#define QUERY_KEY_OPERATINGMODE "operatingmode"
 #define QUERY_KEY_ORDER "order"
 #define QUERY_KEY_ROOM "room"
 #define QUERY_KEY_SCOPE "scope"
+#define QUERY_KEY_SERIAL "serial" // server.xml?setserial&serial=
 #define QUERY_KEY_SETFORSCAN "setforscan" // server.xml?setforscan
+#define QUERY_KEY_SETSERIAL "setserial" // server.xml?setserial
 #define QUERY_KEY_STATEBOX "statebox" // server.xml?statebox
 #define QUERY_KEY_STATUS "status"
 #define QUERY_KEY_UID_AP "uid_ap"
@@ -56,10 +66,12 @@
 //******************************************************************************
 //** action=??? **
 //******************************************************************************
+#define QUERY_ACTION_VAL_GET "get"
 #define QUERY_ACTION_VAL_GETP "getp"
 #define QUERY_ACTION_VAL_GETSTATUS "getstatus"
 #define QUERY_ACTION_VAL_GETVEMERVERSION "getvemerversion"
 #define QUERY_ACTION_VAL_IMPORT "import"
+#define QUERY_ACTION_VAL_MODULES "modules"
 #define QUERY_ACTION_VAL_NETWORKTEST "networktest"
 #define QUERY_ACTION_VAL_OPENCOM "opencom"
 #define QUERY_ACTION_VAL_ORDER "order"

@@ -11,13 +11,13 @@ export PJ_TARGET_CONF="_$ARCH"
 #** Toolchain **
 
 #** Setup Environment **
-export PJ_ROOT=`pwd`
-[ ! -z "$PJ_INSTALL" ] || export PJ_INSTALL="${PJ_ROOT}/install"
-[ ! -z "$PJ_CPACK" ] || export PJ_CPACK="${PJ_ROOT}/install_Cpack"
+export PJ_ROOT_DIR=`pwd`
+[ ! -z "$PJ_INSTALL" ] || export PJ_INSTALL="$PJ_ROOT_DIR/install"
+[ ! -z "$PJ_CPACK" ] || export PJ_CPACK="$PJ_ROOT_DIR/install_Cpack"
 [ ! -z "$SDK_ROOT_DIR" ] || export SDK_ROOT_DIR="${PJ_INSTALL}"
 export SDK_USR_PREFIX_DIR="usr"
 
-export CONFIG_CUSTOMER_DEF_H="${PJ_ROOT}/include/customer_def.h"
+export CONFIG_CUSTOMER_DEF_H="$PJ_INCLUDE_DIR/customer_def.h"
 
 #export CROSS_FILE=
 

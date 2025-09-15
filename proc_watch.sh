@@ -2,12 +2,12 @@
 
 RUN_SH=`basename $0`
 HINT="$RUN_SH {start|stop|restart|status|debug|trigger|logger|clean} iface"
-ROOTFS_PATH="/work/rootfs"
-ROOTFS_PATH_ARG=""
+ROOTFS_DIR="/work/rootfs"
+ROOTFS_DIR_ARG=""
 NOW_t=`date +"%Y%m%d%H%M%S"`
 PWD=`pwd`
-SBIN_PATH=`dirname $0`
-[ -d "$SBIN_PATH" ] || SBIN_PATH="${ROOTFS_PATH}/sbin"
+SBIN_DIR=`dirname $0`
+[ -d "$SBIN_DIR" ] || SBIN_DIR="${ROOTFS_DIR}/sbin"
 SUDO_EX=$(which sudo 2>&1) && SUDO_B="sudo -E -b" && SUDO="sudo -E"
 WHOAMI_EX=$(which whoami 2>&1) && WHO=`whoami`
 [ ! -z "$WHO" ] || WHO="root"
@@ -18,11 +18,11 @@ ACTION=$1
 
 DAEMON="proc_watch"
 [ -z "$DAEMON" ] || BIN_FILE="./$DAEMON"
-[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_PATH/usr/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_DIR/bin/$DAEMON"
+[ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="$ROOTFS_DIR/usr/bin/$DAEMON"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/bin/$DAEMON"
 [ -z "$BIN_FILE" ] || [[ -f "$BIN_FILE" && -x "$BIN_FILE" ]] || BIN_FILE="/usr/bin/$DAEMON"
-[ -z "$BIN_FILE" ] || BIN_FILE=`realpath $BIN_FILE` && BIN_PATH=`dirname $BIN_FILE`
+[ -z "$BIN_FILE" ] || BIN_FILE=`realpath $BIN_FILE` && BIN_DIR=`dirname $BIN_FILE`
 KILL_EX="$SUDO kill"
 KILLALL_EX="$SUDO killall"
 
@@ -30,14 +30,14 @@ IS_INTERACTIVE=""
 IS_ECHO="0"
 IS_QUIT=0
 
-IOT_PATH="/work/rootfs/IoT"
-SAVE_PATH="/work/IoT"
-SAVE_PATH_ARG=""
-WORK_PATH="/tmp/IoT"
-WORK_PATH_ARG=""
+IOT_DIR="/work/rootfs/IoT"
+SAVE_DIR="/work/IoT"
+SAVE_DIR_ARG=""
+WORK_DIR="/tmp/IoT"
+WORK_DIR_ARG=""
 GROUP_NAME="xxx"
-CFG_PATH=""
-CFG_PATH_ARG=""
+CFG_DIR=""
+CFG_DIR_ARG=""
 CFG_FILE=""
 CFG_FILE_ARG=""
 DEBUG="2"
@@ -131,19 +131,19 @@ cfg_fn()
 
 arguments_fn()
 {
-	[ -z $ROOTFS_PATH ] || [ -d "$ROOTFS_PATH" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create ROOTFS_PATH($ROOTFS_PATH) first !!!";}
-	#[ "$ROOTFS_PATH" != "" ] && ROOTFS_PATH_ARG="-r $ROOTFS_PATH"
+	[ -z $ROOTFS_DIR ] || [ -d "$ROOTFS_DIR" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create ROOTFS_DIR($ROOTFS_DIR) first !!!";}
+	#[ "$ROOTFS_DIR" != "" ] && ROOTFS_DIR_ARG="-r $ROOTFS_DIR"
 
-	[ -z $SAVE_PATH ] || [ -d "$SAVE_PATH" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create SAVE_PATH($SAVE_PATH) first !!!";}
-	#[ "$SAVE_PATH" != "" ] && SAVE_PATH_ARG="-s $SAVE_PATH"
+	[ -z $SAVE_DIR ] || [ -d "$SAVE_DIR" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create SAVE_DIR($SAVE_DIR) first !!!";}
+	#[ "$SAVE_DIR" != "" ] && SAVE_DIR_ARG="-s $SAVE_DIR"
 
-	[ -z $CFG_PATH ] || [ -d "$CFG_PATH" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create CFG_PATH($CFG_PATH) first !!!";}
-	#[ "$CFG_PATH" != "" ] && CFG_PATH_ARG="-f $CFG_PATH"
+	[ -z $CFG_DIR ] || [ -d "$CFG_DIR" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create CFG_DIR($CFG_DIR) first !!!";}
+	#[ "$CFG_DIR" != "" ] && CFG_DIR_ARG="-f $CFG_DIR"
 
-	[ -z $WORK_PATH ] || [ -d "$WORK_PATH" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create WORK_PATH($WORK_PATH) first !!!";}
-	#[ "$WORK_PATH" != "" ] && WORK_PATH_ARG=""
+	[ -z $WORK_DIR ] || [ -d "$WORK_DIR" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create WORK_DIR($WORK_DIR) first !!!";}
+	#[ "$WORK_DIR" != "" ] && WORK_DIR_ARG=""
 
-	[ -z $IOT_PATH ] || [ -d "$IOT_PATH" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create IOT_PATH($IOT_PATH) first !!!";}
+	[ -z $IOT_DIR ] || [ -d "$IOT_DIR" ] || { die_fn "${FUNCNAME[0]}:${LINENO}- Please create IOT_DIR($IOT_DIR) first !!!";}
 
 	[ "$DEBUG" != "" ] && DEBUG_ARG="-d $DEBUG"
 
@@ -153,7 +153,7 @@ arguments_fn()
 
 	[ "$CFG_FILE" != "" ] && CFG_FILE_ARG="-s $CFG_FILE"
 
-	DO_COMMAND_ARG="$IFACE_ARG $SAVE_PATH_ARG $CFG_PATH_ARG $WORK_PATH_ARG $DEBUG_ARG $LOG_ARG $LOGGER_ARG $DAEMON_ARG"
+	DO_COMMAND_ARG="$IFACE_ARG $SAVE_DIR_ARG $CFG_DIR_ARG $WORK_DIR_ARG $DEBUG_ARG $LOG_ARG $LOGGER_ARG $DAEMON_ARG"
 
 	return 0
 }

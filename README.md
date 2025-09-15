@@ -4,13 +4,13 @@
 > 主要訴求是 -
 >   應用簡單化！
 >   強化常用、有用的功能！
->
+
 > 大家都知道 Open-source 功能強大，貢獻非凡！提供前所未有的視野，讓開發者們省去大半的研究時間，開發更有效率嗎？也因此我們不是要深究 Open-source 是如此高深，而是要知悉如何應用。
 >
 > 經過多年的工作經驗，心想只是為了糊口飯吃，為什麼還要浪費在這些 Open-source 的文件裏打轉，於是一點一滴才整理出這些.
->
+
 > It is hard to read any usages of Open-source. They are lengthy. 
-> utilx9 is the utility api. 
+>utilx9 is the utility api. 
 > Here giving small api packages and easily to use. We can also get  the ideals from the demo programs
 
 # 2. Depend on
@@ -261,8 +261,6 @@ Aborted (core dumped)
 
 > use chainX_api.c.
 
-#### - client_123 - socket client.
-> use chainX_api.c.
 ```bash
 $ ./chainX_123
 [40677/40677] main:131 - dns: 127.0.0.53
@@ -297,6 +295,8 @@ $ ./chainX_123
 [40677/40677] main:202 - ssid:
 ```
 
+#### - client_123 - socket client.
+> use chainX_api.c.
 #### - clist_123 - link list example.
 > use clist_api.c , use contiki\core\lib\list.*.
 
@@ -467,6 +467,8 @@ $ ./json_123
 
 > use multicast_api.c.
 
+> 很多應用都有用到 multicast，SSDP (Simple Service Discovery Protocol)、mDNS / DNS-SD (Bonjour, Avahi, Zeroconf)、WS-Discovery 等。
+
 ```bash
 $ ./multicast_srv
 listen ... (239.255.255.250:3618)
@@ -492,9 +494,28 @@ sendto (buff: 4)
 #### - nlink_789 netlink example
 > use chainX_api.c (CHAINX_MODE_ID_NETLINK).
 
+> AF_NETLINK 的操作
+
+```bash
+$ ./nlink_789
+[9442/9443] chainX_netlink_bind:2094 - bind ... (AF_NETLINK)
+[9442/9443] chainX_thread_handler_netlink:3415 - netlink-bind ok !!! (netlink, dbg: 4, net_status: 1, sockfd: 3, net_security: 0)
+[9442/9443] netlink_recv:34 - Got !!! (ifname: lo, index: 1, status: UP)
+[9442/9443] netlink_recv:34 - Got !!! (ifname: enp0s3, index: 2, status: UP)
+[9442/9443] netlink_recv:34 - Got !!! (ifname: enp0s8, index: 3, status: UP)
+[9442/9443] netlink_recv:34 - Got !!! (ifname: enp0s9, index: 4, status: UP)
+[9442/9443] netlink_recv:34 - Got !!! (ifname: docker0, index: 5, status: DOWN)
+```
+
 #### - onvif_client_123 - onvif client example.
 
 > export PJ_HAS_MXML=yes, use onvif_api.c.
+
+> 請記得參考 [helper_ONVIF.md](https://github.com/lankahsu520/HelperX/blob/master/helper_ONVIF.md)，理論上很簡單，curl 可以幫助理解。
+
+```bash
+$ ./onvif_client_123
+```
 
 #### - ping_123 - ping example.
 
@@ -520,6 +541,8 @@ $ sudo ./ping_123 -i 1 -c 3 google.com
 #### - queuex_123 - a queue example.
 
 > use queuex_api.c.
+
+> 這是一個 queue + exec 的範例。建立一個 queue 對於軟體工程師不是很艱難的事情，但是`東西`放入後，要有續的處理就不是每位軟體工程師能處理的。
 
 ```bash
 $ ./queuex_123
@@ -559,10 +582,46 @@ $ ./select_123
 
 #### - statex_123 - state machine example.
 > use statex_api.c.
+
+> 一般人都會用 switch - case 實作 state machine，常會發生跳離目前的狀態後，忘了處理後續狀態，造成程式就此停擺。
+
+> 例如辨別是否連上線，有以下狀態
+>
+> A. wifi 找到 ssid
+>
+> B. wifi 連上 ssid
+>
+> C. 要到了 IP
+>
+> D. ping 8.8.8.8
+>
+> E. ping 8.8.8.8 ok
+>
+> 當已連線的狀態下突然失敗時，一般軟體工程師的處理有可能就直接刷新、有的會直接選某個狀態進行測試，不知這些動作或許可以解決問題，但不知原本的程序是否還在進行或某些 Magic Flag 忘了清除 ，反而會造成整個系統混亂。
+
+```bash
+$ ./statex_123
+[8842/8843] sys_init2_cb:19 - __________ Enter __________
+[8842/8843] sys_enter2_cb:31 - __________ Enter __________
+[8842/8843] sys_init0_cb:53 - __________ Enter __________
+[8842/8843] sys_leave2_cb:27 - __________ Enter __________
+[8842/8843] sys_enter0_cb:65 - __________ Enter __________
+[8842/8843] sys_init1_cb:36 - __________ Enter __________
+[8842/8842] sys_free0_cb:57 - __________ Enter __________
+[8842/8842] sys_free1_cb:40 - __________ Enter __________
+[8842/8842] sys_free2_cb:23 - __________ Enter __________
+```
+
 #### - ~~swlink_123 - swconfig example. (depend on linux kernel)~~
 #### - thread_123 - thread example.
 
 > use thread_api.c.
+
+> 啟動 2 * threads
+>
+> thread_A，執行 MAX_OF_A+1 次
+>
+> thread_B，執行 MAX_OF_B+1 次
 
 ```bash
 $ ./thread_123
@@ -599,6 +658,13 @@ $ ./thread_123
 
 #### - tty_123 - a tty example. 
 > use chainX_api.c.
+
+> tty 的連線程式
+
+```bash
+$ ./tty_123 -t /dev/ttyS0 -b 57600n8
+```
+
 #### - tunnel_123 - ssh tunnel example.
 
 > export PJ_HAS_LIBSSH=yes, use ssh_api.c.
@@ -607,17 +673,39 @@ $ ./thread_123
 
 > export PJ_HAS_LIBUBOX=yes,.
 
+> 操控 [libubox](https://github.com/openwrt/libubox)
+
 #### - ubus_123 - ubus example.
 
 > export PJ_HAS_UBUS=yes, use ubus_api.c.
+
+> 操控 ubus (OpenWrt micro bus architecture)
 
 #### - uci_123 - uci example.
 
 > export PJ_HAS_UCI=yes, use uci_api.c.
 
+> 操控 OpenWrt UCI (Unified Configuration Interface) 
+
 #### - usb_123 - usb example.
 
 > export PJ_HAS_LIBUSB=yes, use usbX_api.c.
+
+> 監聽 usb 插拔
+>
+> 以下為 ID 10C4:8468 Tiqiaa
+>
+> #define VENDOR_ID 0x10C4
+> #define PRODUCT_ID 0x8468
+
+```bash
+$ ./usb_123
+[433457/433459] usbX_thread_handler:677 - usbX listen ... (vendor_id: 0x000010C4, product_id: 0x00008468)
+^C[433457/433457] app_signal_handler:260 - (signum: 2)
+[433457/433457] app_stop:207 - Bye-Bye !!! (usb_123)
+[433457/433459] usbX_thread_handler:719 - Bye-Bye !!!
+[433457/433457] main:349 - Bye-Bye !!!
+```
 
 #### - util_123 - example.
 
@@ -659,86 +747,105 @@ $ ./uv_000
 
 ```bash
 $ ./uv_123
-[3334/3335] queue_work_handler:119 - (id: 1, count: 1)
-[3334/3335] queue_work_handler:119 - (id: 4, count: 1)
-[3334/3335] queue_work_handler:119 - (id: 5, count: 1)
-[3334/3335] queue_work_handler:119 - (id: 6, count: 1)
-[3334/3335] queue_work_handler:119 - (id: 7, count: 1)
-[3334/3336] queue_work_handler:119 - (id: 2, count: 1)
-[3334/3336] queue_work_handler:119 - (id: 10, count: 1)
-[3334/3337] queue_work_handler:119 - (id: 3, count: 1)
-[3334/3335] queue_work_handler:119 - (id: 8, count: 1)
-[3334/3338] queue_work_handler:119 - (id: 9, count: 1)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 1, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 4, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 5, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 6, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 7, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 2, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 10, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 3, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 8, status: 0)
-[3334/3334] queue_work_finisher:109 - Bye-Bye !!! (id: 9, status: 0)
-[3334/3334] timer_1_loop:49 - (count: 1)
-[3334/3334] timer_1_loop:55 - Bye-Bye !!!
-[3334/3334] timer_2_loop:63 - (count: 1)
-[3334/3334] timer_2_loop:68 - Bye-Bye !!!
-
-^C[3334/3334] app_signal_handler:409 - (signum: 2)
-[3334/3334] async_loop:300 - (percentage: 0)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 0)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 1)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 2)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 3)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 4)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 5)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 6)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 7)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 8)
-[3334/3334] app_stop_uv:259 - (SAFE_UV_CANCEL: 9)
-[3334/3334] uv_event_close_ex:249 - Bye-Bye !!! (uv_123)
-[3334/3334] main:510 - Bye-Bye !!!
+[428761/428762] thread_loop:87 - (count: 1)
+[428761/428764] queue_work_handler:123 - (id: 1, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 2, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 3, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 4, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 5, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 6, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 7, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 8, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 9, count: 1)
+[428761/428764] queue_work_handler:123 - (id: 10, count: 1)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 1, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 2, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 3, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 4, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 5, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 6, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 7, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 8, status: 0)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 9, status: 0)
+[428761/428761] async_loop:304 - (percentage: 1)
+[428761/428761] queue_work_finisher:113 - Bye-Bye !!! (id: 10, status: 0)
+[428761/428762] thread_loop:87 - (count: 2)
+[428761/428761] async_loop:304 - (percentage: 2)
+[428761/428762] thread_loop:87 - (count: 3)
+[428761/428761] async_loop:304 - (percentage: 3)
+[428761/428762] thread_loop:87 - (count: 4)
+[428761/428761] async_loop:304 - (percentage: 4)
+[428761/428762] thread_loop:87 - (count: 5)
+[428761/428761] async_loop:304 - (percentage: 5)
+[428761/428762] thread_loop:87 - (count: 6)
+[428761/428761] async_loop:304 - (percentage: 6)
+[428761/428762] thread_loop:87 - (count: 7)
+[428761/428761] async_loop:304 - (percentage: 7)
+[428761/428762] thread_loop:87 - (count: 8)
+[428761/428761] async_loop:304 - (percentage: 8)
+[428761/428762] thread_loop:87 - (count: 9)
+[428761/428761] async_loop:304 - (percentage: 9)
+[428761/428762] thread_loop:87 - (count: 10)
+[428761/428761] async_loop:304 - (percentage: 10)
+[428761/428761] timer_1_loop:53 - (count: 1)
+[428761/428762] thread_loop:101 - Bye-Bye !!! (uv_123)
+[428761/428761] timer_1_loop:59 - Bye-Bye !!!
+[428761/428761] timer_2_loop:67 - (count: 1)
+[428761/428761] timer_2_loop:72 - Bye-Bye !!!
+[428761/428761] main:514 - Bye-Bye !!!
 ```
 
 #### - uv_spawn_123 - uv spawn example.
 
 > export PJ_HAS_LIBUV=yes, use uv_api.c.
 
+> 程式啟動後，第2秒使用 uv_spawn_open_ex 執行 ping 8.8.8.8，並且接收 stdout；
+>
+> 程式每 3秒使用 uv_spawn_simple_detached 啟動 uv_123。( 因為 uv_123 是 UV_PROCESS_DETACHED，程式結束後記得 killall uv_123 )
+
 ```bash
 $ ./uv_spawn_123
-[5051/5051] timer_1sec_loop:94 - (count: 1)
-[5051/5051] timer_1sec_loop:94 - (count: 2)
-[5051/5051] uv_spawn_open_ex:163 - Launch a new thread !!! (spawn_req: 0x55d43bc5c0e0, pid: 5052)
-[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base: PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
-64 bytes from 8.8.8.8: icmp_seq=1 ttl=113 time=5.19 ms
+[4179/4179] timer_1sec_loop:94 - (count: 1)
+[4179/4179] timer_1sec_loop:94 - (count: 2)
+[4179/4179] uv_spawn_open_ex:163 - Launch a new thread !!! (spawn_req: 0x55c5898c72e0, pid: 4180)
+[4179/4179] uv_spawn_pipe_stdout_cb:119 - (buf->base: PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=3.58 ms
 )
-[5051/5051] timer_1sec_loop:94 - (count: 3)
-[5051/5051] uv_spawn_simple_detached:210 - uv_spawn error !!! (no such file or directory, file: /work/rootfs/sbin/iot_kvsWebrtc.sh)
-[5051/5051] uv_spawn_simple_detached:210 - uv_spawn error !!! (no such file or directory, file: /work/rootfs/sbin/baresip_123.sh)
-[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=2 ttl=113 time=4.86 ms
+[4179/4179] timer_1sec_loop:94 - (count: 3)
+[4179/4179] uv_spawn_simple_detached:214 - uv_spawn ... (child_args[0]: ./uv_123)
+[4179/4179] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=2 ttl=117 time=3.56 ms
 )
-[5051/5051] timer_1sec_loop:94 - (count: 4)
-[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=3 ttl=113 time=4.68 ms
+[4179/4179] timer_1sec_loop:94 - (count: 4)
+[4179/4179] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=3 ttl=117 time=3.97 ms
 )
-^C[5051/5051] app_signal_handler:239 - (signum: 2)
-[5051/5051] uv_spawn_pipe_stdout_cb:119 - (buf->base:
---- 8.8.8.8 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2002ms
-rtt min/avg/max/mdev = 4.679/4.910/5.187/0.209 ms
+[4179/4179] timer_1sec_loop:94 - (count: 5)
+[4179/4179] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=4 ttl=117 time=3.68 ms
 )
-[5051/5051] async_loop:176 - (async_count: 1)
-[5051/5051] app_stop_uv:142 - call SAFE_UV_TIMER_CLOSE ~~~
-[5051/5051] app_stop_uv:147 - call uv_spawn_close_ex ~~~
-[5051/5051] app_stop_uv:152 - call SAFE_UV_CLOSE ~~~
-[5051/5051] app_stop_uv:158 - call SAFE_UV_LOOP_CLOSE ~~~
-[5051/5051] app_stop_uv:165 - exit
-[5051/5051] uv_spawn_exit_cb:79 - Bye-Bye !!! (ping)
-[5051/5051] main:326 - Bye-Bye !!!
+[4179/4179] timer_1sec_loop:94 - (count: 6)
+[4179/4179] uv_spawn_simple_detached:214 - uv_spawn ... (child_args[0]: ./uv_123)
+[4179/4179] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=5 ttl=117 time=5.61 ms
+)
+[4179/4179] timer_1sec_loop:94 - (count: 7)
+[4179/4179] uv_spawn_pipe_stdout_cb:119 - (buf->base: 64 bytes from 8.8.8.8: icmp_seq=6 ttl=117 time=3.39 ms
+)
+^C[4179/4179] app_signal_handler:241 - (signum: 2)
+[4179/4179] async_loop:178 - (async_count: 1)
+[4179/4179] app_stop_uv:144 - call SAFE_UV_TIMER_CLOSE ~~~
+[4179/4179] app_stop_uv:149 - call uv_spawn_close_ex ~~~
+[4179/4179] app_stop_uv:154 - call SAFE_UV_CLOSE ~~~
+[4179/4179] app_stop_uv:160 - call SAFE_UV_LOOP_CLOSE ~~~
+[4179/4179] app_stop_uv:167 - exit
+[4179/4179] uv_spawn_exit_cb:79 - Bye-Bye !!! (ping)
+[4179/4179] main:328 - Bye-Bye !!!
 ```
 
 #### - wsdiscovery_123 - WS-Discovery example.
 
 > export PJ_HAS_MXML=yes, use wsdiscovery_api.c.
+
+```bash
+$ ./wsdiscovery_123
+```
 
 #### - ~~gbusx_123 - a  example.~~
 > use gbusx_api.c.

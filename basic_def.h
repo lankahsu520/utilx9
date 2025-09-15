@@ -215,6 +215,10 @@ typedef enum
 #define DBG_TXT_WRONG "Wrong !!!"
 #define DBG_TXT_RUN_LOOP "Run loop ..."
 
+#define DBG_TXT_FINISHED "Finished !!!"
+#define DBG_TXT_COMPLETED "Completed !!!"
+
+
 //** debug **
 #define COLORX_NONE "\033[0m"
 #define COLORX_RED "\033[0;32;31m"

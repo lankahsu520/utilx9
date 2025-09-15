@@ -19,7 +19,7 @@
 
 #define USE_ASYNC_CREATE
 #define USE_TIMER_CREATE
-//#define USE_THREAD_CREATE
+#define USE_THREAD_CREATE
 #define USE_QUEUE_CREATE
 //#define USE_IDLE_CREATE
 //#define USE_FS_CREATE
@@ -32,6 +32,10 @@
 // ** app **
 static int is_quit = 0;
 static uv_loop_t *uv_loop = NULL;
+
+#ifdef USE_ASYNC_CREATE
+uv_async_t uv_async_fd;
+#endif
 
 static int app_quit(void)
 {

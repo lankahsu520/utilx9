@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
 	//dbg_lvl_set(DBG_LVL_DEBUG);
 
 	DBG_ER_LN("(Version: %s, Debug LVL: %d)", version_show(), dbg_lvl_get());
-	DBG_ER_LN("(Toolchain: %s, Path: %s, Build Path: %s)", PJ_TOOLCHAIN_NAME, PJ_TOOLCHAIN_PATH, PJ_ROOT);
-	DBG_ER_LN("(Name: %s, Platform: %s, Save: %s, Work: %s)", PJ_NAME, PJ_PLATFORM, PJ_SAVE_PATH, PJ_WORK_PATH);
+	DBG_ER_LN("(Toolchain: %s, Path: %s, Build Path: %s)", PJ_TOOLCHAIN_NAME, PJ_TOOLCHAIN_DIR, PJ_ROOT_DIR);
+	DBG_ER_LN("(Name: %s, Platform: %s, Save: %s, Work: %s)", PJ_NAME, PJ_PLATFORM, PJ_SAVE_DIR, PJ_WORK_DIR);
 	DBG_ER_LN("(ICLOUD: %s:%s-%s, IFACE: %s)", PJ_ICLOUD_HOST, PJ_ICLOUD_PORT, PJ_ICLOUD_SECURITY, PJ_IFACE);
 	DBG_ER_LN("(MCTT: %s:%d)", PJ_MCTT_IP, (int)MCTT_PORT);
 

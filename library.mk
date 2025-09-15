@@ -172,5 +172,5 @@ endif
 
 LIBS_yes += -lz
 
-include $(PJ_MK_REVISION)
-include $(PJ_MK_MESON)
+-include $(PJ_MK_REVISION)
+-include $(PJ_MK_MESON)

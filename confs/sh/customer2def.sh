@@ -5,7 +5,6 @@
 [ -f ${CONFIG_CUSTOMER_DEF_H} ] && rm -f ${CONFIG_CUSTOMER_DEF_H}
 [ -f ${CONFIG_CUSTOMER} ] && rm -f ${CONFIG_CUSTOMER}
 [ -f ${CONFIG_CUSTOMER}.export ] && rm -f ${CONFIG_CUSTOMER}.export
-[ -f ${CONFIG_MESON} ] && rm -f ${CONFIG_MESON}
 
 echo "#ifndef __CUSTOMER_DEF_H__" >> ${CONFIG_CUSTOMER_DEF_H}
 echo "#define __CUSTOMER_DEF_H__" >> ${CONFIG_CUSTOMER_DEF_H}

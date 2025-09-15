@@ -19,7 +19,7 @@ message('>> (sysconfdir: @0@)'.format( get_option('sysconfdir') ))
 #** get_option (meson_options.txt) **
 #********************************************************************************
 # https://mesonbuild.com/Builtin-options.html
-PJ_ROOT = meson.source_root()#get_option('PJ_ROOT')
+PJ_ROOT_DIR = meson.source_root()#get_option('PJ_ROOT_DIR')
 PJ_REVISION = get_option('PJ_REVISION')
 PKG_CONFIG_SYSROOT_DIR = get_option('PKG_CONFIG_SYSROOT_DIR')
 
@@ -68,11 +68,11 @@ if ( SDK_INC_DIR != '' ) and ( run_command('[', '-f', SDK_INC_DIR + '/customer_d
 	CFLAGS_CUSTOMER += ['-include', SDK_INC_DIR + '/dbus_def.h' ]
 	CFLAGS_CUSTOMER += ['-include', SDK_INC_DIR + '/json_def.h' ]
 	CFLAGS_CUSTOMER += ['-include', SDK_INC_DIR + '/query_def.h' ]
-elif ( SDK_INC_DIR != '' ) and ( run_command('[', '-f', PJ_ROOT + '/include/customer_def.h', ']', check : false).returncode() == 0 )
-	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/customer_def.h' ]
-	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/dbus_def.h' ]
-	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/json_def.h' ]
-	CFLAGS_CUSTOMER += ['-include', PJ_ROOT + '/include/query_def.h' ]
+elif ( SDK_INC_DIR != '' ) and ( run_command('[', '-f', PJ_ROOT_DIR + '/include/customer_def.h', ']', check : false).returncode() == 0 )
+	CFLAGS_CUSTOMER += ['-include', PJ_ROOT_DIR + '/include/customer_def.h' ]
+	CFLAGS_CUSTOMER += ['-include', PJ_ROOT_DIR + '/include/dbus_def.h' ]
+	CFLAGS_CUSTOMER += ['-include', PJ_ROOT_DIR + '/include/json_def.h' ]
+	CFLAGS_CUSTOMER += ['-include', PJ_ROOT_DIR + '/include/query_def.h' ]
 elif ( PKG_CONFIG_SYSROOT_DIR != '' ) and ( run_command('[', '-f', PKG_CONFIG_SYSROOT_DIR + '/usr/include/customer_def.h', ']', check : false).returncode() == 0 )
 	CFLAGS_CUSTOMER += ['-include', PKG_CONFIG_SYSROOT_DIR + '/usr/include/customer_def.h' ]
 	CFLAGS_CUSTOMER += ['-include', PKG_CONFIG_SYSROOT_DIR + '/usr/include/dbus_def.h' ]

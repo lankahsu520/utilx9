@@ -109,14 +109,7 @@ void timer_1sec_loop(uv_timer_t *handle)
 			SpawnX_t *spawn_req = (SpawnX_t *)SAFE_CALLOC(1, sizeof(SpawnX_t));
 			spawn_req->loop = uv_loop;
 			spawn_req->child_req.data = spawn_req;
-			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs/sbin/iot_kvsWebrtc.sh", "restart", "1");
-		}
-
-		{
-			SpawnX_t *spawn_req = (SpawnX_t *)SAFE_CALLOC(1, sizeof(SpawnX_t));
-			spawn_req->loop = uv_loop;
-			spawn_req->child_req.data = spawn_req;
-			uv_spawn_simple_detached(spawn_req, 3, "/work/rootfs/sbin/baresip_123.sh", "restart", "1");
+			uv_spawn_simple_detached(spawn_req, 1, "./uv_123");
 		}
 
 		//uv_spawn_simple_test("192.168.50.1");

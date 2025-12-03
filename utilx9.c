@@ -82,6 +82,36 @@ int select_ex(int fd, fd_set *fdrset_ptr, fd_set *fdwset_ptr, fd_set *fdeset_ptr
 
 	return SAFE_SELECT(maxfd, fdrset_ptr, fdwset_ptr, fdeset_ptr, tv_ptr);
 }
+
+#ifndef vasprintf
+int vasprintf(char **strp, const char *fmt, va_list ap)
+{
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+	int len = vsnprintf(NULL, 0, fmt, ap_copy);
+	va_end(ap_copy);
+
+	if (len < 0)
+		return -1;
+
+	*strp = malloc(len + 1);
+	if (!*strp)
+		return -1;
+
+	return vsnprintf(*strp, len + 1, fmt, ap);
+}
+#endif
+
+#ifndef asprintf
+int asprintf(char **strp, const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	int size = vasprintf(strp, fmt, args);
+	va_end(args);
+	return size;
+}
+#endif
 #endif
 
 #ifdef UTIL_EX_BASIC

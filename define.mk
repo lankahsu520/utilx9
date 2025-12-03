@@ -2,8 +2,6 @@
 CONFIGURED = .configured
 
 .patched:
-	$(PJ_SH_SED) "s|#define LIBUTILX9_VERSION.*|#define LIBUTILX9_VERSION $(LIBUTILX9_VERSION)|g" utilx9.h
-
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 	$(PJ_SH_SED) "s|#undef UTIL_EX_SSL.*|#define UTIL_EX_SSL|g" utilx9.h
 else
@@ -108,16 +106,7 @@ endif
 	touch $@
 
 .configured: .patched
-	$(call generate_expiration, $(PJ_EXPIRATION_DATE))
-
-	[ -f $(CONFIG_CUSTOMER) ] || ($(PJ_SH_CUSTOMER2DEF); touch .customer; )
-	[ -f $(SDK_CONFIG_CUSTOMER_DEF_H) ] || ($(PJ_SH_MKDIR) $(SDK_INC_DIR); $(PJ_SH_CP) include/* $(SDK_INC_DIR); )
-
 	touch $@
-
-.PHONY: expired
-expired:
-	$(call generate_expiration, $(shell date -d "+4 years" "+%s"))
 
 .PHONY: target_install
 target_install:

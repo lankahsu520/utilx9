@@ -98,13 +98,6 @@
 
 # 4. Build
 ```bash
-$ . confs/simple_x86.conf
-#$ . confs/sh/customer2def.sh
-# to create
-# include/customer_def.h
-# include/config_customer
-# include/config_customer.export
-# include/meson_options.txt
 $ make
 $ make install
 # will be installed ${SDK_ROOT_DIR} - ./install/github_
@@ -148,8 +141,8 @@ $ sudo apt-get --yes install libjson-c-dev
 #### A. libmxml
 
 ```bash
-$ vi conf/simple_x86.conf
-export PJ_HAS_MXML=yes
+$ vi config_customer
+PJ_HAS_MXML=yes
 
 $ vi utilx9.h
 #define UTIL_EX_MXML
@@ -160,8 +153,8 @@ $ vi utilx9.h
 #### B. libyuarel
 
 ```bash
-$ vi conf/simple_x86.conf
-export PJ_HAS_LIBYUAREL=yes
+$ vi config_customer
+PJ_HAS_LIBYUAREL=yes
 
 $ vi utilx9.h
 #define UTIL_EX_YUAREL
@@ -170,8 +163,8 @@ $ vi utilx9.h
 #### C. libbacktrace
 
 ```bash
-$ vi conf/simple_x86.conf
-export PJ_HAS_LIBBACKTRACE=yes
+$ vi config_customer
+PJ_HAS_LIBBACKTRACE=yes
 
 $ vi utilx9.h
 #define UTIL_EX_BACKTRACE
@@ -851,9 +844,23 @@ $ ./wsdiscovery_123
 > use gbusx_api.c.
 
 
-# 6. License
-> utilx9 is under the New BSD License (BSD-3-Clause).
-
-
-# 7. Documentation
+# 6. Documentation
 > Run an example and read it.
+
+# Appendix
+
+# I. Study
+
+# II. Debug
+
+# III. Glossary
+
+# IV. Tool Usage
+
+# Author
+
+> Created and designed by [Lanka Hsu](lankahsu@gmail.com).
+
+# License
+
+> [utilx9](https://github.com/lankahsu520/utilx9) is under the New BSD License (BSD-3-Clause).

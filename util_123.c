@@ -14,6 +14,34 @@
  ***************************************************************************/
 #include "utilx9.h"
 
+#ifndef PJ_TOOLCHAIN_NAME
+#define PJ_TOOLCHAIN_NAME ""
+#endif
+
+#ifndef PJ_TOOLCHAIN_DIR
+#define PJ_TOOLCHAIN_DIR ""
+#endif
+
+#ifndef PJ_ROOT_DIR
+#define PJ_ROOT_DIR ""
+#endif
+
+#ifndef PJ_NAME
+#define PJ_NAME "utilx9"
+#endif
+
+#ifndef PJ_PLATFORM
+#define PJ_PLATFORM ""
+#endif
+
+#ifndef PJ_SAVE_DIR
+#define PJ_SAVE_DIR ""
+#endif
+
+#ifndef PJ_WORK_DIR
+#define PJ_WORK_DIR ""
+#endif
+
 int main(int argc, char* argv[])
 {
 	DBG_TR_LN("enter");
@@ -23,8 +51,12 @@ int main(int argc, char* argv[])
 	DBG_ER_LN("(Version: %s, Debug LVL: %d)", version_show(), dbg_lvl_get());
 	DBG_ER_LN("(Toolchain: %s, Path: %s, Build Path: %s)", PJ_TOOLCHAIN_NAME, PJ_TOOLCHAIN_DIR, PJ_ROOT_DIR);
 	DBG_ER_LN("(Name: %s, Platform: %s, Save: %s, Work: %s)", PJ_NAME, PJ_PLATFORM, PJ_SAVE_DIR, PJ_WORK_DIR);
+#ifdef PJ_ICLOUD_HOST
 	DBG_ER_LN("(ICLOUD: %s:%s-%s, IFACE: %s)", PJ_ICLOUD_HOST, PJ_ICLOUD_PORT, PJ_ICLOUD_SECURITY, PJ_IFACE);
+#endif
+#ifdef PJ_MCTT_IP
 	DBG_ER_LN("(MCTT: %s:%d)", PJ_MCTT_IP, (int)MCTT_PORT);
+#endif
 
 	int num = 0;
 	BIT_SET(num,0);

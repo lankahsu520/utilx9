@@ -25,6 +25,22 @@ extern "C" {
 
 #define LIBUTILX9_VERSION 0x03001000
 
+#ifndef PJ_INSTALL_IOT
+#define PJ_INSTALL_IOT "/work/rootfs/IoT"
+#endif
+
+#ifndef PJ_REVISION
+#define PJ_REVISION "v3.1.0"
+#endif
+
+#ifndef PJ_BUILDNO
+#define PJ_BUILDNO __DATE__ " " __TIME__
+#endif
+
+#ifndef PJ_BUILDER
+#define PJ_BUILDER getenv("USER")
+#endif
+
 
 //******************************************************************************
 //** include **
@@ -259,6 +275,12 @@ void* pcheck(void* a);
 #define SAFE_SNPRINTF(X, Y, FMT, args...) \
 	({ int __ret =0; do { if ((pcheck(X)) && (Y>0)) __ret = snprintf(X, Y, FMT, ## args); else DBG_ER_LN("%s is NULL or Y (%zd <= 0) !!!", #X, (size_t)Y); } while(0); __ret; })
 
+#ifndef vasprintf
+int vasprintf(char **strp, const char *fmt, va_list ap);
+#endif
+#ifndef asprintf
+int asprintf(char **strp, const char *fmt, ...);
+#endif
 #define SAFE_ASPRINTF(X, FMT, args...) \
 	({ int __ret =0; \
 		do { \

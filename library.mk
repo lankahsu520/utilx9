@@ -170,7 +170,7 @@ ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 LIBS_yes += -lssl -lcrypto
 endif
 
-LIBS_yes += -lz
+LIBS_yes += -pthread -lz
 
 -include $(PJ_MK_REVISION)
 -include $(PJ_MK_MESON)

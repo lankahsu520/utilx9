@@ -1,12 +1,9 @@
 #!/bin/bash
 
 RUN_SH=`basename $0`
-HINT="$0 {build|clean|distclean|rebuild} [x86|i486|aarch64]"
+HINT="$0 {build|clean|distclean|rebuild}"
 
 ACTION=$1
-ARCH=$2
-[ -z "$ARCH" ] && export ARCH="x86"
-export PJ_TARGET_CONF="_$ARCH"
 
 #** Toolchain **
 
@@ -58,7 +55,6 @@ do_commandX_fn()
 
 do_env_fn()
 {
-	. confs/simple${PJ_TARGET_CONF}.conf >/dev/null 2>&1
 	return 0
 }
 

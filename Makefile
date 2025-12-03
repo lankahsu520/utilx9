@@ -1,5 +1,6 @@
 PWD=$(shell pwd)
--include $(SDK_CONFIG_CONFIG)
+include config_customer
+-include $(CONFIG_CUSTOMER)
 
 #** include *.mk **
 -include define.mk
@@ -20,6 +21,14 @@ CXX_SET=.cpp
 CC_SET=$(CC)
 ifneq ("$(CXX_SET)", "")
 CC_SET=$(CXX)
+endif
+ifeq ("$(CFLAGS)", "")
+CFLAGS=-g -Wall -O2 -fPIC -Wformat-truncation=0
+CFLAGS += -include ./include/dbus_def.h
+CFLAGS += -include ./include/json_def.h
+CFLAGS += -include ./include/query_def.h
+CFLAGS += -include ./include/ubus_def.h
+CFLAGS += -include ./include/zwave_def.h
 endif
 CFLAGS += $(CFLAGS_OTHERS) $(CFLAGS_CUSTOMER)
 

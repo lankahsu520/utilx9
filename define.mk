@@ -2,6 +2,8 @@
 CONFIGURED = .configured
 
 .patched:
+	$(PJ_SH_SED) "s|#define LIBUTILX9_VERSION.*|#define LIBUTILX9_VERSION $(LIBUTILX9_VERSION)|g" utilx9.h
+
 ifeq ("$(PJ_HAS_OPENSSL)", "yes")
 	$(PJ_SH_SED) "s|#undef UTIL_EX_SSL.*|#define UTIL_EX_SSL|g" utilx9.h
 else

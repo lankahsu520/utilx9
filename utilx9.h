@@ -23,7 +23,7 @@ extern "C" {
 #define _GNU_SOURCE
 #endif
 
-#define LIBUTILX9_VERSION 0x03001000
+#define LIBUTILX9_VERSION 0x03002000
 
 #ifndef PJ_INSTALL_IOT
 #define PJ_INSTALL_IOT "/work/rootfs/IoT"

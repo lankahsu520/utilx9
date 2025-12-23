@@ -95,8 +95,12 @@
 
 > 因為這是多年工作下的成果，一定還有發展空間.如果有 bug 請多多包函.
 
-
 # 4. Build
+
+> utilx9 本身就可以自行編譯
+
+> 已經整合進 [xbox9](https://github.com/lankahsu520/xbox9)，相關步驟請參考 [xbox9](https://github.com/lankahsu520/xbox9)。
+
 ```bash
 $ make
 $ make install

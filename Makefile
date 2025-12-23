@@ -84,7 +84,7 @@ LIBS_yes = $(LIBXXXS_yes)
 ifneq ("$(wildcard ./library.mk)","")
 -include ./library.mk
 else
--include $(PJ_MK_USER_LIB)
+-include $(PJ_MK_LIBRARY_INIT)
 endif
 
 LIBS += $(LIBS_yes)
